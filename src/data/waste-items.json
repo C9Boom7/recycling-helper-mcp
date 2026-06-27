@@ -2,573 +2,3242 @@
   {
     "id": "pizza_box_oily",
     "name": "기름 묻은 피자박스",
-    "aliases": ["피자박스", "피자 박스", "오염된 종이상자", "배달 박스", "치킨박스", "치킨 박스"],
+    "aliases": [
+      "피자박스",
+      "피자 박스",
+      "오염된 종이상자",
+      "배달 박스",
+      "치킨박스",
+      "치킨 박스"
+    ],
     "category": "paper",
     "disposalType": "general_or_partial_recycle",
     "summary": "기름이나 음식물이 묻은 부분은 재활용하지 않고 일반쓰레기로 버립니다.",
-    "steps": ["깨끗한 부분과 오염된 부분을 분리합니다.", "깨끗한 종이 부분은 종이류로 배출합니다.", "기름, 치즈, 소스가 묻은 부분은 일반쓰레기로 배출합니다."],
-    "cautions": ["오염된 종이는 재활용 품질을 떨어뜨립니다."],
+    "steps": [
+      "깨끗한 부분과 오염된 부분을 분리합니다.",
+      "깨끗한 종이 부분은 종이류로 배출합니다.",
+      "기름, 치즈, 소스가 묻은 부분은 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "오염된 종이는 재활용 품질을 떨어뜨립니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated",
+      "oily",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류 비해당품목: 택배전표, 영수증 감열지, 사진용지, 사용한 화장지 등은 종량제봉투 등으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "오염된 종이는 재활용 품질을 떨어뜨리므로 깨끗한 부분만 종이류 배출로 안내합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "delivery_box",
     "name": "택배상자",
-    "aliases": ["택배 박스", "종이상자", "골판지", "상자", "박스"],
+    "aliases": [
+      "택배 박스",
+      "종이상자",
+      "골판지",
+      "상자",
+      "박스"
+    ],
     "category": "paper",
     "disposalType": "recycle",
     "summary": "테이프, 송장, 철핀 등 이물질을 제거한 뒤 접어서 종이류로 배출합니다.",
-    "steps": ["운송장과 테이프를 제거합니다.", "비닐 코팅이나 완충재를 분리합니다.", "상자를 접어서 종이류로 배출합니다."],
-    "cautions": ["물에 젖었거나 음식물이 묻은 부분은 재활용이 어렵습니다."],
+    "steps": [
+      "운송장과 테이프를 제거합니다.",
+      "비닐 코팅이나 완충재를 분리합니다.",
+      "상자를 접어서 종이류로 배출합니다."
+    ],
+    "cautions": [
+      "물에 젖었거나 음식물이 묻은 부분은 재활용이 어렵습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류·종이팩 배출요령: 내용물을 비우고 이물질을 제거한 뒤 종이류 또는 전용수거함으로 분리배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류는 테이프, 철핀, 운송장 등 이물질 제거 후 접어 배출합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "shipping_label",
     "name": "송장스티커",
-    "aliases": ["택배 송장", "운송장", "스티커 라벨", "주소 스티커"],
+    "aliases": [
+      "택배 송장",
+      "운송장",
+      "스티커 라벨",
+      "주소 스티커"
+    ],
     "category": "paper_mixed",
     "disposalType": "general",
     "summary": "접착제가 붙은 송장스티커는 종이류와 분리해 일반쓰레기로 버립니다.",
-    "steps": ["택배상자에서 송장스티커를 떼어냅니다.", "개인정보가 보이지 않게 찢습니다.", "일반쓰레기로 배출합니다."],
-    "cautions": ["송장을 붙인 채 종이상자를 배출하지 않는 편이 좋습니다."],
+    "steps": [
+      "택배상자에서 송장스티커를 떼어냅니다.",
+      "개인정보가 보이지 않게 찢습니다.",
+      "일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "송장을 붙인 채 종이상자를 배출하지 않는 편이 좋습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "bulky",
+      "empty_required",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류 비해당품목: 택배전표, 영수증 감열지, 사진용지, 사용한 화장지 등은 종량제봉투 등으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "receipt",
     "name": "영수증",
-    "aliases": ["감열지", "카드 영수증", "마트 영수증"],
+    "aliases": [
+      "감열지",
+      "카드 영수증",
+      "마트 영수증"
+    ],
     "category": "paper_mixed",
     "disposalType": "general",
     "summary": "대부분의 영수증은 감열지라 종이류로 재활용하지 않고 일반쓰레기로 버립니다.",
-    "steps": ["개인정보가 있으면 찢습니다.", "종이류가 아니라 일반쓰레기로 배출합니다."],
-    "cautions": ["종이처럼 보여도 감열 코팅이 되어 있으면 재활용 품질을 해칠 수 있습니다."],
+    "steps": [
+      "개인정보가 있으면 찢습니다.",
+      "종이류가 아니라 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "종이처럼 보여도 감열 코팅이 되어 있으면 재활용 품질을 해칠 수 있습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": false,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 확인 권장"
+    ],
+    "conditions": [],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류 비해당품목: 택배전표, 영수증 감열지, 사진용지, 사용한 화장지 등은 종량제봉투 등으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "milk_carton",
     "name": "우유팩",
-    "aliases": ["종이팩", "팩우유", "주스팩", "음료팩"],
+    "aliases": [
+      "종이팩",
+      "팩우유",
+      "주스팩",
+      "음료팩"
+    ],
     "category": "paper_pack",
     "disposalType": "recycle",
     "summary": "내용물을 비우고 헹군 뒤 펼쳐 말려 종이팩으로 별도 배출합니다.",
-    "steps": ["내용물을 비웁니다.", "물로 헹굽니다.", "팩을 펼쳐 말립니다.", "종이팩 전용 수거함이나 안내된 장소에 배출합니다."],
-    "cautions": ["일반 종이류와 따로 모으는 지역이 많습니다."],
+    "steps": [
+      "내용물을 비웁니다.",
+      "물로 헹굽니다.",
+      "팩을 펼쳐 말립니다.",
+      "종이팩 전용 수거함이나 안내된 장소에 배출합니다."
+    ],
+    "cautions": [
+      "일반 종이류와 따로 모으는 지역이 많습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["환경부 분리수거 요령", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "empty_required"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류·종이팩 배출요령: 내용물을 비우고 이물질을 제거한 뒤 종이류 또는 전용수거함으로 분리배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "종이팩 전용수거함 또는 교환사업 운영 여부는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "aseptic_pack",
     "name": "멸균팩",
-    "aliases": ["두유팩", "멸균 우유팩", "테트라팩"],
+    "aliases": [
+      "두유팩",
+      "멸균 우유팩",
+      "테트라팩"
+    ],
     "category": "paper_pack",
     "disposalType": "recycle_or_region_specific",
     "summary": "내용물을 비우고 헹군 뒤 지역 안내에 따라 종이팩 또는 멸균팩으로 별도 배출합니다.",
-    "steps": ["내용물을 비우고 헹굽니다.", "팩을 펼쳐 말립니다.", "지역별 수거 기준에 맞춰 별도 배출합니다."],
-    "cautions": ["내부 알루미늄 코팅 때문에 일반 종이류와 함께 배출하면 안 되는 경우가 많습니다."],
+    "steps": [
+      "내용물을 비우고 헹굽니다.",
+      "팩을 펼쳐 말립니다.",
+      "지역별 수거 기준에 맞춰 별도 배출합니다."
+    ],
+    "cautions": [
+      "내부 알루미늄 코팅 때문에 일반 종이류와 함께 배출하면 안 되는 경우가 많습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "empty_required"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류·종이팩 배출요령: 내용물을 비우고 이물질을 제거한 뒤 종이류 또는 전용수거함으로 분리배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "멸균팩과 일반 종이팩 분리 수거 운영 여부는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "pet_bottle",
     "name": "페트병",
-    "aliases": ["생수병", "투명 페트병", "PET병", "음료수병"],
+    "aliases": [
+      "생수병",
+      "투명 페트병",
+      "PET병",
+      "음료수병"
+    ],
     "category": "plastic",
     "disposalType": "recycle",
     "summary": "내용물을 비우고 헹군 뒤 라벨을 제거하고 압착해 페트병으로 배출합니다.",
-    "steps": ["내용물을 비웁니다.", "가볍게 헹굽니다.", "라벨을 제거합니다.", "압착 후 뚜껑을 닫아 배출합니다."],
-    "cautions": ["무색 투명 페트병은 별도 배출 대상인 지역이 많습니다."],
+    "steps": [
+      "내용물을 비웁니다.",
+      "가볍게 헹굽니다.",
+      "라벨을 제거합니다.",
+      "압착 후 뚜껑을 닫아 배출합니다."
+    ],
+    "cautions": [
+      "무색 투명 페트병은 별도 배출 대상인 지역이 많습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["환경부 분리수거 요령", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "empty_required",
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "무색 페트병 배출요령: 내용물을 비우고 라벨을 제거한 뒤 압착해 별도 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "무색 투명 페트병 별도 배출 요일과 장소는 지역/주택유형별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "shampoo_bottle",
     "name": "샴푸통",
-    "aliases": ["세제통", "바디워시통", "린스통", "플라스틱 용기"],
+    "aliases": [
+      "세제통",
+      "바디워시통",
+      "린스통",
+      "플라스틱 용기"
+    ],
     "category": "plastic",
     "disposalType": "recycle",
     "summary": "내용물을 비우고 헹군 뒤 플라스틱류로 배출합니다.",
-    "steps": ["남은 내용물을 최대한 비웁니다.", "물로 헹굽니다.", "펌프와 스프링 등 다른 재질 부품은 가능한 분리합니다.", "플라스틱류로 배출합니다."],
-    "cautions": ["내용물이 많이 남아 있으면 재활용이 어렵습니다."],
+    "steps": [
+      "남은 내용물을 최대한 비웁니다.",
+      "물로 헹굽니다.",
+      "펌프와 스프링 등 다른 재질 부품은 가능한 분리합니다.",
+      "플라스틱류로 배출합니다."
+    ],
+    "cautions": [
+      "내용물이 많이 남아 있으면 재활용이 어렵습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "empty_required",
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "합성수지류 배출요령: 내용물을 비우고 이물질을 제거한 뒤 부착상표와 다른 재질을 분리해 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "플라스틱 용기는 내용물을 비우고 헹군 뒤 다른 재질 부품을 분리합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "toothbrush",
     "name": "칫솔",
-    "aliases": ["양치 칫솔", "전동칫솔모", "칫솔모"],
+    "aliases": [
+      "양치 칫솔",
+      "전동칫솔모",
+      "칫솔모"
+    ],
     "category": "mixed",
     "disposalType": "general",
     "summary": "여러 재질이 섞여 있어 일반쓰레기로 배출합니다.",
-    "steps": ["물기를 털어냅니다.", "일반쓰레기로 배출합니다."],
-    "cautions": ["플라스틱처럼 보여도 칫솔모와 손잡이 재질이 섞여 재활용이 어렵습니다."],
-    "confidence": "medium",
+    "steps": [
+      "물기를 털어냅니다.",
+      "일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "플라스틱처럼 보여도 칫솔모와 손잡이 재질이 섞여 재활용이 어렵습니다."
+    ],
+    "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 칫솔"
+    ],
+    "conditions": [
+      "mixed_material",
+      "small_item"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 칫솔",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=334",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "칫솔은 일반폐기물/일반종량제폐기물로 분류되며, 종량제봉투 배출 대상입니다. 플라스틱, 솔, 고무 등이 섞인 복합재질이라 재활용이 어렵습니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전 상세 원문으로 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "ballpoint_pen",
     "name": "볼펜",
-    "aliases": ["펜", "샤프", "사인펜", "형광펜"],
+    "aliases": [
+      "펜",
+      "샤프",
+      "사인펜",
+      "형광펜"
+    ],
     "category": "mixed",
     "disposalType": "general",
     "summary": "작고 여러 재질이 섞여 있어 일반쓰레기로 배출합니다.",
-    "steps": ["잉크가 새지 않게 뚜껑을 닫습니다.", "일반쓰레기로 배출합니다."],
-    "cautions": ["대량 폐기라면 지역 수거 프로그램이 있는지 확인할 수 있습니다."],
-    "confidence": "medium",
+    "steps": [
+      "잉크가 새지 않게 뚜껑을 닫습니다.",
+      "일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "대량 폐기라면 지역 수거 프로그램이 있는지 확인할 수 있습니다."
+    ],
+    "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 볼펜"
+    ],
+    "conditions": [
+      "hazardous",
+      "mixed_material",
+      "small_item"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 볼펜",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=394",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "볼펜은 일반폐기물/일반종량제폐기물로 분류되며, 종량제봉투 배출 대상입니다. 플라스틱, 금속, 잉크 등이 섞인 복합재질이라 재활용이 어렵습니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전 상세 원문으로 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "snack_bag",
     "name": "과자봉지",
-    "aliases": ["라면봉지", "비닐봉지", "비닐 포장재", "봉지"],
+    "aliases": [
+      "라면봉지",
+      "비닐봉지",
+      "비닐 포장재",
+      "봉지"
+    ],
     "category": "vinyl",
     "disposalType": "recycle_or_general",
     "summary": "깨끗하게 비우고 이물질이 없으면 비닐류로, 오염이 심하면 일반쓰레기로 배출합니다.",
-    "steps": ["내용물을 완전히 비웁니다.", "음식물이나 기름이 묻었다면 닦거나 헹궈 말립니다.", "깨끗하면 비닐류로 배출합니다.", "오염 제거가 어렵다면 일반쓰레기로 배출합니다."],
-    "cautions": ["오염된 비닐은 재활용이 어렵습니다."],
+    "steps": [
+      "내용물을 완전히 비웁니다.",
+      "음식물이나 기름이 묻었다면 닦거나 헹궈 말립니다.",
+      "깨끗하면 비닐류로 배출합니다.",
+      "오염 제거가 어렵다면 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "오염된 비닐은 재활용이 어렵습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "contaminated",
+      "empty_required",
+      "food_contaminated",
+      "oily",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "필름·시트형 포장재 배출요령: 내용물을 비우고 이물질을 제거한 뒤 비닐류로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "이물질이 묻은 비닐류는 세척 또는 일반쓰레기 판단이 필요합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "bubble_wrap",
     "name": "뽁뽁이",
-    "aliases": ["에어캡", "완충 비닐", "택배 완충재"],
+    "aliases": [
+      "에어캡",
+      "완충 비닐",
+      "택배 완충재"
+    ],
     "category": "vinyl",
     "disposalType": "recycle",
     "summary": "깨끗한 비닐 완충재는 비닐류로 배출합니다.",
-    "steps": ["테이프나 종이 라벨을 제거합니다.", "깨끗한 상태로 비닐류에 배출합니다."],
-    "cautions": ["오염되었거나 여러 재질이 붙어 있으면 일반쓰레기로 배출합니다."],
+    "steps": [
+      "테이프나 종이 라벨을 제거합니다.",
+      "깨끗한 상태로 비닐류에 배출합니다."
+    ],
+    "cautions": [
+      "오염되었거나 여러 재질이 붙어 있으면 일반쓰레기로 배출합니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "empty_required",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "필름·시트형 포장재 배출요령: 내용물을 비우고 이물질을 제거한 뒤 비닐류로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "styrofoam",
     "name": "스티로폼",
-    "aliases": ["스티로폼 박스", "과일 박스", "생선 박스", "흰색 완충재"],
+    "aliases": [
+      "스티로폼 박스",
+      "과일 박스",
+      "생선 박스",
+      "흰색 완충재"
+    ],
     "category": "styrofoam",
     "disposalType": "recycle",
     "summary": "이물질과 테이프를 제거하고 깨끗한 흰색 스티로폼은 스티로폼류로 배출합니다.",
-    "steps": ["테이프, 운송장, 비닐을 제거합니다.", "음식물이나 흙 등 이물질을 제거합니다.", "깨끗한 상태로 스티로폼류에 배출합니다."],
-    "cautions": ["색이 있거나 오염이 심한 스티로폼은 지역 기준을 확인하세요."],
+    "steps": [
+      "테이프, 운송장, 비닐을 제거합니다.",
+      "음식물이나 흙 등 이물질을 제거합니다.",
+      "깨끗한 상태로 스티로폼류에 배출합니다."
+    ],
+    "cautions": [
+      "색이 있거나 오염이 심한 스티로폼은 지역 기준을 확인하세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["환경부 분리수거 요령", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "발포합성수지 배출요령: 내용물을 비우고 부착상표와 테이프 등 이물질을 제거해 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "스티로폼 수거 가능 색상·오염 기준은 지역별 안내를 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "cup_noodle_container",
     "name": "컵라면 용기",
-    "aliases": ["컵라면 컵", "라면 용기", "오염된 스티로폼", "라면컵"],
+    "aliases": [
+      "컵라면 컵",
+      "라면 용기",
+      "오염된 스티로폼",
+      "라면컵"
+    ],
     "category": "styrofoam_or_paper",
     "disposalType": "general_or_recycle_if_clean",
     "summary": "국물 자국과 기름 오염이 지워지지 않으면 일반쓰레기로 배출합니다.",
-    "steps": ["내용물을 비웁니다.", "헹궈서 오염이 없어지는지 확인합니다.", "깨끗하면 재질에 맞게 배출합니다.", "오염이 남으면 일반쓰레기로 배출합니다."],
-    "cautions": ["오염된 스티로폼과 종이 용기는 재활용이 어렵습니다."],
+    "steps": [
+      "내용물을 비웁니다.",
+      "헹궈서 오염이 없어지는지 확인합니다.",
+      "깨끗하면 재질에 맞게 배출합니다.",
+      "오염이 남으면 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "오염된 스티로폼과 종이 용기는 재활용이 어렵습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "contaminated",
+      "empty_required",
+      "food_contaminated",
+      "oily"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "발포합성수지 배출요령: 내용물을 비우고 부착상표와 테이프 등 이물질을 제거해 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "국물·기름 오염이 남으면 재활용 선별이 어려워 일반쓰레기 판단이 필요합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "glass_bottle",
     "name": "유리병",
-    "aliases": ["소주병", "맥주병", "음료 유리병", "잼병"],
+    "aliases": [
+      "소주병",
+      "맥주병",
+      "음료 유리병",
+      "잼병"
+    ],
     "category": "glass",
     "disposalType": "recycle",
     "summary": "내용물을 비우고 병뚜껑을 분리한 뒤 유리병류로 배출합니다.",
-    "steps": ["내용물을 비웁니다.", "가볍게 헹굽니다.", "병뚜껑 등 다른 재질을 분리합니다.", "유리병류로 배출합니다."],
-    "cautions": ["담배꽁초 등 이물질을 넣지 마세요."],
+    "steps": [
+      "내용물을 비웁니다.",
+      "가볍게 헹굽니다.",
+      "병뚜껑 등 다른 재질을 분리합니다.",
+      "유리병류로 배출합니다."
+    ],
+    "cautions": [
+      "담배꽁초 등 이물질을 넣지 마세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "empty_required",
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "유리병류 배출요령: 내용물을 비우고 병뚜껑 등 다른 재질을 제거하며 담배꽁초 등 이물질을 넣지 않습니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "병뚜껑과 이물질을 제거해 유리병류로 배출합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "broken_glass",
     "name": "깨진 유리컵",
-    "aliases": ["깨진 유리", "유리컵", "깨진 컵", "깨진 병", "유리 조각"],
+    "aliases": [
+      "깨진 유리",
+      "유리컵",
+      "깨진 컵",
+      "깨진 병",
+      "유리 조각"
+    ],
     "category": "glass_mixed",
-    "disposalType": "general_safe_wrap",
-    "summary": "깨진 유리는 재활용품으로 배출하지 말고 다치지 않게 감싸 일반쓰레기로 배출합니다.",
-    "steps": ["신문지나 두꺼운 종이로 여러 겹 감쌉니다.", "겉면에 깨진 유리라고 표시합니다.", "종량제봉투에 넣어 일반쓰레기로 배출합니다."],
-    "cautions": ["수거 작업자가 다치지 않도록 날카로운 부분을 반드시 감싸세요."],
+    "disposalType": "nonburnable_or_general_safe_wrap",
+    "summary": "깨진 유리는 재활용품이 아니며, 소량은 충분히 감싸 배출하고 지역별 불연성 봉투 기준을 확인합니다.",
+    "steps": [
+      "신문지나 두꺼운 종이로 여러 겹 감싸 날카로운 부분이 밖으로 나오지 않게 합니다.",
+      "겉면에 깨진 유리라고 표시합니다.",
+      "가정에서 발생한 소량은 감싼 뒤 종량제봉투로 배출할 수 있습니다.",
+      "양이 많거나 지역에서 별도 지정한 경우 불연성 종량제 마대 또는 지역 지정 봉투를 사용합니다."
+    ],
+    "cautions": [
+      "유리병 수거함이나 재활용품으로 배출하지 않습니다.",
+      "수거 작업자가 다치지 않도록 날카로운 부분을 반드시 감싸세요.",
+      "불연성 봉투 명칭과 판매처는 구·군 기준이 다를 수 있습니다."
+    ],
     "confidence": "high",
-    "needsRegionCheck": false,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 깨진 유리",
+      "강남구청 쓰레기 배출 안내"
+    ],
+    "conditions": [
+      "damaged",
+      "safe_wrap_required",
+      "sharp"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "깨진 유리는 지역에 따라 불연성 종량제 마대, PP봉투, 소량 종량제봉투 기준이 달라질 수 있습니다.",
+      "checkItems": [
+        "불연성 봉투 또는 PP봉투 사용 여부",
+        "소량 종량제봉투 허용 여부",
+        "봉투 판매처"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 깨진 유리",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=498",
+        "sourceType": "safety_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "깨진 유리는 일반폐기물/불연성종량제폐기물로 분류되며, 불연성 종량제 마대 배출 대상입니다. 가정에서 발생한 소량은 신문지와 테이프 등으로 감싼 후 종량제봉투 배출도 가능합니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      },
+      {
+        "title": "강남구청 쓰레기 배출 안내",
+        "url": "https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "강남구는 깨진유리 등은 PP봉투에, 동물뼈·조개껍데기·달걀껍데기 등은 음식물쓰레기가 아닌 일반 종량제봉투에 배출하도록 안내합니다.",
+        "note": "강남구 기준 지역 보강 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전과 강남구청 원문으로 확인했습니다.",
+        "불연성 봉투 명칭과 판매처는 지역별 안내가 필요합니다."
+      ]
+    }
   },
   {
     "id": "ceramic_bowl",
     "name": "도자기 그릇",
-    "aliases": ["사기그릇", "머그컵", "도자기컵", "접시", "사기 접시"],
+    "aliases": [
+      "사기그릇",
+      "머그컵",
+      "도자기컵",
+      "접시",
+      "사기 접시"
+    ],
     "category": "ceramic",
     "disposalType": "general_or_bulky",
     "summary": "도자기와 사기그릇은 유리병류가 아니므로 일반쓰레기로 배출합니다.",
-    "steps": ["깨졌다면 종이로 감싸 다치지 않게 합니다.", "소량은 일반쓰레기로 배출합니다.", "양이 많거나 큰 품목은 지자체 안내를 확인합니다."],
-    "cautions": ["유리병 수거함에 넣지 마세요."],
+    "steps": [
+      "깨졌다면 종이로 감싸 다치지 않게 합니다.",
+      "소량은 일반쓰레기로 배출합니다.",
+      "양이 많거나 큰 품목은 지자체 안내를 확인합니다."
+    ],
+    "cautions": [
+      "유리병 수거함에 넣지 마세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 확인 권장"
+    ],
+    "conditions": [
+      "bulky"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "reason": "대형폐기물 신고 여부, 수수료, 배출일은 지자체별로 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "품목별 수수료",
+        "신고필증 부착 방식",
+        "배출 장소와 배출일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "유리병류 비해당품목: 깨진 유리, 판유리, 조명기구용 유리, 도자기류 등은 유리병류로 배출하지 않습니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "거주 지자체 대형폐기물 신고/수수료 안내",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "도자기류가 다량이거나 크면 지자체 대형폐기물 또는 불연성 폐기물 기준을 확인합니다.",
+        "note": "대형폐기물 품목, 수수료, 신고필증, 배출일은 지자체별 확인이 필요합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "mirror",
     "name": "거울",
-    "aliases": ["깨진 거울", "화장대 거울", "손거울"],
+    "aliases": [
+      "깨진 거울",
+      "화장대 거울",
+      "손거울"
+    ],
     "category": "glass_mixed",
     "disposalType": "general_or_bulky",
     "summary": "거울은 코팅과 여러 재질이 섞여 재활용 유리병류가 아니며 크기에 따라 일반 또는 대형폐기물로 배출합니다.",
-    "steps": ["작은 거울은 깨지지 않게 포장해 일반쓰레기로 배출합니다.", "큰 거울이나 가구 부착 거울은 지자체 대형폐기물 신고 여부를 확인합니다."],
-    "cautions": ["깨진 경우 날카로운 부분을 감싸고 표시하세요."],
+    "steps": [
+      "작은 거울은 깨지지 않게 포장해 일반쓰레기로 배출합니다.",
+      "큰 거울이나 가구 부착 거울은 지자체 대형폐기물 신고 여부를 확인합니다."
+    ],
+    "cautions": [
+      "깨진 경우 날카로운 부분을 감싸고 표시하세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "bulky",
+      "damaged",
+      "mixed_material",
+      "safe_wrap_required"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "reason": "대형폐기물 신고 여부, 수수료, 배출일은 지자체별로 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "품목별 수수료",
+        "신고필증 부착 방식",
+        "배출 장소와 배출일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "유리병류 비해당품목: 깨진 유리, 판유리, 조명기구용 유리, 도자기류 등은 유리병류로 배출하지 않습니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "거주 지자체 대형폐기물 신고/수수료 안내",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "거울 크기와 가구 부착 여부에 따라 대형폐기물 신고가 필요할 수 있습니다.",
+        "note": "대형폐기물 품목, 수수료, 신고필증, 배출일은 지자체별 확인이 필요합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "can",
     "name": "음료캔",
-    "aliases": ["캔", "알루미늄캔", "철캔", "통조림캔"],
+    "aliases": [
+      "캔",
+      "알루미늄캔",
+      "철캔",
+      "통조림캔"
+    ],
     "category": "metal",
     "disposalType": "recycle",
     "summary": "내용물을 비우고 헹군 뒤 가능한 압착해 캔류로 배출합니다.",
-    "steps": ["내용물을 비웁니다.", "가볍게 헹굽니다.", "플라스틱 뚜껑 등 다른 재질을 분리합니다.", "캔류로 배출합니다."],
-    "cautions": ["날카로운 통조림 뚜껑은 다치지 않게 안쪽으로 넣거나 별도 주의하세요."],
+    "steps": [
+      "내용물을 비웁니다.",
+      "가볍게 헹굽니다.",
+      "플라스틱 뚜껑 등 다른 재질을 분리합니다.",
+      "캔류로 배출합니다."
+    ],
+    "cautions": [
+      "날카로운 통조림 뚜껑은 다치지 않게 안쪽으로 넣거나 별도 주의하세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "sourceRefs": [
+      "환경부 분리수거 요령"
+    ],
+    "conditions": [
+      "empty_required",
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "금속캔 배출요령: 내용물을 비우고 플라스틱 뚜껑 등 다른 재질을 제거해 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "캔류는 내용물을 비우고 다른 재질을 제거해 배출합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
   },
   {
     "id": "spray_can",
     "name": "스프레이캔",
-    "aliases": ["스프레이", "헤어스프레이", "살충제 캔", "에어로졸"],
+    "aliases": [
+      "스프레이",
+      "헤어스프레이",
+      "살충제 캔",
+      "에어로졸"
+    ],
     "category": "metal_pressurized",
     "disposalType": "recycle_after_empty",
     "summary": "내용물을 완전히 비우고 환기가 잘 되는 곳에서 안전하게 배출합니다.",
-    "steps": ["내용물을 완전히 사용합니다.", "환기가 잘 되는 곳에서 남은 가스를 제거합니다.", "지역 기준에 따라 캔류 또는 지정 장소에 배출합니다."],
-    "cautions": ["불 가까이에서 작업하지 마세요.", "구멍을 뚫어야 하는지는 지자체 안전 안내를 우선 확인하세요."],
+    "steps": [
+      "내용물을 완전히 사용합니다.",
+      "환기가 잘 되는 곳에서 남은 가스를 제거합니다.",
+      "지역 기준에 따라 캔류 또는 지정 장소에 배출합니다."
+    ],
+    "cautions": [
+      "불 가까이에서 작업하지 마세요.",
+      "구멍을 뚫어야 하는지는 지자체 안전 안내를 우선 확인하세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집", "지역별 안전 안내 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집",
+      "지역별 안전 안내 확인 권장"
+    ],
+    "conditions": [
+      "empty_required",
+      "hazardous",
+      "pressurized",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "가스용기 배출요령: 통풍이 잘 되는 장소에서 내용물을 완전히 제거한 뒤 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "스프레이캔의 구멍 뚫기 여부와 안전 배출 방식은 지자체 최신 안내를 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "butane_can",
     "name": "부탄가스",
-    "aliases": ["부탄가스 캔", "캠핑 가스", "가스캔"],
+    "aliases": [
+      "부탄가스 캔",
+      "캠핑 가스",
+      "가스캔"
+    ],
     "category": "metal_pressurized",
     "disposalType": "recycle_after_empty",
     "summary": "내용물을 완전히 비우고 화기 없는 곳에서 안전하게 처리한 뒤 지역 기준에 따라 배출합니다.",
-    "steps": ["내용물을 완전히 사용합니다.", "통풍이 잘 되는 야외에서 남은 가스를 제거합니다.", "지역 기준에 맞춰 캔류 또는 지정 장소에 배출합니다."],
-    "cautions": ["화기 근처에서 절대 작업하지 마세요.", "구멍 뚫기 여부는 지자체 최신 안내를 따르세요."],
+    "steps": [
+      "내용물을 완전히 사용합니다.",
+      "통풍이 잘 되는 야외에서 남은 가스를 제거합니다.",
+      "지역 기준에 맞춰 캔류 또는 지정 장소에 배출합니다."
+    ],
+    "cautions": [
+      "화기 근처에서 절대 작업하지 마세요.",
+      "구멍 뚫기 여부는 지자체 최신 안내를 따르세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집", "지역별 안전 안내 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집",
+      "지역별 안전 안내 확인 권장"
+    ],
+    "conditions": [
+      "empty_required",
+      "hazardous",
+      "pressurized",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "가스용기 배출요령: 통풍이 잘 되는 장소에서 내용물을 완전히 제거한 뒤 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "부탄가스의 구멍 뚫기 여부와 안전 배출 방식은 지자체 최신 안내를 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "aluminum_foil",
     "name": "알루미늄 포일",
-    "aliases": ["은박지", "호일", "쿠킹호일"],
+    "aliases": [
+      "은박지",
+      "호일",
+      "쿠킹호일"
+    ],
     "category": "metal_mixed",
     "disposalType": "general_or_recycle_if_clean",
     "summary": "음식물과 기름이 묻은 포일은 일반쓰레기로 배출합니다.",
-    "steps": ["음식물과 기름 오염을 확인합니다.", "오염이 심하면 일반쓰레기로 배출합니다.", "깨끗한 금속 포일은 지역 기준에 따라 캔류 또는 고철류 가능 여부를 확인합니다."],
-    "cautions": ["작고 오염된 포일은 재활용 선별이 어렵습니다."],
+    "steps": [
+      "음식물과 기름 오염을 확인합니다.",
+      "오염이 심하면 일반쓰레기로 배출합니다.",
+      "깨끗한 금속 포일은 지역 기준에 따라 캔류 또는 고철류 가능 여부를 확인합니다."
+    ],
+    "cautions": [
+      "작고 오염된 포일은 재활용 선별이 어렵습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 확인 권장"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated",
+      "oily"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "알루미늄 포일은 오염 여부와 지역별 캔류/고철류 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "chicken_bone",
     "name": "닭뼈",
-    "aliases": ["치킨뼈", "고기뼈", "돼지뼈", "소뼈"],
+    "aliases": [
+      "치킨뼈",
+      "고기뼈",
+      "돼지뼈",
+      "소뼈"
+    ],
     "category": "food_related",
     "disposalType": "general",
     "summary": "동물 뼈는 음식물쓰레기가 아니라 일반쓰레기로 배출합니다.",
-    "steps": ["물기를 최대한 줄입니다.", "종량제봉투에 일반쓰레기로 배출합니다."],
-    "cautions": ["동물이 먹을 수 없는 딱딱한 뼈는 음식물쓰레기에 넣지 않습니다."],
+    "steps": [
+      "물기를 최대한 줄입니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "동물이 먹을 수 없는 딱딱한 뼈는 음식물쓰레기에 넣지 않습니다."
+    ],
     "confidence": "high",
-    "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 닭뼈",
+      "강남구청 쓰레기 배출 안내"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "음식물류 폐기물 예외 품목은 기본 판단은 명확하지만, 지자체 안내 문구와 배출장소 기준을 함께 확인하면 정확도가 높습니다.",
+      "checkItems": [
+        "음식물류 폐기물 제외 품목 안내",
+        "일반 종량제봉투 배출 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 닭뼈",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=736",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "닭뼈는 일반폐기물/일반종량제폐기물로 분류되며, 동물의 뼈처럼 딱딱한 물질은 처리시설 고장 우려가 있어 종량제봉투 배출 대상입니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      },
+      {
+        "title": "강남구청 쓰레기 배출 안내",
+        "url": "https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "강남구는 깨진유리 등은 PP봉투에, 동물뼈·조개껍데기·달걀껍데기 등은 음식물쓰레기가 아닌 일반 종량제봉투에 배출하도록 안내합니다.",
+        "note": "강남구 기준 지역 보강 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전과 강남구청 원문으로 음식물쓰레기 제외 및 일반 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "shellfish_shell",
     "name": "조개껍데기",
-    "aliases": ["굴껍데기", "홍합껍데기", "전복껍데기", "갑각류 껍데기"],
+    "aliases": [
+      "굴껍데기",
+      "홍합껍데기",
+      "전복껍데기",
+      "갑각류 껍데기"
+    ],
     "category": "food_related",
     "disposalType": "general",
     "summary": "조개껍데기 등 딱딱한 껍데기는 음식물쓰레기가 아니라 일반쓰레기로 배출합니다.",
-    "steps": ["물기를 줄입니다.", "종량제봉투에 일반쓰레기로 배출합니다."],
-    "cautions": ["사료화나 퇴비화가 어려운 딱딱한 껍데기는 음식물쓰레기로 배출하지 않습니다."],
+    "steps": [
+      "물기를 줄입니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "사료화나 퇴비화가 어려운 딱딱한 껍데기는 음식물쓰레기로 배출하지 않습니다."
+    ],
     "confidence": "high",
-    "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 조개 껍데기",
+      "강남구청 쓰레기 배출 안내"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "음식물류 폐기물 예외 품목은 기본 판단은 명확하지만, 지자체 안내 문구와 배출장소 기준을 함께 확인하면 정확도가 높습니다.",
+      "checkItems": [
+        "음식물류 폐기물 제외 품목 안내",
+        "일반 종량제봉투 배출 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 조개 껍데기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=425",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "조개 껍데기는 일반폐기물/일반종량제폐기물로 분류되며, 기계 고장 원인이 될 수 있고 사료로 적합하지 않아 일반쓰레기 배출 대상입니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      },
+      {
+        "title": "강남구청 쓰레기 배출 안내",
+        "url": "https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "강남구는 깨진유리 등은 PP봉투에, 동물뼈·조개껍데기·달걀껍데기 등은 음식물쓰레기가 아닌 일반 종량제봉투에 배출하도록 안내합니다.",
+        "note": "강남구 기준 지역 보강 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전과 강남구청 원문으로 음식물쓰레기 제외 및 일반 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "egg_shell",
     "name": "달걀껍데기",
-    "aliases": ["계란껍데기", "달걀 껍질", "계란 껍질"],
+    "aliases": [
+      "계란껍데기",
+      "달걀 껍질",
+      "계란 껍질"
+    ],
     "category": "food_related",
     "disposalType": "general",
     "summary": "달걀껍데기는 음식물쓰레기가 아니라 일반쓰레기로 배출합니다.",
-    "steps": ["물기를 줄입니다.", "종량제봉투에 일반쓰레기로 배출합니다."],
-    "cautions": ["딱딱한 껍질류는 음식물쓰레기 기준에서 제외되는 경우가 일반적입니다."],
+    "steps": [
+      "물기를 줄입니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "딱딱한 껍질류는 음식물쓰레기 기준에서 제외되는 경우가 일반적입니다."
+    ],
     "confidence": "high",
-    "needsRegionCheck": false,
-    "sourceRefs": ["환경부 분리수거 요령"]
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 계란껍질(달걀껍질)",
+      "강남구청 쓰레기 배출 안내"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "음식물류 폐기물 예외 품목은 기본 판단은 명확하지만, 지자체 안내 문구와 배출장소 기준을 함께 확인하면 정확도가 높습니다.",
+      "checkItems": [
+        "음식물류 폐기물 제외 품목 안내",
+        "일반 종량제봉투 배출 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 계란껍질(달걀껍질)",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=343",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "계란껍질(달걀껍질)은 일반폐기물/일반종량제폐기물로 분류되며, 닭·오리·메추리알 등의 껍데기는 종량제봉투 배출 대상입니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      },
+      {
+        "title": "강남구청 쓰레기 배출 안내",
+        "url": "https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "강남구는 깨진유리 등은 PP봉투에, 동물뼈·조개껍데기·달걀껍데기 등은 음식물쓰레기가 아닌 일반 종량제봉투에 배출하도록 안내합니다.",
+        "note": "강남구 기준 지역 보강 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전과 강남구청 원문으로 음식물쓰레기 제외 및 일반 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "fruit_seed",
     "name": "과일씨",
-    "aliases": ["복숭아씨", "자두씨", "감씨", "아보카도 씨"],
+    "aliases": [
+      "복숭아씨",
+      "자두씨",
+      "감씨",
+      "아보카도 씨"
+    ],
     "category": "food_related",
     "disposalType": "general",
     "summary": "단단한 과일씨는 음식물쓰레기가 아니라 일반쓰레기로 배출합니다.",
-    "steps": ["과육을 최대한 제거합니다.", "단단한 씨는 일반쓰레기로 배출합니다."],
-    "cautions": ["지역별 음식물쓰레기 세부 기준은 다를 수 있습니다."],
+    "steps": [
+      "과육을 최대한 제거합니다.",
+      "단단한 씨는 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "지역별 음식물쓰레기 세부 기준은 다를 수 있습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["환경부 분리수거 요령", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "food_contaminated",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "음식물류 폐기물 제외 여부는 품목사전과 지자체 세부 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "음식물류 폐기물 제외 품목은 지자체 세부 기준을 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "onion_peel",
     "name": "양파껍질",
-    "aliases": ["마늘껍질", "파뿌리", "양파 껍데기", "마늘 껍데기"],
+    "aliases": [
+      "마늘껍질",
+      "파뿌리",
+      "양파 껍데기",
+      "마늘 껍데기"
+    ],
     "category": "food_related",
     "disposalType": "general",
     "summary": "양파껍질, 마늘껍질처럼 질기고 마른 껍질은 일반쓰레기로 배출하는 경우가 일반적입니다.",
-    "steps": ["물기를 줄입니다.", "종량제봉투에 일반쓰레기로 배출합니다."],
-    "cautions": ["음식물쓰레기 세부 기준은 지자체별로 차이가 있을 수 있습니다."],
+    "steps": [
+      "물기를 줄입니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "음식물쓰레기 세부 기준은 지자체별로 차이가 있을 수 있습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "음식물류 폐기물 제외 여부는 품목사전과 지자체 세부 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "음식물류 폐기물 제외 품목은 지자체 세부 기준을 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "coffee_ground",
     "name": "커피찌꺼기",
-    "aliases": ["원두 찌꺼기", "커피가루", "커피박"],
+    "aliases": [
+      "원두 찌꺼기",
+      "커피가루",
+      "커피박"
+    ],
     "category": "food_related",
     "disposalType": "general_or_food_region_specific",
     "summary": "커피찌꺼기는 지역 기준에 따라 일반쓰레기로 안내되는 경우가 많아 지역 확인이 필요합니다.",
-    "steps": ["물기를 최대한 제거합니다.", "지역 기준을 확인합니다.", "별도 안내가 없으면 일반쓰레기로 배출하는 쪽이 안전합니다."],
-    "cautions": ["싱크대나 변기에 버리지 마세요."],
+    "steps": [
+      "물기를 최대한 제거합니다.",
+      "지역 기준을 확인합니다.",
+      "별도 안내가 없으면 일반쓰레기로 배출하는 쪽이 안전합니다."
+    ],
+    "cautions": [
+      "싱크대나 변기에 버리지 마세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "커피찌꺼기는 품목사전과 지자체 음식물류 폐기물 세부 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "일반쓰레기 또는 음식물류 처리 여부는 지역 기준을 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "used_cooking_oil",
     "name": "폐식용유",
-    "aliases": ["식용유", "튀김기름", "기름"],
+    "aliases": [
+      "식용유",
+      "튀김기름",
+      "기름"
+    ],
     "category": "special_liquid",
     "disposalType": "collection_point_or_absorb",
     "summary": "많은 양의 폐식용유는 전용 수거함을 이용하고, 소량은 흡수시켜 일반쓰레기로 배출합니다.",
-    "steps": ["가능하면 폐식용유 전용 수거함 위치를 확인합니다.", "소량은 키친타월 등에 흡수시킵니다.", "흡수시킨 것은 일반쓰레기로 배출합니다."],
-    "cautions": ["하수구에 버리면 배관 막힘과 수질오염을 유발할 수 있습니다."],
+    "steps": [
+      "가능하면 폐식용유 전용 수거함 위치를 확인합니다.",
+      "소량은 키친타월 등에 흡수시킵니다.",
+      "흡수시킨 것은 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "하수구에 버리면 배관 막힘과 수질오염을 유발할 수 있습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "liquid",
+      "oily"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "폐식용유 배출요령: 음식물 등 이물질을 제거하고 폐식용유 전용수거함에 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "폐식용유 전용수거함 위치와 운영 여부는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "battery",
     "name": "건전지",
-    "aliases": ["폐건전지", "AA 건전지", "AAA 건전지", "리튬 건전지"],
+    "aliases": [
+      "폐건전지",
+      "AA 건전지",
+      "AAA 건전지",
+      "리튬 건전지"
+    ],
     "category": "hazardous",
     "disposalType": "special_collection",
     "summary": "건전지는 생활계 유해폐기물로 전용 수거함이나 지정 장소에 배출합니다.",
-    "steps": ["다른 쓰레기와 섞지 않습니다.", "전용 폐건전지 수거함 위치를 확인합니다.", "수거함 또는 지정 장소에 배출합니다."],
-    "cautions": ["화재 위험이 있으므로 일반쓰레기나 재활용품에 섞지 마세요."],
+    "steps": [
+      "다른 쓰레기와 섞지 않습니다.",
+      "전용 폐건전지 수거함 위치를 확인합니다.",
+      "수거함 또는 지정 장소에 배출합니다."
+    ],
+    "cautions": [
+      "화재 위험이 있으므로 일반쓰레기나 재활용품에 섞지 마세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "hazardous",
+      "mixed_material"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "전지류 배출요령: 전지를 제품에서 분리해 전지류 전용수거함에 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "폐건전지 전용수거함 위치와 운영 시간은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "power_bank",
     "name": "보조배터리",
-    "aliases": ["휴대용 배터리", "리튬이온 배터리", "충전 배터리", "배터리팩"],
+    "aliases": [
+      "휴대용 배터리",
+      "리튬이온 배터리",
+      "충전 배터리",
+      "배터리팩"
+    ],
     "category": "hazardous",
     "disposalType": "special_collection",
     "summary": "보조배터리는 화재 위험이 있어 일반쓰레기나 재활용품이 아니라 지정 수거함에 배출합니다.",
-    "steps": ["충격을 주거나 분해하지 않습니다.", "단자 부분을 테이프로 감싸면 더 안전합니다.", "폐건전지/소형가전 수거함 또는 지자체 지정 장소에 배출합니다."],
-    "cautions": ["압착, 파손, 고온 노출은 화재 위험이 있습니다."],
+    "steps": [
+      "충격을 주거나 분해하지 않습니다.",
+      "단자 부분을 테이프로 감싸면 더 안전합니다.",
+      "폐건전지/소형가전 수거함 또는 지자체 지정 장소에 배출합니다."
+    ],
+    "cautions": [
+      "압착, 파손, 고온 노출은 화재 위험이 있습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집", "지역별 안전 안내 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집",
+      "지역별 안전 안내 확인 권장"
+    ],
+    "conditions": [
+      "electronics",
+      "hazardous",
+      "small_item"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "전지류 배출요령: 전지를 제품에서 분리해 전지류 전용수거함에 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "보조배터리와 리튬이온 배터리 수거 장소와 안전 배출 방식은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "fluorescent_lamp",
     "name": "형광등",
-    "aliases": ["폐형광등", "형광램프", "전구형 형광등"],
+    "aliases": [
+      "폐형광등",
+      "형광램프",
+      "전구형 형광등"
+    ],
     "category": "hazardous",
     "disposalType": "special_collection",
     "summary": "형광등은 깨지지 않게 폐형광등 전용 수거함에 배출합니다.",
-    "steps": ["깨지지 않게 포장합니다.", "폐형광등 전용 수거함 위치를 확인합니다.", "전용 수거함에 배출합니다."],
-    "cautions": ["깨진 형광등은 수은 등 유해물질 위험이 있어 지자체 안내를 확인하세요."],
+    "steps": [
+      "깨지지 않게 포장합니다.",
+      "폐형광등 전용 수거함 위치를 확인합니다.",
+      "전용 수거함에 배출합니다."
+    ],
+    "cautions": [
+      "깨진 형광등은 수은 등 유해물질 위험이 있어 지자체 안내를 확인하세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "damaged",
+      "hazardous",
+      "safe_wrap_required"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "조명제품 배출요령: 지자체별 조례에 따라 전용수거함 또는 지정 방식으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "폐형광등 전용수거함 위치와 파손품 처리 기준은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "led_lamp",
     "name": "LED등",
-    "aliases": ["LED 전구", "엘이디 전구", "LED 램프"],
+    "aliases": [
+      "LED 전구",
+      "엘이디 전구",
+      "LED 램프"
+    ],
     "category": "mixed_electronic",
     "disposalType": "region_specific",
     "summary": "LED등은 형광등과 처리 기준이 다를 수 있어 지역별 안내를 확인해야 합니다.",
-    "steps": ["깨지지 않게 포장합니다.", "지역별 조명류 수거 기준을 확인합니다.", "전용 수거함 또는 지정 방식으로 배출합니다."],
-    "cautions": ["형광등 수거함에 함께 넣을 수 있는지는 지역마다 다를 수 있습니다."],
+    "steps": [
+      "깨지지 않게 포장합니다.",
+      "지역별 조명류 수거 기준을 확인합니다.",
+      "전용 수거함 또는 지정 방식으로 배출합니다."
+    ],
+    "cautions": [
+      "형광등 수거함에 함께 넣을 수 있는지는 지역마다 다를 수 있습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "damaged",
+      "electronics",
+      "hazardous",
+      "safe_wrap_required"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "조명제품 배출요령: 지자체별 조례에 따라 전용수거함 또는 지정 방식으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "LED등과 형광등 수거함 공동 이용 가능 여부는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "medicine",
     "name": "폐의약품",
-    "aliases": ["버리는 약", "알약", "시럽약", "연고", "약"],
+    "aliases": [
+      "버리는 약",
+      "알약",
+      "시럽약",
+      "연고",
+      "약"
+    ],
     "category": "hazardous",
     "disposalType": "special_collection",
     "summary": "폐의약품은 약국, 보건소, 주민센터 등 지정 수거함에 배출합니다.",
-    "steps": ["개인정보가 있는 포장지는 제거합니다.", "약은 하수구나 일반쓰레기에 버리지 않습니다.", "지역 지정 폐의약품 수거함에 배출합니다."],
-    "cautions": ["하수구 배출은 수질오염을 유발할 수 있습니다."],
+    "steps": [
+      "개인정보가 있는 포장지는 제거합니다.",
+      "약은 하수구나 일반쓰레기에 버리지 않습니다.",
+      "지역 지정 폐의약품 수거함에 배출합니다."
+    ],
+    "cautions": [
+      "하수구 배출은 수질오염을 유발할 수 있습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "hazardous",
+      "liquid",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "폐의약품은 지정 수거함과 수거처 확인이 필요한 생활계 유해폐기물입니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "약국, 보건소, 주민센터 등 폐의약품 수거함 위치는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "knife_blade",
     "name": "칼날",
-    "aliases": ["칼", "커터칼", "면도날", "깨진 칼"],
+    "aliases": [
+      "칼",
+      "커터칼",
+      "면도날",
+      "깨진 칼"
+    ],
     "category": "sharp",
     "disposalType": "general_safe_wrap",
     "summary": "칼날은 다치지 않게 두껍게 감싸 일반쓰레기로 배출합니다.",
-    "steps": ["신문지, 두꺼운 종이, 테이프로 날을 감쌉니다.", "겉면에 날카로운 물건이라고 표시합니다.", "일반쓰레기로 배출합니다."],
-    "cautions": ["수거 작업자의 안전을 위해 포장이 가장 중요합니다."],
+    "steps": [
+      "신문지, 두꺼운 종이, 테이프로 날을 감쌉니다.",
+      "겉면에 날카로운 물건이라고 표시합니다.",
+      "일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "수거 작업자의 안전을 위해 포장이 가장 중요합니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": false,
-    "sourceRefs": ["생활폐기물 분리배출 누리집 품목사전 확인 권장"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 칼"
+    ],
+    "conditions": [
+      "damaged",
+      "safe_wrap_required",
+      "sharp"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 칼",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=711",
+        "sourceType": "safety_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "칼은 일반폐기물/일반종량제폐기물로 분류되며, 신문지와 테이프 등으로 감싼 후 종량제봉투로 배출합니다. 날카로운 부분이 노출되지 않도록 충분히 감싸야 합니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다. 칼날/면도날류 답변에는 안전 포장 안내를 우선 적용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전 상세 원문으로 날카로운 폐기물의 안전 포장 및 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
   },
   {
     "id": "lighter",
     "name": "라이터",
-    "aliases": ["일회용 라이터", "가스 라이터"],
+    "aliases": [
+      "일회용 라이터",
+      "가스 라이터"
+    ],
     "category": "pressurized_small",
     "disposalType": "general_after_empty",
     "summary": "라이터는 남은 가스를 최대한 제거하고 일반쓰레기로 배출하는 경우가 많습니다.",
-    "steps": ["불이 붙지 않는 안전한 곳에서 남은 가스를 최대한 소진합니다.", "지역 기준을 확인합니다.", "일반쓰레기로 배출합니다."],
-    "cautions": ["화기 주변에서 처리하지 마세요."],
+    "steps": [
+      "불이 붙지 않는 안전한 곳에서 남은 가스를 최대한 소진합니다.",
+      "지역 기준을 확인합니다.",
+      "일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "화기 주변에서 처리하지 마세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "hazardous",
+      "pressurized",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "라이터는 잔여 가스 제거와 지역별 안전 배출 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "가스 제거와 배출 방식은 지자체 안전 안내를 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "small_electronics",
     "name": "소형가전",
-    "aliases": ["드라이기", "고데기", "전기면도기", "충전기", "마우스", "키보드"],
+    "aliases": [
+      "드라이기",
+      "고데기",
+      "전기면도기",
+      "충전기",
+      "마우스",
+      "키보드"
+    ],
     "category": "electronics",
     "disposalType": "special_collection",
     "summary": "소형가전은 전용 수거함, 무상 방문수거, 지자체 수거 방식 등을 확인해 배출합니다.",
-    "steps": ["배터리가 있으면 가능한 분리합니다.", "소형가전 전용 수거함이나 지자체 수거 방식을 확인합니다.", "지정 방식으로 배출합니다."],
-    "cautions": ["배터리 내장 제품은 화재 위험 때문에 일반쓰레기 배출을 피하세요."],
+    "steps": [
+      "배터리가 있으면 가능한 분리합니다.",
+      "소형가전 전용 수거함이나 지자체 수거 방식을 확인합니다.",
+      "지정 방식으로 배출합니다."
+    ],
+    "cautions": [
+      "배터리 내장 제품은 화재 위험 때문에 일반쓰레기 배출을 피하세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "electronics",
+      "hazardous",
+      "separate_parts",
+      "small_item"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "전기전자제품 배출요령: 지자체별 조례에 따라 전용수거함 또는 지정 회수 방식으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "소형가전 전용수거함, 무상 방문수거, 공동주택 수거 방식은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "mobile_phone",
     "name": "휴대폰",
-    "aliases": ["스마트폰", "핸드폰", "휴대전화", "공기계"],
+    "aliases": [
+      "스마트폰",
+      "핸드폰",
+      "휴대전화",
+      "공기계"
+    ],
     "category": "electronics",
     "disposalType": "special_collection",
     "summary": "휴대폰은 개인정보를 삭제한 뒤 전자제품 회수처나 지정 수거 방식으로 배출합니다.",
-    "steps": ["데이터를 백업하고 초기화합니다.", "USIM과 메모리카드를 제거합니다.", "전자제품 회수처나 지자체 지정 방식으로 배출합니다."],
-    "cautions": ["개인정보 삭제를 먼저 하세요.", "배터리 손상 제품은 별도 안전 안내를 따르세요."],
+    "steps": [
+      "데이터를 백업하고 초기화합니다.",
+      "USIM과 메모리카드를 제거합니다.",
+      "전자제품 회수처나 지자체 지정 방식으로 배출합니다."
+    ],
+    "cautions": [
+      "개인정보 삭제를 먼저 하세요.",
+      "배터리 손상 제품은 별도 안전 안내를 따르세요."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "electronics",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "전용 수거함 위치나 지정 수거처가 지역별로 다릅니다.",
+      "checkItems": [
+        "전용 수거함 위치",
+        "지정 수거처",
+        "배출 가능 시간",
+        "파손/위험 품목 안전 안내"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "전기전자제품 배출요령: 지자체별 조례에 따라 전용수거함 또는 지정 회수 방식으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "휴대폰 회수처, 소형가전 수거함, 배터리 손상품 처리 기준은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "chair",
     "name": "의자",
-    "aliases": ["책상의자", "식탁의자", "컴퓨터 의자", "낡은 의자"],
+    "aliases": [
+      "책상의자",
+      "식탁의자",
+      "컴퓨터 의자",
+      "낡은 의자"
+    ],
     "category": "bulky",
     "disposalType": "bulky_waste",
     "summary": "의자는 대형폐기물 신고 대상일 가능성이 높아 지자체 신고 후 배출합니다.",
-    "steps": ["거주 지역의 대형폐기물 신고 페이지를 확인합니다.", "품목과 수수료를 확인합니다.", "스티커 또는 신고필증을 부착해 지정일에 배출합니다."],
-    "cautions": ["무단 배출 시 과태료가 부과될 수 있습니다."],
+    "steps": [
+      "거주 지역의 대형폐기물 신고 페이지를 확인합니다.",
+      "품목과 수수료를 확인합니다.",
+      "스티커 또는 신고필증을 부착해 지정일에 배출합니다."
+    ],
+    "cautions": [
+      "무단 배출 시 과태료가 부과될 수 있습니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["폐기물관리법", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "폐기물관리법",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "bulky"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "reason": "대형폐기물 신고 여부, 수수료, 배출일은 지자체별로 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "품목별 수수료",
+        "신고필증 부착 방식",
+        "배출 장소와 배출일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "거주 지자체 대형폐기물 신고/수수료 안내",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "의자는 지자체별 대형폐기물 신고 품목, 수수료, 신고필증, 배출일을 확인합니다.",
+        "note": "대형폐기물 품목, 수수료, 신고필증, 배출일은 지자체별 확인이 필요합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "mattress",
     "name": "매트리스",
-    "aliases": ["침대 매트리스", "라텍스 매트리스", "토퍼"],
+    "aliases": [
+      "침대 매트리스",
+      "라텍스 매트리스",
+      "토퍼"
+    ],
     "category": "bulky",
     "disposalType": "bulky_waste",
     "summary": "매트리스는 대형폐기물 신고 후 배출합니다.",
-    "steps": ["거주 지역 대형폐기물 신고 페이지에서 품목을 선택합니다.", "수수료를 확인하고 신고합니다.", "신고필증을 부착해 지정 장소와 날짜에 배출합니다."],
-    "cautions": ["지역별 수수료와 배출 방식이 다릅니다."],
+    "steps": [
+      "거주 지역 대형폐기물 신고 페이지에서 품목을 선택합니다.",
+      "수수료를 확인하고 신고합니다.",
+      "신고필증을 부착해 지정 장소와 날짜에 배출합니다."
+    ],
+    "cautions": [
+      "지역별 수수료와 배출 방식이 다릅니다."
+    ],
     "confidence": "high",
     "needsRegionCheck": true,
-    "sourceRefs": ["폐기물관리법", "생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "폐기물관리법",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "bulky"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "reason": "대형폐기물 신고 여부, 수수료, 배출일은 지자체별로 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "품목별 수수료",
+        "신고필증 부착 방식",
+        "배출 장소와 배출일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "거주 지자체 대형폐기물 신고/수수료 안내",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "매트리스는 지자체별 대형폐기물 신고 품목, 수수료, 신고필증, 배출일을 확인합니다.",
+        "note": "대형폐기물 품목, 수수료, 신고필증, 배출일은 지자체별 확인이 필요합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "blanket",
     "name": "이불",
-    "aliases": ["담요", "요", "베개", "쿠션"],
+    "aliases": [
+      "담요",
+      "요",
+      "베개",
+      "쿠션"
+    ],
     "category": "textile_or_bulky",
     "disposalType": "general_or_bulky",
     "summary": "이불과 베개는 의류수거함 대상이 아닌 경우가 많고, 크기와 지역에 따라 일반 또는 대형폐기물로 배출합니다.",
-    "steps": ["지역의 이불류 배출 기준을 확인합니다.", "소량은 종량제봉투 가능 여부를 확인합니다.", "부피가 크면 대형폐기물 신고 대상인지 확인합니다."],
-    "cautions": ["의류수거함에 이불, 베개, 쿠션을 넣지 못하게 하는 지역이 많습니다."],
+    "steps": [
+      "지역의 이불류 배출 기준을 확인합니다.",
+      "소량은 종량제봉투 가능 여부를 확인합니다.",
+      "부피가 크면 대형폐기물 신고 대상인지 확인합니다."
+    ],
+    "cautions": [
+      "의류수거함에 이불, 베개, 쿠션을 넣지 못하게 하는 지역이 많습니다."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "bulky"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "reason": "대형폐기물 신고 여부, 수수료, 배출일은 지자체별로 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "품목별 수수료",
+        "신고필증 부착 방식",
+        "배출 장소와 배출일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "거주 지자체 대형폐기물 신고/수수료 안내",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "이불, 베개, 쿠션은 의류수거함 제외 여부와 종량제/대형폐기물 기준을 지자체별로 확인합니다.",
+        "note": "대형폐기물 품목, 수수료, 신고필증, 배출일은 지자체별 확인이 필요합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "섬유류 수거함과 대형폐기물 기준은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "umbrella",
     "name": "우산",
-    "aliases": ["고장난 우산", "양산"],
+    "aliases": [
+      "고장난 우산",
+      "양산"
+    ],
     "category": "mixed",
     "disposalType": "general_or_metal_separate",
     "summary": "우산은 천, 플라스틱, 금속이 섞여 있어 분리 가능하면 분리하고 어렵다면 일반쓰레기로 배출합니다.",
-    "steps": ["천과 금속대를 분리할 수 있는지 확인합니다.", "분리 가능하면 재질별로 배출합니다.", "분리가 어렵다면 일반쓰레기로 배출합니다.", "크기가 크면 지역 기준을 확인합니다."],
-    "cautions": ["날카로운 금속 끝은 다치지 않게 처리하세요."],
+    "steps": [
+      "천과 금속대를 분리할 수 있는지 확인합니다.",
+      "분리 가능하면 재질별로 배출합니다.",
+      "분리가 어렵다면 일반쓰레기로 배출합니다.",
+      "크기가 크면 지역 기준을 확인합니다."
+    ],
+    "cautions": [
+      "날카로운 금속 끝은 다치지 않게 처리하세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "우산은 천, 금속, 플라스틱 복합재질로 분리 가능 여부와 지역 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "ice_pack",
     "name": "아이스팩",
-    "aliases": ["젤 아이스팩", "보냉팩", "얼음팩"],
+    "aliases": [
+      "젤 아이스팩",
+      "보냉팩",
+      "얼음팩"
+    ],
     "category": "mixed_or_water",
     "disposalType": "region_specific",
     "summary": "물 아이스팩은 물을 버리고 비닐을 분리할 수 있지만, 젤 아이스팩은 지역별 수거 기준을 확인해야 합니다.",
-    "steps": ["겉면 표시를 확인해 물 타입인지 젤 타입인지 봅니다.", "물 타입은 물을 비우고 비닐류 기준을 확인합니다.", "젤 타입은 전용 수거함이나 일반쓰레기 기준을 지역별로 확인합니다."],
-    "cautions": ["젤 내용물을 하수구에 버리지 마세요."],
+    "steps": [
+      "겉면 표시를 확인해 물 타입인지 젤 타입인지 봅니다.",
+      "물 타입은 물을 비우고 비닐류 기준을 확인합니다.",
+      "젤 타입은 전용 수거함이나 일반쓰레기 기준을 지역별로 확인합니다."
+    ],
+    "cautions": [
+      "젤 내용물을 하수구에 버리지 마세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "empty_required",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "아이스팩은 물 타입과 젤 타입을 구분하고 품목사전 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "젤 아이스팩 전용수거함 운영 여부는 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   },
   {
     "id": "cat_litter",
     "name": "고양이 모래",
-    "aliases": ["벤토나이트 모래", "두부모래", "반려동물 모래"],
+    "aliases": [
+      "벤토나이트 모래",
+      "두부모래",
+      "반려동물 모래"
+    ],
     "category": "pet_waste",
     "disposalType": "general",
     "summary": "사용한 고양이 모래는 일반쓰레기로 배출하는 것이 일반적이며 변기에 버리지 않습니다.",
-    "steps": ["배설물을 포함해 밀봉합니다.", "종량제봉투에 일반쓰레기로 배출합니다."],
-    "cautions": ["변기에 버리면 배관 막힘과 수질 문제가 생길 수 있습니다.", "제품별 변기 배출 가능 표기가 있어도 지역 하수 기준을 확인하세요."],
+    "steps": [
+      "배설물을 포함해 밀봉합니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "변기에 버리면 배관 막힘과 수질 문제가 생길 수 있습니다.",
+      "제품별 변기 배출 가능 표기가 있어도 지역 하수 기준을 확인하세요."
+    ],
     "confidence": "medium",
     "needsRegionCheck": true,
-    "sourceRefs": ["생활폐기물 분리배출 누리집"]
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "checkItems": [
+        "품목별 지역 배출 기준",
+        "재활용품 배출 요일",
+        "전용 수거함 운영 여부",
+        "주택 유형별 배출 방식"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "사용한 반려동물 모래는 제품 유형과 지자체 기준 확인이 필요한 일반쓰레기 후보입니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "변기 배출 가능 표기와 별개로 지역 하수·폐기물 기준 확인이 필요합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
+  },
+  {
+    "id": "plastic_food_container",
+    "name": "배달 플라스틱 용기",
+    "aliases": [
+      "배달용기",
+      "플라스틱 배달용기",
+      "포장용기",
+      "반찬통",
+      "일회용 플라스틱 용기"
+    ],
+    "category": "plastic",
+    "disposalType": "recycle_or_general",
+    "summary": "내용물을 비우고 음식물과 기름 오염을 제거할 수 있으면 플라스틱류로, 오염 제거가 어렵다면 일반쓰레기로 배출합니다.",
+    "steps": [
+      "남은 음식물을 비웁니다.",
+      "물로 헹궈 음식물과 기름 오염을 제거합니다.",
+      "라벨, 비닐, 종이 등 다른 재질은 가능한 분리합니다.",
+      "깨끗하면 플라스틱류로 배출하고, 오염이 남으면 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "고추기름, 양념, 음식물이 많이 남은 용기는 재활용 품질을 떨어뜨립니다.",
+      "지역별로 오염 플라스틱의 세부 배출 기준이 다를 수 있습니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "empty_required",
+      "food_contaminated",
+      "oily",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "합성수지류 배출요령: 내용물을 비우고 이물질을 제거한 뒤 부착상표와 다른 재질을 분리해 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "환경부 재활용품 분리수거 요령",
+        "url": "https://www.me.go.kr/webdata/education/class21/8-03.html",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "플라스틱 용기는 내용물을 비우고 이물질을 제거한 뒤 배출합니다.",
+        "note": "환경부 교육자료의 재활용품 분리수거 요령을 보조 출처로 사용합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
+  },
+  {
+    "id": "paper_cup",
+    "name": "종이컵",
+    "aliases": [
+      "일회용 종이컵",
+      "커피 종이컵",
+      "컵홀더 없는 종이컵",
+      "테이크아웃 종이컵"
+    ],
+    "category": "paper_coated",
+    "disposalType": "recycle_or_general",
+    "summary": "내용물을 비우고 깨끗하게 헹군 종이컵은 지역 기준에 따라 종이컵 또는 종이류로 배출하고, 오염이 남으면 일반쓰레기로 배출합니다.",
+    "steps": [
+      "남은 음료를 비웁니다.",
+      "가능하면 물로 헹궈 말립니다.",
+      "빨대, 뚜껑, 컵홀더 등 다른 재질은 분리합니다.",
+      "지역별 종이컵 배출 기준에 맞춰 배출합니다."
+    ],
+    "cautions": [
+      "음료, 크림, 기름 오염이 남은 종이컵은 재활용이 어렵습니다.",
+      "종이컵 전용 수거함 운영 여부는 지역이나 건물에 따라 다를 수 있습니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "환경부 분리수거 요령",
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "empty_required",
+      "mixed_material",
+      "separate_parts"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "종이컵 전용 수거함 운영 여부와 배출 분류가 지역이나 시설별로 다를 수 있습니다.",
+      "checkItems": [
+        "종이컵 전용 수거함 운영 여부",
+        "종이류 또는 별도 품목 배출 기준",
+        "건물/사업장 내부 분리배출 기준",
+        "오염 종이컵 일반쓰레기 처리 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이컵 배출요령: 내용물을 비우고 물로 헹군 뒤 압착하고, 빨대·비닐 등 다른 재질은 제거합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "종이컵 전용 수거함 운영 여부와 건물/사업장 분리배출 기준은 지역별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
+  },
+  {
+    "id": "disposable_mask",
+    "name": "일회용 마스크",
+    "aliases": [
+      "마스크",
+      "보건용 마스크",
+      "KF94 마스크",
+      "덴탈마스크"
+    ],
+    "category": "hygiene_mixed",
+    "disposalType": "general",
+    "summary": "일회용 마스크는 여러 재질이 섞인 위생용품이므로 일반쓰레기로 배출합니다.",
+    "steps": [
+      "끈을 잡고 벗어 오염면 접촉을 줄입니다.",
+      "가능하면 봉투에 담아 밀봉합니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "마스크 겉면을 만진 뒤에는 손을 씻으세요.",
+      "재활용품이나 의류수거함에 넣지 마세요."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 일회용 마스크"
+    ],
+    "conditions": [
+      "hygiene",
+      "mixed_material"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 일회용 마스크",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=369",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "일회용 마스크는 일반폐기물/일반종량제폐기물로 분류되며, 사용한 마스크는 재질과 상관없이 재활용이 어려워 종량제봉투 배출 대상입니다.",
+        "note": "품목사전 상세 원문 기준으로 확인했습니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-dictionary-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "공식 품목사전 상세 원문으로 종량제봉투 배출 기준을 확인했습니다."
+      ]
+    }
+  },
+  {
+    "id": "wet_tissue",
+    "name": "물티슈",
+    "aliases": [
+      "휴지",
+      "사용한 휴지",
+      "키친타월",
+      "화장지",
+      "기름 닦은 휴지"
+    ],
+    "category": "paper_contaminated",
+    "disposalType": "general",
+    "summary": "사용한 휴지와 물티슈는 오염되었거나 물에 풀리지 않는 재질이 섞인 경우가 많아 일반쓰레기로 배출합니다.",
+    "steps": [
+      "물기와 오염물이 새지 않게 모읍니다.",
+      "종량제봉투에 일반쓰레기로 배출합니다.",
+      "변기나 하수구에 버리지 않습니다."
+    ],
+    "cautions": [
+      "물티슈는 변기에 버리면 배관 막힘을 유발할 수 있습니다.",
+      "휴지처럼 보여도 사용 후 오염된 종이는 재활용하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 확인 권장"
+    ],
+    "conditions": [
+      "contaminated",
+      "hygiene"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "전국 공통 기준으로 우선 안내 가능한 seed 데이터입니다."
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "종이류 비해당품목: 택배전표, 영수증 감열지, 사진용지, 사용한 화장지 등은 종량제봉투 등으로 배출합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "위생용품과 오염된 종이류는 재활용품으로 섞지 않는 보수적 안내가 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "전국 공통 기준으로 우선 답변 가능한 품목입니다. 지역별 세부 배출일은 별도 확인 대상입니다."
+      ]
+    }
+  },
+  {
+    "id": "clothing",
+    "name": "옷",
+    "aliases": [
+      "의류",
+      "헌옷",
+      "티셔츠",
+      "바지",
+      "외투"
+    ],
+    "category": "textile",
+    "disposalType": "reuse_collection_or_general",
+    "summary": "입을 수 있는 깨끗한 옷은 의류수거함 등 재사용 수거로, 오염되거나 훼손된 옷은 지역 기준에 따라 일반쓰레기로 배출합니다.",
+    "steps": [
+      "재사용 가능한 상태인지 확인합니다.",
+      "깨끗하고 마른 옷은 의류수거함이나 지정 수거처를 확인합니다.",
+      "오염, 곰팡이, 심한 훼손이 있으면 종량제봉투 배출 가능 여부를 지역 기준으로 확인합니다."
+    ],
+    "cautions": [
+      "젖은 옷이나 오염된 옷은 의류수거함에 넣지 마세요.",
+      "의류수거함 수거 가능 품목은 운영 주체와 지역별로 다를 수 있습니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "reusable",
+      "textile"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "의류수거함 위치와 수거 가능 품목, 훼손 의류 처리 기준은 지역과 운영 주체별로 다릅니다.",
+      "checkItems": [
+        "의류수거함 위치",
+        "수거 가능 의류 품목",
+        "오염/훼손 의류 일반쓰레기 기준",
+        "대량 배출 또는 부피 큰 의류 처리 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "재활용가능자원의 분리수거 등에 관한 지침 별표 1",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+        "sourceType": "law",
+        "checkedAt": "2026-06-27",
+        "basis": "의류 배출요령: 물기에 젖지 않게 배출하고, 수거 가능 품목은 지자체 또는 민간 재활용사업자 기준을 확인합니다.",
+        "note": "생활폐기물 분리배출 누리집 공지의 현행 지침을 기준 출처로 사용합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "의류수거함 위치와 수거 가능 품목은 지역 및 운영 주체별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
+  },
+  {
+    "id": "shoes",
+    "name": "신발",
+    "aliases": [
+      "운동화",
+      "구두",
+      "슬리퍼",
+      "샌들",
+      "헌신발"
+    ],
+    "category": "textile_mixed",
+    "disposalType": "reuse_collection_or_general",
+    "summary": "재사용 가능한 신발은 의류·신발 수거함 가능 여부를 확인하고, 심하게 훼손되었거나 한 짝만 남은 신발은 지역 기준에 따라 일반쓰레기로 배출합니다.",
+    "steps": [
+      "짝이 맞고 재사용 가능한 상태인지 확인합니다.",
+      "깨끗한 신발은 의류·신발 수거함 또는 지정 수거처 가능 여부를 확인합니다.",
+      "훼손이 심하거나 오염된 신발은 지역 기준에 따라 일반쓰레기로 배출합니다."
+    ],
+    "cautions": [
+      "흙, 기름, 곰팡이 등 오염이 심한 신발은 수거함에 넣지 않는 편이 안전합니다.",
+      "부츠처럼 부피가 크거나 특수 소재인 신발은 지역 기준을 확인하세요."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집"
+    ],
+    "conditions": [
+      "contaminated",
+      "mixed_material",
+      "reusable"
+    ],
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "reason": "신발 수거 가능 여부와 훼손 신발 처리 기준은 지역과 수거함 운영 주체별로 다릅니다.",
+      "checkItems": [
+        "의류·신발 수거함 위치",
+        "수거 가능한 신발 상태",
+        "오염/훼손 신발 일반쓰레기 기준",
+        "부피 큰 신발류 처리 기준"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "신발은 의류·신발 수거함 가능 여부와 훼손품 처리 기준 확인이 필요합니다.",
+        "note": "품목별 배출방법 확인을 위한 공식 품목사전 출처입니다. 세부 품목 원문은 후속 검수에서 보강합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 지역별 정보",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-06-27",
+        "basis": "신발 수거함 위치와 수거 가능 상태는 지역 및 운영 주체별로 확인합니다.",
+        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "official-source-enrichment",
+      "lastReviewedAt": "2026-06-27",
+      "notes": [
+        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
+        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다."
+      ]
+    }
   }
 ]

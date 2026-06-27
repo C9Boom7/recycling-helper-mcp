@@ -1,0 +1,31 @@
+[
+  {
+    "region": "강남구",
+    "query": "폐건전지",
+    "expectedRegionId": "gangnam_gu",
+    "expectedItemId": "battery",
+    "expectedGuideContains": "주민센터"
+  },
+  {
+    "region": "서울 강남구",
+    "query": "투명 페트병",
+    "expectedRegionId": "gangnam_gu",
+    "expectedItemId": "pet_bottle",
+    "expectedGuideContains": "목요일"
+  },
+  {
+    "region": "서울시 강남구",
+    "query": "책상의자",
+    "expectedRegionId": "gangnam_gu",
+    "expectedItemId": "chair",
+    "expectedGuideContains": "배출 3일 전",
+    "expectedFeeKrw": 2000
+  },
+  {
+    "region": "gangnam-gu",
+    "query": "폐의약품",
+    "expectedRegionId": "gangnam_gu",
+    "expectedItemId": "medicine",
+    "expectedGuideContains": "폐의약품 수거함"
+  }
+]

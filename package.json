@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "tsc && mkdir -p dist/data && cp src/data/waste-items.json dist/data/waste-items.json",
+    "build": "tsc && mkdir -p dist/data && cp src/data/*.json dist/data/",
     "start": "node dist/server.js",
-    "check": "tsc --noEmit"
+    "validate:data": "node scripts/validate-data.mjs",
+    "eval:data": "node scripts/evaluate-data.mjs",
+    "check": "tsc --noEmit && node scripts/validate-data.mjs && node scripts/evaluate-data.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",

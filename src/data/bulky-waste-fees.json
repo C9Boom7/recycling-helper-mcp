@@ -1,0 +1,75 @@
+[
+  {
+    "regionId": "gangnam_gu",
+    "regionName": "서울 강남구",
+    "checkedAt": "2026-06-27",
+    "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02030000.do",
+    "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
+    "phone": "1522-3833",
+    "source": {
+      "title": "강남구 자원순환 종합포털 대형생활폐기물 안내",
+      "url": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
+      "sourceType": "local_guidance",
+      "checkedAt": "2026-06-27",
+      "basis": "대형생활폐기물 수거대상 물품/수수료 표에서 Top 50 관련 대형폐기물 품목 수수료를 확인했습니다."
+    },
+    "fees": [
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "1인용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "장의자",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "바퀴달린의자(일반)",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "바퀴달린의자(대형)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대",
+        "spec": "1인용(매트리스)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대",
+        "spec": "2인용(매트리스)",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "blanket",
+        "category": "기타생활용품",
+        "itemName": "이불",
+        "spec": "모든규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "mirror",
+        "category": "기타생활용품",
+        "itemName": "유리(거울/판유리)",
+        "spec": "1㎡당",
+        "feeKrw": 2000
+      }
+    ]
+  }
+]

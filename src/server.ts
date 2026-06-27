@@ -4,12 +4,20 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { MatchedRegionPolicy, WasteItem } from "./data.js";
 import {
   confidenceLabel,
   disposalGroupLabel,
+  findBulkyWasteFeeSchedule,
+  findBulkyWasteFees,
   findBestWasteItem,
+  findRegionalPolicy,
   findWasteItems,
   formatItemGuide,
+  formatRegionItemGuide,
+  formatRegionSourceList,
+  itemNeedsRegionCheck,
+  itemSourceRefs,
   wasteItems,
 } from "./data.js";
 
@@ -29,6 +37,39 @@ const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join("
   .filter(Boolean);
 
 type ToolResult = Record<string, unknown>;
+
+function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem): ToolResult | undefined {
+  if (!region) return undefined;
+
+  const itemGuide = item ? formatRegionItemGuide(item, region) : undefined;
+  const bulkyWasteFees = item ? findBulkyWasteFees(region.region, item) : [];
+  const bulkyWasteFeeSchedule = bulkyWasteFees.length > 0 ? findBulkyWasteFeeSchedule(region.region) : undefined;
+
+  return {
+    id: region.region.id,
+    name: region.region.name,
+    checkedAt: region.region.checkedAt,
+    summary: region.region.summary,
+    recycling: {
+      time: region.region.recycling.time,
+      vinylAndPetDay: region.region.recycling.vinylAndPetDay,
+      otherDays: region.region.recycling.otherDays,
+    },
+    itemGuide,
+    ...(bulkyWasteFeeSchedule
+      ? {
+          bulkyWasteFees: {
+            checkedAt: bulkyWasteFeeSchedule.checkedAt,
+            applicationUrl: bulkyWasteFeeSchedule.applicationUrl,
+            feeUrl: bulkyWasteFeeSchedule.feeUrl,
+            phone: bulkyWasteFeeSchedule.phone,
+            fees: bulkyWasteFees,
+          },
+        }
+      : {}),
+    sources: region.region.sources,
+  };
+}
 
 function textResult(text: string, structuredContent?: ToolResult): CallToolResult {
   return {
@@ -87,8 +128,8 @@ function registerTools(server: McpServer): void {
         `- 세부 판단: ${item.disposalType}`,
         `- 결론: ${item.summary}`,
         `- 확신도: ${confidenceLabel(item.confidence)}`,
-        `- 지역 확인 필요: ${item.needsRegionCheck ? "예" : "아니오"}`,
-        region && item.needsRegionCheck ? `- 입력 지역: ${region}` : undefined,
+        `- 지역 확인 필요: ${itemNeedsRegionCheck(item) ? "예" : "아니오"}`,
+        region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
       ]
         .filter(Boolean)
         .join("\n");
@@ -100,10 +141,14 @@ function registerTools(server: McpServer): void {
         score: match.score,
         disposalGroup: disposalGroupLabel(item.disposalType),
         disposalType: item.disposalType,
+        conditions: item.conditions,
         confidence: item.confidence,
-        needsRegionCheck: item.needsRegionCheck,
+        needsRegionCheck: itemNeedsRegionCheck(item),
+        regionPolicy: item.regionPolicy,
         region,
-        sourceRefs: item.sourceRefs,
+        sourceRefs: itemSourceRefs(item),
+        sources: item.sources,
+        review: item.review,
       });
     },
   );
@@ -130,6 +175,7 @@ function registerTools(server: McpServer): void {
       const match = findBestWasteItem(itemName);
       if (!match) return unknownItemResult(itemName);
 
+      const regionMatch = itemNeedsRegionCheck(match.item) ? findRegionalPolicy(region) : undefined;
       const text = formatItemGuide(match.item, region);
       return textResult(text, {
         found: true,
@@ -137,6 +183,7 @@ function registerTools(server: McpServer): void {
         matchedBy: match.matchedBy,
         score: match.score,
         region,
+        regionalPolicy: compactRegionalPolicy(regionMatch, match.item),
       });
     },
   );
@@ -182,7 +229,9 @@ function registerTools(server: McpServer): void {
           summary: match.item.summary,
           cautions: match.item.cautions,
           confidence: match.item.confidence,
-          needsRegionCheck: match.item.needsRegionCheck,
+          needsRegionCheck: itemNeedsRegionCheck(match.item),
+          conditions: match.item.conditions,
+          review: match.item.review,
         })),
       });
     },
@@ -226,7 +275,8 @@ function registerTools(server: McpServer): void {
           score: match.score,
           group: disposalGroupLabel(match.item.disposalType),
           summary: match.item.summary,
-          needsRegionCheck: match.item.needsRegionCheck,
+          needsRegionCheck: itemNeedsRegionCheck(match.item),
+          conditions: match.item.conditions,
         };
       });
 
@@ -280,7 +330,16 @@ function registerTools(server: McpServer): void {
     },
     async ({ region, itemName }): Promise<CallToolResult> => {
       const match = itemName ? findBestWasteItem(itemName) : undefined;
-      const checkList = [
+      const regionMatch = findRegionalPolicy(region);
+      const checkList = regionMatch
+        ? [
+            "일반쓰레기 배출시간과 장소",
+            "비닐·투명페트병 목요일 별도 배출",
+            "기타 재활용품 월·화·수·금·일요일 배출",
+            "대형생활폐기물 사전 신청과 수수료",
+            "폐건전지, 폐형광등, 폐의약품, 폐식용유, 의류수거함 위치",
+          ]
+        : [
         "재활용품 배출 요일과 시간",
         "품목별 전용 수거함 위치",
         "대형폐기물 신고 페이지와 수수료",
@@ -289,28 +348,46 @@ function registerTools(server: McpServer): void {
       ];
 
       const lines = [
-        `${region} 지역 확인 안내`,
+        `${regionMatch?.region.name ?? region} 지역 확인 안내`,
         "",
         match ? `품목: ${match.item.name}` : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.",
         match ? `기본 판단: ${match.item.summary}` : undefined,
+        regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
+        "",
+        regionMatch ? "강남구 기본 배출 기준" : undefined,
+        regionMatch ? `- 일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}` : undefined,
+        regionMatch ? `- 재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}` : undefined,
+        regionMatch ? `- ${regionMatch.region.recycling.vinylAndPetDay}` : undefined,
+        regionMatch ? `- ${regionMatch.region.recycling.otherDays}` : undefined,
+        match && regionMatch ? "" : undefined,
+        match && regionMatch ? "품목별 강남구 안내" : undefined,
+        match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
         "",
         "확인할 정보",
         ...checkList.map((item, index) => `${index + 1}. ${item}`),
         "",
         "공식 확인처",
-        "- 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do",
-        "- 거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-        "- 대형폐기물은 지자체 대형폐기물 신고 페이지",
+        ...(regionMatch
+          ? formatRegionSourceList(regionMatch.region)
+          : [
+              "- 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do",
+              "- 거주 지자체 청소/자원순환/환경 부서 안내 페이지",
+              "- 대형폐기물은 지자체 대형폐기물 신고 페이지",
+            ]),
       ].filter(Boolean);
 
       return textResult(lines.join("\n"), {
         region,
+        matchedRegion: regionMatch?.region.name,
         item: match?.item.name,
         defaultSummary: match?.item.summary,
-        officialSources: [
-          "https://www.분리배출.kr/front/region/region.do",
-          "거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-        ],
+        regionalPolicy: compactRegionalPolicy(regionMatch, match?.item),
+        officialSources: regionMatch
+          ? regionMatch.region.sources
+          : [
+              "https://www.분리배출.kr/front/region/region.do",
+              "거주 지자체 청소/자원순환/환경 부서 안내 페이지",
+            ],
         checkList,
       });
     },

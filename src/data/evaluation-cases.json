@@ -1,0 +1,302 @@
+[
+  {
+    "query": "기름 묻은 피자박스",
+    "expectedItemId": "pizza_box_oily",
+    "expectedDisposalType": "general_or_partial_recycle",
+    "notes": "오염된 종이류는 깨끗한 부분과 오염된 부분을 나누어 판단해야 합니다."
+  },
+  {
+    "query": "골판지 택배상자",
+    "expectedItemId": "delivery_box",
+    "expectedDisposalType": "recycle",
+    "notes": "운송장, 테이프, 완충재를 제거한 뒤 종이류로 배출해야 합니다."
+  },
+  {
+    "query": "택배 송장 스티커",
+    "expectedItemId": "shipping_label",
+    "expectedDisposalType": "general",
+    "notes": "상자는 종이류지만 접착 송장은 일반쓰레기로 분리해야 합니다."
+  },
+  {
+    "query": "카드 영수증",
+    "expectedItemId": "receipt",
+    "expectedDisposalType": "general",
+    "notes": "감열지는 종이류 재활용으로 안내하면 안 됩니다."
+  },
+  {
+    "query": "우유팩",
+    "expectedItemId": "milk_carton",
+    "expectedDisposalType": "recycle",
+    "notes": "내용물을 비우고 헹군 뒤 펼쳐 말려 종이팩으로 별도 배출해야 합니다."
+  },
+  {
+    "query": "두유팩",
+    "expectedItemId": "aseptic_pack",
+    "expectedDisposalType": "recycle_or_region_specific",
+    "notes": "멸균팩은 종이팩과 지역별 분리 기준 차이가 있을 수 있습니다."
+  },
+  {
+    "query": "투명 페트병",
+    "expectedItemId": "pet_bottle",
+    "expectedDisposalType": "recycle",
+    "notes": "내용물 비우기, 라벨 제거, 별도 배출 여부를 안내해야 합니다."
+  },
+  {
+    "query": "샴푸통",
+    "expectedItemId": "shampoo_bottle",
+    "expectedDisposalType": "recycle",
+    "notes": "내용물을 비우고 펌프 등 다른 재질 부품 분리를 안내해야 합니다."
+  },
+  {
+    "query": "전동칫솔모",
+    "expectedItemId": "toothbrush",
+    "expectedDisposalType": "general",
+    "notes": "작고 복합재질인 위생용품은 재활용으로 과잉 안내하지 않아야 합니다."
+  },
+  {
+    "query": "형광펜",
+    "expectedItemId": "ballpoint_pen",
+    "expectedDisposalType": "general",
+    "notes": "작고 복합재질인 필기구는 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "라면봉지",
+    "expectedItemId": "snack_bag",
+    "expectedDisposalType": "recycle_or_general",
+    "notes": "깨끗한 비닐류와 오염 비닐을 구분해야 합니다."
+  },
+  {
+    "query": "에어캡",
+    "expectedItemId": "bubble_wrap",
+    "expectedDisposalType": "recycle",
+    "notes": "깨끗한 비닐 완충재는 비닐류로 안내해야 합니다."
+  },
+  {
+    "query": "스티로폼 박스",
+    "expectedItemId": "styrofoam",
+    "expectedDisposalType": "recycle",
+    "notes": "테이프와 이물질 제거, 오염 여부 확인을 안내해야 합니다."
+  },
+  {
+    "query": "컵라면 용기",
+    "expectedItemId": "cup_noodle_container",
+    "expectedDisposalType": "general_or_recycle_if_clean",
+    "notes": "국물 자국과 기름 오염이 남으면 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "소주병",
+    "expectedItemId": "glass_bottle",
+    "expectedDisposalType": "recycle",
+    "notes": "내용물을 비우고 병뚜껑 등 다른 재질을 분리해야 합니다."
+  },
+  {
+    "query": "깨진 유리컵",
+    "expectedItemId": "broken_glass",
+    "expectedDisposalType": "nonburnable_or_general_safe_wrap",
+    "notes": "안전 포장 안내가 핵심입니다."
+  },
+  {
+    "query": "도자기 접시",
+    "expectedItemId": "ceramic_bowl",
+    "expectedDisposalType": "general_or_bulky",
+    "notes": "도자기류를 유리병류로 안내하면 안 됩니다."
+  },
+  {
+    "query": "깨진 거울",
+    "expectedItemId": "mirror",
+    "expectedDisposalType": "general_or_bulky",
+    "notes": "거울은 유리병류가 아니며 크기에 따른 대형폐기물 확인이 필요합니다."
+  },
+  {
+    "query": "통조림캔",
+    "expectedItemId": "can",
+    "expectedDisposalType": "recycle",
+    "notes": "내용물 비우기와 다른 재질 분리를 안내해야 합니다."
+  },
+  {
+    "query": "스프레이 캔",
+    "expectedItemId": "spray_can",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "압축 용기는 내용물 비우기와 안전 안내가 필요합니다."
+  },
+  {
+    "query": "부탄가스 캔",
+    "expectedItemId": "butane_can",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "잔여 가스 제거와 화기 주의 안내가 필요합니다."
+  },
+  {
+    "query": "쿠킹호일",
+    "expectedItemId": "aluminum_foil",
+    "expectedDisposalType": "general_or_recycle_if_clean",
+    "notes": "오염된 포일과 깨끗한 포일의 지역 기준 확인을 구분해야 합니다."
+  },
+  {
+    "query": "닭뼈",
+    "expectedItemId": "chicken_bone",
+    "expectedDisposalType": "general",
+    "notes": "동물 뼈는 음식물쓰레기로 안내하면 안 됩니다."
+  },
+  {
+    "query": "조개껍데기",
+    "expectedItemId": "shellfish_shell",
+    "expectedDisposalType": "general",
+    "notes": "딱딱한 껍데기류는 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "계란껍데기",
+    "expectedItemId": "egg_shell",
+    "expectedDisposalType": "general",
+    "notes": "달걀껍데기는 음식물쓰레기로 안내하면 안 됩니다."
+  },
+  {
+    "query": "복숭아씨",
+    "expectedItemId": "fruit_seed",
+    "expectedDisposalType": "general",
+    "notes": "단단한 과일씨는 일반쓰레기와 지역 기준 확인을 안내해야 합니다."
+  },
+  {
+    "query": "마늘껍질",
+    "expectedItemId": "onion_peel",
+    "expectedDisposalType": "general",
+    "notes": "질기고 마른 껍질류는 일반쓰레기와 지역 기준 확인을 안내해야 합니다."
+  },
+  {
+    "query": "커피찌꺼기",
+    "expectedItemId": "coffee_ground",
+    "expectedDisposalType": "general_or_food_region_specific",
+    "notes": "커피찌꺼기는 지역 기준 확인이 필요한 품목으로 안내해야 합니다."
+  },
+  {
+    "query": "튀김기름",
+    "expectedItemId": "used_cooking_oil",
+    "expectedDisposalType": "collection_point_or_absorb",
+    "notes": "폐식용유 수거함과 하수구 배출 금지를 안내해야 합니다."
+  },
+  {
+    "query": "폐건전지",
+    "expectedItemId": "battery",
+    "expectedDisposalType": "special_collection",
+    "notes": "전용 수거함 배출과 화재 위험 주의가 필요합니다."
+  },
+  {
+    "query": "보조배터리",
+    "expectedItemId": "power_bank",
+    "expectedDisposalType": "special_collection",
+    "notes": "화재 위험이 있어 일반쓰레기로 안내하면 안 됩니다."
+  },
+  {
+    "query": "폐형광등",
+    "expectedItemId": "fluorescent_lamp",
+    "expectedDisposalType": "special_collection",
+    "notes": "깨지지 않게 폐형광등 전용 수거함 배출을 안내해야 합니다."
+  },
+  {
+    "query": "LED 전구",
+    "expectedItemId": "led_lamp",
+    "expectedDisposalType": "region_specific",
+    "notes": "형광등과 기준이 다를 수 있어 지역 기준 확인이 필요합니다."
+  },
+  {
+    "query": "폐의약품",
+    "expectedItemId": "medicine",
+    "expectedDisposalType": "special_collection",
+    "notes": "하수구나 일반쓰레기 배출을 피하고 지정 수거함을 안내해야 합니다."
+  },
+  {
+    "query": "면도날",
+    "expectedItemId": "knife_blade",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "날카로운 품목은 안전 포장 후 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "일회용 라이터",
+    "expectedItemId": "lighter",
+    "expectedDisposalType": "general_after_empty",
+    "notes": "잔여 가스 제거와 화기 주의 안내가 필요합니다."
+  },
+  {
+    "query": "드라이기",
+    "expectedItemId": "small_electronics",
+    "expectedDisposalType": "special_collection",
+    "notes": "소형가전 수거함이나 지자체 수거 방식을 안내해야 합니다."
+  },
+  {
+    "query": "스마트폰",
+    "expectedItemId": "mobile_phone",
+    "expectedDisposalType": "special_collection",
+    "notes": "개인정보 삭제와 전자제품 회수처 안내가 필요합니다."
+  },
+  {
+    "query": "책상의자",
+    "expectedItemId": "chair",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "대형폐기물 신고와 수수료 확인이 필요합니다."
+  },
+  {
+    "query": "침대 매트리스",
+    "expectedItemId": "mattress",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "대형폐기물 신고와 지역별 수수료 확인이 필요합니다."
+  },
+  {
+    "query": "베개",
+    "expectedItemId": "blanket",
+    "expectedDisposalType": "general_or_bulky",
+    "notes": "의류수거함 대상이 아닌 경우와 대형폐기물 여부를 안내해야 합니다."
+  },
+  {
+    "query": "고장난 우산",
+    "expectedItemId": "umbrella",
+    "expectedDisposalType": "general_or_metal_separate",
+    "notes": "복합재질 분리 가능 여부와 일반쓰레기 판단을 안내해야 합니다."
+  },
+  {
+    "query": "젤 아이스팩",
+    "expectedItemId": "ice_pack",
+    "expectedDisposalType": "region_specific",
+    "notes": "물 타입과 젤 타입을 구분하고 지역 기준을 확인해야 합니다."
+  },
+  {
+    "query": "벤토나이트 모래",
+    "expectedItemId": "cat_litter",
+    "expectedDisposalType": "general",
+    "notes": "사용한 반려동물 모래는 변기 배출을 피하고 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "양념 묻은 배달 플라스틱 용기",
+    "expectedItemId": "plastic_food_container",
+    "expectedDisposalType": "recycle_or_general",
+    "notes": "오염 제거 가능 여부에 따라 플라스틱류 또는 일반쓰레기로 나뉩니다."
+  },
+  {
+    "query": "커피 묻은 종이컵",
+    "expectedItemId": "paper_cup",
+    "expectedDisposalType": "recycle_or_general",
+    "notes": "오염 여부와 종이컵 별도 수거 기준을 함께 안내해야 합니다."
+  },
+  {
+    "query": "KF94 마스크",
+    "expectedItemId": "disposable_mask",
+    "expectedDisposalType": "general",
+    "notes": "위생용품이므로 재활용품으로 안내하면 안 됩니다."
+  },
+  {
+    "query": "사용한 물티슈",
+    "expectedItemId": "wet_tissue",
+    "expectedDisposalType": "general",
+    "notes": "사용 후 오염된 위생용품은 일반쓰레기로 안내해야 합니다."
+  },
+  {
+    "query": "헌옷",
+    "expectedItemId": "clothing",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "재사용 가능 여부와 의류수거함 기준을 확인해야 합니다."
+  },
+  {
+    "query": "낡은 운동화",
+    "expectedItemId": "shoes",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "재사용 가능한 신발과 훼손된 신발을 구분해야 합니다."
+  }
+]
