@@ -16,6 +16,17 @@ import {
 const SERVICE_NAME = "RecyclingHelper(재활용척척)";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
 const HOST = process.env.HOST ?? "127.0.0.1";
+const DEFAULT_ALLOWED_HOSTS = [
+  "localhost",
+  "127.0.0.1",
+  "[::1]",
+  "recyling-helper-mcp.playmcp-endpoint.kakaocloud.io",
+  "recycling-helper-mcp.playmcp-endpoint.kakaocloud.io",
+];
+const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join(","))
+  .split(",")
+  .map((host) => host.trim())
+  .filter(Boolean);
 
 type ToolResult = Record<string, unknown>;
 
@@ -322,7 +333,10 @@ function createServer(): McpServer {
   return server;
 }
 
-const app = createMcpExpressApp();
+const app = createMcpExpressApp({
+  host: HOST,
+  allowedHosts: ALLOWED_HOSTS,
+});
 
 app.get("/health", (_req: Request, res: Response) => {
   res.json({
