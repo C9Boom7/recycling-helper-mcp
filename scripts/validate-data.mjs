@@ -3,14 +3,35 @@ import { readFileSync } from "node:fs";
 const dataPath = new URL("../src/data/waste-items.json", import.meta.url);
 const regionPolicyPath = new URL("../src/data/region-policies.json", import.meta.url);
 const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.meta.url);
+const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
+const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
 const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8"));
 const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
+const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
+const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 
 const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
 const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed"]);
 const regionScopes = new Set(["national_default", "region_specific", "local_collection_point", "bulky_waste"]);
+const questionBacklogTypes = new Set([
+  "new_item_candidate",
+  "synonym_gap",
+  "answer_gap",
+  "region_gap",
+  "source_gap",
+  "condition_gap",
+]);
+const questionBacklogStatuses = new Set(["todo", "triaged", "covered", "wont_fix"]);
+const questionBacklogPriorities = new Set(["high", "medium", "low"]);
+const mcpToolNames = new Set([
+  "classify_waste_item",
+  "get_disposal_steps",
+  "check_confusing_item",
+  "make_cleanup_plan",
+  "get_region_disposal_info",
+]);
 
 const errors = [];
 const warnings = [];
@@ -58,6 +79,14 @@ if (!Array.isArray(regionalPolicies)) {
 
 if (!Array.isArray(bulkyWasteFeeSchedules)) {
   throw new Error("src/data/bulky-waste-fees.json must contain an array");
+}
+
+if (!Array.isArray(mcpAnswerCases)) {
+  throw new Error("src/data/mcp-answer-cases.json must contain an array");
+}
+
+if (!Array.isArray(questionBacklog)) {
+  throw new Error("src/data/question-backlog.json must contain an array");
 }
 
 for (const [index, item] of items.entries()) {
@@ -253,6 +282,107 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
       if (!isNonEmptyString(fee.itemName)) errors.push(`${feePrefix}.itemName must be a non-empty string`);
       if (!isNonEmptyString(fee.spec)) errors.push(`${feePrefix}.spec must be a non-empty string`);
       if (!Number.isInteger(fee.feeKrw) || fee.feeKrw < 0) errors.push(`${feePrefix}.feeKrw must be a non-negative integer`);
+    }
+  }
+}
+
+const answerCaseIds = new Set();
+for (const [index, testCase] of mcpAnswerCases.entries()) {
+  const prefix = `mcpAnswerCase[${index}]${testCase?.id ? `(${testCase.id})` : ""}`;
+  if (!isNonEmptyString(testCase.id)) {
+    errors.push(`${prefix}.id must be a non-empty string`);
+  } else {
+    if (!/^[a-z0-9_]+$/.test(testCase.id)) errors.push(`${prefix}.id must use lowercase snake_case`);
+    if (answerCaseIds.has(testCase.id)) errors.push(`${prefix}.id is duplicated`);
+    answerCaseIds.add(testCase.id);
+  }
+
+  if (!mcpToolNames.has(testCase.tool)) {
+    errors.push(`${prefix}.tool must be one of ${Array.from(mcpToolNames).join(", ")}`);
+  }
+
+  if (!testCase.arguments || typeof testCase.arguments !== "object" || Array.isArray(testCase.arguments)) {
+    errors.push(`${prefix}.arguments must be an object`);
+  }
+
+  for (const field of [
+    "expectedTextIncludes",
+    "expectedTextExcludes",
+    "expectedStructuredIncludes",
+    "expectedStructuredExcludes",
+  ]) {
+    if (testCase[field] === undefined) continue;
+    if (!Array.isArray(testCase[field])) {
+      errors.push(`${prefix}.${field} must be an array when present`);
+      continue;
+    }
+    for (const [valueIndex, value] of testCase[field].entries()) {
+      if (!isNonEmptyString(value)) errors.push(`${prefix}.${field}[${valueIndex}] must be a non-empty string`);
+    }
+  }
+
+  const hasExpectation = [
+    "expectedTextIncludes",
+    "expectedTextExcludes",
+    "expectedStructuredIncludes",
+    "expectedStructuredExcludes",
+  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0);
+  if (!hasExpectation) {
+    errors.push(`${prefix} must include at least one expectation`);
+  }
+}
+
+const questionBacklogIds = new Set();
+for (const [index, question] of questionBacklog.entries()) {
+  const prefix = `questionBacklog[${index}]${question?.id ? `(${question.id})` : ""}`;
+
+  if (!isNonEmptyString(question.id)) {
+    errors.push(`${prefix}.id must be a non-empty string`);
+  } else {
+    if (!/^[a-z0-9_]+$/.test(question.id)) errors.push(`${prefix}.id must use lowercase snake_case`);
+    if (questionBacklogIds.has(question.id)) errors.push(`${prefix}.id is duplicated`);
+    questionBacklogIds.add(question.id);
+  }
+
+  for (const field of ["query", "type", "status", "priority", "observed", "expectedAction"]) {
+    if (!isNonEmptyString(question[field])) errors.push(`${prefix}.${field} must be a non-empty string`);
+  }
+
+  if (question.region !== undefined && !isNonEmptyString(question.region)) {
+    errors.push(`${prefix}.region must be a non-empty string when present`);
+  }
+
+  if (!questionBacklogTypes.has(question.type)) {
+    errors.push(`${prefix}.type must be one of ${Array.from(questionBacklogTypes).join(", ")}`);
+  }
+
+  if (!questionBacklogStatuses.has(question.status)) {
+    errors.push(`${prefix}.status must be one of ${Array.from(questionBacklogStatuses).join(", ")}`);
+  }
+
+  if (!questionBacklogPriorities.has(question.priority)) {
+    errors.push(`${prefix}.priority must be one of ${Array.from(questionBacklogPriorities).join(", ")}`);
+  }
+
+  if (!Array.isArray(question.candidateItemIds)) {
+    errors.push(`${prefix}.candidateItemIds must be an array`);
+  } else {
+    for (const [candidateIndex, itemId] of question.candidateItemIds.entries()) {
+      if (!isNonEmptyString(itemId)) {
+        errors.push(`${prefix}.candidateItemIds[${candidateIndex}] must be a non-empty string`);
+      } else if (!ids.has(itemId)) {
+        warnings.push(`${prefix}.candidateItemIds[${candidateIndex}] references unknown item ${itemId}`);
+      }
+    }
+  }
+
+  if (question.notes !== undefined) {
+    if (!Array.isArray(question.notes)) {
+      errors.push(`${prefix}.notes must be an array when present`);
+    } else {
+      for (const [noteIndex, note] of question.notes.entries()) {
+        if (!isNonEmptyString(note)) errors.push(`${prefix}.notes[${noteIndex}] must be a non-empty string`);
+      }
     }
   }
 }

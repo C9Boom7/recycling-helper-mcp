@@ -2,16 +2,16 @@
   {
     "regionId": "gangnam_gu",
     "regionName": "서울 강남구",
-    "checkedAt": "2026-06-27",
-    "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02030000.do",
+    "checkedAt": "2026-07-02",
+    "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02010000.do",
     "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
     "phone": "1522-3833",
     "source": {
       "title": "강남구 자원순환 종합포털 대형생활폐기물 안내",
       "url": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-06-27",
-      "basis": "대형생활폐기물 수거대상 물품/수수료 표에서 Top 50 관련 대형폐기물 품목 수수료를 확인했습니다."
+      "checkedAt": "2026-07-02",
+      "basis": "대형생활폐기물 수거대상 물품/수수료 표에서 Top 50 관련 대형폐기물 품목과 사용자 질문의 리빙박스·플라스틱 수납함, 요가매트, 빨래건조대, 화분, 장난감, 인형 관련 수수료 후보를 확인했습니다. 신청 URL은 현재 휴대폰 인증 신청 화면으로 연결되는 경로를 사용합니다."
     },
     "fees": [
       {
@@ -64,11 +64,374 @@
         "feeKrw": 2000
       },
       {
+        "itemId": "yoga_mat",
+        "category": "기타생활용품",
+        "itemName": "돗자리(대자리/놀이매트)",
+        "spec": "1㎡당",
+        "feeKrw": 1000
+      },
+      {
         "itemId": "mirror",
         "category": "기타생활용품",
         "itemName": "유리(거울/판유리)",
         "spec": "1㎡당",
         "feeKrw": 2000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "기타생활용품",
+        "itemName": "기타 프라스틱류",
+        "spec": "5kg 당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "4단 이하",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "5단 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "기타생활용품",
+        "itemName": "빨래건조대",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타생활용품",
+        "itemName": "화분",
+        "spec": "높이 50cm이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타생활용품",
+        "itemName": "화분",
+        "spec": "높이 50cm미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "기타생활용품",
+        "itemName": "인형/ 장난감류",
+        "spec": "대형(미끄럼틀/ 놀이집 등)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "toy",
+        "category": "기타생활용품",
+        "itemName": "인형/ 장난감류",
+        "spec": "소형(3kg당)",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "기타생활용품",
+        "itemName": "인형/ 장난감류",
+        "spec": "대형(미끄럼틀/ 놀이집 등)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "기타생활용품",
+        "itemName": "인형/ 장난감류",
+        "spec": "소형(3kg당)",
+        "feeKrw": 1000
+      }
+    ]
+  },
+  {
+    "regionId": "seocho_gu",
+    "regionName": "서울 서초구",
+    "checkedAt": "2026-07-02",
+    "applicationUrl": "https://www.seocho.go.kr/site/seocho/ex/bigWaste/BigWasteUserFStart.do",
+    "feeUrl": "https://www.seocho.go.kr/site/seocho/01/10103070301002018030701.jsp",
+    "phone": "02-2155-6720",
+    "source": {
+      "title": "서초구청 대형폐기물 배출안내",
+      "url": "https://www.seocho.go.kr/site/seocho/01/10103070301002018030701.jsp",
+      "sourceType": "local_guidance",
+      "checkedAt": "2026-07-02",
+      "basis": "대형폐기물 배출안내의 부과기준표(PDF)에서 Top 대형폐기물 일부와 사용자 질문 확장 후보인 빨래건조대, 빈 화분, 장난감류, 인형류 행만 우선 구조화했습니다. 전체 표, 소파·책상·장롱·가전·여름용 이불 등 미선정 행은 이번 수집 범위에서 제외했습니다."
+    },
+    "fees": [
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "1인용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "책상용의자(바퀴달린 의자)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "책상용의자(바퀴달린 의자 대형)",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "장의자",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대 매트리스",
+        "spec": "1인용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대 매트리스",
+        "spec": "2인용",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "blanket",
+        "category": "생활용품",
+        "itemName": "이불",
+        "spec": "겨울용(1채당)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품",
+        "itemName": "대자리(돗자리)",
+        "spec": "3.3㎡(1평)당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "mirror",
+        "category": "생활용품",
+        "itemName": "거울",
+        "spec": "1m×60cm 이하",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "mirror",
+        "category": "생활용품",
+        "itemName": "거울",
+        "spec": "1m×60cm 초과",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "4단 이하",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "5단 이상",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "기타",
+        "itemName": "빨래건조대",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타",
+        "itemName": "빈 화분",
+        "spec": "대형",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타",
+        "itemName": "빈 화분",
+        "spec": "소형",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "기타",
+        "itemName": "장난감류",
+        "spec": "모든 규격",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "기타",
+        "itemName": "인형류",
+        "spec": "대형",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "기타",
+        "itemName": "인형류",
+        "spec": "소형",
+        "feeKrw": 1000
+      }
+    ]
+  },
+  {
+    "regionId": "songpa_gu",
+    "regionName": "서울 송파구",
+    "checkedAt": "2026-07-02",
+    "applicationUrl": "https://www.songpa.go.kr/www/addWstExhAppView.do?key=2119",
+    "feeUrl": "https://www.songpa.go.kr/www/exhaustPrdlstList.do?key=2118&rep=1",
+    "phone": "02-2147-6380",
+    "source": {
+      "title": "송파구청 품목별수거기준 및 비용",
+      "url": "https://www.songpa.go.kr/www/exhaustPrdlstList.do?key=2118&rep=1",
+      "sourceType": "local_guidance",
+      "checkedAt": "2026-07-02",
+      "basis": "품목별수거기준 및 비용 표에서 Top 대형폐기물 일부와 사용자 질문 확장 후보인 빨래건조대, 화분, 장난감, 인형 행만 우선 구조화했습니다. 전체 표, 소파·책상·장롱·가전·컬러박스·전기담요 등 미선정 행은 이번 수집 범위에서 제외했습니다."
+    },
+    "fees": [
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "1인용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "장의자",
+        "feeKrw": 6000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "회전의자",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(목재)",
+        "spec": "1인용 매트리스",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(목재)",
+        "spec": "2인용 매트리스",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "blanket",
+        "category": "생활용품류",
+        "itemName": "이불",
+        "spec": "겨울용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리(대자리,놀이매트)",
+        "spec": "1㎡당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "mirror",
+        "category": "가구류",
+        "itemName": "거울",
+        "spec": "가장 긴면 50cm미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "mirror",
+        "category": "가구류",
+        "itemName": "거울",
+        "spec": "가장 긴면 50cm이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "4단 이하",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "가구류",
+        "itemName": "서랍장",
+        "spec": "5단 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "생활용품류",
+        "itemName": "빨래건조대",
+        "spec": "길이 1m 미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "생활용품류",
+        "itemName": "빨래건조대",
+        "spec": "길이 1m 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타류",
+        "itemName": "화분",
+        "spec": "지름 50cm 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "기타류",
+        "itemName": "화분",
+        "spec": "지름 50cm 미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "생활용품류",
+        "itemName": "장난감",
+        "spec": "길이 50cm미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "생활용품류",
+        "itemName": "장난감",
+        "spec": "길이 50cm이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "생활용품류",
+        "itemName": "인형",
+        "spec": "인형",
+        "feeKrw": 1000
       }
     ]
   }

@@ -333,19 +333,22 @@ function registerTools(server: McpServer): void {
       const regionMatch = findRegionalPolicy(region);
       const checkList = regionMatch
         ? [
-            "일반쓰레기 배출시간과 장소",
-            "비닐·투명페트병 목요일 별도 배출",
-            "기타 재활용품 월·화·수·금·일요일 배출",
+            `일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}`,
+            `재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}`,
+            regionMatch.region.recycling.vinylAndPetDay,
+            regionMatch.region.recycling.otherDays,
+            "불연성 폐기물 봉투, 특수마대, PP봉투 등 지역 지정 봉투 기준",
+            "음식물류폐기물 전용봉투, RFID, 제외 품목",
             "대형생활폐기물 사전 신청과 수수료",
             "폐건전지, 폐형광등, 폐의약품, 폐식용유, 의류수거함 위치",
           ]
         : [
-        "재활용품 배출 요일과 시간",
-        "품목별 전용 수거함 위치",
-        "대형폐기물 신고 페이지와 수수료",
-        "폐건전지, 폐형광등, 폐의약품 등 생활계 유해폐기물 수거 장소",
-        "아파트, 단독주택, 상가 등 주택 유형별 배출 방식",
-      ];
+            "재활용품 배출 요일과 시간",
+            "품목별 전용 수거함 위치",
+            "대형폐기물 신고 페이지와 수수료",
+            "폐건전지, 폐형광등, 폐의약품 등 생활계 유해폐기물 수거 장소",
+            "아파트, 단독주택, 상가 등 주택 유형별 배출 방식",
+          ];
 
       const lines = [
         `${regionMatch?.region.name ?? region} 지역 확인 안내`,
@@ -354,13 +357,13 @@ function registerTools(server: McpServer): void {
         match ? `기본 판단: ${match.item.summary}` : undefined,
         regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
         "",
-        regionMatch ? "강남구 기본 배출 기준" : undefined,
+        regionMatch ? `${regionMatch.region.name} 기본 배출 기준` : undefined,
         regionMatch ? `- 일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}` : undefined,
         regionMatch ? `- 재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}` : undefined,
         regionMatch ? `- ${regionMatch.region.recycling.vinylAndPetDay}` : undefined,
         regionMatch ? `- ${regionMatch.region.recycling.otherDays}` : undefined,
         match && regionMatch ? "" : undefined,
-        match && regionMatch ? "품목별 강남구 안내" : undefined,
+        match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
         match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
         "",
         "확인할 정보",

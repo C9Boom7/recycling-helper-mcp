@@ -9,7 +9,13 @@
     "start": "node dist/server.js",
     "validate:data": "node scripts/validate-data.mjs",
     "eval:data": "node scripts/evaluate-data.mjs",
-    "check": "tsc --noEmit && node scripts/validate-data.mjs && node scripts/evaluate-data.mjs"
+    "backlog:questions": "node scripts/report-question-backlog.mjs",
+    "backlog:auto": "node scripts/auto-backlog-queries.mjs",
+    "backlog:auto:quality": "node scripts/auto-backlog-queries.mjs --input logs/quality-seed-queries.example.jsonl --region \"서울 강남구\"",
+    "log:query": "node scripts/log-query.mjs",
+    "check": "tsc --noEmit && node scripts/validate-data.mjs && node scripts/evaluate-data.mjs",
+    "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
+    "local:test": "pnpm check && pnpm smoke:mcp"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",

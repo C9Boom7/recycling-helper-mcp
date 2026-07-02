@@ -1,0 +1,2 @@
+{"createdAt":"2026-07-01T00:00:00.000Z","query":"요가매트는 어떻게 버려?","region":"서울 강남구","source":"manual-test","tool":"get_disposal_steps","answer":"bad_match","notes":["이불의 짧은 별칭 요로 과매칭될 수 있음"]}
+{"createdAt":"2026-07-01T00:00:00.000Z","query":"청소기 먼지는 어떻게 버려?","region":"서울 강남구","source":"manual-test","tool":"get_disposal_steps","answer":"ok_but_low_confidence","notes":["needs_source 품목이라 단독 공식 근거 추가 확인 필요"]}

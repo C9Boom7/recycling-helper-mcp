@@ -62,6 +62,9 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 자세한 절차는 [docs/playmcp-in-kc.md](docs/playmcp-in-kc.md)를 참고하세요.
 
+평소 개발은 로컬 검증을 우선하고, 큰 개선이나 제출 전 확인이 필요할 때만 PlayMCP in KC에 새 서버를 올립니다.
+자세한 로컬 검증 흐름은 [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)를 참고하세요.
+
 ## Kubernetes 직접 배포
 
 일반 카카오클라우드 Kubernetes Engine에 직접 배포해야 하는 경우에만 `k8s/` manifest를 사용합니다.
@@ -81,15 +84,28 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 - 품목 데이터: `src/data/waste-items.json`
 - 대표 질문 평가셋: `src/data/evaluation-cases.json`
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json`
+- 질문 백로그: `src/data/question-backlog.json`
 - 작업 가이드: [docs/data-quality.md](docs/data-quality.md)
+- 질문 백로그 흐름: [docs/question-backlog.md](docs/question-backlog.md)
 - Top 50 품목: [docs/top-50-items.md](docs/top-50-items.md)
 - 출처 커버리지: [docs/source-coverage.md](docs/source-coverage.md)
+- 출처 갭 정책: [docs/source-gap-policy.md](docs/source-gap-policy.md)
+- High-priority 출처 조사: [docs/source-research-high-priority-2026-07-01.md](docs/source-research-high-priority-2026-07-01.md)
 - 강남구 지역 기준: [docs/gangnam-region-policy.md](docs/gangnam-region-policy.md)
+- 지역 정책 비교: [docs/region-policy-comparison.md](docs/region-policy-comparison.md)
+- 로컬 MCP 검증 흐름: [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)
 
 검증:
 
 ```bash
 pnpm validate:data
 pnpm eval:data
+pnpm backlog:questions
+pnpm log:query -- --query "요가매트는 어떻게 버려?"
+pnpm backlog:auto -- --query "요가매트는 어떻게 버려?"
+pnpm backlog:auto:quality
 pnpm check
+pnpm smoke:mcp
+pnpm local:test
 ```

@@ -1,0 +1,2641 @@
+[
+  {
+    "id": "frying_pan",
+    "query": "후라이팬은 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "Top 50 품목에 전용 항목이 없어 금속류, 불연성 폐기물, 대형폐기물 중 어느 기준이 맞는지 확인이 필요했다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 frying_pan 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "frying_pan"
+    ],
+    "notes": [
+      "손잡이 재질, 코팅 여부, 크기에 따라 답변이 달라질 수 있다.",
+      "사용자는 프라이팬, 후라이팬을 모두 입력할 수 있다."
+    ]
+  },
+  {
+    "id": "cooking_pot",
+    "query": "냄비는 분리수거 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "금속 조리도구 계열이 품목 데이터에 없었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 cooking_pot 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "cooking_pot"
+    ],
+    "notes": [
+      "냄비, 솥, 냄비뚜껑을 별칭 또는 분리 품목으로 볼지 결정해야 한다."
+    ]
+  },
+  {
+    "id": "cable_wire",
+    "query": "충전 케이블은 어디에 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "전선, 충전 케이블, 이어폰 줄 같은 소형 전기 부속품 기준이 비어 있었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 cable_wire 품목, 강남구 PP봉투 확인 문구, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "cable_wire",
+      "small_electronics"
+    ],
+    "notes": [
+      "전국 공통 판단은 소형전기전자제품 전용수거함이지만 강남구 전선 PP봉투 안내를 함께 확인한다."
+    ]
+  },
+  {
+    "id": "rubber_gloves",
+    "query": "고무장갑은 재활용이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "고무류 생활용품 기준이 없었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 rubber_gloves 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "rubber_gloves"
+    ],
+    "notes": [
+      "가정용 고무장갑은 복합 합성 고무재질로 종량제봉투 배출을 안내한다."
+    ]
+  },
+  {
+    "id": "toothpaste_tube",
+    "query": "치약 튜브는 플라스틱으로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "내용물 잔여물과 복합재질 튜브 기준이 데이터에 없었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 toothpaste_tube 품목, 도포·첩합 예외, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "toothpaste_tube"
+    ],
+    "notes": [
+      "내용물을 비우고 헹군 플라스틱 표시 제품은 플라스틱류로, 도포·첩합 표시는 종량제봉투로 안내한다."
+    ]
+  },
+  {
+    "id": "wooden_chopsticks",
+    "query": "나무젓가락은 음식물쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "나무류 일회용품과 음식물쓰레기 오인 케이스가 없었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 chopsticks 품목, 음식물쓰레기 제외 문구, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "chopsticks"
+    ],
+    "notes": [
+      "나무젓가락과 복합재질 젓가락은 종량제봉투, 금속 단일재질 젓가락은 고철류로 구분한다."
+    ]
+  },
+  {
+    "id": "plastic_straw",
+    "query": "빨대는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "작고 오염되기 쉬운 플라스틱 품목 기준이 없었다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 straw 품목, 플라스틱/금속/PLA 재질별 기준, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "straw"
+    ],
+    "notes": [
+      "작은 PP 빨대는 이물질이 없을 때 플라스틱류, 금속 빨대는 고철류, 옥수수·PLA 빨대는 종량제봉투로 안내한다."
+    ]
+  },
+  {
+    "id": "pencil_lead",
+    "query": "샤프심은 어디에 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "low",
+    "observed": "작은 문구류 소모품 기준이 없다.",
+    "expectedAction": "공식 품목사전의 연필/흑연심 근거를 확인해 pencil_lead 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "pencil_lead"
+    ],
+    "notes": [
+      "볼펜 품목과 별개로 관리한다.",
+      "샤프심 단독 항목은 확인되지 않아 연필의 흑연심·소형 문구류 기준을 보수적으로 적용했다."
+    ]
+  },
+  {
+    "id": "parcel_plastic_bag",
+    "query": "택배 비닐봉투는 비닐류로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "비닐류 품목은 과자봉지 중심이라 택배 비닐봉투 질의가 정확히 매칭되지 않을 수 있었다.",
+    "expectedAction": "snack_bag을 비닐류 포장재 대표 품목으로 확장하고 택배 비닐봉투 별칭, 송장·테이프 분리 안내, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "snack_bag"
+    ],
+    "notes": [
+      "송장 스티커, 테이프, 오염 여부가 답변에 포함되어야 한다."
+    ]
+  },
+  {
+    "id": "ice_pack_water_gel",
+    "query": "물 아이스팩이랑 젤 아이스팩은 버리는 방법이 달라?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "ice_pack 품목은 있었으나 물형/젤형 차이를 회귀 테스트로 고정하지 않았다.",
+    "expectedAction": "공식 품목사전 상세 근거를 확인해 물 타입/젤 타입 별칭, 답변 문구, 강남구 확인 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "ice_pack"
+    ],
+    "notes": [
+      "강남구 수거함 또는 재사용 거점 여부 확인이 필요할 수 있다."
+    ]
+  },
+  {
+    "id": "plant_soil",
+    "query": "화분 흙은 음식물쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "흙, 모래, 화분 부산물 기준이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 plant_soil 품목, 불연성종량제봉투/특수규격마대 안내, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "plant_soil"
+    ],
+    "notes": [
+      "식물 줄기, 화분, 흙은 분리해서 안내한다.",
+      "화분 흙은 음식물쓰레기가 아니라 불연성폐기물로 안내한다."
+    ]
+  },
+  {
+    "id": "paint_can",
+    "query": "페인트통은 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "유해성 잔여물과 용기 재질이 모두 영향을 주는 품목이 없었다.",
+    "expectedAction": "공식 품목사전과 지침 근거를 확인해 paint_can 품목, 생활계 유해폐기물 안전 문구, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "paint_can"
+    ],
+    "notes": [
+      "내용물이 남은 페인트는 생활계 유해폐기물로 밀봉과 전용 수거함/지자체 조례 기준을 안내한다.",
+      "빈 용기는 내용물 제거 여부를 확인한 뒤 지역 기준에 따라 안내한다."
+    ]
+  },
+  {
+    "id": "non_empty_hairspray",
+    "query": "헤어스프레이가 조금 남았는데 캔으로 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "spray_can 품목은 있었으나 내용물이 남은 경우의 안전 답변을 더 강하게 검증해야 했다.",
+    "expectedAction": "공식 지침과 품목사전 근거를 확인해 내용물 남음, 위험 표시, 밀봉, 생활계 유해폐기물 안내와 MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "spray_can"
+    ],
+    "notes": [
+      "안전 관련 표현은 답변 회귀 케이스로 고정하는 것이 좋다."
+    ]
+  },
+  {
+    "id": "broken_fluorescent_lamp",
+    "query": "깨진 형광등은 수거함에 넣어도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "fluorescent_lamp 품목은 있었으나 파손 시 안전 포장과 수거함 금지 안내가 충분히 검증되지 않았다.",
+    "expectedAction": "공식 지침과 품목사전 근거를 확인해 깨지지 않은 형광등/깨진 형광등 기준을 나누고 MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "fluorescent_lamp"
+    ],
+    "notes": [
+      "파손품은 일반 수거함 투입 금지 여부를 공식 근거로 확인해야 한다."
+    ]
+  },
+  {
+    "id": "coffee_capsule",
+    "query": "커피 캡슐은 재활용으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "알루미늄/플라스틱 복합재질과 내용물 제거 기준이 없다.",
+    "expectedAction": "분리배출 지침과 제조사 회수 프로그램 근거를 확인해 coffee_capsule 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "coffee_capsule",
+      "coffee_ground"
+    ],
+    "notes": [
+      "커피 찌꺼기와 캡슐 용기를 분리해서 안내한다.",
+      "품목사전 단독 항목이 없어 제조사 회수 프로그램을 우선 확인하고, 분리·세척이 어려우면 종량제봉투로 안내한다."
+    ]
+  },
+  {
+    "id": "power_strip",
+    "query": "멀티탭은 소형가전으로 버려?",
+    "region": "서울 강남구",
+    "type": "answer_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "small_electronics로 넓게 답할 수 있으나 멀티탭 전용 문구와 별칭이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 power_strip 품목, 소형전기전자제품 전용수거함 안내, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "power_strip",
+      "small_electronics"
+    ],
+    "notes": [
+      "콘센트, 멀티콘센트, 전원탭 별칭을 같이 반영했다.",
+      "강남구에서는 소형폐가전 신청 방식과 전용수거함 이용 가능 여부를 함께 확인한다."
+    ]
+  },
+  {
+    "id": "nail_polish",
+    "query": "매니큐어 병은 유리병으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "화장품 용기 품목만으로는 남은 매니큐어, 솔, 유리병, 유해 액체 여부를 안전하게 구분하기 어렵다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 nail_polish 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "nail_polish"
+    ],
+    "notes": [
+      "내용물이 굳었는지, 액체가 남았는지에 따라 답변이 달라질 수 있다.",
+      "유리병처럼 보여도 내용물과 솔이 남으면 유리병류로 바로 안내하면 위험하다."
+    ]
+  },
+  {
+    "id": "perfume_bottle",
+    "query": "향수병은 유리병으로 분리수거해?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "화장품 용기 품목은 있으나 알코올성 액체, 금속 펌프, 스프레이 부품 분기까지 회귀 테스트가 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 perfume_bottle 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "perfume_bottle"
+    ],
+    "notes": [
+      "향수병은 예쁜 유리병이라 재활용 오인이 많다.",
+      "내용물이 남은 경우 하수구 배출 금지 문구가 필요한지 확인한다."
+    ]
+  },
+  {
+    "id": "mercury_thermometer",
+    "query": "수은 체온계가 깨졌는데 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "수은, 유리 파편, 밀봉, 환기 같은 안전 조치가 필요한 고위험 품목이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 mercury_thermometer 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "mercury_thermometer"
+    ],
+    "notes": [
+      "깨진 유리 일반 안내로 처리하면 수은 노출 위험을 놓칠 수 있다.",
+      "응답 회귀 케이스로 안전 문구를 강하게 고정해야 한다."
+    ]
+  },
+  {
+    "id": "pesticide_container",
+    "query": "살충제 통에 내용물이 남았는데 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "스프레이캔과 비슷하지만 농약·살충제 잔여물은 생활계 유해폐기물 기준이 따로 필요할 수 있다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 pesticide_container 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "pesticide_container"
+    ],
+    "notes": [
+      "내용물이 남은 경우 재활용품 직행 금지 문구가 필요하다.",
+      "에어로졸 살충제와 플라스틱 약제 용기를 나눠야 할 수 있다."
+    ]
+  },
+  {
+    "id": "fire_extinguisher",
+    "query": "소화기는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "압축 용기이자 대형·특수 폐기물 가능성이 있는 품목 기준이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 fire_extinguisher 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "fire_extinguisher"
+    ],
+    "notes": [
+      "소화기는 캔류나 고철류로 단순 안내하면 안 된다.",
+      "내용물과 압력 잔여 여부 확인이 필요할 수 있다."
+    ]
+  },
+  {
+    "id": "remaining_lighter_gas",
+    "query": "라이터에 가스 남았는데 그냥 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "lighter 품목은 있지만 잔여 가스가 있을 때의 안전 답변을 MCP 회귀 케이스로 고정하지 않았다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 lighter 품목의 잔여 가스 안전 문구, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "lighter"
+    ],
+    "notes": [
+      "스프레이캔의 남은 내용물 케이스와 같은 안전 톤이 필요하다."
+    ]
+  },
+  {
+    "id": "swollen_power_bank",
+    "query": "부푼 보조배터리는 수거함에 넣어도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "보조배터리 품목은 있으나 부풀거나 손상된 리튬배터리의 화재 위험과 수거함 투입 가능 여부를 구분하지 않는다.",
+    "expectedAction": "공식 품목사전의 보조배터리 화재 위험 근거를 바탕으로 power_bank 품목의 팽창·손상 안전 문구, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "power_bank",
+      "battery"
+    ],
+    "notes": [
+      "일반 폐건전지 수거함 안내만으로는 화재 위험 케이스를 놓칠 수 있다."
+    ]
+  },
+  {
+    "id": "disposable_razor",
+    "query": "일회용 면도기는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "칼날 품목은 있으나 플라스틱 손잡이와 금속 날이 붙은 면도기 기준이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 disposable_razor 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "disposable_razor",
+      "knife_blade"
+    ],
+    "notes": [
+      "날카로운 품목이므로 MCP 답변 케이스에 안전 포장 문구를 넣어야 한다."
+    ]
+  },
+  {
+    "id": "tea_bag",
+    "query": "티백은 음식물쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "커피찌꺼기와 비슷하지만 종이/부직포 티백, 실, 스테이플러, 찻잎 분리 여부가 데이터에 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 tea_bag 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "tea_bag"
+    ],
+    "notes": [
+      "티백 자체와 안의 찻잎을 구분해야 할 수 있다.",
+      "강남구 음식물쓰레기 예외와 연결해 확인한다."
+    ]
+  },
+  {
+    "id": "wilted_flower",
+    "query": "시든 꽃은 음식물쓰레기로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "식물 줄기, 꽃, 흙, 화분을 구분하는 품목은 아직 plant_soil과 flower_pot 중심이다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 wilted_flower 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "wilted_flower",
+      "plant_soil",
+      "flower_pot"
+    ],
+    "notes": [
+      "흙과 식물체를 분리해서 답해야 한다.",
+      "꽃다발 포장 비닐과 철사는 별도 분리 가능성이 있다."
+    ]
+  },
+  {
+    "id": "candle",
+    "query": "향초는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "왁스, 유리 용기, 금속 심지 받침, 향료 잔여물이 섞인 품목 기준이 없다.",
+    "expectedAction": "공식 품목사전의 양초·플라스틱 근거를 확인해 candle 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "candle",
+      "glass_bottle"
+    ],
+    "notes": [
+      "캔들 유리 용기를 유리병류로 바로 안내해도 되는지 확인해야 한다.",
+      "향초와 양초 별칭을 함께 검토한다."
+    ]
+  },
+  {
+    "id": "contact_lens",
+    "query": "콘택트렌즈는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "작고 물렁한 합성수지·위생용품 계열 기준이 없다.",
+    "expectedAction": "한국소비자원 공식 콘텐츠와 렌즈케이스·플라스틱 공식 근거를 바탕으로 contact_lens 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "contact_lens",
+      "plastic_food_container"
+    ],
+    "notes": [
+      "렌즈 자체는 하수구 배출 금지 문구가 필요할 수 있다.",
+      "렌즈 케이스와 알루미늄 포장재는 별도 품목이 될 수 있다.",
+      "한국소비자원 공식 콘텐츠에서 콘택트렌즈는 미세플라스틱이 되어 수질오염을 유발할 수 있으므로 일반쓰레기로 버리라고 안내한다.",
+      "생활폐기물 분리배출 누리집에는 콘택트렌즈 단독 품목사전 항목이 없으므로 렌즈케이스와 플라스틱 근거를 함께 관리한다."
+    ]
+  },
+  {
+    "id": "cd_dvd",
+    "query": "CD는 플라스틱으로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "작고 코팅된 복합 플라스틱 디스크 기준이 없다.",
+    "expectedAction": "공식 품목사전의 CD·플라스틱 근거를 확인해 cd_dvd 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "cd_dvd",
+      "coated_paper"
+    ],
+    "notes": [
+      "디스크와 플라스틱 케이스를 분리해서 안내해야 할 수 있다."
+    ]
+  },
+  {
+    "id": "clothes_hanger",
+    "query": "옷걸이는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "플라스틱, 철사, 나무, 세탁소 옷걸이처럼 재질별로 답이 갈리는 품목이 없다.",
+    "expectedAction": "공식 품목사전의 세탁소 옷걸이·플라스틱 근거를 확인해 clothes_hanger 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "clothes_hanger",
+      "plastic_cup",
+      "cooking_pot"
+    ],
+    "notes": [
+      "철사 옷걸이와 플라스틱 옷걸이를 같은 답변으로 처리하면 안 된다.",
+      "세탁소 회수 안내를 넣을지 결정한다."
+    ]
+  },
+  {
+    "id": "sponge_scrubber",
+    "query": "수세미는 재활용이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "오염된 스펀지, 철수세미, 아크릴 수세미 기준이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 sponge_scrubber 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "sponge_scrubber"
+    ],
+    "notes": [
+      "철수세미와 스펀지 수세미는 분리 품목이 될 수 있다."
+    ]
+  },
+  {
+    "id": "disposable_cutlery",
+    "query": "일회용 숟가락이랑 포크는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "젓가락과 빨대는 있지만 일회용 숟가락·포크·나이프 기준이 없다.",
+    "expectedAction": "공식 품목사전의 아이스크림 숟가락·옥수수 식기 근거를 확인해 disposable_cutlery 품목, 강남구 지역 가이드, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "disposable_cutlery",
+      "chopsticks",
+      "straw"
+    ],
+    "notes": [
+      "음식물 오염 제거 가능 여부가 중요하다.",
+      "PLA 재질은 빨대 케이스와 같은 분기로 검토한다."
+    ]
+  },
+  {
+    "id": "silicone_kitchenware",
+    "query": "실리콘 주걱은 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "실리콘 조리도구나 실리콘 빨대처럼 플라스틱으로 오인하기 쉬운 재질 기준이 없다.",
+    "expectedAction": "공식 품목사전 근거를 확인해 silicone_kitchenware 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "silicone_kitchenware"
+    ],
+    "notes": [
+      "실리콘 빨대는 기존 straw 품목 별칭 또는 별도 품목으로 볼지 결정한다."
+    ]
+  },
+  {
+    "id": "vacuum_dust",
+    "query": "청소기 먼지는 일반쓰레기로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "먼지, 머리카락, 미세 플라스틱, 고양이 모래와 섞인 청소 폐기물 기준이 없다.",
+    "expectedAction": "화장지·걸레·물티슈 공식 근거와 품목사전 검색 미확인 메모를 바탕으로 vacuum_dust 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "vacuum_dust",
+      "cat_litter",
+      "wet_tissue"
+    ],
+    "notes": [
+      "로봇청소기 먼지통, 진공청소기 먼지봉투 별칭을 같이 검토한다.",
+      "청소기 먼지 자체의 국내 공식 단독 품목사전 근거는 아직 추가 확인이 필요하다."
+    ]
+  },
+  {
+    "id": "ice_pack_reuse_location",
+    "query": "젤 아이스팩 수거함 위치도 알려줄 수 있어?",
+    "region": "서울 강남구",
+    "type": "region_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "ice_pack 품목은 있지만 강남구 수거함 위치 데이터를 구조화하지 않았다. 강남구 자원순환 종합포털 위치정보 메뉴 확인 결과 아이스팩 전용 항목은 별도 노출되지 않았다.",
+    "expectedAction": "강남구 공식 위치정보에 아이스팩 전용 수거함 주소가 확인되지 않아 주소·좌표 데이터 구조화는 보류하고, 정확한 수거함 주소를 답하지 않는 지역 안내와 MCP 답변 회귀 케이스로 반영했다.",
+    "candidateItemIds": [
+      "ice_pack"
+    ],
+    "notes": [
+      "사용자에게 위치를 직접 답하려면 수거함 주소/좌표 데이터 구조가 필요하다.",
+      "강남구 자원순환 종합포털 위치정보 메뉴는 담배꽁초, 폐의약품, 폐형광등·폐건전지, 폐식용유, 의류수거함을 노출하지만 아이스팩 항목은 확인되지 않았다.",
+      "현재 답변은 강남구청, 동주민센터, 공동주택 관리사무소에 전용 수거함 운영 여부를 확인하도록 안내한다."
+    ]
+  },
+  {
+    "id": "large_plastic_storage_box",
+    "query": "큰 리빙박스는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "low",
+    "observed": "플라스틱 단일재질이지만 크기 때문에 대형폐기물로 갈 수 있는 생활용품 기준이 부족했다.",
+    "expectedAction": "리빙박스(합성수지 재질), 플라스틱 수납장, 플라스틱 서랍장 공식 품목사전 근거를 확인해 plastic_storage_box 품목, 평가 케이스, 강남구 지역 가이드, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "plastic_storage_box",
+      "plastic_cup",
+      "chair"
+    ],
+    "notes": [
+      "작은 플라스틱 단일재질 리빙박스는 플라스틱류, 큰 리빙박스·플라스틱 수납장·서랍장은 대형폐기물로 분기한다.",
+      "강남구 대형폐기물 수수료 후보로 기타 프라스틱류 5kg당 2,000원, 서랍장 4단 이하 3,000원, 5단 이상 5,000원을 반영했다."
+    ]
+  },
+  {
+    "id": "pet_pad",
+    "query": "강아지 배변패드는 어디에 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "low",
+    "observed": "반려동물 위생용품은 고양이 모래 외에 데이터가 없었다.",
+    "expectedAction": "공식 품목사전의 배변패드 종량제봉투 기준을 확인해 pet_pad 품목, 평가 케이스, MCP 답변 케이스로 반영했다.",
+    "candidateItemIds": [
+      "pet_pad",
+      "cat_litter",
+      "wet_tissue"
+    ],
+    "notes": [
+      "배변패드는 부직포, 흡수체, 펄프 등이 섞인 오염 위생용 복합재질이므로 별도 품목으로 관리한다.",
+      "배변봉투와 강아지 똥봉투 별칭도 같은 종량제봉투 기준으로 묶었다."
+    ]
+  },
+  {
+    "id": "auto_dccf01657e",
+    "query": "요가매트는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"이불\" 후보가 있으나 짧은 별칭 \"요\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "공식 품목사전의 고무매트 기준을 확인해 yoga_mat 품목, 강남구 대형폐기물 수수료 후보, 평가 케이스, MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "yoga_mat",
+      "blanket"
+    ],
+    "notes": [
+      "autoSource: manual-test",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "topCandidate: blanket/이불 matchedBy=요 score=94",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "resolvedBy: yoga_mat item using official 고무매트 source and Gangnam 돗자리(대자리/놀이매트) fee",
+      "regressionCase: gangnam_yoga_mat_not_blanket"
+    ]
+  },
+  {
+    "id": "auto_85eef994b5",
+    "query": "에어프라이어 종이호일은 종이로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"알루미늄 포일\"(aluminum_foil)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 종이호일/유산지 근거를 바탕으로 parchment_paper 신규 품목을 추가하고, 종이류·알루미늄 포일 과매칭 방지 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "parchment_paper",
+      "aluminum_foil"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 1",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 종이호일, 유산지, 오염된 베이킹시트 표현이 들어올 수 있다.",
+      "topCandidate: aluminum_foil/알루미늄 포일 matchedBy=호일 score=90",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: lighter/라이터 matchedBy=일회용 라이터 score=15; spray_can/스프레이캔 matchedBy=헤어스프레이 score=15",
+      "officialSource: 생활폐기물 분리배출 누리집 종이호일 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=410",
+      "officialSource: 생활폐기물 분리배출 누리집 유산지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=442",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_78a18690d9",
+    "query": "빨래 먼지 거름망에서 나온 보풀은 음식물 아니지?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"물티슈\"(wet_tissue)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집에서 단독 세탁 보풀 항목이 없음을 확인하고, 화장지·걸레·물티슈 공식 근거를 바탕으로 laundry_lint 신규 품목과 source-gap 답변 회귀 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "laundry_lint"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 2",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 청소기 먼지와 비슷하지만 세탁 보풀·섬유 먼지로 별도 검토가 필요하다.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=기름 닦은 휴지 score=9",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: wilted_flower/시든 꽃 matchedBy=죽은 식물 score=9; rubber_gloves/고무장갑 matchedBy=설거지 장갑 score=6",
+      "officialSource: 생활폐기물 분리배출 누리집 화장지 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=492",
+      "officialSource: 생활폐기물 분리배출 누리집 걸레 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=342",
+      "officialSource: 생활폐기물 분리배출 누리집 물티슈 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=375",
+      "sourceGap: 보풀, 세탁 보풀, 세탁먼지 검색에서 단독 항목 없음",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_ff59fb7faa",
+    "query": "깨진 보조배터리는 폐건전지함에 그냥 넣어도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"보조배터리\"(power_bank)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 보조배터리 근거를 바탕으로 전지수거함 배출, 재활용품 혼입 금지, 파손·팽창 시 지자체 확인/안전 포장 문구를 보강하고 MCP 답변 회귀 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "power_bank",
+      "battery"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 3",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 파손·팽창 리튬배터리 안전 답변이 유지되는지 확인한다.",
+      "topCandidate: power_bank/보조배터리 matchedBy=보조배터리 score=93",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: battery/건전지 matchedBy=폐건전지 score=92; broken_glass/깨진 유리컵 matchedBy=깨진 유리컵 score=9",
+      "officialSource: 생활폐기물 분리배출 누리집 보조배터리 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=125",
+      "sourceBasis: 보조배터리는 전지수거함으로 배출하며 재활용품으로 배출하면 화재 발생 우려가 있다고 안내한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01",
+      "supplementarySource: 사용자 제공 네이버 블로그는 비공식 참고로만 기록했다."
+    ]
+  },
+  {
+    "id": "auto_9913ee7e43",
+    "query": "다 쓴 고체 방향제는 플라스틱 용기만 분리해?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"샴푸통\"(shampoo_bottle)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 석고방향제 근거를 바탕으로 gypsum_air_freshener 신규 품목을 추가하고, 고체 본체/플라스틱 용기 분리 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "gypsum_air_freshener",
+      "shampoo_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 4",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 방향제 본체, 젤 잔여물, 플라스틱 용기 분리 기준이 필요하다.",
+      "topCandidate: shampoo_bottle/샴푸통 matchedBy=플라스틱 용기 score=93",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기 score=20; cosmetic_container/화장품 용기 matchedBy=화장품 플라스틱 용기 score=20",
+      "officialSource: 생활폐기물 분리배출 누리집 석고방향제 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=435",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_d69d35f9ff",
+    "query": "샴푸바 포장 없는 비누 조각은 어디 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"비닐류 포장재\"(snack_bag)입니다.",
+    "expectedAction": "샴푸바·비누 조각 단독 품목사전 항목이 없음을 확인하고, 가루세제 공식 근거를 보조로 soap_bar_piece 신규 품목과 source-gap 답변 회귀 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "soap_bar_piece"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 5",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 비누, 샴푸바, 세안비누처럼 물에 녹는 생활용품 기준을 검토한다.",
+      "topCandidate: snack_bag/비닐류 포장재 matchedBy=비닐류 포장재 score=11",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: rubber_gloves/고무장갑 matchedBy=낡은 고무장갑 score=8; broken_glass/깨진 유리컵 matchedBy=유리 조각 score=8",
+      "officialSource: 생활폐기물 분리배출 누리집 가루세제 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EA%B0%80%EB%A3%A8%EC%84%B8%EC%A0%9C",
+      "sourceGap: 샴푸바, 비누 조각 검색에서 단독 항목 없음",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_77926a45de",
+    "query": "곰팡이 핀 빵은 음식물쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"살충제\"(pesticide_container)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 상한 음식/음식물류폐기물 근거를 바탕으로 moldy_bread 신규 품목을 추가하고, 포장재 제거와 지역 음식물류 배출 방식 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "moldy_bread"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 6",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 빵류, 곰팡이, 반려동물 사료 가능 여부 오인을 막아야 한다.",
+      "topCandidate: pesticide_container/살충제 matchedBy=모기 스프레이 score=14",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: wilted_flower/시든 꽃 matchedBy=죽은 식물 score=14; pizza_box_oily/기름 묻은 피자박스 matchedBy=기름 묻은 피자박스 score=9",
+      "officialSource: 생활폐기물 분리배출 누리집 상한 음식 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%83%81%ED%95%9C%20%EC%9D%8C%EC%8B%9D",
+      "officialSource: 생활폐기물 분리배출 누리집 음식물류폐기물 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9D%8C%EC%8B%9D%EB%AC%BC%EB%A5%98%ED%8F%90%EA%B8%B0%EB%AC%BC",
+      "sourceBasis: 상한 음식과 음식물류폐기물은 음식물 전용 종량제봉투/납부필증/RFID 방식으로 배출하며 이물질을 제거한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_076895a605",
+    "query": "귤껍질은 음식물쓰레기로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"시든 꽃\"(wilted_flower)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 말린 귤껍질 근거를 바탕으로 mandarin_peel 신규 품목을 추가하고, 음식물류폐기물/지역 배출방식 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "mandarin_peel"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 7",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 과일 껍질과 과일 씨를 구분하는 대표 질문이다.",
+      "topCandidate: wilted_flower/시든 꽃 matchedBy=말라버린 식물 score=14",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: cat_litter/고양이 모래 matchedBy=반려동물 모래 score=9; pizza_box_oily/기름 묻은 피자박스 matchedBy=기름 묻은 피자박스 score=9",
+      "officialSource: 생활폐기물 분리배출 누리집 말린 귤껍질 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=160",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_1a77a8fa24",
+    "query": "배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"배달 플라스틱 용기\"(plastic_food_container)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 고추장 근거를 바탕으로 고추장 내용물은 음식물류폐기물, 세척 가능한 용기는 플라스틱류, 제거 어려운 오염 용기는 종량제봉투로 답변을 보강하고 회귀 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "plastic_food_container",
+      "shampoo_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 8",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 오염 제거 가능 여부에 따라 재활용/종량제 답변이 갈린다.",
+      "topCandidate: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기 score=98",
+      "itemConfidence: medium",
+      "reviewStatus: verified",
+      "otherCandidates: shampoo_bottle/샴푸통 matchedBy=플라스틱 용기 score=93; cosmetic_container/화장품 용기 matchedBy=화장품 플라스틱 용기 score=18",
+      "officialSource: 생활폐기물 분리배출 누리집 고추장 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=170",
+      "sourceBasis: 고추장은 음식물류폐기물로 배출하고, 내용물 제거가 어려운 경우 제품 그대로 종량제봉투로 배출한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_188d2e7fe3",
+    "query": "깨진 도자기 화분은 불연성 마대야?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"화분\"(flower_pot)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 화분/불연성종량제폐기물 근거를 바탕으로 도자기·유리 화분은 특수규격마대, 플라스틱 화분은 이물질 제거 후 플라스틱, 대형 화분은 대형폐기물 가능성을 답변에 고정했습니다.",
+    "candidateItemIds": [
+      "flower_pot"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 9",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 화분, 도자기, 깨진 파편, 지역 특수규격봉투 기준을 함께 확인한다.",
+      "topCandidate: flower_pot/화분 matchedBy=도자기 화분 score=93",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: pizza_box_oily/기름 묻은 피자박스 matchedBy=기름 묻은 피자박스 score=13; ceramic_bowl/도자기 그릇 matchedBy=도자기 그릇 score=13",
+      "officialSource: 생활폐기물 분리배출 누리집 화분 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=511",
+      "officialSource: 생활폐기물 분리배출 누리집 불연성종량제폐기물 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=543",
+      "sourceBasis: 도자기·유리 화분은 불연성 종량제봉투(특수규격마대)로 배출하고 불연성종량제폐기물은 도자기 등 불에 타지 않는 폐기물을 포함한다고 안내한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_cd3e095e55",
+    "query": "LED 전구 깨졌는데 형광등 수거함에 넣어도 돼?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"LED등\"(led_lamp)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 LED/조명제품 근거를 바탕으로 깨지지 않은 전구형·직관형 LED는 형광등 수거함, 깨진 LED는 신문지·테이프 포장 후 불연성종량제폐기물로 답변을 보강했습니다.",
+    "candidateItemIds": [
+      "led_lamp",
+      "fluorescent_lamp"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 10",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: LED와 형광등을 혼동하지 않게 답변해야 한다.",
+      "topCandidate: led_lamp/LED등 matchedBy=LED 전구 score=98",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: fluorescent_lamp/형광등 matchedBy=형광등 score=91; mirror/거울 matchedBy=깨진 거울 score=6",
+      "officialSource: 생활폐기물 분리배출 누리집 LED https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=137",
+      "officialSource: 생활폐기물 분리배출 누리집 조명제품 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=538",
+      "sourceBasis: LED 조명은 형광등 수거함 배출 대상이나, 깨진 경우 신문지와 테이프로 감싸 불연성종량제폐기물로 배출하라고 안내한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_2e2e264c1e",
+    "query": "토너 가루가 누출된 프린터 카트리지는 어디 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"일회용 면도기\"(disposable_razor)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 토너/카트리지 근거를 바탕으로 toner_cartridge 신규 품목을 추가하고, 누출 시 밀봉 후 종량제봉투 및 회수업체/재활용 전문업체 우선 확인 문구를 MCP 답변 케이스로 고정했습니다.",
+    "candidateItemIds": [
+      "toner_cartridge"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 11",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 토너/잉크 카트리지 회수 프로그램과 누출 안전 문구가 필요할 수 있다.",
+      "topCandidate: disposable_razor/일회용 면도기 matchedBy=카트리지 면도기 score=13",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: power_bank/보조배터리 matchedBy=손상된 보조배터리 score=9; photo_print/사진 matchedBy=프린트 사진 score=9",
+      "officialSource: 생활폐기물 분리배출 누리집 토너 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=742",
+      "officialSource: 생활폐기물 분리배출 누리집 카트리지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=412",
+      "sourceBasis: 토너는 종량제봉투 배출, 카트리지는 잉크나 토너가 흘러내리지 않도록 밀봉 후 종량제봉투 배출 또는 구입업체/재활용전문업체 배출을 안내한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_ff4d239f68",
+    "query": "배터리 들어있는 일회용 전자담배는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"라이터\"(lighter)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 전자담배 근거를 바탕으로 electronic_cigarette 품목을 추가하고, 소형전기전자제품 전용수거함/지자체 문의 및 배터리 내장 제품 일반쓰레기 금지 문구를 답변 케이스로 고정했습니다.",
+    "candidateItemIds": [
+      "electronic_cigarette"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 12",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 리튬배터리 내장 제품이라 일반쓰레기 안내가 위험할 수 있다.",
+      "topCandidate: lighter/라이터 matchedBy=일회용 라이터 score=14",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: power_bank/보조배터리 matchedBy=휴대용 배터리 score=14; plastic_food_container/배달 플라스틱 용기 matchedBy=일회용 플라스틱 용기 score=11",
+      "officialSource: 생활폐기물 분리배출 누리집 전자담배 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=298",
+      "sourceBasis: 전자담배는 소형전기전자제품 전용수거함으로 배출하고, 인근 전용수거함이 없으면 지자체 문의 후 배출하라고 안내한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_ba7cee1f52",
+    "query": "다 쓴 핫팩은 어디 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"라이터\"(lighter)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 일회용 손난로/전기 손난로 근거를 바탕으로 disposable_hand_warmer 신규 품목을 추가하고, 라이터 과매칭 방지 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "disposable_hand_warmer"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 13",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 손난로, 붙이는 핫팩, 철가루 내용물 기준을 검토한다.",
+      "topCandidate: lighter/라이터 matchedBy=다 쓴 라이터 score=13",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: rubber_gloves/고무장갑 matchedBy=낡은 고무장갑 score=7; cat_litter/고양이 모래 matchedBy=반려동물 모래 score=7",
+      "officialSource: 생활폐기물 분리배출 누리집 일회용 손난로 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=392",
+      "officialSource: 생활폐기물 분리배출 누리집 전기 손난로 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=293",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_8af3ae8fa8",
+    "query": "물티슈 포장 캡은 플라스틱으로 따로 버려?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"물티슈\"(wet_tissue)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 물티슈와 플라스틱 근거를 바탕으로 물티슈 본품은 종량제봉투, 깨끗하게 분리한 포장 캡은 플라스틱류, 접착제·오염이 남은 캡은 종량제봉투로 답변을 보강하고 회귀 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "wet_tissue"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 14",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 물티슈 자체와 포장재·캡을 분리해서 안내해야 한다.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=물티슈 score=96",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: plastic_storage_box/리빙박스·플라스틱 수납함 matchedBy=플라스틱 수납장 score=19; disposable_cutlery/일회용 숟가락·포크 matchedBy=플라스틱 포크 score=19",
+      "officialSource: 생활폐기물 분리배출 누리집 물티슈 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=375",
+      "officialSource: 생활폐기물 분리배출 누리집 플라스틱 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=531",
+      "sourceBasis: 물티슈는 폴리에스터·부직포 등으로 재활용이 어려워 종량제봉투로 배출하고, 플라스틱은 내용물·이물질·부속품을 제거하고 헹군 뒤 배출한다.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_7cfb9710dc",
+    "query": "실리카겔 방습제는 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"실리콘 주걱\"(silicone_kitchenware)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 방습제 근거를 바탕으로 desiccant 신규 품목을 추가하고, 실리콘 주걱 과매칭 방지 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "desiccant"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 15",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 방습제, 제습제, 포장재 동봉 실리카겔 표현을 검토한다.",
+      "topCandidate: silicone_kitchenware/실리콘 주걱 matchedBy=실리콘 용기 score=13",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: disposable_razor/일회용 면도기 matchedBy=카트리지 면도기 score=13; nail_polish/매니큐어 matchedBy=네일폴리시 score=9",
+      "officialSource: 생활폐기물 분리배출 누리집 방습제 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=457",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_c74e4b395f",
+    "query": "휴대폰 액정 보호필름은 비닐류야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"휴대폰\"(mobile_phone)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 액정보호필름 근거를 바탕으로 screen_protector 신규 품목을 추가하고, 휴대폰 본체 과매칭 방지 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "screen_protector",
+      "mobile_phone"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 16",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 강화유리 보호필름과 PET 보호필름을 구분해야 할 수 있다.",
+      "topCandidate: mobile_phone/휴대폰 matchedBy=휴대폰 score=96",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: wet_tissue/물티슈 matchedBy=기름 닦은 휴지 score=13; snack_bag/비닐류 포장재 matchedBy=비닐류 포장재 score=13",
+      "officialSource: 생활폐기물 분리배출 누리집 액정보호필름 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=458",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_a12fbc8ec3",
+    "query": "드립백 커피 필터는 음식물쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"커피찌꺼기\"(coffee_ground)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 티백/육수팩/녹차잎 근거를 바탕으로 drip_bag_coffee_filter 신규 품목을 추가하고, 필터는 종량제봉투·분리한 커피찌꺼기는 지역 기준 확인으로 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "drip_bag_coffee_filter",
+      "coffee_ground"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 17",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 커피찌꺼기, 종이 필터, 부직포 필터를 분리해서 답해야 한다.",
+      "topCandidate: coffee_ground/커피찌꺼기 matchedBy=커피찌꺼기 score=12",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: tea_bag/티백 matchedBy=커피 티백 score=12; pizza_box_oily/기름 묻은 피자박스 matchedBy=기름 묻은 피자박스 score=8",
+      "officialSource: 생활폐기물 분리배출 누리집 티백 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=419",
+      "officialSource: 생활폐기물 분리배출 누리집 육수팩 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=744",
+      "officialSource: 생활폐기물 분리배출 누리집 녹차잎 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=420",
+      "sourceGap: 드립백, 커피 필터, 커피찌꺼기 검색에서 단독 항목 없음. 티백 항목은 커피를 포함한 다공질 포장재 기준을 제공함.",
+      "sourceReviewedAt: 2026-07-01",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_72da62f1cd",
+    "query": "부직포 장바구니는 의류수거함에 넣어도 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"옷\"(clothing)입니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 부직포 가방 근거를 바탕으로 nonwoven_bag 신규 품목을 추가하고, 의류수거함 과매칭 방지 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "nonwoven_bag",
+      "clothing"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 18",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 부직포 가방, 에코백, 의류수거함 오인을 검토한다.",
+      "topCandidate: clothing/옷 matchedBy=의류 score=90",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: sponge_scrubber/수세미 matchedBy=부직포 수세미 score=13; snack_bag/비닐류 포장재 matchedBy=비닐류 포장재 score=10",
+      "officialSource: 생활폐기물 분리배출 누리집 부직포 가방 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=390",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_d7aafbf93b",
+    "query": "샴푸 리필 파우치는 비닐류로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "snack_bag을 리필 파우치 표현까지 확장하고, 스파우트파우치·스틱봉지 공식 근거와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "snack_bag"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 19",
+      "tool: get_disposal_steps",
+      "logNote: 리필 파우치, 내용물 잔여물, 비닐류와 종량제 분기를 확인한다.",
+      "topCandidate: soap_bar_piece/비누 조각 matchedBy=샴푸바 포장 없는 비누 조각은 어디 버려 score=20",
+      "itemConfidence: high",
+      "reviewStatus: needs_source",
+      "otherCandidates: screen_protector/액정보호필름 matchedBy=휴대폰 액정 보호필름은 비닐류야 score=16; nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=12",
+      "officialSource: 생활폐기물 분리배출 누리집 스파우트파우치 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=104",
+      "officialSource: 생활폐기물 분리배출 누리집 스틱봉지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=628",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_72a6d0127f",
+    "query": "간장 유리병에 플라스틱 뚜껑 붙어있으면 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"유리병\" 후보가 있으나 짧은 별칭 \"유리병\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "glass_bottle에 간장 유리병·플라스틱 뚜껑 표현을 별칭으로 추가하고, 유리병 공식 품목사전 근거와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "glass_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 22",
+      "tool: get_disposal_steps",
+      "logNote: 유리병, 플라스틱 뚜껑, 내용물 비움 분리 안내를 확인한다.",
+      "topCandidate: glass_bottle/유리병 matchedBy=유리병 score=91",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "officialSource: 생활폐기물 분리배출 누리집 유리병 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=534",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_2dabb2122d",
+    "query": "요거트 은박 뚜껑은 캔류야 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"이불\" 후보가 있으나 짧은 별칭 \"요\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "aluminum_foil에 요거트 은박 뚜껑 별칭을 추가하고, 알루미늄 호일·은박 접시 공식 근거에 따라 일반쓰레기 판단과 MCP 과매칭 방지 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "aluminum_foil"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 23",
+      "tool: get_disposal_steps",
+      "logNote: 작은 알루미늄 리드와 음식물 오염 분기를 검토한다.",
+      "topCandidate: blanket/이불 matchedBy=요 score=94",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 알루미늄 호일 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=409",
+      "officialSource: 생활폐기물 분리배출 누리집 은박 접시 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=741",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_82cd073f17",
+    "query": "프링글스 통은 종이로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 감자칩 용기 근거를 바탕으로 potato_chip_canister 신규 품목, 평가 케이스, MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "potato_chip_canister"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 24",
+      "tool: get_disposal_steps",
+      "logNote: 종이+금속+플라스틱 복합재질 원통 과매칭 여부를 본다.",
+      "topCandidate: parchment_paper/종이호일 matchedBy=에어프라이어 종이호일은 종이로 버려 score=28",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=18; mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=14",
+      "officialSource: 생활폐기물 분리배출 누리집 감자칩 용기 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=346",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_8891f66da5",
+    "query": "배달 음식 소스 작은 비닐팩은 씻어서 비닐류야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "snack_bag에 소스 비닐팩 별칭을 추가하고, 스틱봉지·스프봉지 공식 품목사전 근거를 바탕으로 세척 가능 비닐류와 오염 일반쓰레기 분기를 반영했습니다.",
+    "candidateItemIds": [
+      "snack_bag"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 26",
+      "tool: get_disposal_steps",
+      "logNote: 소스 오염 비닐, 세척 가능 여부, 작은 포장재 분기를 검토한다.",
+      "topCandidate: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=23",
+      "itemConfidence: medium",
+      "reviewStatus: verified",
+      "otherCandidates: screen_protector/액정보호필름 matchedBy=휴대폰 액정 보호필름은 비닐류야 score=19; moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=15",
+      "officialSource: 생활폐기물 분리배출 누리집 스틱봉지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=628",
+      "officialSource: 생활폐기물 분리배출 누리집 스프봉지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=102",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_88317c0599",
+    "query": "젖은 우산은 그냥 일반쓰레기야 고철이야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"우산\" 후보가 있으나 짧은 별칭 \"우산\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "umbrella에 젖은 우산 질문 별칭을 추가하고, 우산 공식 품목사전 근거에 따라 분리 가능 시 재질별·분리 어려우면 종량제봉투 안내와 MCP 답변 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "umbrella"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 27",
+      "tool: get_disposal_steps",
+      "logNote: 우산 천, 금속살, 손잡이 분리 가능 여부를 확인한다.",
+      "topCandidate: umbrella/우산 matchedBy=우산 score=90",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 우산 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=303",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_a159c4739f",
+    "query": "부러진 우산살은 고철로 따로 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"우산\" 후보가 있으나 짧은 별칭 \"우산\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "umbrella에 부러진 우산살 질문 별칭을 추가하고, 우산 공식 품목사전의 우산 뼈대 고철 재활용 가능 근거를 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "umbrella"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 28",
+      "tool: get_disposal_steps",
+      "logNote: 부러진 금속 부품 안전 포장과 우산 전체 분기 확인.",
+      "topCandidate: umbrella/우산 matchedBy=우산 score=90",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 우산 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=303",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_93ec27f838",
+    "query": "전동칫솔 본체랑 칫솔모는 같이 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"칫솔\" 후보가 있으나 짧은 별칭 \"칫솔모\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "electric_toothbrush 신규 품목을 추가해 본체는 소형전기전자제품 수거, 칫솔모는 일반 종량제봉투로 분리 안내하고 평가 케이스와 MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "electric_toothbrush",
+      "toothbrush",
+      "small_electronics"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 29",
+      "tool: get_disposal_steps",
+      "logNote: 전동칫솔 본체 소형가전과 칫솔모 일반쓰레기 분리 여부를 확인한다.",
+      "topCandidate: toothbrush/칫솔 matchedBy=칫솔모 score=91",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "officialSource: 생활폐기물 분리배출 누리집 전동칫솔 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=301",
+      "officialSource: 생활폐기물 분리배출 누리집 칫솔 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=334",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_4f507756de",
+    "query": "멜라민 스펀지는 플라스틱으로 재활용 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 생선가시 근거를 바탕으로 fish_bone 신규 품목, 평가 케이스, MCP 답변 케이스를 추가했습니다.",
+    "candidateItemIds": [
+      "fish_bone"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 32",
+      "tool: get_disposal_steps",
+      "logNote: 멜라민 스펀지, 청소 스펀지, 수세미 과매칭 여부를 확인한다.",
+      "topCandidate: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=32",
+      "itemConfidence: medium",
+      "reviewStatus: verified",
+      "otherCandidates: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=24; gypsum_air_freshener/석고방향제 matchedBy=다 쓴 고체 방향제는 플라스틱 용기만 분리해 score=24"
+    ]
+  },
+  {
+    "id": "auto_7c98721c7c",
+    "query": "설거지 솔은 플라스틱으로 버리면 되나?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "dish_brush 신규 품목을 추가하고, 수세미·칫솔 공식 품목사전 근거와 설거지 솔 단독 항목 부재를 기록한 뒤 평가 케이스와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "dish_brush"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 33",
+      "tool: get_disposal_steps",
+      "logNote: 브러시류 복합재질 신규 품목 후보인지 확인한다.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=30",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: plastic_storage_box/리빙박스·플라스틱 수납함 matchedBy=리빙박스·플라스틱 수납함 score=19; plastic_food_container/배달 플라스틱 용기 matchedBy=고추장 묻은 배달 플라스틱 용기 score=19",
+      "officialSource: 생활폐기물 분리배출 누리집 수세미 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=485",
+      "officialSource: 생활폐기물 분리배출 누리집 칫솔 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=334",
+      "sourceGap: 설거지 솔/설거지솔/주방 솔 단독 품목사전 항목은 확인하지 못함. 복합재질 청소 도구 기준으로 보수 안내.",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_476cc4e718",
+    "query": "고무줄이랑 머리끈은 일반쓰레기 맞아?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "hair_tie_rubber_band 신규 품목을 추가하고, 머리끈 공식 품목사전 근거에 따라 고무줄·머리끈 일반 종량제봉투 안내와 MCP 답변 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "hair_tie_rubber_band"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 34",
+      "tool: get_disposal_steps",
+      "logNote: 작은 고무·섬유 혼합재질 생활용품 매칭을 확인한다.",
+      "topCandidate: desiccant/방습제 matchedBy=실리카겔 방습제는 일반쓰레기야 score=23",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=19; mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=15",
+      "officialSource: 생활폐기물 분리배출 누리집 머리끈 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=370",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_c2b84cfdfa",
+    "query": "면봉은 종이니까 종이류로 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "cotton_swab 신규 품목을 추가하고, 화장솜·화장지 공식 품목사전 근거와 면봉 단독 항목 부재를 기록한 뒤 평가 케이스와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "cotton_swab"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 35",
+      "tool: get_disposal_steps",
+      "logNote: 위생용품, 나무/종이/플라스틱 막대, 오염 분기 확인.",
+      "topCandidate: parchment_paper/종이호일 matchedBy=에어프라이어 종이호일은 종이로 버려 score=28",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=18; wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=18",
+      "officialSource: 생활폐기물 분리배출 누리집 화장솜 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=733",
+      "officialSource: 생활폐기물 분리배출 누리집 화장지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=492",
+      "sourceGap: 면봉 단독 품목사전 항목은 확인하지 못함. 위생·오염 소형품 기준으로 보수 안내.",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_273760eb9a",
+    "query": "화장솜에 클렌징오일 묻었으면 어디 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "cosmetic_cotton_pad 신규 품목을 추가하고, 화장솜 공식 품목사전 근거에 따라 클렌징오일 오염 화장솜의 종량제봉투 안내와 MCP 답변 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "cosmetic_cotton_pad"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 36",
+      "tool: get_disposal_steps",
+      "logNote: 화장솜, 기름 오염, 위생용품 매칭 여부를 확인한다.",
+      "topCandidate: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=18",
+      "itemConfidence: medium",
+      "reviewStatus: verified",
+      "otherCandidates: soap_bar_piece/비누 조각 matchedBy=샴푸바 포장 없는 비누 조각은 어디 버려 score=18; parchment_paper/종이호일 matchedBy=에어프라이어 종이호일은 종이로 버려 score=18",
+      "officialSource: 생활폐기물 분리배출 누리집 화장솜 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=733",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_6d37f99c22",
+    "query": "향수 샘플 작은 유리병도 향수병이랑 똑같아?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"유리병\" 후보가 있으나 짧은 별칭 \"유리병\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "perfume_bottle에 향수 샘플·작은 향수병 별칭을 추가하고, 기존 향수병 공식 품목사전 근거로 내용물 비움·잔여물 흡수·펌프 분리 안내를 반영했습니다.",
+    "candidateItemIds": [
+      "perfume_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 38",
+      "tool: get_disposal_steps",
+      "logNote: 작은 샘플병, 잔여 향수, 유리병 분리 안내를 확인한다.",
+      "topCandidate: glass_bottle/유리병 matchedBy=유리병 score=91",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "officialSource: 생활폐기물 분리배출 누리집 향수병 https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=134",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_7c6518a357",
+    "query": "주사바늘 달린 자가주사기는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "법령과 지역 확인 근거를 바탕으로 home_injection_needle 신규 품목, 평가 케이스, MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "home_injection_needle"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 40",
+      "tool: get_disposal_steps",
+      "logNote: 날카로운 의료폐기물성 질문으로 안전 안내가 필요할 수 있다.",
+      "topCandidate: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=20",
+      "itemConfidence: medium",
+      "reviewStatus: verified",
+      "otherCandidates: soap_bar_piece/비누 조각 matchedBy=샴푸바 포장 없는 비누 조각은 어디 버려 score=20; mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=12",
+      "officialSource: 폐기물관리법 시행령 별표 2 의료폐기물의 종류 https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%ED%8F%90%EA%B8%B0%EB%AC%BC%EA%B4%80%EB%A6%AC%EB%B2%95%EC%8B%9C%ED%96%89%EB%A0%B9/%EB%B3%84%ED%91%9C2",
+      "sourceGap: 생활폐기물 분리배출 누리집에서 주사바늘/자가주사기 단독 품목사전 항목은 확인하지 못함. 안전상 일반쓰레기 확정 안내 대신 보건소·처방기관·약국·지자체 회수 기준 확인으로 고정.",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_9b48da424d",
+    "query": "금 간 머그컵은 도자기니까 불연성 봉투야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"도자기 그릇\" 후보가 있으나 짧은 별칭 \"머그컵\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "ceramic_bowl에 금 간 머그컵 별칭을 추가하고, 머그잔 공식 품목사전 근거에 따라 불연성종량제폐기물 판단으로 보강했습니다.",
+    "candidateItemIds": [
+      "ceramic_bowl"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 43",
+      "tool: get_disposal_steps",
+      "logNote: 도자기 컵, 깨진 파편, 불연성/특수규격마대 안내 확인.",
+      "topCandidate: ceramic_bowl/도자기 그릇 matchedBy=머그컵 score=91",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 머그잔 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=502",
+      "officialSource: 강남구청 쓰레기배출안내 https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_15c0254bce",
+    "query": "인덕션 유리 상판 깨진 건 대형폐기물이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 책상유리/조명 유리커버/대형폐기물 근거를 바탕으로 induction_cooktop_broken_glass 신규 품목, 평가 케이스, MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "induction_cooktop_broken_glass"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 45",
+      "tool: get_disposal_steps",
+      "logNote: 가전/유리/대형폐기물 경계 품목 후보.",
+      "topCandidate: moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=14",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: broken_glass/깨진 유리컵 matchedBy=깨진 유리컵 score=14; drying_rack/빨래건조대 matchedBy=스테인리스 건조대 score=14",
+      "officialSource: 생활폐기물 분리배출 누리집 책상유리 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=756",
+      "officialSource: 생활폐기물 분리배출 누리집 조명 유리커버 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=515",
+      "officialSource: 생활폐기물 분리배출 누리집 대형폐기물 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=539",
+      "sourceGap: 인덕션 단독 품목사전 항목은 확인하지 못함. 상판만 분리된 파손 유리와 본체 포함 대형폐기물 분기를 공식 유사 품목 근거로 안내.",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_0b8ec2075e",
+    "query": "충전 어댑터는 케이블이랑 같이 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"충전 케이블\" 후보가 있으나 짧은 별칭 \"케이블\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "phone_charger_adapter 신규 품목을 추가하고, 핸드폰 충전기 공식 품목사전 근거와 강남구 소형가전 안내를 평가 케이스와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "phone_charger_adapter",
+      "cable_wire"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 48",
+      "tool: get_disposal_steps",
+      "logNote: 어댑터, 충전기, 케이블 분리 매칭 확인.",
+      "topCandidate: cable_wire/충전 케이블 matchedBy=케이블 score=91",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 핸드폰 충전기 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=275",
+      "officialSource: 강남구 자원순환 종합포털 소형폐가전 무상수거 안내 https://clean.gangnam.go.kr/use/biwa/USEBIWA03000000.do",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_fd42b0d18a",
+    "query": "시너 묻은 걸레는 일반쓰레기로 버리면 위험하지 않아?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "solvent_contaminated_rag 신규 품목을 추가하고, 걸레·페인트 공식 품목사전 및 인화성 잔여물 지침을 바탕으로 생활계 유해폐기물 우선 확인 안내와 MCP 답변 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "solvent_contaminated_rag",
+      "paint_can"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 53",
+      "tool: get_disposal_steps",
+      "logNote: 인화성 용제 오염 천, 생활계 유해폐기물 안전 안내 필요 여부.",
+      "topCandidate: desiccant/방습제 matchedBy=실리카겔 방습제는 일반쓰레기야 score=20",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=17; moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=11",
+      "officialSource: 생활폐기물 분리배출 누리집 걸레 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=342",
+      "officialSource: 생활폐기물 분리배출 누리집 페인트 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=140",
+      "officialSource: 재활용가능자원의 분리수거 등에 관한 지침 별표 1 https://www.xn--oy2b29bd3a601b.kr/front/bbsList.do?bbsId=BBS_0003",
+      "sourceGap: 시너 묻은 걸레/신나 묻은 걸레 단독 품목사전 항목은 확인하지 못함. 인화성 잔여물 안전 기준으로 보수 안내.",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_5901c7e326",
+    "query": "강아지 똥 묻은 휴지는 변기에 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"물티슈\" 후보가 있으나 짧은 별칭 \"휴지\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "pet_waste_tissue 신규 품목을 추가하고, 배변패드·화장지 공식 품목사전 근거를 바탕으로 변기 배출 금지와 종량제봉투 안내를 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "pet_waste_tissue"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 56",
+      "tool: get_disposal_steps",
+      "logNote: 반려동물 분변, 휴지, 변기 배출 금지 안내 확인.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=휴지 score=90",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "officialSource: 생활폐기물 분리배출 누리집 배변패드 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=380",
+      "officialSource: 생활폐기물 분리배출 누리집 화장지 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=492",
+      "sourceGap: 반려동물 배설물 묻은 휴지 단독 품목사전 항목은 확인하지 못함. 배변패드와 사용한 화장지 근거로 보수 안내.",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_793bcfb5f6",
+    "query": "생선가시는 음식물쓰레기야 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "fish_bone 신규 품목, 평가 케이스, MCP 답변 케이스로 반영한 상태를 백로그에 동기화했습니다.",
+    "candidateItemIds": [
+      "fish_bone"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 59",
+      "tool: get_disposal_steps",
+      "logNote: 생선가시와 동물뼈/음식물 예외 분기 확인.",
+      "topCandidate: drip_bag_coffee_filter/드립백 커피 필터 matchedBy=드립백 커피 필터는 음식물쓰레기야 score=34",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=30; desiccant/방습제 matchedBy=실리카겔 방습제는 일반쓰레기야 score=30",
+      "officialSource: 생활폐기물 분리배출 누리집 생선가시 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=468",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_e3c9129f15",
+    "query": "호두껍질은 음식물쓰레기 아니지?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"귤껍질\" 후보가 있으나 매칭 점수 39로 낮아 사용자 표현을 안정적으로 처리하지 못할 수 있습니다.",
+    "expectedAction": "nut_shell 신규 품목을 추가하고, 호두 껍데기 공식 품목사전과 강남구 음식물 예외 안내를 평가 케이스와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "nut_shell"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: low_match_score",
+      "minScore: 70",
+      "sourceIndex: 61",
+      "tool: get_disposal_steps",
+      "logNote: 견과류 껍질과 과일씨 예외 매칭 확인.",
+      "topCandidate: mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=39",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 호두 껍데기 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=456",
+      "officialSource: 강남구청 쓰레기배출안내 https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_e828e97870",
+    "query": "옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "corn_cob_husk 신규 품목을 추가하고, 옥수수대·옥수수껍질 공식 품목사전과 강남구 음식물 예외 안내를 평가 케이스와 MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "corn_cob_husk"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 62",
+      "tool: get_disposal_steps",
+      "logNote: 옥수수대, 껍질, 음식물류 예외 세부 구분 확인.",
+      "topCandidate: mandarin_peel/귤껍질 matchedBy=귤껍질은 음식물쓰레기로 버려 score=24",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: desiccant/방습제 matchedBy=실리카겔 방습제는 일반쓰레기야 score=24; moldy_bread/곰팡이 핀 빵 matchedBy=곰팡이 핀 빵은 음식물쓰레기야 score=20",
+      "officialSource: 생활폐기물 분리배출 누리집 옥수수대 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=422",
+      "officialSource: 생활폐기물 분리배출 누리집 옥수수껍질 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=747",
+      "officialSource: 강남구청 쓰레기배출안내 https://www.gangnam.go.kr/board/waste/list.do?mid=ID02_011109",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_ec2e524a1c",
+    "query": "한약재 찌꺼기는 음식물쓰레기로 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"폐의약품\" 후보가 있으나 짧은 별칭 \"약\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "herbal_medicine_dregs 신규 품목을 추가하고, 한약 찌꺼기 공식 품목사전 근거에 따라 음식물쓰레기·폐의약품 오분류 방지 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "herbal_medicine_dregs"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 63",
+      "tool: get_disposal_steps",
+      "logNote: 한약 찌꺼기와 차 찌꺼기 유사 품목 매칭 확인.",
+      "topCandidate: medicine/폐의약품 matchedBy=약 score=89",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 한약 찌꺼기 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=745",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_64dc9ebe6d",
+    "query": "참치캔 기름 남아있으면 캔류로 못 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"폐식용유\" 후보가 있으나 짧은 별칭 \"기름\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "can에 참치캔 기름 질문 별칭을 추가하고, 참치캔 공식 품목사전과 식용유 공식 품목사전 근거로 내용물 비움·헹굼 안내를 반영했습니다.",
+    "candidateItemIds": [
+      "can",
+      "used_cooking_oil"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 65",
+      "tool: get_disposal_steps",
+      "logNote: 캔 내용물 비움, 기름 오염, 헹굼 안내 확인.",
+      "topCandidate: used_cooking_oil/폐식용유 matchedBy=기름 score=90",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 참치캔 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=84",
+      "officialSource: 생활폐기물 분리배출 누리집 식용유 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=178",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_fa112693a7",
+    "query": "컵라면 뚜껑 은박지는 어디 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"알루미늄 포일\" 후보가 있으나 짧은 별칭 \"은박지\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "aluminum_foil에 컵라면 은박 뚜껑 별칭을 추가하고, 알루미늄 호일·은박 접시 공식 품목사전 근거에 따라 종량제봉투 안내와 MCP 답변 케이스를 반영했습니다.",
+    "candidateItemIds": [
+      "aluminum_foil"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 66",
+      "tool: get_disposal_steps",
+      "logNote: 컵라면 용기와 뚜껑 재질 분리 안내 확인.",
+      "topCandidate: aluminum_foil/알루미늄 포일 matchedBy=은박지 score=91",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "officialSource: 생활폐기물 분리배출 누리집 알루미늄 호일 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=409",
+      "officialSource: 생활폐기물 분리배출 누리집 은박 접시 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=741",
+      "dataCoveredAt: 2026-07-02"
+    ]
+  },
+  {
+    "id": "auto_fd664f22b1",
+    "query": "깨진 보온병은 유리야 고철이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "생활폐기물 분리배출 누리집의 유리컵/내열식기/불연성종량제폐기물 근거를 바탕으로 broken_thermos 신규 품목, 평가 케이스, MCP 답변 케이스로 반영했습니다.",
+    "candidateItemIds": [
+      "broken_thermos"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 68",
+      "tool: get_disposal_steps",
+      "logNote: 보온병 복합재질, 유리 내통, 고철/일반/대형 분기 후보.",
+      "topCandidate: broken_glass/깨진 유리컵 matchedBy=깨진 유리컵 score=20",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: power_bank/보조배터리 matchedBy=깨진 보조배터리 score=20; mercury_thermometer/수은 체온계 matchedBy=깨진 수은 체온계 score=20",
+      "officialSource: 생활폐기물 분리배출 누리집 유리컵 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=503",
+      "officialSource: 생활폐기물 분리배출 누리집 내열식기 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=499",
+      "officialSource: 생활폐기물 분리배출 누리집 불연성종량제폐기물 https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=543",
+      "sourceGap: 보온병/텀블러 단독 품목사전 항목은 확인하지 못함. 복합재질과 파손 안전 포장 기준으로 보수 안내.",
+      "dataCoveredAt: 2026-07-01"
+    ]
+  },
+  {
+    "id": "auto_9c08da94a2",
+    "query": "닭고기 포장 흡수패드는 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "공식 출처를 확인해 신규 품목 추가 여부를 결정하고, 필요하면 평가 케이스와 MCP 답변 케이스를 추가합니다.",
+    "candidateItemIds": [],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 70",
+      "tool: get_disposal_steps",
+      "logNote: 육류 포장 흡수패드, 아이스팩/비닐류 과매칭 방지와 위생 오염 안내가 필요하다.",
+      "topCandidate: desiccant/방습제 matchedBy=실리카겔 방습제는 일반쓰레기야 score=28",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: fish_bone/생선가시 matchedBy=생선가시는 음식물쓰레기야 일반쓰레기야 score=28; corn_cob_husk/옥수수대와 옥수수껍질 matchedBy=옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야 score=28"
+    ]
+  },
+  {
+    "id": "auto_07ff62db1c",
+    "query": "쿠킹랩 심지는 종이류야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"비닐랩\" 후보가 있으나 짧은 별칭 \"랩\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "plastic_wrap"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 75",
+      "tool: get_disposal_steps",
+      "logNote: 비닐랩 본품과 종이 심지 분리 안내 후보.",
+      "topCandidate: plastic_wrap/비닐랩 matchedBy=랩 score=89",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed"
+    ]
+  },
+  {
+    "id": "auto_bdf0448a8f",
+    "query": "스티커 붙은 유리병은 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"유리병\" 후보가 있으나 짧은 별칭 \"유리병\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "glass_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 77",
+      "tool: get_disposal_steps",
+      "logNote: 유리병 라벨·스티커 제거 가능 여부와 유리병류 안내 확인.",
+      "topCandidate: glass_bottle/유리병 matchedBy=유리병 score=91",
+      "itemConfidence: high",
+      "reviewStatus: verified"
+    ]
+  },
+  {
+    "id": "auto_4fca93d08b",
+    "query": "깨진 접시는 신문지에 싸서 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: \"도자기 그릇\" 후보가 있으나 짧은 별칭 \"접시\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "ceramic_bowl"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 78",
+      "tool: get_disposal_steps",
+      "logNote: 깨진 도자기 접시, 안전 포장, 불연성/PP봉투 기준 확인.",
+      "topCandidate: ceramic_bowl/도자기 그릇 matchedBy=접시 score=90",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed"
+    ]
+  },
+  {
+    "id": "auto_f70f0c85d3",
+    "query": "녹슨 칼은 고철로 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "자동 백로그화: \"칼날\" 후보가 있으나 짧은 별칭 \"칼\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "knife_blade"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 79",
+      "tool: get_disposal_steps",
+      "logNote: 녹슨 칼날의 고철 오인 방지와 안전 포장 확인.",
+      "topCandidate: knife_blade/칼날 matchedBy=칼 score=89",
+      "itemConfidence: high",
+      "reviewStatus: verified"
+    ]
+  },
+  {
+    "id": "auto_b661123a14",
+    "query": "부러진 가위는 고철이야 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"우산\" 후보가 있으나 매칭 점수 36로 낮아 사용자 표현을 안정적으로 처리하지 못할 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "umbrella"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: low_match_score",
+      "minScore: 70",
+      "sourceIndex: 80",
+      "tool: get_disposal_steps",
+      "logNote: 가위, 칼날, 고철류, 안전 포장 분기 후보.",
+      "topCandidate: umbrella/우산 matchedBy=젖은 우산은 그냥 일반쓰레기야 고철이야 score=36",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed"
+    ]
+  },
+  {
+    "id": "auto_def339e3db",
+    "query": "물감 묻은 팔레트는 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"물티슈\" 후보가 있으나 매칭 점수 38로 낮아 사용자 표현을 안정적으로 처리하지 못할 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "wet_tissue"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: low_match_score",
+      "minScore: 70",
+      "sourceIndex: 85",
+      "tool: get_disposal_steps",
+      "logNote: 미술용 팔레트, 물감 오염, 플라스틱류/종량제 분기 후보.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=38",
+      "itemConfidence: high",
+      "reviewStatus: verified"
+    ]
+  },
+  {
+    "id": "auto_5f6eadbbba",
+    "query": "네일 리무버 솜은 일반쓰레기야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"머리끈과 고무줄\" 후보가 있으나 매칭 점수 40로 낮아 사용자 표현을 안정적으로 처리하지 못할 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "hair_tie_rubber_band"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: low_match_score",
+      "minScore: 70",
+      "sourceIndex: 86",
+      "tool: get_disposal_steps",
+      "logNote: 아세톤/네일 리무버가 묻은 화장솜의 유해·인화성 오염 답변 확인.",
+      "topCandidate: hair_tie_rubber_band/머리끈과 고무줄 matchedBy=고무줄이랑 머리끈은 일반쓰레기 맞아 score=40",
+      "itemConfidence: high",
+      "reviewStatus: verified"
+    ]
+  },
+  {
+    "id": "auto_ce5ea12c3c",
+    "query": "샴푸 리필팩 뚜껑만 플라스틱이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "공식 출처를 확인해 신규 품목 추가 여부를 결정하고, 필요하면 평가 케이스와 MCP 답변 케이스를 추가합니다.",
+    "candidateItemIds": [],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 87",
+      "tool: get_disposal_steps",
+      "logNote: 리필 파우치 몸체와 뚜껑 분리 안내가 짧은 표현에서도 작동하는지 확인.",
+      "topCandidate: glass_bottle/유리병 matchedBy=플라스틱 뚜껑 붙은 유리병 score=30",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: gypsum_air_freshener/석고방향제 matchedBy=다 쓴 고체 방향제는 플라스틱 용기만 분리해 score=26; plastic_storage_box/리빙박스·플라스틱 수납함 matchedBy=리빙박스·플라스틱 수납함 score=21"
+    ]
+  },
+  {
+    "id": "auto_b4ed52ac15",
+    "query": "치실은 플라스틱으로 버려도 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"물티슈\" 후보가 있으나 매칭 점수 42로 낮아 사용자 표현을 안정적으로 처리하지 못할 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "wet_tissue"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: low_match_score",
+      "minScore: 70",
+      "sourceIndex: 88",
+      "tool: get_disposal_steps",
+      "logNote: 치실과 치실 케이스, 위생 소모품 오인 방지 후보.",
+      "topCandidate: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=42",
+      "itemConfidence: high",
+      "reviewStatus: verified"
+    ]
+  },
+  {
+    "id": "auto_f7bffb0ecd",
+    "query": "약과 포장지는 폐의약품 수거함에 넣어?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(bad_match)상 현재 매칭이 잘못되었거나 별칭 매칭이 약합니다. 현재 자동 후보는 \"폐의약품\"(medicine)입니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지, 과매칭 방지 규칙이 필요한지 검토합니다.",
+    "candidateItemIds": [
+      "medicine",
+      "nonwoven_bag"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_bad_match",
+      "minScore: 70",
+      "sourceIndex: 89",
+      "tool: get_disposal_steps",
+      "feedback: bad_match",
+      "logNote: 짧은 별칭 '약'이 과자 이름 약과를 폐의약품으로 과매칭하는지 확인한다.",
+      "topCandidate: medicine/폐의약품 matchedBy=약 score=94",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=40; plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=16"
+    ]
+  },
+  {
+    "id": "auto_3cce03b320",
+    "query": "랩탑은 소형가전으로 버리면 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(bad_match)상 현재 매칭이 잘못되었거나 별칭 매칭이 약합니다. 현재 자동 후보는 \"비닐랩\"(plastic_wrap)입니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지, 과매칭 방지 규칙이 필요한지 검토합니다.",
+    "candidateItemIds": [
+      "plastic_wrap",
+      "small_electronics"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_bad_match",
+      "minScore: 70",
+      "sourceIndex: 90",
+      "tool: get_disposal_steps",
+      "feedback: bad_match",
+      "logNote: 짧은 별칭 '랩'이 랩탑을 비닐랩으로 과매칭하는지 확인한다.",
+      "topCandidate: plastic_wrap/비닐랩 matchedBy=랩 score=94",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: small_electronics/소형가전 matchedBy=소형가전 score=92; potato_chip_canister/감자칩 용기 matchedBy=프링글스 통은 종이로 버리면 돼 score=28"
+    ]
+  },
+  {
+    "id": "auto_945c249522",
+    "query": "캔버스 액자는 캔류야?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(bad_match)상 현재 매칭이 잘못되었거나 별칭 매칭이 약합니다. 현재 자동 후보는 \"음료캔\"(can)입니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지, 과매칭 방지 규칙이 필요한지 검토합니다.",
+    "candidateItemIds": [
+      "can"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_bad_match",
+      "minScore: 70",
+      "sourceIndex: 91",
+      "tool: get_disposal_steps",
+      "feedback: bad_match",
+      "logNote: 짧은 별칭 '캔'이 캔버스 액자를 음료캔으로 과매칭하는지 확인한다.",
+      "topCandidate: can/음료캔 matchedBy=캔 score=94",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: paint_palette/물감 묻은 팔레트 matchedBy=물감 묻은 팔레트는 플라스틱으로 버려 score=23; snack_bag/비닐류 포장재 matchedBy=샴푸 리필 파우치는 비닐류로 버리면 돼 score=23"
+    ]
+  },
+  {
+    "id": "auto_177776ff7e",
+    "query": "기름 조금 묻은 피자박스 깨끗한 부분만 종이로 가능해?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(bad_match)상 현재 매칭이 잘못되었거나 별칭 매칭이 약합니다. 현재 자동 후보는 \"폐식용유\"(used_cooking_oil)입니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 별도 품목으로 분리할지, 과매칭 방지 규칙이 필요한지 검토합니다.",
+    "candidateItemIds": [
+      "used_cooking_oil",
+      "pizza_box_oily",
+      "delivery_box"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_bad_match",
+      "minScore: 70",
+      "sourceIndex: 92",
+      "tool: get_disposal_steps",
+      "feedback: bad_match",
+      "logNote: 짧은 별칭 '기름'이 오염된 피자박스 질문을 폐식용유로 과매칭하는지 확인한다.",
+      "topCandidate: used_cooking_oil/폐식용유 matchedBy=기름 score=95",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: pizza_box_oily/기름 묻은 피자박스 matchedBy=피자박스 score=92; delivery_box/택배상자 matchedBy=박스 score=90"
+    ]
+  },
+  {
+    "id": "auto_69201eb2f2",
+    "query": "빈 약통은 폐의약품 수거함이야 플라스틱이야?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "covered",
+    "priority": "high",
+    "observed": "Source Gap/Data Modeling 작업에서 `empty_medicine_bottle` 품목이 추가되어 남은 약과 빈 약통을 분리해 답변할 수 있습니다.",
+    "expectedAction": "품목 데이터와 MCP 답변 케이스로 반영 완료. status는 데이터 승격 후 covered로 전환했습니다.",
+    "candidateItemIds": [
+      "empty_medicine_bottle",
+      "medicine"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 93",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 폐의약품과 빈 약 포장·약통의 분리 조건을 구분해야 한다.",
+      "topCandidate: medicine/폐의약품 matchedBy=폐의약품 score=92",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: plastic_storage_box/리빙박스·플라스틱 수납함 matchedBy=리빙박스·플라스틱 수납함 score=23; snack_bag/비닐류 포장재 matchedBy=샴푸 리필팩 뚜껑만 플라스틱이야 score=23",
+      "coveredAt: 2026-07-02",
+      "coveredBy: empty_medicine_bottle 품목 추가와 MCP answer case empty_medicine_bottle_no_medicine_collection_overmatch"
+    ]
+  },
+  {
+    "id": "auto_b2c9350a97",
+    "query": "비닐장판은 비닐류로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_item)상 기존 품목만으로 답하기 어려운 신규 품목 후보입니다. 현재 자동 후보는 \"면봉\"(cotton_swab)입니다.",
+    "expectedAction": "공식 출처를 확인해 신규 품목 추가 여부를 결정하고, 필요하면 평가 케이스와 MCP 답변 케이스를 추가합니다.",
+    "candidateItemIds": [],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_item",
+      "minScore: 70",
+      "sourceIndex: 94",
+      "tool: get_disposal_steps",
+      "feedback: missing_item",
+      "logNote: 비닐이라는 단어만으로 비닐류 포장재에 과매칭하지 않아야 한다.",
+      "topCandidate: cotton_swab/면봉 matchedBy=면봉은 종이니까 종이류로 버려도 돼 score=33",
+      "itemConfidence: medium",
+      "reviewStatus: needs_source",
+      "otherCandidates: wet_tissue/물티슈 matchedBy=물티슈 포장 캡은 플라스틱으로 따로 버려 score=33; soap_bar_piece/비누 조각 matchedBy=샴푸바 포장 없는 비누 조각은 어디 버려 score=33"
+    ]
+  },
+  {
+    "id": "auto_0fd271c495",
+    "query": "젖은 택배상자는 말리면 종이류야?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"택배상자\"(delivery_box)입니다.",
+    "expectedAction": "조건별 답변 문구를 보강하고, 조건을 고정할 MCP 답변 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "delivery_box"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 95",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 젖은 종이상자의 건조 가능 여부와 오염 종이 기준을 분리해서 확인한다.",
+      "topCandidate: delivery_box/택배상자 matchedBy=택배상자 score=92",
+      "itemConfidence: high",
+      "reviewStatus: verified",
+      "otherCandidates: potato_chip_canister/감자칩 용기 matchedBy=프링글스 통은 종이로 버리면 돼 score=21; cotton_swab/면봉 matchedBy=면봉은 종이니까 종이류로 버려도 돼 score=21"
+    ]
+  },
+  {
+    "id": "auto_396aaa911b",
+    "query": "스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "todo",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"스프레이캔\"(spray_can)입니다.",
+    "expectedAction": "조건별 답변 문구를 보강하고, 조건을 고정할 MCP 답변 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "spray_can",
+      "can"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 96",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 압축용기 파손·찌그러짐 상태와 내용물 잔류 여부를 함께 묻는 안전 질문이다.",
+      "topCandidate: spray_can/스프레이캔 matchedBy=스프레이캔 score=98",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: can/음료캔 matchedBy=캔 score=89; scissors/가위 matchedBy=부러진 가위는 고철이야 일반쓰레기야 score=19"
+    ]
+  },
+  {
+    "id": "auto_cc2326a056",
+    "query": "냉동식품 포장 비닐봉지에 성에랑 음식물 묻었는데 비닐류야?",
+    "region": "서울 강남구",
+    "type": "condition_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_condition)상 상태·재질·오염·파손 여부에 따른 답변 분기가 부족합니다. 현재 자동 후보는 \"비닐류 포장재\"(snack_bag)입니다.",
+    "expectedAction": "조건별 답변 문구를 보강하고, 조건을 고정할 MCP 답변 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "snack_bag"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_condition",
+      "minScore: 70",
+      "sourceIndex: 97",
+      "tool: get_disposal_steps",
+      "feedback: missing_condition",
+      "logNote: 냉동식품 포장 비닐봉지의 물기, 음식물 오염, 세척 가능 여부를 구분해야 한다.",
+      "topCandidate: snack_bag/비닐류 포장재 matchedBy=비닐봉지 score=92",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: plastic_food_container/배달 플라스틱 용기 matchedBy=배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해 score=17; drip_bag_coffee_filter/드립백 커피 필터 matchedBy=드립백 커피 필터는 음식물쓰레기야 score=14"
+    ]
+  },
+  {
+    "id": "auto_44ef673984",
+    "query": "서초구에서 투명 페트병은 목요일에 내놓는 거야?",
+    "region": "서울 서초구",
+    "type": "region_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_region)상 지역별 수거 방식, 수거함, 수수료, 신청 방식 확인이 필요합니다. 현재 자동 후보는 \"페트병\"(pet_bottle)입니다.",
+    "expectedAction": "강남구 기준을 우선 확인하고 지역 가이드 또는 지역 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "pet_bottle",
+      "blanket"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_region",
+      "minScore: 70",
+      "sourceIndex: 98",
+      "tool: get_disposal_steps",
+      "feedback: missing_region",
+      "logNote: 강남구 목요일 안내가 다른 지역 질문에 섞이지 않는지 확인한다.",
+      "topCandidate: pet_bottle/페트병 matchedBy=투명 페트병 score=93",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: blanket/이불 matchedBy=요 score=89; aluminum_foil/알루미늄 포일 matchedBy=요거트 은박 뚜껑은 캔류야 일반쓰레기야 score=20"
+    ]
+  },
+  {
+    "id": "auto_990c3c72c0",
+    "query": "부산 해운대구 폐건전지 수거함 위치 알려줘",
+    "region": "부산 해운대구",
+    "type": "region_gap",
+    "status": "todo",
+    "priority": "high",
+    "observed": "자동 백로그화: 테스트 판정(missing_region)상 지역별 수거 방식, 수거함, 수수료, 신청 방식 확인이 필요합니다. 현재 자동 후보는 \"건전지\"(battery)입니다.",
+    "expectedAction": "강남구 기준을 우선 확인하고 지역 가이드 또는 지역 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "battery"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_region",
+      "minScore: 70",
+      "sourceIndex: 99",
+      "tool: get_region_disposal_info",
+      "feedback: missing_region",
+      "logNote: 강남구 외 지역의 수거함 위치를 단정하지 않고 지역 공식 확인처로 유도해야 한다.",
+      "topCandidate: battery/건전지 matchedBy=폐건전지 score=92",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=17; induction_cooktop_broken_glass/깨진 인덕션 유리 상판 matchedBy=인덕션 유리 상판 깨진 건 대형폐기물이야 score=10"
+    ]
+  },
+  {
+    "id": "auto_ca00a3c992",
+    "query": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?",
+    "region": "서울 강남구",
+    "type": "region_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 테스트 판정(missing_region)상 지역별 수거 방식, 수거함, 수수료, 신청 방식 확인이 필요합니다. 현재 자동 후보는 \"비닐류 포장재\"(snack_bag)입니다.",
+    "expectedAction": "강남구 기준을 우선 확인하고 지역 가이드 또는 지역 회귀 케이스를 추가합니다.",
+    "candidateItemIds": [
+      "snack_bag",
+      "blanket"
+    ],
+    "notes": [
+      "autoSource: quality-seed-regression",
+      "autoReason: feedback_missing_region",
+      "minScore: 70",
+      "sourceIndex: 100",
+      "tool: get_region_disposal_info",
+      "feedback: missing_region",
+      "logNote: 강남구 안에서도 주택 유형별 배출 기준 질문을 별도 지역 조건으로 추적한다.",
+      "topCandidate: snack_bag/비닐류 포장재 matchedBy=비닐봉지 score=92",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: blanket/이불 matchedBy=요 score=89; pet_waste_tissue/반려동물 배설물 묻은 휴지 matchedBy=강아지 배설물 묻은 휴지 score=16"
+    ]
+  },
+  {
+    "id": "auto_bb177cd0fe",
+    "query": "알약 포장 은박지는 재활용 돼?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "Source Gap/Data Modeling 작업에서 `pill_blister_packaging` 품목이 추가되어 알루미늄 포일/캔류 과매칭 없이 답변할 수 있습니다.",
+    "expectedAction": "품목 데이터와 MCP 답변 케이스로 반영 완료. status는 데이터 승격 후 covered로 전환했습니다.",
+    "candidateItemIds": [
+      "pill_blister_packaging",
+      "aluminum_foil"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 39",
+      "tool: get_disposal_steps",
+      "logNote: 폐의약품과 블리스터 포장재를 혼동하지 않는지 확인한다.",
+      "topCandidate: aluminum_foil/알루미늄 포일 matchedBy=은박지 score=91",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed",
+      "coveredAt: 2026-07-02",
+      "coveredBy: pill_blister_packaging 품목 추가와 MCP answer case pill_blister_packaging_no_foil_match"
+    ]
+  },
+  {
+    "id": "auto_8b7448bf7e",
+    "query": "공유기는 소형가전 수거함이야?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "Source Gap/Data Modeling 작업에서 `small_electronics`에 공유기 별칭과 근거가 보강되어 소형가전으로 안정 매칭됩니다.",
+    "expectedAction": "기존 소형가전 품목 보강과 MCP 답변 케이스로 반영 완료. status는 데이터 승격 후 covered로 전환했습니다.",
+    "candidateItemIds": [
+      "small_electronics"
+    ],
+    "notes": [
+      "autoSource: quality-seed",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 50",
+      "tool: get_disposal_steps",
+      "logNote: 공유기/라우터 소형가전 매칭 여부 확인.",
+      "topCandidate: small_electronics/소형가전 matchedBy=소형가전 score=20",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: scissors/가위 matchedBy=부러진 가위는 고철이야 일반쓰레기야 score=12; induction_cooktop_broken_glass/깨진 인덕션 유리 상판 matchedBy=인덕션 유리 상판 깨진 건 대형폐기물이야 score=12",
+      "coveredAt: 2026-07-02",
+      "coveredBy: small_electronics 공유기 별칭 보강과 MCP answer case gangnam_router_small_electronics"
+    ]
+  },
+  {
+    "id": "auto_6874483c4f",
+    "query": "휴대용 선풍기는 소형가전으로 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "covered",
+    "priority": "medium",
+    "observed": "Source Gap/Data Modeling 작업에서 `small_electronics`에 휴대용 선풍기 별칭과 근거가 보강되어 소형가전으로 안정 매칭됩니다.",
+    "expectedAction": "기존 소형가전 품목 보강과 MCP 답변 케이스로 반영 완료. status는 데이터 승격 후 covered로 전환했습니다.",
+    "candidateItemIds": [
+      "small_electronics"
+    ],
+    "notes": [
+      "autoSource: quality-seed-next",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 81",
+      "tool: get_disposal_steps",
+      "logNote: 휴대용 선풍기와 소형가전 매칭 확인.",
+      "topCandidate: small_electronics/소형가전 matchedBy=소형가전 score=20",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: paint_palette/물감 묻은 팔레트 matchedBy=물감 묻은 팔레트는 플라스틱으로 버려 score=10; pet_waste_tissue/반려동물 배설물 묻은 휴지 matchedBy=강아지 똥 묻은 휴지는 변기에 버려도 돼 score=10",
+      "coveredAt: 2026-07-02",
+      "coveredBy: small_electronics 휴대용 선풍기 별칭 보강과 MCP answer case gangnam_portable_fan_small_electronics"
+    ]
+  },
+  {
+    "id": "auto_4aefdf991e",
+    "query": "약 다 먹은 플라스틱 약병은 플라스틱으로 버려?",
+    "region": "서울 강남구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"빈 약통\" 후보가 있으나 짧은 별칭 \"약병\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "empty_medicine_bottle"
+    ],
+    "notes": [
+      "autoSource: quality-seed-modeled",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 103",
+      "tool: get_disposal_steps",
+      "logNote: 빈 약통과 폐의약품을 분리해서 안내하는지 확인한다.",
+      "topCandidate: empty_medicine_bottle/빈 약통 matchedBy=약병 score=78",
+      "itemConfidence: high",
+      "reviewStatus: region_review_needed"
+    ]
+  },
+  {
+    "id": "auto_11f931bc02",
+    "query": "송파구 거울 버릴 때 수수료 얼마야?",
+    "region": "서울 송파구",
+    "type": "synonym_gap",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: \"거울\" 후보가 있으나 짧은 별칭 \"거울\"의 부분 매칭이라 다른 품목을 잘못 가리킬 수 있습니다.",
+    "expectedAction": "사용자 표현을 기존 품목 별칭으로 추가할지, 짧은 별칭 과매칭을 줄일지, 별도 품목으로 분리할지 검토합니다.",
+    "candidateItemIds": [
+      "mirror"
+    ],
+    "notes": [
+      "autoSource: quality-seed-modeled",
+      "autoReason: broad_partial_match",
+      "minScore: 70",
+      "sourceIndex: 106",
+      "tool: get_disposal_steps",
+      "logNote: 송파구 거울 수수료 Top 행이 답변에 노출되는지 확인한다.",
+      "topCandidate: mirror/거울 matchedBy=거울 score=78",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed"
+    ]
+  }
+]

@@ -1,6 +1,8 @@
 # Data Quality Workflow
 
 재활용척척의 답변 정확도는 `src/data/waste-items.json`의 품목 데이터와 `src/data/evaluation-cases.json`의 대표 질문 테스트셋을 함께 키우는 방식으로 관리한다.
+실제 MCP 응답의 문구와 구조화 데이터 회귀는 `src/data/mcp-answer-cases.json`으로 별도 관리한다.
+아직 공식 근거와 처리 방향이 정리되지 않은 실제 질문 후보는 `src/data/question-backlog.json`에 먼저 쌓는다.
 
 ## Data Shape
 
@@ -19,10 +21,12 @@
 자주 쓰는 태그:
 
 - `clean`: 깨끗한 상태일 때 재활용 가능
+- `coated`: 코팅 여부가 판단에 영향
 - `contaminated`: 오염 여부가 판단에 영향
 - `food_contaminated`: 음식물, 국물, 소스 오염
 - `oily`: 기름 오염
 - `empty_required`: 내용물을 비우거나 헹궈야 함
+- `remaining_content`: 내용물이 남아 있으면 배출 판단이 달라짐
 - `mixed_material`: 복합재질
 - `separate_parts`: 라벨, 뚜껑, 펌프 등 부품 분리 필요
 - `damaged`: 파손 상태
@@ -34,6 +38,8 @@
 - `electronics`: 전자제품
 - `bulky`: 대형폐기물 가능성
 - `liquid`: 액체류
+- `nonburnable`: 불연성 폐기물
+- `manufacturer_takeback`: 제조사 회수 프로그램 확인 필요
 - `reusable`: 재사용 가능 여부가 판단에 영향
 - `textile`: 섬유류
 
@@ -70,13 +76,16 @@
 ## Add A New Item
 
 1. 사용자 질문 또는 검색 로그에서 품목 후보를 고른다.
-2. 공식 출처를 먼저 찾고, 없으면 `review.status`를 `needs_source`로 둔다.
-3. 품목 상태가 답을 바꾸는지 확인한다.
-4. `src/data/waste-items.json`에 품목을 추가한다.
-5. 같은 품목의 대표 질문을 `src/data/evaluation-cases.json`에 추가한다.
-6. Top 50 품목은 품목당 정확히 1개의 대표 질문 평가 케이스를 유지한다.
-7. `pnpm check`를 실행한다.
-8. 대표 MCP 호출로 실제 답변 톤을 확인한다.
+2. 바로 품목으로 만들기 애매하면 `src/data/question-backlog.json`에 먼저 추가한다.
+3. 공식 출처를 먼저 찾고, 없으면 `review.status`를 `needs_source`로 둔다.
+4. 품목 상태가 답을 바꾸는지 확인한다.
+5. `src/data/waste-items.json`에 품목을 추가한다.
+6. 같은 품목의 대표 질문을 `src/data/evaluation-cases.json`에 추가한다.
+7. Top 50 품목과 사용자 질문에서 승격한 확장 품목은 품목당 정확히 1개의 대표 질문 평가 케이스를 유지한다.
+8. 실제 답변 문구나 구조화 응답이 중요하면 `src/data/mcp-answer-cases.json`에 MCP 답변 케이스를 추가한다.
+9. 백로그에서 승격한 질문은 `covered`로 바꾼다.
+10. `pnpm check`를 실행한다.
+11. 대표 MCP 호출로 실제 답변 톤을 확인한다.
 
 ## Expansion Order
 
@@ -103,15 +112,38 @@
 ```bash
 pnpm validate:data
 pnpm eval:data
+pnpm backlog:questions
+pnpm log:query -- --query "요가매트는 어떻게 버려?"
+pnpm backlog:auto -- --query "요가매트는 어떻게 버려?"
+pnpm backlog:auto:quality
 pnpm check
+pnpm smoke:mcp
+pnpm local:test
 ```
 
 `pnpm check`는 TypeScript 타입 검사, 데이터 스키마 검증, 대표 질문 평가를 모두 실행한다.
 
-대표 질문 평가는 Top 50 품목이 각각 1개씩 평가 케이스를 갖는지까지 확인한다.
+`pnpm backlog:questions`는 아직 품목 데이터로 승격하지 않은 실제 질문 후보를 상태와 우선순위별로 요약한다.
 
-현재 Top 50 목록은 [top-50-items.md](top-50-items.md)를 기준으로 관리한다.
+`pnpm backlog:auto`는 실제 질문 로그를 분석해 미매칭, 낮은 매칭 점수, `needs_source`, 낮은 confidence 품목을 자동으로 `question-backlog.json` 후보로 만든다. 기본은 dry-run이고, 저장하려면 `--write`를 붙인다.
+
+`pnpm backlog:auto:quality`는 개인정보 없는 재현용 질문 묶음인 `logs/quality-seed-queries.example.jsonl`을 분석한다. 현재 quality seed는 88개 질문을 담고 있으며, 실제 백로그에 추가하려면 dry-run 후보를 검토한 뒤 `pnpm backlog:auto:quality -- --write`를 붙인다.
+
+`pnpm log:query`는 수동 테스트 또는 사용자 피드백 질문을 `logs/manual-queries.jsonl`에 JSONL로 남긴다. 실제 로그 파일은 Git에 커밋하지 않고, `logs/manual-queries.example.jsonl`만 형식 예시로 관리한다.
+
+대표 질문 평가는 Top 50 품목과 확장 품목이 각각 1개씩 평가 케이스를 갖는지까지 확인한다.
+
+`pnpm smoke:mcp`는 빌드된 서버를 로컬 임시 포트로 띄우고 실제 MCP Streamable HTTP 호출을 보낸다. 답변 품질 케이스는 `src/data/mcp-answer-cases.json`에 저장한다.
+
+`pnpm local:test`는 로컬 개발 기본 게이트다. PlayMCP in KC에 올리기 전에 최소 이 명령을 통과시킨다.
+
+현재 Top 50 목록과 사용자 질문에서 승격한 확장 품목은 [top-50-items.md](top-50-items.md)를 기준으로 관리한다.
 
 공식 출처 보강 현황은 [source-coverage.md](source-coverage.md)를 기준으로 관리한다.
+공식 단독 근거를 찾지 못한 품목의 예외/근거 gap 기준은 [source-gap-policy.md](source-gap-policy.md)를 기준으로 한다.
 
 1차 지역 보강은 `서울 강남구` 기준으로 시작한다. 지역 기본 정책은 `src/data/region-policies.json`에 저장하고, 대형폐기물 수수료처럼 품목별로 커질 수 있는 데이터는 `src/data/bulky-waste-fees.json`처럼 별도 파일로 분리한다.
+
+로컬 우선 개발/검증 흐름은 [local-mcp-workflow.md](local-mcp-workflow.md)를 기준으로 한다.
+
+실제 질문 백로그 관리 흐름은 [question-backlog.md](question-backlog.md)를 기준으로 한다.

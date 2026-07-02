@@ -145,27 +145,82 @@ export function normalizeText(value: string): string {
     .trim();
 }
 
+const SHORT_ALIAS_MAX_LENGTH = 2;
+const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
+
+function normalizedTokens(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/gu)
+    .map((token) => normalizeText(token))
+    .filter(Boolean);
+}
+
+function stripShortAliasParticle(token: string): string {
+  for (const suffix of SHORT_ALIAS_PARTICLE_SUFFIXES) {
+    if (token.length > suffix.length && token.endsWith(suffix)) {
+      return token.slice(0, -suffix.length);
+    }
+  }
+
+  return token;
+}
+
+function hasStandaloneShortAliasMatch(queryTokens: string[], normalizedName: string): boolean {
+  return queryTokens.some((token) => token === normalizedName || stripShortAliasParticle(token) === normalizedName);
+}
+
+function isLikelyDisposalTargetMention(query: string, normalizedQuery: string, normalizedName: string): boolean {
+  if (normalizedQuery.startsWith(normalizedName)) {
+    return false;
+  }
+
+  const index = normalizedQuery.indexOf(normalizedName);
+  if (index <= 0) {
+    return false;
+  }
+
+  const before = normalizedQuery.slice(0, index);
+  const after = normalizedQuery.slice(index + normalizedName.length);
+  const hasTopicBefore = /[은는이가]$/u.test(before);
+  const looksLikeTarget = after.startsWith("수거함") || after.startsWith("수거처") || after.startsWith("류") || after.startsWith("로") || after.startsWith("으로");
+
+  return hasTopicBefore && looksLikeTarget && query.includes("?");
+}
+
 function scoreItem(query: string, item: WasteItem): WasteMatch {
   const normalizedQuery = normalizeText(query);
+  const queryTokens = normalizedTokens(query);
   const names = [item.name, ...item.aliases];
   let bestScore = 0;
   let matchedBy = item.name;
 
   for (const name of names) {
     const normalizedName = normalizeText(name);
+    const isShortAlias = normalizedName.length <= SHORT_ALIAS_MAX_LENGTH;
     let score = 0;
 
     if (normalizedQuery === normalizedName) {
       score = 100;
     } else if (normalizedQuery.includes(normalizedName)) {
-      score = 88;
+      if (isLikelyDisposalTargetMention(query, normalizedQuery, normalizedName)) {
+        score = 20;
+      } else if (isShortAlias) {
+        score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? 78 : 0;
+      } else {
+        const startsWithName = normalizedQuery.startsWith(normalizedName);
+        const lengthBonus = Math.min(normalizedName.length, 5);
+        score = Math.min(99, 88 + lengthBonus + (startsWithName ? 5 : 0));
+      }
     } else if (normalizedName.includes(normalizedQuery)) {
       score = 82;
     } else {
-      const queryChars = Array.from(new Set(normalizedQuery.split("")));
-      const nameChars = new Set(normalizedName.split(""));
-      const overlap = queryChars.filter((char) => nameChars.has(char)).length;
-      score = Math.round((overlap / Math.max(queryChars.length, 1)) * 60);
+      if (!isShortAlias) {
+        const queryChars = Array.from(new Set(normalizedQuery.split("")));
+        const nameChars = new Set(normalizedName.split(""));
+        const overlap = queryChars.filter((char) => nameChars.has(char)).length;
+        score = Math.round((overlap / Math.max(queryChars.length, 1)) * 30);
+      }
     }
 
     if (score > bestScore) {
@@ -227,6 +282,7 @@ export function confidenceLabel(confidence: Confidence): string {
 const conditionLabels: Record<string, string> = {
   bulky: "크기/부피 확인",
   clean: "깨끗한 상태",
+  coated: "코팅 여부",
   contaminated: "오염 여부 확인",
   damaged: "파손됨",
   electronics: "전자제품",
@@ -236,8 +292,11 @@ const conditionLabels: Record<string, string> = {
   hygiene: "위생용품",
   liquid: "액체",
   mixed_material: "복합재질",
+  manufacturer_takeback: "제조사 회수 확인",
+  nonburnable: "불연성 폐기물",
   oily: "기름 오염",
   pressurized: "압축/가스 용기",
+  remaining_content: "내용물 남음",
   reusable: "재사용 가능 여부",
   safe_wrap_required: "안전 포장 필요",
   separate_parts: "분리 필요",
@@ -395,6 +454,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
 export function disposalGroupLabel(disposalType: string): string {
   if (disposalType.includes("bulky")) return "대형폐기물";
   if (disposalType.includes("special") || disposalType.includes("hazardous")) return "특수/유해폐기물";
+  if (disposalType.includes("general") && disposalType.includes("recycle")) return "재활용/일반쓰레기";
   if (disposalType.includes("general")) return "일반쓰레기";
   if (disposalType.includes("recycle")) return "재활용";
   if (disposalType.includes("region")) return "지역 확인 필요";

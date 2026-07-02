@@ -1,0 +1,1814 @@
+[
+  {
+    "id": "gangnam_chair_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상의자",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["서울 강남구 대형생활폐기물 수수료 후보", "의자 1인용: 2,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"bulkyWasteFees\"", "\"feeKrw\":2000"]
+  },
+  {
+    "id": "gangnam_mattress_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 매트리스",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["침대 1인용(매트리스): 5,000원", "침대 2인용(매트리스): 8,000원"]
+  },
+  {
+    "id": "gangnam_blanket_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "이불",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["이불 모든규격: 2,000원", "대형생활폐기물"]
+  },
+  {
+    "id": "gangnam_mirror_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "거울",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["재활용 유리병류가 아니며", "크기에 따라 일반 또는 대형폐기물", "큰 거울이나 가구 부착 거울", "대형폐기물 신고 여부", "유리(거울/판유리) 1㎡당: 2,000원", "전신거울은 대형폐기물", "재활용이 어렵", "유리병류로 배출하지 않습니다"],
+    "expectedStructuredIncludes": ["\"id\":\"mirror\"", "\"matchedBy\":\"거울\"", "\"status\":\"region_review_needed\"", "\"bulkyWasteFees\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_broken_glass_pp_bag",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 유리컵",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["PP봉투", "깨진 유리는 일반폐기물/불연성종량제폐기물"]
+  },
+  {
+    "id": "gangnam_chicken_bone_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "닭뼈",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["강남구는 동물뼈", "음식물쓰레기가 아닌 일반 종량제 봉투"]
+  },
+  {
+    "id": "gangnam_shellfish_shell_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "조개껍데기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["조개 껍데기는 일반폐기물", "음식물쓰레기와 섞지 않습니다"]
+  },
+  {
+    "id": "gangnam_egg_shell_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "달걀껍데기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["계란껍질(달걀껍질)", "일반 종량제 봉투"]
+  },
+  {
+    "id": "toothbrush_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "칫솔",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["품목사전 - 칫솔", "복합재질"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"]
+  },
+  {
+    "id": "receipt_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카드 영수증",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["영수증", "감열지", "종이류가 아니라 일반쓰레기", "종량제봉투", "품목사전 - 영수증"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"receipt\"", "\"matchedBy\":\"카드 영수증\"", "\"status\":\"verified\""]
+  },
+  {
+    "id": "shipping_label_no_paper_recycling",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "택배 송장은 종이류로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["송장스티커", "종이류와 분리", "감열지와 이형지", "접착제", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"shipping_label\"", "\"matchedBy\":\"택배 송장\"", "\"status\":\"verified\""]
+  },
+  {
+    "id": "shampoo_bottle_pump_parts",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "샴푸통 펌프는 플라스틱이야 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["샴푸통", "내용물을 비우고", "펌프와 스프링", "플라스틱류", "다량의 내용물이 남아 제거하기 어려우면", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"shampoo_bottle\"", "\"matchedBy\":\"샴푸통\"", "\"status\":\"verified\""]
+  },
+  {
+    "id": "ballpoint_pen_dictionary",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "볼펜"
+    },
+    "expectedTextIncludes": ["품목사전 - 볼펜", "종량제봉투"]
+  },
+  {
+    "id": "disposable_mask_dictionary",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "KF94 마스크"
+    },
+    "expectedTextIncludes": ["품목사전 - 일회용 마스크", "재활용이 어려워"]
+  },
+  {
+    "id": "knife_safe_wrap",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "커터칼"
+    },
+    "expectedTextIncludes": ["신문지", "테이프", "날카로운 부분"]
+  },
+  {
+    "id": "non_empty_hairspray_hazardous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "헤어스프레이가 조금 남았는데 캔으로 버려도 돼?"
+    },
+    "expectedTextIncludes": ["내용물이 남아 있으면", "바로 넣지 않습니다", "위험성을 표시", "밀봉", "생활계 유해폐기물"],
+    "expectedStructuredIncludes": ["\"id\":\"spray_can\"", "\"matchedBy\":\"헤어스프레이\""]
+  },
+  {
+    "id": "gangnam_pet_bottle_thursday",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "투명 페트병",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["목요일", "비닐과 함께 별도 배출"]
+  },
+  {
+    "id": "gangnam_snack_bag_thursday",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "과자봉지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류", "목요일"]
+  },
+  {
+    "id": "gangnam_parcel_plastic_bag_thursday",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "택배 비닐봉투",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류 포장재", "송장스티커", "테이프", "목요일", "투명·반투명 봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"택배 비닐봉투\""]
+  },
+  {
+    "id": "gangnam_frying_pan_metal_recycling",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "후라이팬",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["고철 수거함", "월·화·수·금·일요일", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"frying_pan\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_cooking_pot_metal_recycling",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냄비",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["고철 수거함", "내열유리", "월·화·수·금·일요일"],
+    "expectedStructuredIncludes": ["\"id\":\"cooking_pot\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_milk_carton_other_days",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "우유팩",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["월·화·수·금·일요일", "녹색 그물망"]
+  },
+  {
+    "id": "gangnam_battery_collection",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐건전지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["주민센터", "수거함"]
+  },
+  {
+    "id": "gangnam_fluorescent_lamp_collection",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐형광등",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["폐형광등", "수거함"]
+  },
+  {
+    "id": "gangnam_broken_fluorescent_lamp_safe_wrap",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 형광등",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["수거함에 넣지", "신문지", "테이프", "불연성 종량제봉투", "PP봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"fluorescent_lamp\"", "\"matchedBy\":\"깨진 형광등\""]
+  },
+  {
+    "id": "gangnam_medicine_collection",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐의약품",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["폐의약품 수거함", "하수구", "알약", "물약", "한약", "연고", "폐의약품 전용수거함", "우체통 배출이 불가"],
+    "expectedStructuredIncludes": ["\"id\":\"medicine\"", "\"matchedBy\":\"폐의약품\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"empty_medicine_bottle\"", "\"id\":\"pill_blister_packaging\""]
+  },
+  {
+    "id": "gangnam_used_cooking_oil_collection",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐식용유",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["폐식용유 수거함", "하수구"]
+  },
+  {
+    "id": "gangnam_ice_pack_water_gel_distinction",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "물 아이스팩이랑 젤 아이스팩",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["물 타입", "젤 타입", "비닐류", "전용 수거함", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"ice_pack\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_ice_pack_location_limit",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "젤 아이스팩 수거함 위치도 알려줄 수 있어?"
+    },
+    "expectedTextIncludes": ["아이스팩", "정확한 수거함 주소", "전용 수거함 운영 여부", "별도 노출되지 않습니다", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"아이스팩\"", "\"regionalPolicy\"", "\"itemGuide\""]
+  },
+  {
+    "id": "gangnam_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "드라이기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["1~4개", "자원순환 종합포털"]
+  },
+  {
+    "id": "gangnam_mobile_phone",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "휴대폰",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["소형가전", "e순환거버넌스"]
+  },
+  {
+    "id": "gangnam_cable_wire_pp_or_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "충전 케이블",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["소형전기전자제품 전용 수거함", "고철로 배출", "PP봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"cable_wire\"", "\"matchedBy\":\"충전 케이블\""]
+  },
+  {
+    "id": "gangnam_paint_can_hazardous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "페인트통",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["생활계 유해폐기물", "밀봉", "전용 수거함", "종량제봉투", "하수구"],
+    "expectedStructuredIncludes": ["\"id\":\"paint_can\"", "\"matchedBy\":\"페인트통\""]
+  },
+  {
+    "id": "rubber_gloves_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "고무장갑",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["종량제봉투", "합성 고무"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"rubber_gloves\"", "\"matchedBy\":\"고무장갑\""]
+  },
+  {
+    "id": "gangnam_toothpaste_tube_label_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "치약 튜브",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["도포·첩합", "플라스틱", "종량제봉투", "녹색 그물망"],
+    "expectedStructuredIncludes": ["\"id\":\"toothpaste_tube\"", "\"matchedBy\":\"치약 튜브\""]
+  },
+  {
+    "id": "gangnam_wooden_chopsticks_not_food",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "나무젓가락",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["음식물쓰레기", "종량제봉투", "금속 단일재질", "고철류"],
+    "expectedStructuredIncludes": ["\"id\":\"chopsticks\"", "\"matchedBy\":\"나무젓가락\""]
+  },
+  {
+    "id": "gangnam_straw_material_specific",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옥수수 빨대랑 플라스틱 빨대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["옥수수·PLA", "종량제봉투", "플라스틱", "고철류"],
+    "expectedStructuredIncludes": ["\"id\":\"straw\""]
+  },
+  {
+    "id": "gangnam_clothing_reuse",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "헌옷",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["의류수거함", "깨끗하고 마른 상태", "오염되거나 훼손된 옷", "젖은 옷이나 오염된 옷은 의류수거함에 넣지 마세요", "운영 주체와 지역별", "의류, 원단", "물기에 젖지 않도록"],
+    "expectedStructuredIncludes": ["\"id\":\"clothing\"", "\"matchedBy\":\"헌옷\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_shoes_reuse_or_pp",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "운동화",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["재사용 가능한 신발", "의류수거함", "해지거나 오염되어 재사용이 어려운 운동화", "종량제봉투", "수거함 위치와 수거 가능 상태", "PP봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"shoes\"", "\"matchedBy\":\"운동화\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "pencil_lead_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "샤프심",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["종량제봉투", "흑연", "재활용이 어려워"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pencil_lead\"", "\"matchedBy\":\"샤프심\""]
+  },
+  {
+    "id": "gangnam_plant_soil_nonburnable",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화분 흙",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["음식물쓰레기", "불연성종량제봉투", "특수규격마대", "식물", "화분"],
+    "expectedStructuredIncludes": ["\"id\":\"plant_soil\"", "\"matchedBy\":\"화분 흙\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_coffee_capsule_takeback_or_general",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "커피 캡슐",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["제조사 회수", "커피 찌꺼기", "분리·세척", "종량제봉투", "알루미늄"],
+    "expectedStructuredIncludes": ["\"id\":\"coffee_capsule\"", "\"matchedBy\":\"커피 캡슐\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_power_strip_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "멀티탭",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["소형전기전자제품 전용수거함", "고철", "플라스틱", "1~4개", "e순환거버넌스"],
+    "expectedStructuredIncludes": ["\"id\":\"power_strip\"", "\"matchedBy\":\"멀티탭\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_plastic_cup_deposit_and_pet_separation",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카페 플라스틱 컵",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["무색페트병", "보증금", "플라스틱", "월·화·수·금·일요일"],
+    "expectedStructuredIncludes": ["\"id\":\"plastic_cup\"", "\"matchedBy\":\"플라스틱 컵\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_cup_holder_coating",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "커피 컵홀더",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["코팅되지 않은 종이", "코팅", "종량제봉투", "월·화·수·금·일요일"],
+    "expectedStructuredIncludes": ["\"id\":\"cup_holder\"", "\"matchedBy\":\"커피 컵홀더\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_plastic_wrap_pe_pvc",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비닐랩",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["PE", "PVC", "목요일", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"plastic_wrap\"", "\"matchedBy\":\"비닐랩\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "coated_paper_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "코팅지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["합성수지 필름", "종량제봉투", "종이류"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"coated_paper\"", "\"matchedBy\":\"코팅지\""]
+  },
+  {
+    "id": "photo_print_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인화사진",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["인화지", "약품", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"photo_print\"", "\"matchedBy\":\"인화사진\""]
+  },
+  {
+    "id": "gangnam_flower_pot_material_specific",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "도자기 화분",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["화분 흙", "플라스틱", "불연성종량제봉투", "대형생활폐기물"],
+    "expectedStructuredIncludes": ["\"id\":\"flower_pot\"", "\"matchedBy\":\"도자기 화분\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_cosmetic_container_parts",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장품 용기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["내용물", "펌프", "뚜껑", "월·화·수·금·일요일", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"cosmetic_container\"", "\"matchedBy\":\"화장품 용기\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_drying_rack_bulky_or_metal",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빨래건조대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["대형생활폐기물", "고철", "분리", "강남구 자원순환 종합포털"],
+    "expectedStructuredIncludes": ["\"id\":\"drying_rack\"", "\"matchedBy\":\"빨래건조대\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_toy_battery_bulky",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장난감",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["복합재질", "전지", "폐건전지 수거함", "종량제봉투", "대형생활폐기물"],
+    "expectedStructuredIncludes": ["\"id\":\"toy\"", "\"matchedBy\":\"장난감\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_stuffed_toy_general_not_clothing",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["천, 솜", "종량제봉투", "의류수거함", "대형생활폐기물"],
+    "expectedStructuredIncludes": ["\"id\":\"stuffed_toy\"", "\"matchedBy\":\"인형\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "pizza_box_oily_general",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "기름 묻은 피자박스"
+    },
+    "expectedTextIncludes": ["기름 묻은 피자박스", "깨끗한 부분과 오염된 부분", "깨끗한 종이 부분", "일반쓰레기", "품목사전 - 피자박스"],
+    "expectedStructuredIncludes": ["\"id\":\"pizza_box_oily\"", "\"matchedBy\":\"기름 묻은 피자박스\"", "\"status\":\"verified\""]
+  },
+  {
+    "id": "delivery_container_clean_or_dirty",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "배달 플라스틱 용기"
+    },
+    "expectedTextIncludes": ["내용물을 비우", "오염"]
+  },
+  {
+    "id": "region_info_chair_gangnam",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "itemName": "책상의자",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["대형생활폐기물", "강남구"]
+  },
+  {
+    "id": "gangnam_nail_polish_remaining_content",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매니큐어 병은 유리병으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["내용물 제거가 어렵", "종량제봉투", "유리병", "플라스틱", "용제 성분"],
+    "expectedStructuredIncludes": ["\"id\":\"nail_polish\"", "\"matchedBy\":\"매니큐어 병\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_perfume_bottle_absorb_content",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "향수병은 유리병으로 분리수거해?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["휴지", "뚜껑", "펌프", "유리병", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"perfume_bottle\"", "\"matchedBy\":\"향수병\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_mercury_thermometer_hazardous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "수은 체온계가 깨졌는데 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["수은", "생활계유해폐기물", "전용수거함", "분해하거나 해체하지", "골판지 상자"],
+    "expectedStructuredIncludes": ["\"id\":\"mercury_thermometer\"", "\"matchedBy\":\"수은 체온계\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_pesticide_container_hazardous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "살충제 통에 내용물이 남았는데 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["폐농약", "생활계유해폐기물", "완전히 밀봉", "유출", "전용수거함"],
+    "expectedStructuredIncludes": ["\"id\":\"pesticide_container\"", "\"matchedBy\":\"살충제 통\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_fire_extinguisher_bulky_special",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소화기는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["대형생활폐기물", "전문 처리업체", "폭발사고", "강남구 자원순환 종합포털"],
+    "expectedStructuredIncludes": ["\"id\":\"fire_extinguisher\"", "\"matchedBy\":\"소화기\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_remaining_lighter_gas_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "라이터에 가스 남았는데 그냥 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["통풍이 잘되는 장소", "가스를 완전히 제거", "종량제봉투", "종이상자"],
+    "expectedStructuredIncludes": ["\"id\":\"lighter\"", "\"matchedBy\":\"라이터\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_swollen_power_bank_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "부푼 보조배터리는 수거함에 넣어도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["사용하거나 충전하지", "화재 위험", "전지 수거함", "지자체", "일반쓰레기나 재활용품"],
+    "expectedStructuredIncludes": ["\"id\":\"power_bank\"", "\"matchedBy\":\"부푼 보조배터리\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "disposable_razor_safe_wrap_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "일회용 면도기는 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["플라스틱, 금속", "종량제봉투", "신문지", "테이프"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"disposable_razor\"", "\"matchedBy\":\"일회용 면도기\""]
+  },
+  {
+    "id": "tea_bag_general_not_food_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "티백은 음식물쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["음식물류폐기물로 배출 불가능", "종량제봉투", "재활용이 어렵", "녹차잎"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"tea_bag\"", "\"matchedBy\":\"티백\""]
+  },
+  {
+    "id": "gangnam_wilted_flower_not_food",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "시든 꽃은 음식물쓰레기로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["음식물쓰레기", "흙을 최대한 털어", "종량제봉투", "화분 흙", "큰 나뭇가지"],
+    "expectedStructuredIncludes": ["\"id\":\"wilted_flower\"", "\"matchedBy\":\"시든 꽃\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_candle_wax_container_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "향초는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["파라핀", "밀랍", "왁스", "심지", "재질별"],
+    "expectedStructuredIncludes": ["\"id\":\"candle\"", "\"matchedBy\":\"향초\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_contact_lens_general_case_recycle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "콘택트렌즈는 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["하수구", "종량제봉투", "렌즈케이스", "플라스틱 수거함", "한국소비자원", "수질오염"],
+    "expectedStructuredIncludes": ["\"id\":\"contact_lens\"", "\"matchedBy\":\"콘택트렌즈\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_cd_dvd_disc_not_plastic",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "CD는 플라스틱으로 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["폴리카보네이트", "알루미늄 막", "종량제봉투", "케이스", "플라스틱"],
+    "expectedStructuredIncludes": ["\"id\":\"cd_dvd\"", "\"matchedBy\":\"CD\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_clothes_hanger_material_specific",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옷걸이는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["세탁소", "고철수거함", "반납", "플라스틱", "나무"],
+    "expectedStructuredIncludes": ["\"id\":\"clothes_hanger\"", "\"matchedBy\":\"옷걸이\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "sponge_scrubber_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "수세미는 재활용이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["아크릴", "부직포", "스펀지", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"sponge_scrubber\"", "\"matchedBy\":\"수세미\""]
+  },
+  {
+    "id": "gangnam_disposable_cutlery_material_cleanliness",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "일회용 숟가락이랑 포크는 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨끗한", "아이스크림 숟가락", "옥수수 식기", "PLA", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"disposable_cutlery\"", "\"matchedBy\":\"일회용 숟가락\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "silicone_kitchenware_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "실리콘 주걱은 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["열경화성 수지", "재활용이 어렵", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"silicone_kitchenware\"", "\"matchedBy\":\"실리콘 주걱\""]
+  },
+  {
+    "id": "vacuum_dust_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "청소기 먼지는 일반쓰레기로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["청소기 먼지", "일반쓰레기 예외 품목", "종량제봉투", "재활용품", "음식물쓰레기", "일반쓰레기 고정", "단독 공식 품목사전 항목은 아직 없지만"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"vacuum_dust\"", "\"matchedBy\":\"청소기 먼지\"", "\"status\":\"needs_source\""]
+  },
+  {
+    "id": "gangnam_large_plastic_storage_box_size_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "큰 리빙박스는 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["리빙박스", "플라스틱 단일재질", "대형폐기물", "기타 프라스틱류 5kg 당: 2,000원", "서랍장 4단 이하: 3,000원"],
+    "expectedStructuredIncludes": ["\"id\":\"plastic_storage_box\"", "\"matchedBy\":\"큰 리빙박스\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "gangnam_yoga_mat_not_blanket",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "요가매트는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["요가매트", "고무매트", "종량제봉투", "비닐류 재활용품", "대형생활폐기물", "돗자리(대자리/놀이매트) 1㎡당: 1,000원"],
+    "expectedStructuredIncludes": ["\"id\":\"yoga_mat\"", "\"matchedBy\":\"요가매트\"", "\"bulkyWasteFees\""],
+    "expectedStructuredExcludes": ["\"id\":\"blanket\""]
+  },
+  {
+    "id": "pet_pad_general_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강아지 배변패드는 어디에 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["배변패드", "부직포", "흡수체", "펄프", "종량제봉투", "변기"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pet_pad\"", "\"matchedBy\":\"강아지 배변패드\""]
+  },
+  {
+    "id": "gangnam_broken_power_bank_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 보조배터리는 폐건전지함에 그냥 넣어도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["사용하거나 충전하지", "테이프", "전지 수거함", "일반쓰레기나 재활용품", "주민센터", "자가 처리"],
+    "expectedStructuredIncludes": ["\"id\":\"power_bank\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_broken_ceramic_flower_pot_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 도자기 화분은 불연성 마대야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨진 도자기", "신문지", "테이프", "불연성종량제봉투", "특수규격마대", "화분 흙"],
+    "expectedStructuredIncludes": ["\"id\":\"flower_pot\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_broken_led_lamp_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "LED 전구 깨졌는데 형광등 수거함에 넣어도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨진 LED", "형광등 수거함", "신문지", "테이프", "불연성종량제폐기물"],
+    "expectedStructuredIncludes": ["\"id\":\"led_lamp\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_toner_cartridge_leak_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "토너 가루가 누출된 프린터 카트리지는 어디 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["토너 가루", "밀봉", "종량제봉투", "구입업체", "카트리지 재활용전문업체"],
+    "expectedStructuredIncludes": ["\"id\":\"toner_cartridge\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_electronic_cigarette_battery_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "배터리 들어있는 일회용 전자담배는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["배터리", "소형전기전자제품 전용수거함", "지자체", "일반쓰레기", "라이터"],
+    "expectedStructuredIncludes": ["\"id\":\"electronic_cigarette\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "parchment_paper_general_no_foil_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "에어프라이어 종이호일은 종이로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["종이호일", "실리콘", "코팅", "종량제봉투", "종이류", "알루미늄 포일"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"parchment_paper\"", "\"matchedBy\":\"에어프라이어 종이호일은 종이로 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"aluminum_foil\""]
+  },
+  {
+    "id": "disposable_hand_warmer_general_no_lighter_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "다 쓴 핫팩은 어디 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["일회용 손난로", "철가루", "젤", "종량제봉투", "전기 손난로", "소형전기전자제품"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"disposable_hand_warmer\"", "\"matchedBy\":\"다 쓴 핫팩은 어디 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"lighter\""]
+  },
+  {
+    "id": "desiccant_general_no_silicone_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "실리카겔 방습제는 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["실리카겔", "부직포", "복합재질", "종량제봉투", "음식물쓰레기"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"desiccant\"", "\"matchedBy\":\"실리카겔 방습제는 일반쓰레기야\""],
+    "expectedStructuredExcludes": ["\"id\":\"silicone_kitchenware\""]
+  },
+  {
+    "id": "screen_protector_general_no_mobile_phone_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "휴대폰 액정 보호필름은 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["액정보호필름", "비닐류", "유리", "우레탄", "종량제봉투", "신문지"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"screen_protector\"", "\"matchedBy\":\"휴대폰 액정 보호필름은 비닐류야\""],
+    "expectedStructuredExcludes": ["\"id\":\"mobile_phone\""]
+  },
+  {
+    "id": "gangnam_gypsum_air_freshener_material_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "다 쓴 고체 방향제는 플라스틱 용기만 분리해?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["석고방향제", "플라스틱 용기", "종량제봉투", "불연성종량제봉투", "특수규격마대", "서울 강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"gypsum_air_freshener\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_mandarin_peel_food_waste",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "귤껍질은 음식물쓰레기로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["귤껍질", "말린 귤껍질", "음식물류폐기물", "전용 종량제봉투", "RFID", "지역"],
+    "expectedStructuredIncludes": ["\"id\":\"mandarin_peel\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "nonwoven_bag_general_no_clothing_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "부직포 장바구니는 의류수거함에 넣어도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["부직포 가방", "의류수거함", "합성섬유", "재사용", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"nonwoven_bag\"", "\"matchedBy\":\"부직포 장바구니는 의류수거함에 넣어도 돼\""],
+    "expectedStructuredExcludes": ["\"id\":\"clothing\""]
+  },
+  {
+    "id": "laundry_lint_general_source_gap_no_wet_tissue_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빨래 먼지 거름망에서 나온 보풀은 음식물 아니지?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["세탁 보풀", "일반쓰레기 예외 품목", "음식물쓰레기", "재활용품", "종량제봉투", "일반쓰레기 고정"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"laundry_lint\"", "\"matchedBy\":\"빨래 먼지 거름망에서 나온 보풀은 음식물 아니지\""],
+    "expectedStructuredExcludes": ["\"id\":\"wet_tissue\""]
+  },
+  {
+    "id": "soap_bar_piece_general_source_gap_no_packaging_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "샴푸바 포장 없는 비누 조각은 어디 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비누 조각", "샴푸바", "일반쓰레기 예외 품목", "종량제봉투", "하수구", "일반쓰레기 고정"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"soap_bar_piece\"", "\"matchedBy\":\"샴푸바 포장 없는 비누 조각은 어디 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"snack_bag\""]
+  },
+  {
+    "id": "gangnam_moldy_bread_food_waste",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "곰팡이 핀 빵은 음식물쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["곰팡이 핀 빵", "상한 음식", "음식물류폐기물", "포장재", "빵끈", "전용 종량제봉투", "RFID", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"moldy_bread\"", "\"matchedBy\":\"곰팡이 핀 빵은 음식물쓰레기야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"pesticide_container\""]
+  },
+  {
+    "id": "plastic_food_container_gochujang_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["고추장", "음식물류폐기물", "헹", "플라스틱류", "종량제봉투", "오염"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"plastic_food_container\"", "\"matchedBy\":\"배달 플라스틱 용기에 고추장 묻었는데 씻어서 재활용 가능해\""],
+    "expectedStructuredExcludes": ["\"id\":\"shampoo_bottle\""]
+  },
+  {
+    "id": "wet_tissue_pack_cap_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "물티슈 포장 캡은 플라스틱으로 따로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["물티슈", "포장 캡", "접착제", "플라스틱류", "종량제봉투", "폴리에스터"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"wet_tissue\"", "\"matchedBy\":\"물티슈 포장 캡은 플라스틱으로 따로 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_storage_box\""]
+  },
+  {
+    "id": "drip_bag_coffee_filter_general_no_coffee_ground_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "드립백 커피 필터는 음식물쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["드립백", "티백", "종량제봉투", "음식물류폐기물", "커피찌꺼기", "지역 기준"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"drip_bag_coffee_filter\"", "\"matchedBy\":\"드립백 커피 필터는 음식물쓰레기야\""],
+    "expectedStructuredExcludes": ["\"id\":\"coffee_ground\""]
+  },
+  {
+    "id": "home_injection_needle_sharps_contact_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "주사바늘 달린 자가주사기는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["자가주사기 주사바늘", "일반쓰레기나 재활용품", "뚫리지 않는 용기", "보건소", "처방 의료기관", "약국", "지자체"],
+    "expectedStructuredIncludes": ["\"id\":\"home_injection_needle\"", "\"matchedBy\":\"주사바늘 달린 자가주사기는 어떻게 버려\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""]
+  },
+  {
+    "id": "gangnam_induction_cooktop_broken_glass_safe_bulky",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인덕션 유리 상판 깨진 건 대형폐기물이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨진 인덕션 유리 상판", "유리병류", "신문지", "테이프", "불연성종량제봉투", "대형폐기물", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"induction_cooktop_broken_glass\"", "\"matchedBy\":\"인덕션 유리 상판 깨진 건 대형폐기물이야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"broken_glass\""]
+  },
+  {
+    "id": "broken_thermos_no_glass_or_metal_overclaim",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 보온병은 유리야 고철이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨진 보온병", "유리병류", "고철류", "복합재질", "신문지", "테이프", "불연성종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"broken_thermos\"", "\"matchedBy\":\"깨진 보온병은 유리야 고철이야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"broken_glass\""]
+  },
+  {
+    "id": "gangnam_shampoo_refill_pouch_vinyl_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "샴푸 리필 파우치는 비닐류로 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["리필 파우치", "플라스틱 캡", "비닐류", "일반쓰레기", "목요일"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"샴푸 리필 파우치는 비닐류로 버리면 돼\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"soap_bar_piece\""]
+  },
+  {
+    "id": "gangnam_yogurt_foil_lid_general_no_blanket_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "요거트 은박 뚜껑은 캔류야 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["요거트 은박 뚜껑", "캔류", "고철류", "일반쓰레기", "종량제봉투", "알루미늄 호일"],
+    "expectedStructuredIncludes": ["\"id\":\"aluminum_foil\"", "\"matchedBy\":\"요거트 은박 뚜껑은 캔류야 일반쓰레기야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"blanket\""]
+  },
+  {
+    "id": "potato_chip_canister_general_no_paper_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "프링글스 통은 종이로 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["감자칩 용기", "프링글스", "복합재질", "종이류", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"potato_chip_canister\"", "\"matchedBy\":\"프링글스 통은 종이로 버리면 돼\""],
+    "expectedStructuredExcludes": ["\"id\":\"parchment_paper\""]
+  },
+  {
+    "id": "gangnam_electric_toothbrush_split_body_head",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전동칫솔 본체랑 칫솔모는 같이 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["전동칫솔", "본체", "소형전기전자제품", "칫솔모", "종량제봉투", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"electric_toothbrush\"", "\"matchedBy\":\"전동칫솔 본체랑 칫솔모는 같이 버려\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"toothbrush\""]
+  },
+  {
+    "id": "gangnam_fish_bone_general_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "생선가시는 음식물쓰레기야 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["생선가시", "생선뼈", "일반 종량제봉투", "음식물류폐기물", "소량", "동물의 사료", "서울 강남구 기준으로 확인된 지역 안내", "음식물쓰레기 전용봉투나 RFID에 넣지 않습니다"],
+    "expectedStructuredIncludes": ["\"id\":\"fish_bone\"", "\"matchedBy\":\"생선가시는 음식물쓰레기야 일반쓰레기야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"drip_bag_coffee_filter\""]
+  },
+  {
+    "id": "gangnam_fruit_seed_food_exception_region_guide",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "복숭아씨는 음식물쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["과일씨", "복숭아 씨", "서울 강남구 기준으로 확인된 지역 안내", "핵과류 씨", "음식물쓰레기가 아닌 일반쓰레기 종량제봉투", "일반쓰레기 종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"fruit_seed\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_onion_peel_food_exception_region_guide",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "양파껍질은 음식물쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["양파껍질", "서울 강남구 기준으로 확인된 지역 안내", "음식물쓰레기가 아닌 일반쓰레기 종량제봉투", "음식물쓰레기 전용봉투나 RFID에 넣지 않습니다", "일반쓰레기 종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"onion_peel\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_region_info_tea_bag_food_exception",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "티백"
+    },
+    "expectedTextIncludes": ["서울 강남구 지역 확인 안내", "품목: 티백", "티백과 녹차잎", "음식물쓰레기가 아닌 일반쓰레기 종량제봉투", "음식물쓰레기 전용봉투나 RFID에 넣지 않습니다", "일반쓰레기 종량제봉투"],
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"티백\"", "\"itemGuide\"", "음식물쓰레기가 아닌 일반쓰레기 종량제봉투"]
+  },
+  {
+    "id": "gangnam_soy_sauce_glass_bottle_cap",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "간장 유리병에 플라스틱 뚜껑 붙어있으면 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["유리병", "내용물", "병뚜껑", "유리병류", "이물질"],
+    "expectedStructuredIncludes": ["\"id\":\"glass_bottle\"", "\"matchedBy\":\"간장 유리병에 플라스틱 뚜껑 붙어있으면 어떻게 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"perfume_bottle\""]
+  },
+  {
+    "id": "gangnam_sauce_vinyl_pack_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "배달 음식 소스 작은 비닐팩은 씻어서 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류", "내용물", "이물질", "일반쓰레기", "목요일"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"배달 음식 소스 작은 비닐팩은 씻어서 비닐류야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""]
+  },
+  {
+    "id": "gangnam_wet_umbrella_material_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖은 우산은 그냥 일반쓰레기야 고철이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["우산", "젖었", "재질별", "일반 종량제봉투", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"umbrella\"", "\"matchedBy\":\"젖은 우산은 그냥 일반쓰레기야 고철이야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"frying_pan\""]
+  },
+  {
+    "id": "gangnam_broken_umbrella_rib_metal_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "부러진 우산살은 고철로 따로 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["우산", "고철", "분리", "종량제봉투", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"umbrella\"", "\"matchedBy\":\"부러진 우산살은 고철로 따로 버려도 돼\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"cooking_pot\""]
+  },
+  {
+    "id": "dish_brush_general_no_plastic_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "설거지 솔은 플라스틱으로 버리면 되나?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["설거지 솔", "플라스틱류", "복합재질", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"dish_brush\"", "\"matchedBy\":\"설거지 솔은 플라스틱으로 버리면 되나\""],
+    "expectedStructuredExcludes": ["\"id\":\"shampoo_bottle\""]
+  },
+  {
+    "id": "hair_tie_rubber_band_general",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "고무줄이랑 머리끈은 일반쓰레기 맞아?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["머리끈", "고무줄", "종량제봉투", "복합재질"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"hair_tie_rubber_band\"", "\"matchedBy\":\"고무줄이랑 머리끈은 일반쓰레기 맞아\""],
+    "expectedStructuredExcludes": ["\"id\":\"rubber_gloves\""]
+  },
+  {
+    "id": "cotton_swab_general_no_paper_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "면봉은 종이니까 종이류로 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["면봉", "종이류", "종량제봉투", "변기", "단독 품목사전 항목은 확인하지 못했습니다"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"cotton_swab\"", "\"matchedBy\":\"면봉은 종이니까 종이류로 버려도 돼\"", "\"status\":\"needs_source\""],
+    "expectedStructuredExcludes": ["\"id\":\"receipt\""]
+  },
+  {
+    "id": "cosmetic_cotton_pad_oil_general",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장솜에 클렌징오일 묻었으면 어디 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["화장솜", "클렌징오일", "재활용품", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"cosmetic_cotton_pad\"", "\"matchedBy\":\"화장솜에 클렌징오일 묻었으면 어디 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
+  },
+  {
+    "id": "gangnam_perfume_sample_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "향수 샘플 작은 유리병도 향수병이랑 똑같아?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["향수병", "내용물", "펌프", "유리병류", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"perfume_bottle\"", "\"matchedBy\":\"향수 샘플 작은 유리병도 향수병이랑 똑같아\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"glass_bottle\""]
+  },
+  {
+    "id": "gangnam_cracked_mug_nonburnable",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "금 간 머그컵은 도자기니까 불연성 봉투야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["금 간 머그컵", "불연성", "유리병류", "지역", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"ceramic_bowl\"", "\"matchedBy\":\"금 간 머그컵은 도자기니까 불연성 봉투야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"glass_bottle\""]
+  },
+  {
+    "id": "gangnam_phone_charger_adapter_collection",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "충전 어댑터는 케이블이랑 같이 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["충전 어댑터", "케이블", "소형전기전자제품", "강남구", "소형가전"],
+    "expectedStructuredIncludes": ["\"id\":\"phone_charger_adapter\"", "\"matchedBy\":\"충전 어댑터는 케이블이랑 같이 버리면 돼\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"cable_wire\""]
+  },
+  {
+    "id": "gangnam_solvent_contaminated_rag_contact_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "시너 묻은 걸레는 일반쓰레기로 버리면 위험하지 않아?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["시너", "걸레", "일반쓰레기로 바로 버리지 말고", "생활계 유해폐기물", "지자체", "화기", "강남구", "단독 품목사전 항목은 확인하지 못했습니다"],
+    "expectedStructuredIncludes": ["\"id\":\"solvent_contaminated_rag\"", "\"matchedBy\":\"시너 묻은 걸레는 일반쓰레기로 버리면 위험하지 않아\"", "\"status\":\"needs_source\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"cleaning_cloth\""]
+  },
+  {
+    "id": "pet_waste_tissue_general_no_toilet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강아지 똥 묻은 휴지는 변기에 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["반려동물 배설물", "변기", "종량제봉투", "재활용품", "단독 항목은 확인하지 못했습니다"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pet_waste_tissue\"", "\"matchedBy\":\"강아지 똥 묻은 휴지는 변기에 버려도 돼\"", "\"status\":\"needs_source\""],
+    "expectedStructuredExcludes": ["\"id\":\"wet_tissue\""]
+  },
+  {
+    "id": "gangnam_walnut_shell_general_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "호두껍질은 음식물쓰레기 아니지?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["호두껍질", "음식물쓰레기", "종량제봉투", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"nut_shell\"", "\"matchedBy\":\"호두껍질은 음식물쓰레기 아니지\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"mandarin_peel\""]
+  },
+  {
+    "id": "gangnam_corn_cob_husk_general_food_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["옥수수대", "옥수수껍질", "음식물쓰레기", "종량제봉투", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"corn_cob_husk\"", "\"matchedBy\":\"옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"mandarin_peel\""]
+  },
+  {
+    "id": "herbal_medicine_dregs_general_no_medicine_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "한약재 찌꺼기는 음식물쓰레기로 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["한약재 찌꺼기", "음식물쓰레기", "폐의약품", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"herbal_medicine_dregs\"", "\"matchedBy\":\"한약재 찌꺼기는 음식물쓰레기로 버려도 돼\""],
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+  },
+  {
+    "id": "tuna_can_oil_empty_rinse",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "참치캔 기름 남아있으면 캔류로 못 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["참치캔", "기름", "헹", "캔류"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"can\"", "\"matchedBy\":\"참치캔 기름 남아있으면 캔류로 못 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
+  },
+  {
+    "id": "cup_noodle_foil_lid_general",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "컵라면 뚜껑 은박지는 어디 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["알루미늄 포일", "은박", "캔류", "고철류", "종량제봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"aluminum_foil\"", "\"matchedBy\":\"컵라면 뚜껑 은박지는 어디 버려\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"cup_noodle_container\""]
+  },
+  {
+    "id": "meat_absorbent_pad_general_no_ice_pack",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "닭고기 포장 흡수패드는 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["흡수패드", "복합재질", "재활용품", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"meat_absorbent_pad\"", "\"matchedBy\":\"닭고기 포장 흡수패드는 일반쓰레기야\""],
+    "expectedStructuredExcludes": ["\"id\":\"ice_pack\""]
+  },
+  {
+    "id": "gangnam_paper_core_recycle_no_wrap_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "쿠킹랩 심지는 종이류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["종이 심지", "비닐랩", "종이류", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"paper_core\"", "\"matchedBy\":\"쿠킹랩 심지는 종이류야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_wrap\""]
+  },
+  {
+    "id": "glass_bottle_sticker_remove_label",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스티커 붙은 유리병은 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["유리병", "스티커", "라벨", "분리"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"glass_bottle\"", "\"matchedBy\":\"스티커 붙은 유리병은 어떻게 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"shipping_label\""]
+  },
+  {
+    "id": "gangnam_broken_plate_nonburnable_safe_wrap",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "깨진 접시는 신문지에 싸서 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["도자기 그릇", "종이로 감싸", "불연성", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"ceramic_bowl\"", "\"matchedBy\":\"깨진 접시는 신문지에 싸서 버리면 돼\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"broken_glass\""]
+  },
+  {
+    "id": "rusty_knife_general_no_scrap_metal",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "녹슨 칼은 고철로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["칼날", "신문지", "일반쓰레기", "날카로운"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"knife_blade\"", "\"matchedBy\":\"녹슨 칼은 고철로 버려\""],
+    "expectedStructuredExcludes": ["\"id\":\"frying_pan\""]
+  },
+  {
+    "id": "scissors_general_safe_wrap_no_umbrella",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "부러진 가위는 고철이야 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["가위", "고철류", "신문지", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"scissors\"", "\"matchedBy\":\"부러진 가위는 고철이야 일반쓰레기야\""],
+    "expectedStructuredExcludes": ["\"id\":\"umbrella\""]
+  },
+  {
+    "id": "paint_palette_contaminated_general_no_wet_tissue",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "물감 묻은 팔레트는 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["물감", "팔레트", "플라스틱류 재활용품이 아니라", "종량제봉투", "단독 품목사전 항목은 확인하지 못했습니다"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"paint_palette\"", "\"matchedBy\":\"물감 묻은 팔레트는 플라스틱으로 버려\"", "\"status\":\"needs_source\""],
+    "expectedStructuredExcludes": ["\"id\":\"wet_tissue\""]
+  },
+  {
+    "id": "nail_remover_cotton_pad_general_no_hair_tie",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "네일 리무버 솜은 일반쓰레기야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["화장솜", "네일 리무버", "아세톤", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"cosmetic_cotton_pad\"", "\"matchedBy\":\"네일 리무버 솜은 일반쓰레기야\""],
+    "expectedStructuredExcludes": ["\"id\":\"hair_tie_rubber_band\""]
+  },
+  {
+    "id": "gangnam_shampoo_refill_pack_cap_separate",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "샴푸 리필팩 뚜껑만 플라스틱이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["리필 파우치", "뚜껑", "플라스틱", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"샴푸 리필팩 뚜껑만 플라스틱이야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"glass_bottle\""]
+  },
+  {
+    "id": "dental_floss_general_no_wet_tissue",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "치실은 플라스틱으로 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["치실", "플라스틱", "재활용품", "종량제봉투"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"dental_floss\"", "\"matchedBy\":\"치실은 플라스틱으로 버려도 돼\""],
+    "expectedStructuredExcludes": ["\"id\":\"wet_tissue\""]
+  },
+  {
+    "id": "gangnam_food_contaminated_vinyl_region_phrase",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강남구에서 김치국물 묻은 비닐봉지는 목요일에 내놔?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류 포장재", "오염 제거가 어렵다면 일반쓰레기", "목요일", "투명·반투명 봉투"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
+  },
+  {
+    "id": "seocho_pet_bottle_region_schedule",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서초구에서 투명 페트병은 무슨 요일이야?",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "폐비닐과 함께 동별 목요일 또는 금요일", "서울 서초구 공식 출처"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "songpa_pet_bottle_region_schedule_no_seocho_leak",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "송파구에서 투명 페트병은 무슨 요일이야?",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["페트병", "서울 송파구 기준으로 확인된 지역 안내", "송파구 투명페트병", "목요일 배출 동과 금요일 배출 동", "서울 송파구 공식 출처"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처", "서초구에서 투명페트병"],
+    "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 송파구\"", "\"regionalPolicy\"", "\"name\":\"서울 송파구\""]
+  },
+  {
+    "id": "seocho_battery_collection_no_gangnam_or_songpa_leak",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐건전지 수거함",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["건전지", "서울 서초구 기준으로 확인된 지역 안내", "공동주택·주택가·동주민센터 수거함", "서울 서초구 공식 출처"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 송파구 공식 출처", "송파구 폐형광등"],
+    "expectedStructuredIncludes": ["\"id\":\"battery\"", "\"matchedBy\":\"폐건전지\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\"", "\"name\":\"서울 서초구\""]
+  },
+  {
+    "id": "songpa_small_electronics_collection_no_seocho_leak",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "드라이기",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["소형가전", "서울 송파구 기준으로 확인된 지역 안내", "처리수수료 무료", "관할 청소대행업체에 신고 후 배출", "서울 송파구 공식 출처"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처", "아파트 수집용 거치대"],
+    "expectedStructuredIncludes": ["\"id\":\"small_electronics\"", "\"matchedBy\":\"드라이기\"", "\"region\":\"서울 송파구\"", "\"regionalPolicy\"", "\"name\":\"서울 송파구\""]
+  },
+  {
+    "id": "gangnam_remaining_butane_can_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "부탄가스가 조금 남았는데 캔류로 버려도 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["내용물을 완전히", "통풍", "구멍 뚫기 여부", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"butane_can\"", "\"matchedBy\":\"부탄가스\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_broken_led_lamp_region_phrase",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강남구에서 깨진 LED 전구는 형광등 수거함에 넣어?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["깨진 LED", "수거함에 바로 넣으면", "신문지", "불연성종량제폐기물", "강남구"],
+    "expectedStructuredIncludes": ["\"id\":\"led_lamp\"", "\"matchedBy\":\"LED 전구\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"fluorescent_lamp\""]
+  },
+  {
+    "id": "wet_delivery_box_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비 맞은 택배상자는 종이류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["택배상자", "운송장과 테이프", "물에 젖었거나 음식물이 묻은 부분", "재활용이 어렵"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"delivery_box\"", "\"matchedBy\":\"택배상자\""]
+  },
+  {
+    "id": "damp_delivery_box_condition_no_region_noise",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖은 택배상자는 말리면 종이류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["택배상자", "운송장과 테이프", "물에 젖었거나 음식물이 묻은 부분", "재활용이 어렵"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"delivery_box\"", "\"matchedBy\":\"택배상자\""]
+  },
+  {
+    "id": "gangnam_cat_litter_bentonite_material_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "벤토나이트 고양이 모래는 변기에 버리면 안 되지?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["고양이 모래", "벤토나이트 모래", "불연성종량제봉투", "고양이 두부모래", "종량제봉투", "변기", "지역 하수"],
+    "expectedStructuredIncludes": ["\"id\":\"cat_litter\"", "\"matchedBy\":\"고양이 모래\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "bubble_wrap_contaminated_vinyl_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "뽁뽁이에 음식물 묻었는데 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["뽁뽁이", "깨끗한 상태로 비닐류", "오염되었거나 여러 재질이 붙어 있으면 일반쓰레기", "에어캡", "이물질을 제거"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"bubble_wrap\"", "\"matchedBy\":\"뽁뽁이\"", "\"status\":\"verified\""]
+  },
+  {
+    "id": "gangnam_paper_cup_cream_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이컵에 크림 묻었는데 종이류로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["종이컵", "내용물을 비우고", "물로 헹군", "크림", "오염이 남으면 일반쓰레기", "종이컵 전용 수거함 운영 여부", "음수대용 종이컵", "종이류수거함", "월·화·수·금·일요일"],
+    "expectedTextExcludes": ["## 플라스틱 컵", "합성수지 용기류"],
+    "expectedStructuredIncludes": ["\"id\":\"paper_cup\"", "\"matchedBy\":\"종이컵\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_cup\""]
+  },
+  {
+    "id": "gangnam_plastic_wrap_blood_contamination",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마트 랩에 고기 핏물 묻었는데 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐랩", "음식물 등으로 오염된 랩", "PVC", "종량제봉투", "목요일"],
+    "expectedStructuredIncludes": ["\"id\":\"plastic_wrap\"", "\"matchedBy\":\"랩\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_frozen_food_vinyl_contamination",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉동식품 포장 비닐봉지에 성에랑 음식물 묻었는데 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류 포장재", "음식물이나 기름이 묻었다면", "오염 제거가 어렵다면 일반쓰레기", "목요일"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""]
+  },
+  {
+    "id": "seocho_pet_bottle_explicit_thursday_known_region",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서초구에서 투명 페트병은 목요일에 내놓는 거야?",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "동별 목요일 또는 금요일", "서울 서초구 공식 출처"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 송파구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\"", "\"name\":\"서울 서초구\""]
+  },
+  {
+    "id": "gangnam_dented_spray_can_empty_safe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["스프레이캔", "내용물을 완전히", "금속캔 수거함", "임의로 뚫지", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"spray_can\"", "\"matchedBy\":\"스프레이캔\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"can\""]
+  },
+  {
+    "id": "unknown_vinyl_floor_no_vinyl_bag_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비닐장판은 비닐류로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
+    "expectedTextExcludes": ["비닐류 포장재", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"비닐장판은 비닐류로 버려?\""]
+  },
+  {
+    "id": "yakgwa_packaging_no_medicine_short_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "약과 포장지는 폐의약품 수거함에 넣어?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
+    "expectedTextExcludes": ["## 폐의약품", "남은 약"],
+    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"약과 포장지는 폐의약품 수거함에 넣어?\""],
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+  },
+  {
+    "id": "laptop_no_plastic_wrap_short_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "랩탑은 소형가전으로 버리면 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
+    "expectedTextExcludes": ["## 비닐랩", "## 소형가전"],
+    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"랩탑은 소형가전으로 버리면 돼?\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_wrap\"", "\"id\":\"small_electronics\""]
+  },
+  {
+    "id": "canvas_frame_no_can_short_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "캔버스 액자는 캔류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
+    "expectedTextExcludes": ["음료캔"],
+    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"캔버스 액자는 캔류야?\""],
+    "expectedStructuredExcludes": ["\"id\":\"can\""]
+  },
+  {
+    "id": "oily_pizza_box_prefers_specific_item",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "기름 조금 묻은 피자박스 깨끗한 부분만 종이로 가능해?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["기름 묻은 피자박스", "깨끗한 종이 부분", "일반쓰레기", "깨끗한 피자박스는 종이류", "이물질이 묻은 경우에는 종량제봉투", "품목사전 - 피자박스"],
+    "expectedTextExcludes": ["폐식용유"],
+    "expectedStructuredIncludes": ["\"id\":\"pizza_box_oily\"", "\"matchedBy\":\"피자박스\""],
+    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
+  },
+  {
+    "id": "empty_medicine_bottle_no_medicine_collection_overmatch",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빈 약통은 폐의약품 수거함이야 플라스틱이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"empty_medicine_bottle\"", "\"matchedBy\":\"빈 약통은 폐의약품 수거함이야 플라스틱이야\"", "\"regionalPolicy\""],
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+  },
+  {
+    "id": "pill_blister_packaging_no_foil_match",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "알약 포장 은박지는 재활용 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["알약 포장재", "복합재질", "일반 종량제봉투", "알루미늄 포일이나 캔류"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"pill_blister_packaging\"", "\"matchedBy\":\"알약 포장 은박지는 재활용 돼\""],
+    "expectedStructuredExcludes": ["\"id\":\"aluminum_foil\""]
+  },
+  {
+    "id": "gangnam_router_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "공유기는 소형가전 수거함이야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["소형가전", "공유기", "전용 수거함", "1~4개", "e순환거버넌스"],
+    "expectedStructuredIncludes": ["\"id\":\"small_electronics\"", "\"matchedBy\":\"공유기\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "gangnam_portable_fan_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "휴대용 선풍기는 소형가전으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["소형가전", "휴대용 선풍기", "배터리", "1~4개", "e순환거버넌스"],
+    "expectedStructuredIncludes": ["\"id\":\"small_electronics\"", "\"matchedBy\":\"휴대용 선풍기\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "seocho_chair_fee_top_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상의자",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["서울 서초구 대형생활폐기물 수수료 후보", "의자 1인용: 2,000원", "의자 책상용의자(바퀴달린 의자): 3,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"chair\"", "\"region\":\"서울 서초구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "songpa_mattress_fee_top_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 매트리스",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["서울 송파구 대형생활폐기물 수수료 후보", "침대(목재) 1인용 매트리스: 5,000원", "침대(목재) 2인용 매트리스: 8,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"mattress\"", "\"region\":\"서울 송파구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "songpa_mirror_fee_top_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "거울",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["서울 송파구 대형생활폐기물 수수료 후보", "거울 가장 긴면 50cm미만: 1,000원", "거울 가장 긴면 50cm이상: 2,000원"],
+    "expectedStructuredIncludes": ["\"id\":\"mirror\"", "\"region\":\"서울 송파구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "empty_medicine_bottle_plastic_medicine_bottle_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "약 다 먹은 플라스틱 약병은 플라스틱으로 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"empty_medicine_bottle\"", "\"matchedBy\":\"약병\"", "\"region\":\"서울 강남구\""],
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+  },
+  {
+    "id": "songpa_mirror_fee_question_short_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "송파구 거울 버릴 때 수수료 얼마야?",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["서울 송파구 대형생활폐기물 수수료 후보", "거울 가장 긴면 50cm미만: 1,000원", "거울 가장 긴면 50cm이상: 2,000원", "신청 URL"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"mirror\"", "\"matchedBy\":\"거울\"", "\"region\":\"서울 송파구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "gangnam_drying_rack_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강남구 빨래건조대 수수료 얼마야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["서울 강남구 대형생활폐기물 수수료 후보", "빨래건조대 모든 규격: 2,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"drying_rack\"", "\"matchedBy\":\"빨래건조대\"", "\"region\":\"서울 강남구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "seocho_flower_pot_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "대형 화분",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["서울 서초구 대형생활폐기물 수수료 후보", "빈 화분 대형: 2,000원", "빈 화분 소형: 1,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"flower_pot\"", "\"matchedBy\":\"대형 화분\"", "\"region\":\"서울 서초구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "songpa_toy_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장난감",
+      "region": "서울 송파구"
+    },
+    "expectedTextIncludes": ["서울 송파구 대형생활폐기물 수수료 후보", "장난감 길이 50cm미만: 1,000원", "장난감 길이 50cm이상: 2,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"toy\"", "\"matchedBy\":\"장난감\"", "\"region\":\"서울 송파구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "seocho_stuffed_toy_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "대형 인형",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["서울 서초구 대형생활폐기물 수수료 후보", "인형류 대형: 2,000원", "인형류 소형: 1,000원", "신청 URL"],
+    "expectedStructuredIncludes": ["\"id\":\"stuffed_toy\"", "\"matchedBy\":\"대형 인형\"", "\"region\":\"서울 서초구\"", "\"bulkyWasteFees\""]
+  },
+  {
+    "id": "gangnam_region_info_herbal_dregs_food_exception",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "한약재 찌꺼기"
+    },
+    "expectedTextIncludes": ["서울 강남구 지역 확인 안내", "품목: 한약재 찌꺼기", "일반 종량제봉투", "음식물 제외 품목"],
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"한약재 찌꺼기\"", "\"regionalPolicy\"", "음식물 제외 품목"]
+  },
+  {
+    "id": "seocho_fish_bone_food_exception_region_guide",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서초구 생선뼈는 음식물 수거용기에 넣어?",
+      "region": "서울 서초구"
+    },
+    "expectedTextIncludes": ["서울 서초구 기준으로 확인된 지역 안내", "생선뼈", "음식물쓰레기가 아닌 일반 종량제봉투", "예외 품목은 음식물 수거용기에 넣지 않습니다", "서초구청 음식물쓰레기 분리배출 요령"],
+    "expectedStructuredIncludes": ["\"id\":\"fish_bone\"", "\"matchedBy\":\"생선뼈\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\""]
+  },
+  {
+    "id": "songpa_region_info_tea_bag_food_exception",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 송파구",
+      "itemName": "티백"
+    },
+    "expectedTextIncludes": ["서울 송파구 지역 확인 안내", "품목: 티백", "1회용 티백", "음식물 전용용기나 RFID에 넣지 않습니다", "일반 생활쓰레기 종량제봉투"],
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 송파구\"", "\"item\":\"티백\"", "\"itemGuide\"", "1회용 티백"]
+  },
+  {
+    "id": "region_info_unknown_battery_collection",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 해운대구",
+      "itemName": "폐건전지 수거함 위치 알려줘"
+    },
+    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "품목별 전용 수거함 위치", "거주 지자체 청소/자원순환/환경 부서"],
+    "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
+    "expectedStructuredExcludes": ["\"matchedRegion\":\"서울 강남구\""]
+  }
+]

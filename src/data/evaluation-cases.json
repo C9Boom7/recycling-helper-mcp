@@ -84,6 +84,30 @@
     "notes": "국물 자국과 기름 오염이 남으면 일반쓰레기로 안내해야 합니다."
   },
   {
+    "query": "고무장갑",
+    "expectedItemId": "rubber_gloves",
+    "expectedDisposalType": "general",
+    "notes": "고무장갑은 비닐류나 플라스틱류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "치약 튜브",
+    "expectedItemId": "toothpaste_tube",
+    "expectedDisposalType": "recycle_or_general_after_empty",
+    "notes": "내용물 제거 후 플라스틱 배출과 도포·첩합 표시 예외를 함께 안내해야 합니다."
+  },
+  {
+    "query": "나무젓가락",
+    "expectedItemId": "chopsticks",
+    "expectedDisposalType": "general_or_metal_recycle",
+    "notes": "나무젓가락은 음식물쓰레기가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "플라스틱 빨대",
+    "expectedItemId": "straw",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "빨대는 플라스틱, 금속, PLA/옥수수 등 재질별 배출 기준을 구분해야 합니다."
+  },
+  {
     "query": "소주병",
     "expectedItemId": "glass_bottle",
     "expectedDisposalType": "recycle",
@@ -98,8 +122,8 @@
   {
     "query": "도자기 접시",
     "expectedItemId": "ceramic_bowl",
-    "expectedDisposalType": "general_or_bulky",
-    "notes": "도자기류를 유리병류로 안내하면 안 됩니다."
+    "expectedDisposalType": "nonburnable_or_bulky",
+    "notes": "도자기류를 유리병류로 안내하지 않고 불연성 폐기물 또는 대형폐기물 기준으로 안내해야 합니다."
   },
   {
     "query": "깨진 거울",
@@ -114,10 +138,34 @@
     "notes": "내용물 비우기와 다른 재질 분리를 안내해야 합니다."
   },
   {
+    "query": "후라이팬",
+    "expectedItemId": "frying_pan",
+    "expectedDisposalType": "recycle_or_general",
+    "notes": "프라이팬은 고철 수거함 배출을 기본으로 하되 복합재질이 많은 경우 종량제봉투 가능성을 안내해야 합니다."
+  },
+  {
+    "query": "스텐 냄비",
+    "expectedItemId": "cooking_pot",
+    "expectedDisposalType": "recycle_or_general",
+    "notes": "금속 냄비는 고철류로 안내하고 내열유리·세라믹 예외를 섞어 판단하지 않아야 합니다."
+  },
+  {
+    "query": "충전 케이블",
+    "expectedItemId": "cable_wire",
+    "expectedDisposalType": "special_collection",
+    "notes": "전선과 케이블은 고철이 아니라 소형전기전자제품 전용수거함 또는 지역 기준으로 안내해야 합니다."
+  },
+  {
     "query": "스프레이 캔",
     "expectedItemId": "spray_can",
     "expectedDisposalType": "recycle_after_empty",
     "notes": "압축 용기는 내용물 비우기와 안전 안내가 필요합니다."
+  },
+  {
+    "query": "페인트통",
+    "expectedItemId": "paint_can",
+    "expectedDisposalType": "hazardous_or_empty_container",
+    "notes": "남은 페인트는 생활계 유해폐기물로 밀봉과 전용수거함/지자체 기준을 안내해야 합니다."
   },
   {
     "query": "부탄가스 캔",
@@ -128,8 +176,8 @@
   {
     "query": "쿠킹호일",
     "expectedItemId": "aluminum_foil",
-    "expectedDisposalType": "general_or_recycle_if_clean",
-    "notes": "오염된 포일과 깨끗한 포일의 지역 기준 확인을 구분해야 합니다."
+    "expectedDisposalType": "general",
+    "notes": "알루미늄 호일과 작은 은박류는 캔류나 고철류가 아니라 종량제봉투로 안내해야 합니다."
   },
   {
     "query": "닭뼈",
@@ -204,6 +252,18 @@
     "notes": "하수구나 일반쓰레기 배출을 피하고 지정 수거함을 안내해야 합니다."
   },
   {
+    "query": "빈 약통",
+    "expectedItemId": "empty_medicine_bottle",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "빈 약통은 남은 약을 폐의약품 수거함으로 분리한 뒤 플라스틱 용기로 안내해야 합니다."
+  },
+  {
+    "query": "알약 포장 은박지",
+    "expectedItemId": "pill_blister_packaging",
+    "expectedDisposalType": "general",
+    "notes": "알약 포장재는 플라스틱과 알루미늄이 섞인 복합재질이라 캔류나 알루미늄 포일이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
     "query": "면도날",
     "expectedItemId": "knife_blade",
     "expectedDisposalType": "general_safe_wrap",
@@ -238,6 +298,12 @@
     "expectedItemId": "mattress",
     "expectedDisposalType": "bulky_waste",
     "notes": "대형폐기물 신고와 지역별 수수료 확인이 필요합니다."
+  },
+  {
+    "query": "요가매트는 어떻게 버려?",
+    "expectedItemId": "yoga_mat",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "요가매트는 짧은 별칭 요 때문에 이불로 과매칭되지 않아야 하며, 종량제봉투 또는 크기에 따른 대형폐기물 분기를 안내해야 합니다."
   },
   {
     "query": "베개",
@@ -298,5 +364,401 @@
     "expectedItemId": "shoes",
     "expectedDisposalType": "reuse_collection_or_general",
     "notes": "재사용 가능한 신발과 훼손된 신발을 구분해야 합니다."
+  },
+  {
+    "query": "샤프심",
+    "expectedItemId": "pencil_lead",
+    "expectedDisposalType": "general",
+    "notes": "작은 흑연계 문구류는 재활용품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "화분 흙",
+    "expectedItemId": "plant_soil",
+    "expectedDisposalType": "nonburnable_special_bag",
+    "notes": "화분 흙은 음식물쓰레기가 아니라 불연성폐기물로 안내해야 합니다."
+  },
+  {
+    "query": "커피 캡슐",
+    "expectedItemId": "coffee_capsule",
+    "expectedDisposalType": "manufacturer_takeback_or_recycle_or_general",
+    "notes": "커피 찌꺼기와 캡슐 재질 분리, 제조사 회수 프로그램, 종량제봉투 예외를 함께 안내해야 합니다."
+  },
+  {
+    "query": "멀티탭",
+    "expectedItemId": "power_strip",
+    "expectedDisposalType": "special_collection",
+    "notes": "멀티탭은 고철이나 플라스틱이 아니라 소형전기전자제품 전용수거함 또는 지역 소형폐가전 기준으로 안내해야 합니다."
+  },
+  {
+    "query": "카페 플라스틱 컵",
+    "expectedItemId": "plastic_cup",
+    "expectedDisposalType": "recycle_or_deposit_return",
+    "notes": "카페 일회용컵은 무색페트병과 구분하고 보증금 대상 여부를 확인해야 합니다."
+  },
+  {
+    "query": "커피 컵홀더",
+    "expectedItemId": "cup_holder",
+    "expectedDisposalType": "paper_recycle_or_general",
+    "notes": "컵홀더는 종이 재질, 코팅 여부, 오염 여부에 따라 종이류 또는 종량제봉투로 나뉩니다."
+  },
+  {
+    "query": "비닐랩",
+    "expectedItemId": "plastic_wrap",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "깨끗한 PE 랩과 오염 랩/PVC 포장랩을 구분해야 합니다."
+  },
+  {
+    "query": "코팅지",
+    "expectedItemId": "coated_paper",
+    "expectedDisposalType": "general",
+    "notes": "합성수지 필름 코팅 종이는 종이류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "인화사진",
+    "expectedItemId": "photo_print",
+    "expectedDisposalType": "general",
+    "notes": "사진 인화지는 약품 처리된 종이라 종이류로 안내하면 안 됩니다."
+  },
+  {
+    "query": "도자기 화분",
+    "expectedItemId": "flower_pot",
+    "expectedDisposalType": "plastic_or_nonburnable_or_bulky",
+    "notes": "화분은 흙 분리 후 플라스틱, 불연성폐기물, 대형폐기물 기준을 재질별로 안내해야 합니다."
+  },
+  {
+    "query": "화장품 용기",
+    "expectedItemId": "cosmetic_container",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "화장품 용기는 내용물 제거와 펌프·뚜껑 분리, 재질별 배출을 안내해야 합니다."
+  },
+  {
+    "query": "빨래건조대",
+    "expectedItemId": "drying_rack",
+    "expectedDisposalType": "bulky_waste_or_metal_recycle_if_disassembled",
+    "notes": "빨래건조대는 대형폐기물 중심으로 안내하되 분리 가능한 고철 예외를 함께 안내해야 합니다."
+  },
+  {
+    "query": "장난감",
+    "expectedItemId": "toy",
+    "expectedDisposalType": "general_or_bulky_or_special_collection",
+    "notes": "장난감은 복합재질, 전지 제거, 대형폐기물 여부를 함께 안내해야 합니다."
+  },
+  {
+    "query": "인형",
+    "expectedItemId": "stuffed_toy",
+    "expectedDisposalType": "general_or_bulky",
+    "notes": "인형은 의류수거함이 아니라 종량제봉투 또는 크기에 따른 대형폐기물로 안내해야 합니다."
+  },
+  {
+    "query": "매니큐어 병",
+    "expectedItemId": "nail_polish",
+    "expectedDisposalType": "recycle_by_material_or_general",
+    "notes": "매니큐어 병은 내용물 제거 가능 여부에 따라 유리병·플라스틱 재활용 또는 종량제봉투로 나뉩니다."
+  },
+  {
+    "query": "향수병",
+    "expectedItemId": "perfume_bottle",
+    "expectedDisposalType": "glass_recycle_after_empty_or_general",
+    "notes": "향수병은 내용물 흡수 처리, 뚜껑·펌프 분리, 빈 유리병 배출 기준을 함께 안내해야 합니다."
+  },
+  {
+    "query": "수은 체온계",
+    "expectedItemId": "mercury_thermometer",
+    "expectedDisposalType": "hazardous_collection",
+    "notes": "수은 체온계는 깨진 유리 일반 안내가 아니라 생활계유해폐기물과 수은 노출 안전 안내가 필요합니다."
+  },
+  {
+    "query": "살충제 통",
+    "expectedItemId": "pesticide_container",
+    "expectedDisposalType": "hazardous_collection_or_recycle_if_empty",
+    "notes": "내용물이 남은 살충제 통은 밀봉과 생활계유해폐기물 또는 폐농약 수거함 기준을 안내해야 합니다."
+  },
+  {
+    "query": "소화기",
+    "expectedItemId": "fire_extinguisher",
+    "expectedDisposalType": "bulky_waste_special_handling",
+    "notes": "소화기는 캔류나 고철류가 아니라 대형폐기물과 전문 처리 기준을 안내해야 합니다."
+  },
+  {
+    "query": "일회용 면도기",
+    "expectedItemId": "disposable_razor",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "일회용 면도기는 복합재질과 날카로운 부분 안전 포장을 안내해야 합니다."
+  },
+  {
+    "query": "티백",
+    "expectedItemId": "tea_bag",
+    "expectedDisposalType": "general",
+    "notes": "티백과 차 찌꺼기는 음식물쓰레기가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "시든 꽃",
+    "expectedItemId": "wilted_flower",
+    "expectedDisposalType": "general_or_bulky_by_volume",
+    "notes": "시든 꽃은 음식물쓰레기가 아니며 흙, 화분, 포장재를 분리하고 큰 가지나 대량 낙엽은 지역 기준을 확인해야 합니다."
+  },
+  {
+    "query": "향초",
+    "expectedItemId": "candle",
+    "expectedDisposalType": "general_or_container_by_material",
+    "notes": "향초는 남은 왁스와 심지는 종량제봉투, 용기는 왁스 제거 후 재질별 기준을 안내해야 합니다."
+  },
+  {
+    "query": "콘택트렌즈",
+    "expectedItemId": "contact_lens",
+    "expectedDisposalType": "general_lens_case_recycle_if_clean",
+    "notes": "콘택트렌즈 자체는 종량제봉투로, 깨끗한 렌즈케이스는 플라스틱 기준을 확인하도록 안내해야 합니다."
+  },
+  {
+    "query": "CD",
+    "expectedItemId": "cd_dvd",
+    "expectedDisposalType": "general_or_case_recycle",
+    "notes": "CD/DVD 디스크는 플라스틱류가 아니라 종량제봉투로 안내하고 케이스는 분리해야 합니다."
+  },
+  {
+    "query": "옷걸이",
+    "expectedItemId": "clothes_hanger",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "세탁소 철제 옷걸이, 플라스틱 옷걸이, 나무·복합재질 옷걸이를 재질별로 구분해야 합니다."
+  },
+  {
+    "query": "수세미",
+    "expectedItemId": "sponge_scrubber",
+    "expectedDisposalType": "general",
+    "notes": "수세미는 아크릴·부직포·스펀지 복합재질이라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "일회용 숟가락",
+    "expectedItemId": "disposable_cutlery",
+    "expectedDisposalType": "recycle_or_general_by_material_and_cleanliness",
+    "notes": "깨끗한 플라스틱, 오염품, PLA·옥수수 식기 분기를 안내해야 합니다."
+  },
+  {
+    "query": "실리콘 주걱",
+    "expectedItemId": "silicone_kitchenware",
+    "expectedDisposalType": "general",
+    "notes": "실리콘 주걱은 열경화성 수지로 플라스틱류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "청소기 먼지",
+    "expectedItemId": "vacuum_dust",
+    "expectedDisposalType": "general",
+    "notes": "청소기 먼지는 재활용품이나 음식물쓰레기가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "큰 리빙박스는 플라스틱으로 버려?",
+    "expectedItemId": "plastic_storage_box",
+    "expectedDisposalType": "recycle_or_bulky_by_size",
+    "notes": "플라스틱 단일재질 리빙박스와 큰 플라스틱 수납장·서랍장의 대형폐기물 분기를 안내해야 합니다."
+  },
+  {
+    "query": "강아지 배변패드는 어디에 버려?",
+    "expectedItemId": "pet_pad",
+    "expectedDisposalType": "general",
+    "notes": "배변패드는 오염 위생용 복합재질이라 재활용품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "토너 가루가 누출된 프린터 카트리지",
+    "expectedItemId": "toner_cartridge",
+    "expectedDisposalType": "general_or_takeback_if_not_empty",
+    "notes": "토너 누출 시 밀봉, 종량제봉투, 구입업체 또는 재활용전문업체 회수를 안내해야 합니다."
+  },
+  {
+    "query": "배터리 들어있는 일회용 전자담배",
+    "expectedItemId": "electronic_cigarette",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "배터리 내장 전자담배는 일반쓰레기나 라이터가 아니라 소형전기전자제품 전용수거함으로 안내해야 합니다."
+  },
+  {
+    "query": "에어프라이어 종이호일은 종이로 버려?",
+    "expectedItemId": "parchment_paper",
+    "expectedDisposalType": "general",
+    "notes": "종이호일은 코팅된 종이라 종이류나 금속류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "다 쓴 핫팩은 어디 버려?",
+    "expectedItemId": "disposable_hand_warmer",
+    "expectedDisposalType": "general",
+    "notes": "일회용 손난로는 철가루나 젤이 있어도 재활용품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "실리카겔 방습제는 일반쓰레기야?",
+    "expectedItemId": "desiccant",
+    "expectedDisposalType": "general",
+    "notes": "실리카겔 방습제는 복합재질로 종량제봉투 배출을 안내해야 합니다."
+  },
+  {
+    "query": "휴대폰 액정 보호필름은 비닐류야?",
+    "expectedItemId": "screen_protector",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "액정보호필름은 휴대폰 본체나 비닐류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "다 쓴 고체 방향제는 플라스틱 용기만 분리해?",
+    "expectedItemId": "gypsum_air_freshener",
+    "expectedDisposalType": "general_or_nonburnable_by_amount",
+    "notes": "고체 방향제 본체와 플라스틱 용기 분리, 다량 석고방향제의 불연성폐기물 가능성을 안내해야 합니다."
+  },
+  {
+    "query": "귤껍질은 음식물쓰레기로 버려?",
+    "expectedItemId": "mandarin_peel",
+    "expectedDisposalType": "food_waste",
+    "notes": "귤껍질과 말린 귤껍질은 음식물류폐기물로 안내하되 지역별 배출 방식을 확인해야 합니다."
+  },
+  {
+    "query": "부직포 장바구니는 의류수거함에 넣어도 돼?",
+    "expectedItemId": "nonwoven_bag",
+    "expectedDisposalType": "general",
+    "notes": "부직포 가방은 의류수거함이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "빨래 먼지 거름망에서 나온 보풀은 음식물 아니지?",
+    "expectedItemId": "laundry_lint",
+    "expectedDisposalType": "general",
+    "notes": "세탁 보풀은 음식물쓰레기나 재활용품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "샴푸바 포장 없는 비누 조각은 어디 버려?",
+    "expectedItemId": "soap_bar_piece",
+    "expectedDisposalType": "general",
+    "notes": "비누 조각과 샴푸바는 포장재와 분리하고 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "곰팡이 핀 빵은 음식물쓰레기야?",
+    "expectedItemId": "moldy_bread",
+    "expectedDisposalType": "food_waste_region_specific",
+    "notes": "곰팡이 핀 빵은 포장재와 빵끈을 제거한 뒤 음식물류폐기물로 안내하고 지역 배출 방식을 확인해야 합니다."
+  },
+  {
+    "query": "드립백 커피 필터는 음식물쓰레기야?",
+    "expectedItemId": "drip_bag_coffee_filter",
+    "expectedDisposalType": "general_filter_ground_region_specific",
+    "notes": "드립백 커피 필터는 음식물쓰레기가 아니라 종량제봉투로 안내하고 커피찌꺼기 분리 시 지역 기준을 확인해야 합니다."
+  },
+  {
+    "query": "주사바늘 달린 자가주사기는 어떻게 버려?",
+    "expectedItemId": "home_injection_needle",
+    "expectedDisposalType": "hazardous_sharps_collection_contact_required",
+    "notes": "자가주사기 주사바늘은 일반쓰레기나 재활용품이 아니라 안전 용기 밀봉 후 보건소·처방기관·약국·지자체 회수 기준 확인으로 안내해야 합니다."
+  },
+  {
+    "query": "인덕션 유리 상판 깨진 건 대형폐기물이야?",
+    "expectedItemId": "induction_cooktop_broken_glass",
+    "expectedDisposalType": "nonburnable_or_bulky_safe_wrap",
+    "notes": "깨진 인덕션 유리 상판은 유리병류가 아니라 안전 포장 후 불연성폐기물 또는 본체 포함 대형폐기물 기준을 안내해야 합니다."
+  },
+  {
+    "query": "깨진 보온병은 유리야 고철이야?",
+    "expectedItemId": "broken_thermos",
+    "expectedDisposalType": "general_or_nonburnable_safe_wrap",
+    "notes": "깨진 보온병은 유리병류나 고철류로 단정하지 않고 복합재질과 파손 안전 포장을 안내해야 합니다."
+  },
+  {
+    "query": "프링글스 통은 종이로 버리면 돼?",
+    "expectedItemId": "potato_chip_canister",
+    "expectedDisposalType": "general",
+    "notes": "프링글스 통 같은 감자칩 용기는 복합재질이라 종이류가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "전동칫솔 본체랑 칫솔모는 같이 버려?",
+    "expectedItemId": "electric_toothbrush",
+    "expectedDisposalType": "special_collection_body_general_head",
+    "notes": "전동칫솔 본체는 소형전기전자제품 수거, 칫솔모는 일반 종량제봉투로 분리 안내해야 합니다."
+  },
+  {
+    "query": "생선가시는 음식물쓰레기야 일반쓰레기야?",
+    "expectedItemId": "fish_bone",
+    "expectedDisposalType": "general_food_waste_small_amount_allowed",
+    "notes": "생선가시는 원칙적으로 종량제봉투이며, 공식 품목사전의 소량 음식물류폐기물 허용 예외를 함께 안내해야 합니다."
+  },
+  {
+    "query": "설거지 솔은 플라스틱으로 버리면 되나?",
+    "expectedItemId": "dish_brush",
+    "expectedDisposalType": "general",
+    "notes": "설거지 솔은 플라스틱류가 아니라 복합재질 세척 도구로 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "고무줄이랑 머리끈은 일반쓰레기 맞아?",
+    "expectedItemId": "hair_tie_rubber_band",
+    "expectedDisposalType": "general",
+    "notes": "고무줄과 머리끈은 섬유·고무 혼합 소형품으로 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "면봉은 종이니까 종이류로 버려도 돼?",
+    "expectedItemId": "cotton_swab",
+    "expectedDisposalType": "general",
+    "notes": "면봉은 종이류가 아니라 사용 위생 소모품으로 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "화장솜에 클렌징오일 묻었으면 어디 버려?",
+    "expectedItemId": "cosmetic_cotton_pad",
+    "expectedDisposalType": "general",
+    "notes": "클렌징오일이 묻은 화장솜은 재활용품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "충전 어댑터는 케이블이랑 같이 버리면 돼?",
+    "expectedItemId": "phone_charger_adapter",
+    "expectedDisposalType": "special_collection",
+    "notes": "충전 어댑터는 케이블과 함께 소형전기전자제품 수거 기준을 확인하도록 안내해야 합니다."
+  },
+  {
+    "query": "시너 묻은 걸레는 일반쓰레기로 버리면 위험하지 않아?",
+    "expectedItemId": "solvent_contaminated_rag",
+    "expectedDisposalType": "hazardous_contact_required_or_general_after_dry",
+    "notes": "시너 묻은 걸레는 잔여 액체와 인화성 위험을 확인하고 지자체 유해폐기물 안내를 우선해야 합니다."
+  },
+  {
+    "query": "강아지 똥 묻은 휴지는 변기에 버려도 돼?",
+    "expectedItemId": "pet_waste_tissue",
+    "expectedDisposalType": "general",
+    "notes": "반려동물 배설물 묻은 휴지는 변기가 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "호두껍질은 음식물쓰레기 아니지?",
+    "expectedItemId": "nut_shell",
+    "expectedDisposalType": "general",
+    "notes": "호두껍질 같은 단단한 견과류 껍데기는 음식물쓰레기 예외로 안내해야 합니다."
+  },
+  {
+    "query": "옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야?",
+    "expectedItemId": "corn_cob_husk",
+    "expectedDisposalType": "general",
+    "notes": "옥수수대와 옥수수껍질은 모두 음식물류폐기물이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "한약재 찌꺼기는 음식물쓰레기로 버려도 돼?",
+    "expectedItemId": "herbal_medicine_dregs",
+    "expectedDisposalType": "general",
+    "notes": "한약재 찌꺼기는 음식물쓰레기나 폐의약품이 아니라 종량제봉투로 안내해야 합니다."
+  },
+  {
+    "query": "닭고기 포장 흡수패드는 일반쓰레기야?",
+    "expectedItemId": "meat_absorbent_pad",
+    "expectedDisposalType": "general",
+    "notes": "육류 포장 흡수패드는 종이류나 비닐류가 아니라 오염된 복합재질로 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "쿠킹랩 심지는 종이류야?",
+    "expectedItemId": "paper_core",
+    "expectedDisposalType": "recycle",
+    "notes": "쿠킹랩 본품이 아니라 분리한 종이 심지는 종이류로 안내하고 지역 배출 요일을 확인해야 합니다."
+  },
+  {
+    "query": "부러진 가위는 고철이야 일반쓰레기야?",
+    "expectedItemId": "scissors",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "부러진 가위는 고철류가 아니라 날카로운 물건으로 안전 포장 후 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "물감 묻은 팔레트는 플라스틱으로 버려?",
+    "expectedItemId": "paint_palette",
+    "expectedDisposalType": "general",
+    "notes": "물감 오염이 남은 팔레트는 플라스틱류가 아니라 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "치실은 플라스틱으로 버려도 돼?",
+    "expectedItemId": "dental_floss",
+    "expectedDisposalType": "general",
+    "notes": "치실과 치실픽은 플라스틱 재활용품이 아니라 사용 위생 소모품으로 종량제봉투 안내해야 합니다."
   }
 ]
