@@ -1447,6 +1447,18 @@
     "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
   },
   {
+    "id": "gangnam_officetel_vinyl_steps_guard",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류 포장재", "오피스텔", "관리사무소", "건물 관리 기준", "목요일"],
+    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "관리사무소"],
+    "expectedStructuredExcludes": ["\"id\":\"blanket\""]
+  },
+  {
     "id": "seocho_pet_bottle_region_schedule",
     "tool": "get_disposal_steps",
     "arguments": {

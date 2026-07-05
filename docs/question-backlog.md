@@ -118,6 +118,7 @@ Top 50과 1차 사용자 질문 확장 품목을 처리한 뒤, 다음 데이터
 - 2026-07-03 마포구 수수료 2차 answer smoke 동기화: `drying_rack`, `flower_pot` 마포구 대형생활폐기물 수수료가 MCP 답변에 노출되는지 `mapo_drying_rack_fee_coverage`, `mapo_flower_pot_fee_coverage`로 고정. 새 backlog/status 변경은 없음
 - 2026-07-05 Source 반영 answer smoke 동기화: `비닐약봉지`는 `snack_bag` 별칭으로 약 자체/알약 포장재와 분리하고, `비닐장판`, `캔버스 액자`, `스탠드형 행거`, `cup_noodle_container` 조건 답변을 MCP answer smoke로 고정. `비닐장판`, `캔버스 액자` todo는 Source 승격과 smoke 보강 기준으로 `covered` 전환
 - 2026-07-05 백로그 위생 정리: `부산 해운대구 폐건전지 수거함 위치`는 사용자 결정에 따라 탐색하지 않기로 해 `wont_fix`로 전환했고, `강남구 오피스텔 비닐봉지`는 오피스텔 전용 모델링 없이 보수 안내와 `gangnam_officetel_vinyl_building_type_guard` smoke로 방어되어 `covered`로 전환
+- 2026-07-05 로컬 MCP 답변 QA: 실제 질문형 41개를 ad-hoc으로 점검했고, `get_disposal_steps` 경로의 `강남구 오피스텔 비닐봉지` 답변에 관리사무소·건물 관리 기준 확인 문구가 약한 점을 발견해 강남구 `snack_bag` 지역 가이드와 `gangnam_officetel_vinyl_steps_guard` smoke로 보강. 새 backlog todo는 없음
 
 남은 백로그 방향:
 
