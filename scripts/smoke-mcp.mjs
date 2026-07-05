@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createServer } from "node:net";
 
 const HOST = "127.0.0.1";
+const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
 const STARTUP_TIMEOUT_MS = 15_000;
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
 const wasteItemsPath = new URL("../dist/data/waste-items.json", import.meta.url);
@@ -92,12 +93,13 @@ function parseSseJson(body) {
   throw new Error(`MCP response did not contain a result:\n${body}`);
 }
 
-async function mcpRequest(baseUrl, method, params, id) {
+async function mcpRequest(baseUrl, method, params, id, extraHeaders = {}) {
   const response = await fetch(`${baseUrl}/mcp`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json, text/event-stream",
+      ...extraHeaders,
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
@@ -189,7 +191,20 @@ async function runSmoke() {
       assert(toolNames.includes(toolName), `Missing tool ${toolName}`);
     }
 
-    let requestId = 2;
+    const playMcpToolsList = await mcpRequest(baseUrl, "tools/list", {}, 2, {
+      Host: PLAYMCP_ENDPOINT_HOST,
+    });
+    const playMcpToolNames = playMcpToolsList.tools.map((tool) => tool.name).sort();
+    assert(
+      playMcpToolNames.length === 5,
+      `Expected 5 tools with PlayMCP endpoint host, got ${playMcpToolNames.length}`,
+    );
+    assert(
+      playMcpToolNames.join(",") === toolNames.join(","),
+      "PlayMCP endpoint host returned a different tool list",
+    );
+
+    let requestId = 3;
     for (const answerCase of answerCases) {
       await runAnswerCase(baseUrl, answerCase, requestId);
       requestId += 1;
