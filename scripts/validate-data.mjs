@@ -3,13 +3,19 @@ import { readFileSync } from "node:fs";
 const dataPath = new URL("../src/data/waste-items.json", import.meta.url);
 const regionPolicyPath = new URL("../src/data/region-policies.json", import.meta.url);
 const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.meta.url);
+const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.meta.url);
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
+const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
+const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
 const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8"));
 const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
+const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
+const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
+const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
 const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
@@ -63,6 +69,78 @@ function isNonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function countBy(values, getKey) {
+  const counts = {};
+  for (const value of values) {
+    const key = getKey(value);
+    if (typeof key !== "string") continue;
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function expectDocumentCount(label, text, regex, expected) {
+  const match = text.match(regex);
+  if (!match) {
+    errors.push(`${label} count is missing from docs`);
+    return;
+  }
+
+  const actual = Number(match[1]);
+  if (actual !== expected) {
+    errors.push(`${label} count must be ${expected}, got ${actual}`);
+  }
+}
+
+function expectAllDocumentCounts(label, text, regex, expected) {
+  const matches = [...text.matchAll(regex)];
+  if (matches.length === 0) {
+    errors.push(`${label} count is missing from docs`);
+    return;
+  }
+
+  for (const match of matches) {
+    const actual = Number(match[1]);
+    if (actual !== expected) {
+      errors.push(`${label} count must be ${expected}, got ${actual}`);
+    }
+  }
+}
+
+function expectSessionSourceSnapshot(expected) {
+  const match = sessionCoordination.match(
+    /waste-items\.json` (\d+)개, `evaluation-cases\.json` (\d+)개, MCP answer cases (\d+)개, review count는 `verified (\d+) \/ region_review_needed (\d+) \/ needs_source (\d+)`/,
+  );
+  if (!match) {
+    errors.push("docs/session-coordination.md source snapshot counts are missing");
+    return;
+  }
+
+  const labels = ["wasteItems", "evaluationCases", "mcpAnswerCases", "verified", "regionReviewNeeded", "needsSource"];
+  for (const [index, label] of labels.entries()) {
+    const actual = Number(match[index + 1]);
+    if (actual !== expected[label]) {
+      errors.push(`docs/session-coordination.md ${label} count must be ${expected[label]}, got ${actual}`);
+    }
+  }
+}
+
+function expectSessionBacklogSnapshot(expected) {
+  const match = sessionCoordination.match(/Backlog는 `covered (\d+) \/ wont_fix (\d+) \/ todo (\d+)`/);
+  if (!match) {
+    errors.push("docs/session-coordination.md backlog snapshot counts are missing");
+    return;
+  }
+
+  const labels = ["covered", "wont_fix", "todo"];
+  for (const [index, label] of labels.entries()) {
+    const actual = Number(match[index + 1]);
+    if (actual !== expected[label]) {
+      errors.push(`docs/session-coordination.md backlog ${label} count must be ${expected[label]}, got ${actual}`);
+    }
+  }
+}
+
 function requireString(item, index, field) {
   if (!isNonEmptyString(item[field])) {
     errors.push(`${at(index, item.id, field)} must be a non-empty string`);
@@ -98,6 +176,10 @@ if (!Array.isArray(bulkyWasteFeeSchedules)) {
   throw new Error("src/data/bulky-waste-fees.json must contain an array");
 }
 
+if (!Array.isArray(evaluationCases)) {
+  throw new Error("src/data/evaluation-cases.json must contain an array");
+}
+
 if (!Array.isArray(mcpAnswerCases)) {
   throw new Error("src/data/mcp-answer-cases.json must contain an array");
 }
@@ -105,6 +187,34 @@ if (!Array.isArray(mcpAnswerCases)) {
 if (!Array.isArray(questionBacklog)) {
   throw new Error("src/data/question-backlog.json must contain an array");
 }
+
+const reviewCounts = countBy(items, (item) => item?.review?.status);
+const questionBacklogCounts = countBy(questionBacklog, (question) => question?.status);
+expectDocumentCount("docs/source-coverage.md total waste items", sourceCoverage, /- 총 품목: (\d+)/, items.length);
+expectDocumentCount("docs/source-coverage.md evaluation cases", sourceCoverage, /- 평가 케이스: (\d+)/, evaluationCases.length);
+expectDocumentCount("docs/source-coverage.md MCP answer cases", sourceCoverage, /- MCP 답변 회귀 케이스: (\d+)/, mcpAnswerCases.length);
+expectDocumentCount("docs/source-coverage.md verified items", sourceCoverage, /- `verified`: (\d+)/, reviewCounts.verified ?? 0);
+expectDocumentCount(
+  "docs/source-coverage.md region_review_needed items",
+  sourceCoverage,
+  /- `region_review_needed`: (\d+)/,
+  reviewCounts.region_review_needed ?? 0,
+);
+expectDocumentCount("docs/source-coverage.md needs_source items", sourceCoverage, /- `needs_source`: (\d+)/, reviewCounts.needs_source ?? 0);
+expectAllDocumentCounts("docs/session-coordination.md MCP answer cases", sessionCoordination, /MCP answer cases (\d+)개/g, mcpAnswerCases.length);
+expectSessionSourceSnapshot({
+  wasteItems: items.length,
+  evaluationCases: evaluationCases.length,
+  mcpAnswerCases: mcpAnswerCases.length,
+  verified: reviewCounts.verified ?? 0,
+  regionReviewNeeded: reviewCounts.region_review_needed ?? 0,
+  needsSource: reviewCounts.needs_source ?? 0,
+});
+expectSessionBacklogSnapshot({
+  covered: questionBacklogCounts.covered ?? 0,
+  wont_fix: questionBacklogCounts.wont_fix ?? 0,
+  todo: questionBacklogCounts.todo ?? 0,
+});
 
 for (const [index, item] of items.entries()) {
   requireString(item, index, "id");

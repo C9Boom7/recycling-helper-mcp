@@ -26,6 +26,7 @@ pnpm check
 ```
 
 `pnpm check`는 TypeScript 타입 검사, 데이터 스키마 검증, 대표 질문 평가를 실행한다.
+`pnpm validate:data`는 `docs/source-coverage.md`와 `docs/session-coordination.md`의 현재 품목/평가/MCP answer case 카운트도 실제 JSON 기준과 대조한다.
 
 ```bash
 pnpm smoke:mcp
