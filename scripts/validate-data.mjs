@@ -342,8 +342,25 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
       errors.push(`${prefix}.${field} must be an array when present`);
       continue;
     }
+    const expectationValues = new Set();
     for (const [valueIndex, value] of testCase[field].entries()) {
       if (!isNonEmptyString(value)) errors.push(`${prefix}.${field}[${valueIndex}] must be a non-empty string`);
+      if (expectationValues.has(value)) {
+        errors.push(`${prefix}.${field}[${valueIndex}] duplicates an earlier expectation`);
+      }
+      expectationValues.add(value);
+    }
+  }
+
+  for (const [includeField, excludeField] of [
+    ["expectedTextIncludes", "expectedTextExcludes"],
+    ["expectedStructuredIncludes", "expectedStructuredExcludes"],
+  ]) {
+    const excludedValues = new Set(testCase[excludeField] ?? []);
+    for (const value of testCase[includeField] ?? []) {
+      if (excludedValues.has(value)) {
+        errors.push(`${prefix}.${includeField} conflicts with ${excludeField} for "${value}"`);
+      }
     }
   }
 

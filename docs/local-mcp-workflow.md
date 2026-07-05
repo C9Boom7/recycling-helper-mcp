@@ -34,6 +34,7 @@ pnpm smoke:mcp
 `pnpm smoke:mcp`는 빌드 후 로컬 MCP 서버를 임시 포트로 띄우고 실제 Streamable HTTP 요청을 보낸다.
 답변 품질 회귀 케이스는 `src/data/mcp-answer-cases.json`에서 관리한다.
 같은 `tool`과 같은 입력 인자를 가진 중복 answer case는 `pnpm validate:data`에서 실패시켜, 새 케이스를 추가할 때 기존 케이스를 보강할지 새 질문으로 분리할지 먼저 결정하게 한다.
+각 케이스의 include/exclude 기대값도 같은 배열 안에서 중복되거나 include와 exclude에 동시에 들어가면 `pnpm validate:data`에서 실패한다.
 
 확인하는 대표 회귀 포인트:
 
