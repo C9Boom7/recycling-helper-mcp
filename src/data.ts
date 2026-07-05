@@ -313,6 +313,30 @@ export function itemNeedsRegionCheck(item: WasteItem): boolean {
   return item.regionPolicy?.needsRegionCheck ?? item.needsRegionCheck;
 }
 
+export function itemNeedsCriticalRegionCheck(item: WasteItem): boolean {
+  if (!itemNeedsRegionCheck(item)) return false;
+  const policyText = [
+    item.disposalType,
+    ...(item.conditions ?? []),
+    ...item.steps,
+    ...item.cautions,
+    item.regionPolicy?.reason,
+    ...(item.regionPolicy?.checkItems ?? []),
+  ].join(" ");
+
+  return (
+    item.regionPolicy?.scope === "local_collection_point" ||
+    item.regionPolicy?.scope === "bulky_waste" ||
+    /불연성|특수규격|특수마대|PP봉투|생활계 유해폐기물|폐의약품|위험|누출|가스|폭발|구멍|통풍|신고|수수료/.test(policyText)
+  );
+}
+
+export function itemRegionCheckLabel(item: WasteItem): string {
+  if (!itemNeedsRegionCheck(item)) return "낮음";
+  if (itemNeedsCriticalRegionCheck(item)) return "필수";
+  return "참고";
+}
+
 export function itemSourceRefs(item: WasteItem): string[] {
   if (item.sources?.length > 0) {
     return item.sources.map((source) => source.title);
@@ -404,6 +428,14 @@ export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegi
 
 export function formatItemGuide(item: WasteItem, region?: string): string {
   const regionMatch = findRegionalPolicy(region);
+  const hasSpecificRegionGuide = Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item));
+  const needsCriticalRegionCheck = itemNeedsCriticalRegionCheck(item);
+  const needsAdvisoryRegionCheck = itemNeedsRegionCheck(item) && !needsCriticalRegionCheck;
+  const regionGuideLines =
+    itemNeedsRegionCheck(item) && (hasSpecificRegionGuide || needsCriticalRegionCheck)
+      ? formatRegionItemGuide(item, regionMatch)
+      : [];
+  const hasRegionGuide = regionGuideLines.length > 0;
   const lines = [
     `## ${item.name}`,
     "",
@@ -421,30 +453,32 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     lines.push("", "### 주의", ...item.cautions.map((caution) => `- ${caution}`));
   }
 
-  if (itemNeedsRegionCheck(item)) {
+  if (needsCriticalRegionCheck) {
+    lines.push("", "### 지역 확인 필요");
+
+    if (regionMatch) {
+      lines.push(`- ${regionMatch.region.name} 기준으로 확인된 지역 안내를 함께 반영합니다.`);
+    } else if (region) {
+      lines.push(`- ${region} 기준 수거함 위치, 신고 방식, 배출일 또는 수수료는 지자체 공식 안내 확인이 필요합니다.`);
+    } else {
+      lines.push("- 이 품목은 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역별 기준이 실제 배출 방법을 바꿀 수 있습니다.");
+    }
+
+    if (hasRegionGuide) lines.push(...regionGuideLines);
+    if (item.regionPolicy?.checkItems?.length) lines.push(...item.regionPolicy.checkItems.map((checkItem) => `- 확인 항목: ${checkItem}`));
+  } else if (needsAdvisoryRegionCheck && regionMatch) {
+    lines.push("", "### 지역 참고");
     lines.push(
-      "",
-      "### 지역 확인",
-      regionMatch
+      hasRegionGuide
         ? `- ${regionMatch.region.name} 기준으로 확인된 지역 안내를 함께 반영합니다.`
-        : region
-        ? `- ${region} 기준 상세 배출 요일, 수거함 위치, 신고 수수료는 지자체 안내와 생활폐기물 분리배출 누리집에서 추가 확인이 필요합니다.`
-        : "- 이 품목은 지역별 기준 차이가 있을 수 있습니다. 지역명을 함께 알려주면 확인해야 할 항목을 안내할 수 있습니다.",
+        : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 기준 배출 요일·장소만 맞춰 배출하면 됩니다.`,
     );
-
-    const regionGuideLines = formatRegionItemGuide(item, regionMatch);
-    if (regionGuideLines.length > 0) {
-      lines.push(...regionGuideLines);
-    }
-
-    if (item.regionPolicy?.checkItems?.length) {
-      lines.push(...item.regionPolicy.checkItems.map((checkItem) => `- 확인 항목: ${checkItem}`));
-    }
+    if (hasRegionGuide) lines.push(...regionGuideLines);
   }
 
   lines.push("", "### 근거", ...formatSourceList(item));
 
-  if (regionMatch && itemNeedsRegionCheck(item)) {
+  if (regionMatch && (needsCriticalRegionCheck || hasRegionGuide)) {
     lines.push("", `### ${regionMatch.region.name} 공식 출처`, ...formatRegionSourceList(regionMatch.region));
   }
 

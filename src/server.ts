@@ -16,7 +16,9 @@ import {
   formatItemGuide,
   formatRegionItemGuide,
   formatRegionSourceList,
+  itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
+  itemRegionCheckLabel,
   itemSourceRefs,
   wasteItems,
 } from "./data.js";
@@ -309,7 +311,12 @@ function registerTools(server: McpServer): void {
         `- 세부 판단: ${item.disposalType}`,
         `- 결론: ${item.summary}`,
         `- 확신도: ${confidenceLabel(item.confidence)}`,
-        `- 지역 확인 필요: ${itemNeedsRegionCheck(item) ? "예" : "아니오"}`,
+        `- 지역 영향: ${itemRegionCheckLabel(item)}`,
+        itemNeedsCriticalRegionCheck(item)
+          ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
+          : itemNeedsRegionCheck(item)
+          ? "- 기본 판단은 가능하며, 실제 배출 요일·장소는 거주지 기준에 맞추면 됩니다."
+          : undefined,
         region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
       ]
         .filter(Boolean)
@@ -325,6 +332,7 @@ function registerTools(server: McpServer): void {
         conditions: item.conditions,
         confidence: item.confidence,
         needsRegionCheck: itemNeedsRegionCheck(item),
+        regionCheckLevel: itemRegionCheckLabel(item),
         regionPolicy: item.regionPolicy,
         region,
         sourceRefs: itemSourceRefs(item),
@@ -457,6 +465,7 @@ function registerTools(server: McpServer): void {
           group: disposalGroupLabel(match.item.disposalType),
           summary: match.item.summary,
           needsRegionCheck: itemNeedsRegionCheck(match.item),
+          regionCheckLevel: itemRegionCheckLabel(match.item),
           conditions: match.item.conditions,
         };
       });
@@ -480,7 +489,12 @@ function registerTools(server: McpServer): void {
           }),
           "",
         ]),
-        "지역 확인 필요 품목은 배출 요일, 수거함 위치, 대형폐기물 신고 수수료가 지역마다 다를 수 있습니다.",
+        planned.some((entry) => entry.found && entry.regionCheckLevel === "필수")
+          ? "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
+          : undefined,
+        planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
+          ? "일부 재활용품은 기본 판단은 위와 같고, 실제 배출 요일·장소만 거주지 기준에 맞추면 됩니다."
+          : undefined,
       ].filter(Boolean);
 
       return textResult(lines.join("\n"), {
