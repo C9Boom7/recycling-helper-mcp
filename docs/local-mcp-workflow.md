@@ -41,6 +41,7 @@ pnpm smoke:mcp
 
 - `/health`의 품목 수가 `src/data/waste-items.json`의 품목 수와 일치하는지
 - PlayMCP 호환 JSON-only `initialize`/`ping`/`notifications/initialized`와 CORS preflight/actual POST가 서버 정보, capabilities, instructions, MCP 관련 요청 헤더를 정상 처리하는지
+- PlayMCP endpoint Host alias(`recyling`/`recycle`/`recycling`)에서도 `tools/list`가 정상 노출되는지
 - `tools/list`가 5개 도구를 반환하고 각 도구의 `description`, `inputSchema`, PlayMCP 필수 `annotations`를 포함하는지
 - `책상의자 + 서울 강남구` 답변에 대형폐기물 수수료 후보가 포함되는지
 - `깨진 유리컵 + 서울 강남구` 답변에 PP봉투 안내가 포함되는지

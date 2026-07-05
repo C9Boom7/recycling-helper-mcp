@@ -4,6 +4,11 @@ import { readFileSync } from "node:fs";
 import { createServer } from "node:net";
 
 const HOST = "127.0.0.1";
+const PLAYMCP_ENDPOINT_HOSTS = [
+  "recyling-helper-mcp.playmcp-endpoint.kakaocloud.io",
+  "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io",
+  "recycling-helper-mcp.playmcp-endpoint.kakaocloud.io",
+];
 const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
 const PLAYMCP_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
 const STARTUP_TIMEOUT_MS = 15_000;
@@ -468,6 +473,14 @@ async function runSmoke() {
     assertToolList(getDiscovery, "GET discovery");
 
     let requestId = 6;
+    for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
+      const endpointHostToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, requestId, {
+        Host: endpointHost,
+      });
+      assertToolList(endpointHostToolsList, `JSON-only tools/list for endpoint host ${endpointHost}`);
+      requestId += 1;
+    }
+
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
 
