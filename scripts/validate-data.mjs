@@ -21,6 +21,7 @@ const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
 const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed"]);
 const regionScopes = new Set(["national_default", "region_specific", "local_collection_point", "bulky_waste"]);
+const regionCheckLevels = new Set(["required", "advisory"]);
 const questionBacklogTypes = new Set([
   "new_item_candidate",
   "synonym_gap",
@@ -39,7 +40,11 @@ const mcpToolNames = new Set([
   "get_region_disposal_info",
 ]);
 const expectedRegionalPolicyLevels = new Set(["필수", "참고", "낮음"]);
-const expectedRegionalPolicyShapes = new Set(["minimal"]);
+const expectedRegionalPolicyShapes = new Set(["minimal", "itemGuideOnly"]);
+const regionCheckLevelToExpectedPolicyLevel = {
+  required: "필수",
+  advisory: "참고",
+};
 
 const errors = [];
 const warnings = [];
@@ -274,6 +279,15 @@ for (const [index, item] of items.entries()) {
     if (item.regionPolicy.needsRegionCheck && !isNonEmptyString(item.regionPolicy.reason)) {
       warnings.push(`${at(index, item.id, "regionPolicy.reason")} should explain why region verification is needed`);
     }
+    if (item.regionPolicy.regionCheckLevel !== undefined && !regionCheckLevels.has(item.regionPolicy.regionCheckLevel)) {
+      errors.push(`${at(index, item.id, "regionPolicy.regionCheckLevel")} must be one of ${Array.from(regionCheckLevels).join(", ")}`);
+    }
+    if (item.regionPolicy.regionCheckLevel !== undefined && !item.regionPolicy.needsRegionCheck) {
+      errors.push(`${at(index, item.id, "regionPolicy.regionCheckLevel")} can only be set when needsRegionCheck is true`);
+    }
+    if (item.regionPolicy.regionCheckLevel === "advisory" && item.regionPolicy.scope !== "region_specific") {
+      errors.push(`${at(index, item.id, "regionPolicy.regionCheckLevel")} advisory overrides are only allowed for region_specific items`);
+    }
     if (item.regionPolicy.checkItems !== undefined && !Array.isArray(item.regionPolicy.checkItems)) {
       errors.push(`${at(index, item.id, "regionPolicy.checkItems")} must be an array when present`);
     }
@@ -492,6 +506,19 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
       if (level === undefined && shape === undefined) {
         errors.push(`${prefix}.expectedRegionalPolicy must include level or shape`);
       }
+      if (shape !== undefined && level === undefined) {
+        errors.push(`${prefix}.expectedRegionalPolicy.shape must be paired with level`);
+      }
+      if (shape === "itemGuideOnly" && level !== "참고") {
+        errors.push(`${prefix}.expectedRegionalPolicy.shape=itemGuideOnly is only valid for advisory regional policy cases`);
+      }
+      if (
+        testCase.tool === "get_disposal_steps" &&
+        level === "참고" &&
+        !(testCase.expectedTextExcludes ?? []).some((entry) => entry.includes("공식 출처"))
+      ) {
+        errors.push(`${prefix}.expectedTextExcludes must exclude 공식 출처 for advisory get_disposal_steps cases`);
+      }
     }
   }
 
@@ -503,6 +530,26 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
   ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionalPolicy !== undefined;
   if (!hasExpectation) {
     errors.push(`${prefix} must include at least one expectation`);
+  }
+}
+
+for (const item of items) {
+  const regionCheckLevel = item.regionPolicy?.regionCheckLevel;
+  if (regionCheckLevel === undefined) continue;
+
+  const expectedLevel = regionCheckLevelToExpectedPolicyLevel[regionCheckLevel];
+  const expectedItemId = `"id":"${item.id}"`;
+  const hasAnswerCoverage = mcpAnswerCases.some(
+    (testCase) =>
+      testCase.expectedRegionalPolicy?.level === expectedLevel &&
+      Array.isArray(testCase.expectedStructuredIncludes) &&
+      testCase.expectedStructuredIncludes.includes(expectedItemId),
+  );
+
+  if (!hasAnswerCoverage) {
+    errors.push(
+      `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case with expectedRegionalPolicy.level=${expectedLevel}`,
+    );
   }
 }
 

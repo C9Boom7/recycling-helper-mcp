@@ -374,6 +374,13 @@ function assertRegionalPolicyExpectation(result, testCase) {
       assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for minimal regional policy`);
     }
   }
+
+  if (expectation.shape === "itemGuideOnly") {
+    assert(Array.isArray(policy.itemGuide), `${testCase.id} regionalPolicy.itemGuide should be included`);
+    for (const field of ["summary", "recycling", "sources", "bulkyWasteFees"]) {
+      assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for itemGuideOnly regional policy`);
+    }
+  }
 }
 
 async function runAnswerCase(baseUrl, testCase, id) {

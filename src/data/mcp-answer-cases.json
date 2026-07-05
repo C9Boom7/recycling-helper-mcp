@@ -641,8 +641,13 @@
       "itemName": "시든 꽃은 음식물쓰레기로 버려?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["음식물쓰레기", "흙을 최대한 털어", "종량제봉투", "화분 흙", "큰 나뭇가지"],
-    "expectedStructuredIncludes": ["\"id\":\"wilted_flower\"", "\"matchedBy\":\"시든 꽃\"", "\"regionalPolicy\""]
+    "expectedTextIncludes": ["음식물쓰레기", "흙을 최대한 털어", "종량제봉투", "화분 흙", "큰 나뭇가지", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"wilted_flower\"", "\"matchedBy\":\"시든 꽃\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "itemGuideOnly"
+    }
   },
   {
     "id": "gangnam_candle_wax_container_split",
@@ -876,8 +881,13 @@
       "itemName": "다 쓴 고체 방향제는 플라스틱 용기만 분리해?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["석고방향제", "플라스틱 용기", "종량제봉투", "불연성종량제봉투", "특수규격마대", "서울 강남구"],
-    "expectedStructuredIncludes": ["\"id\":\"gypsum_air_freshener\"", "\"regionalPolicy\""]
+    "expectedTextIncludes": ["석고방향제", "플라스틱 용기", "종량제봉투", "불연성종량제봉투", "특수규격마대", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"gypsum_air_freshener\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   },
   {
     "id": "gangnam_mandarin_peel_food_waste",
@@ -932,7 +942,8 @@
       "itemName": "곰팡이 핀 빵은 음식물쓰레기야?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["곰팡이 핀 빵", "상한 음식", "음식물류폐기물", "포장재", "빵끈", "전용 종량제봉투", "RFID", "서울 강남구 공식 출처"],
+    "expectedTextIncludes": ["곰팡이 핀 빵", "상한 음식", "음식물류폐기물", "포장재", "빵끈", "전용 종량제봉투", "RFID", "### 지역 참고"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"moldy_bread\"", "\"matchedBy\":\"곰팡이 핀 빵은 음식물쓰레기야\"", "\"regionalPolicy\""],
     "expectedStructuredExcludes": ["\"id\":\"pesticide_container\""]
   },
@@ -1452,9 +1463,14 @@
       "itemName": "강남구에서 김치국물 묻은 비닐봉지는 목요일에 내놔?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["비닐류 포장재", "오염 제거가 어렵다면 일반쓰레기", "목요일", "투명·반투명 봉투"],
-    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""]
+    "expectedTextIncludes": ["비닐류 포장재", "오염 제거가 어렵다면 일반쓰레기", "목요일", "투명·반투명 봉투", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedStructuredExcludes": ["\"id\":\"used_cooking_oil\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "itemGuideOnly"
+    }
   },
   {
     "id": "gangnam_officetel_vinyl_steps_guard",
@@ -1463,10 +1479,14 @@
       "itemName": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["비닐류 포장재", "오피스텔", "관리사무소", "건물 관리 기준", "목요일"],
-    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준"],
-    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "관리사무소"],
-    "expectedStructuredExcludes": ["\"id\":\"blanket\""]
+    "expectedTextIncludes": ["비닐류 포장재", "오피스텔", "관리사무소", "건물 관리 기준", "목요일", "### 지역 참고"],
+    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준", "### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\"", "관리사무소"],
+    "expectedStructuredExcludes": ["\"id\":\"blanket\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "itemGuideOnly"
+    }
   },
   {
     "id": "seocho_pet_bottle_region_schedule",
@@ -1475,8 +1495,8 @@
       "itemName": "서초구에서 투명 페트병은 무슨 요일이야?",
       "region": "서울 서초구"
     },
-    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "폐비닐과 함께 동별 목요일 또는 금요일", "서울 서초구 공식 출처"],
-    "expectedTextExcludes": ["서울 강남구 공식 출처"],
+    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "폐비닐과 함께 동별 목요일 또는 금요일", "### 지역 참고"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\""]
   },
   {
@@ -1486,8 +1506,8 @@
       "itemName": "송파구에서 투명 페트병은 무슨 요일이야?",
       "region": "서울 송파구"
     },
-    "expectedTextIncludes": ["페트병", "서울 송파구 기준으로 확인된 지역 안내", "송파구 투명페트병", "목요일 배출 동과 금요일 배출 동", "서울 송파구 공식 출처"],
-    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처", "서초구에서 투명페트병"],
+    "expectedTextIncludes": ["페트병", "서울 송파구 기준으로 확인된 지역 안내", "송파구 투명페트병", "목요일 배출 동과 금요일 배출 동", "### 지역 참고"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처", "서울 송파구 공식 출처", "서초구에서 투명페트병"],
     "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 송파구\"", "\"regionalPolicy\"", "\"name\":\"서울 송파구\""]
   },
   {
@@ -1605,9 +1625,14 @@
       "itemName": "냉동식품 포장 비닐봉지에 성에랑 음식물 묻었는데 비닐류야?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["비닐류 포장재", "음식물이나 기름이 묻었다면", "오염 제거가 어렵다면 일반쓰레기", "목요일"],
-    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""]
+    "expectedTextIncludes": ["비닐류 포장재", "음식물이나 기름이 묻었다면", "오염 제거가 어렵다면 일반쓰레기", "목요일", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "itemGuideOnly"
+    }
   },
   {
     "id": "seocho_pet_bottle_explicit_thursday_known_region",
@@ -1616,8 +1641,8 @@
       "itemName": "서초구에서 투명 페트병은 목요일에 내놓는 거야?",
       "region": "서울 서초구"
     },
-    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "동별 목요일 또는 금요일", "서울 서초구 공식 출처"],
-    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 송파구 공식 출처"],
+    "expectedTextIncludes": ["페트병", "서울 서초구 기준으로 확인된 지역 안내", "동별 목요일 또는 금요일", "### 지역 참고"],
+    "expectedTextExcludes": ["서울 강남구 공식 출처", "서울 서초구 공식 출처", "서울 송파구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"pet_bottle\"", "\"matchedBy\":\"투명 페트병\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\"", "\"name\":\"서울 서초구\""]
   },
   {
@@ -1710,9 +1735,14 @@
       "itemName": "빈 약통은 폐의약품 수거함이야 플라스틱이야?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "서울 강남구 공식 출처"],
+    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"empty_medicine_bottle\"", "\"matchedBy\":\"빈 약통은 폐의약품 수거함이야 플라스틱이야\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   },
   {
     "id": "pill_blister_packaging_no_foil_match",
@@ -1783,9 +1813,14 @@
       "itemName": "약 다 먹은 플라스틱 약병은 플라스틱으로 버려?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "서울 강남구 공식 출처"],
+    "expectedTextIncludes": ["빈 약통", "남은 약", "폐의약품 수거함", "플라스틱 수거함", "### 지역 참고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"empty_medicine_bottle\"", "\"matchedBy\":\"약병\"", "\"region\":\"서울 강남구\""],
-    "expectedStructuredExcludes": ["\"id\":\"medicine\""]
+    "expectedStructuredExcludes": ["\"id\":\"medicine\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   },
   {
     "id": "songpa_mirror_fee_question_short_alias",
@@ -1877,7 +1912,8 @@
       "itemName": "서초구 생선뼈는 음식물 수거용기에 넣어?",
       "region": "서울 서초구"
     },
-    "expectedTextIncludes": ["서울 서초구 기준으로 확인된 지역 안내", "생선뼈", "음식물쓰레기가 아닌 일반 종량제봉투", "예외 품목은 음식물 수거용기에 넣지 않습니다", "서초구청 음식물쓰레기 분리배출 요령"],
+    "expectedTextIncludes": ["서울 서초구 기준으로 확인된 지역 안내", "생선뼈", "음식물쓰레기가 아닌 일반 종량제봉투", "예외 품목은 음식물 수거용기에 넣지 않습니다", "### 지역 참고"],
+    "expectedTextExcludes": ["서울 서초구 공식 출처", "서초구청 음식물쓰레기 분리배출 요령"],
     "expectedStructuredIncludes": ["\"id\":\"fish_bone\"", "\"matchedBy\":\"생선뼈\"", "\"region\":\"서울 서초구\"", "\"regionalPolicy\""]
   },
   {
@@ -1897,8 +1933,16 @@
       "region": "서울 강남구",
       "itemName": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?"
     },
-    "expectedTextIncludes": ["서울 강남구 지역 확인 안내", "품목: 비닐류 포장재", "단독주택·빌라·소규모 상가 기준", "확인할 정보"],
-    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준"],
+    "expectedTextIncludes": [
+      "서울 강남구 지역 확인 안내",
+      "품목: 비닐류 포장재",
+      "단독주택·빌라·소규모 상가 기준",
+      "확인할 정보",
+      "비닐류 배출 요일",
+      "투명·반투명 봉투 또는 그물망 기준",
+      "오염 비닐 일반쓰레기 전환 기준"
+    ],
+    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준", "대형생활폐기물 사전 신청", "폐건전지, 폐형광등"],
     "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"비닐류 포장재\"", "강남구 단독주택·빌라·소규모 상가 기준"]
   },
   {
@@ -1908,8 +1952,8 @@
       "region": "부산 해운대구",
       "itemName": "폐건전지 수거함 위치 알려줘"
     },
-    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "품목별 전용 수거함 위치", "생활계 유해폐기물 수거 장소", "거주 지자체 청소/자원순환/환경 부서"],
-    "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소"],
+    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "전용 수거함 위치", "지정 수거처", "배출 가능 시간", "거주 지자체 청소/자원순환/환경 부서"],
+    "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소", "대형폐기물 신고 페이지와 수수료"],
     "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
     "expectedStructuredExcludes": ["\"matchedRegion\""]
   },
@@ -1946,6 +1990,25 @@
     "expectedStructuredIncludes": ["\"matchedItem\":\"칫솔\"", "\"needsRegionCheck\":false", "\"regionCheckLevel\":\"낮음\""]
   },
   {
+    "id": "confusing_vinyl_bag_region_advisory",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "비닐봉지"
+    },
+    "expectedTextIncludes": ["헷갈림 체크", "비닐류 포장재", "지역 영향: 참고"],
+    "expectedTextExcludes": ["지역 영향: 필수"],
+    "expectedStructuredIncludes": ["\"itemName\":\"비닐류 포장재\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\""]
+  },
+  {
+    "id": "confusing_battery_region_required",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "폐건전지"
+    },
+    "expectedTextIncludes": ["헷갈림 체크", "건전지", "지역 영향: 필수"],
+    "expectedStructuredIncludes": ["\"itemName\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\""]
+  },
+  {
     "id": "cleanup_plan_region_impact_mixed_levels",
     "tool": "make_cleanup_plan",
     "arguments": {
@@ -1958,8 +2021,11 @@
       "우산 -> 우산",
       "폐건전지 -> 건전지",
       "칫솔 -> 칫솔",
+      "(지역 영향: 참고)",
+      "(지역 영향: 필수)",
+      "(지역 영향: 낮음)",
       "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다.",
-      "일부 재활용품은 기본 판단은 위와 같고, 실제 배출 요일·장소만 거주지 기준에 맞추면 됩니다."
+      "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
     ],
     "expectedTextExcludes": ["서울 강남구 공식 출처"],
     "expectedStructuredIncludes": [
@@ -1974,5 +2040,68 @@
       "\"regionCheckLevel\":\"낮음\""
     ],
     "expectedStructuredExcludes": ["\"regionalPolicy\""]
+  },
+  {
+    "id": "cleanup_plan_region_impact_advisory_only",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": ["우산", "비닐봉지", "칫솔"],
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "대청소 배출 계획",
+      "지역: 서울 강남구",
+      "우산 -> 우산",
+      "비닐봉지 -> 비닐류 포장재",
+      "칫솔 -> 칫솔",
+      "(지역 영향: 참고)",
+      "(지역 영향: 낮음)",
+      "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+    ],
+    "expectedTextExcludes": [
+      "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다.",
+      "서울 강남구 공식 출처"
+    ],
+    "expectedStructuredIncludes": [
+      "\"input\":\"우산\"",
+      "\"itemName\":\"우산\"",
+      "\"regionCheckLevel\":\"참고\"",
+      "\"input\":\"비닐봉지\"",
+      "\"itemName\":\"비닐류 포장재\"",
+      "\"input\":\"칫솔\"",
+      "\"itemName\":\"칫솔\"",
+      "\"regionCheckLevel\":\"낮음\""
+    ],
+    "expectedStructuredExcludes": ["\"regionalPolicy\""]
+  },
+  {
+    "id": "steps_empty_medicine_bottle_region_advisory",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빈 약통",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["## 빈 약통", "### 지역 참고", "기본 배출 판단은 위와 같고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"empty_medicine_bottle\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
+  },
+  {
+    "id": "steps_toner_cartridge_region_advisory",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "토너 카트리지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["## 토너 카트리지", "### 지역 참고", "기본 배출 판단은 위와 같고"],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"toner_cartridge\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   }
 ]

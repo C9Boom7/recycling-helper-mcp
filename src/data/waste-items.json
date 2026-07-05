@@ -1051,6 +1051,7 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
+      "regionCheckLevel": "advisory",
       "reason": "비닐류의 분리배출 가능 여부는 전국 공통 기준으로 판단할 수 있지만, 실제 배출 요일과 배출장소는 지자체별로 다릅니다.",
       "checkItems": [
         "비닐류 배출 요일",
@@ -3221,6 +3222,7 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
+      "regionCheckLevel": "advisory",
       "reason": "플라스틱류 배출 요일·장소와 남은 약의 폐의약품 수거함 위치는 지역별 확인이 필요합니다.",
       "checkItems": [
         "남은 약 분리 여부",
@@ -6647,6 +6649,7 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
+      "regionCheckLevel": "advisory",
       "reason": "일반 종량제봉투 배출은 가능하지만, 화분 흙, 큰 나뭇가지, 대량 낙엽, 수거요청 방식은 지역별 확인이 필요합니다.",
       "checkItems": [
         "꽃다발 포장재 분리 여부",
@@ -7633,6 +7636,7 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
+      "regionCheckLevel": "advisory",
       "reason": "다량 배출 시 불연성종량제봉투·특수규격마대 운영 기준과 플라스틱 용기 배출일은 지역별 확인이 필요합니다.",
       "checkItems": [
         "고체 방향제 본체 재질",
@@ -7849,6 +7853,7 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
+      "regionCheckLevel": "advisory",
       "reason": "카트리지 회수 프로그램, 플라스틱 수거함 가능 여부, 종량제봉투 배출 방식은 지역과 업체 운영에 따라 확인이 필요합니다.",
       "checkItems": [
         "토너·잉크 누출 여부",

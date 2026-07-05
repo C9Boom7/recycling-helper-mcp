@@ -17,6 +17,7 @@ export type WasteSource = {
 export type RegionPolicy = {
   scope: "national_default" | "region_specific" | "local_collection_point" | "bulky_waste";
   needsRegionCheck: boolean;
+  regionCheckLevel?: "required" | "advisory";
   reason?: string;
   checkItems?: string[];
 };
@@ -315,6 +316,9 @@ export function itemNeedsRegionCheck(item: WasteItem): boolean {
 
 export function itemNeedsCriticalRegionCheck(item: WasteItem): boolean {
   if (!itemNeedsRegionCheck(item)) return false;
+  if (item.regionPolicy?.regionCheckLevel === "required") return true;
+  if (item.regionPolicy?.regionCheckLevel === "advisory") return false;
+
   const policyText = [
     item.disposalType,
     ...(item.conditions ?? []),
@@ -471,14 +475,14 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     lines.push(
       hasRegionGuide
         ? `- ${regionMatch.region.name} 기준으로 확인된 지역 안내를 함께 반영합니다.`
-        : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 기준 배출 요일·장소만 맞춰 배출하면 됩니다.`,
+        : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 기준 배출 요일·장소나 수거함·회수 가능 여부만 맞춰 확인하면 됩니다.`,
     );
     if (hasRegionGuide) lines.push(...regionGuideLines);
   }
 
   lines.push("", "### 근거", ...formatSourceList(item));
 
-  if (regionMatch && (needsCriticalRegionCheck || hasRegionGuide)) {
+  if (regionMatch && needsCriticalRegionCheck) {
     lines.push("", `### ${regionMatch.region.name} 공식 출처`, ...formatRegionSourceList(regionMatch.region));
   }
 
