@@ -40,6 +40,21 @@ const warnings = [];
 const ids = new Set();
 const names = new Set();
 
+function stableJsonStringify(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((entry) => stableJsonStringify(entry)).join(",")}]`;
+  }
+
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJsonStringify(value[key])}`)
+      .join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
 function at(index, id, field) {
   return `item[${index}]${id ? `(${id})` : ""}.${field}`;
 }
@@ -289,6 +304,7 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
 }
 
 const answerCaseIds = new Set();
+const answerCaseToolInputs = new Map();
 for (const [index, testCase] of mcpAnswerCases.entries()) {
   const prefix = `mcpAnswerCase[${index}]${testCase?.id ? `(${testCase.id})` : ""}`;
   if (!isNonEmptyString(testCase.id)) {
@@ -305,6 +321,14 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
 
   if (!testCase.arguments || typeof testCase.arguments !== "object" || Array.isArray(testCase.arguments)) {
     errors.push(`${prefix}.arguments must be an object`);
+  } else if (mcpToolNames.has(testCase.tool)) {
+    const toolInputKey = `${testCase.tool}:${stableJsonStringify(testCase.arguments)}`;
+    const existingId = answerCaseToolInputs.get(toolInputKey);
+    if (existingId) {
+      errors.push(`${prefix} duplicates tool/input already covered by ${existingId}`);
+    } else if (isNonEmptyString(testCase.id)) {
+      answerCaseToolInputs.set(toolInputKey, testCase.id);
+    }
   }
 
   for (const field of [
