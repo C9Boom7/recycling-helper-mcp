@@ -12,6 +12,7 @@ import {
   findBulkyWasteFees,
   findBestWasteItem,
   findRegionalPolicy,
+  findRegionItemGuide,
   findWasteItems,
   formatItemGuide,
   formatRegionItemGuide,
@@ -224,7 +225,9 @@ const COMPAT_TOOLS = [
 function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem): ToolResult | undefined {
   if (!region) return undefined;
 
-  const itemGuide = item ? formatRegionItemGuide(item, region) : undefined;
+  const hasSpecificItemGuide = Boolean(item && findRegionItemGuide(region.region, item));
+  const includeItemSpecificRegion = !item || itemNeedsCriticalRegionCheck(item) || hasSpecificItemGuide;
+  const itemGuide = item && includeItemSpecificRegion ? formatRegionItemGuide(item, region) : undefined;
   const bulkyWasteFees = item ? findBulkyWasteFees(region.region, item) : [];
   const bulkyWasteFeeSchedule = bulkyWasteFees.length > 0 ? findBulkyWasteFeeSchedule(region.region) : undefined;
 
@@ -239,6 +242,7 @@ function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: W
       otherDays: region.region.recycling.otherDays,
     },
     itemGuide,
+    regionCheckLevel: item ? itemRegionCheckLabel(item) : undefined,
     ...(bulkyWasteFeeSchedule
       ? {
           bulkyWasteFees: {
@@ -250,7 +254,7 @@ function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: W
           },
         }
       : {}),
-    sources: region.region.sources,
+    sources: includeItemSpecificRegion ? region.region.sources : [],
   };
 }
 
