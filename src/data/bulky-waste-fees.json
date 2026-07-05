@@ -434,5 +434,120 @@
         "feeKrw": 1000
       }
     ]
+  },
+  {
+    "regionId": "mapo_gu",
+    "regionName": "서울 마포구",
+    "checkedAt": "2026-07-03",
+    "applicationUrl": "https://www.mapo.go.kr/site/main/content/mapo05060506",
+    "feeUrl": "https://www.mapo.go.kr/site/main/content/mapo05060502",
+    "phone": "02-3153-9200",
+    "source": {
+      "title": "마포구청 대형폐기물배출안내",
+      "url": "https://www.mapo.go.kr/site/main/content/mapo05060502",
+      "sourceType": "local_guidance",
+      "checkedAt": "2026-07-03",
+      "basis": "대형생활폐기물 수집ㆍ운반 수수료 표에서 기존 coverage 10개 중 Top 50 직접 후보인 의자, 침대 매트리스, 이불, 거울과 사용자 확장 후보인 돗자리, 빨래건조대, 화분 관련 행만 우선 구조화했습니다. 전체 표와 나머지 coverage 후보는 이번 수집 범위에서 제외했습니다."
+    },
+    "fees": [
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "1인용",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "2인용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자",
+        "spec": "3인용",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "의자(바퀴)",
+        "spec": "1인당",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "좌식의자, 접의자",
+        "spec": "1인당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "chair",
+        "category": "가구류",
+        "itemName": "쿠션 의자",
+        "spec": "1인당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대",
+        "spec": "1인용 매트리스, 라텍스",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대",
+        "spec": "2인용 매트리스, 라텍스",
+        "feeKrw": 11000
+      },
+      {
+        "itemId": "blanket",
+        "category": "생활용품류",
+        "itemName": "이불",
+        "spec": "1채당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리",
+        "spec": "1m²당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "mirror",
+        "category": "생활용품류",
+        "itemName": "거울(유리)",
+        "spec": "1㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "생활용품류",
+        "itemName": "빨래건조대",
+        "spec": "-",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "생활용품류",
+        "itemName": "화분",
+        "spec": "50cm 이상(흙, 화초 제외)",
+        "feeKrw": 1500
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "생활용품류",
+        "itemName": "화분",
+        "spec": "50cm 미만(흙, 화초 제외)",
+        "feeKrw": 1000
+      }
+    ]
   }
 ]

@@ -760,5 +760,23 @@
     "expectedItemId": "dental_floss",
     "expectedDisposalType": "general",
     "notes": "치실과 치실픽은 플라스틱 재활용품이 아니라 사용 위생 소모품으로 종량제봉투 안내해야 합니다."
+  },
+  {
+    "query": "비닐장판은 비닐류로 버리면 돼?",
+    "expectedItemId": "vinyl_flooring",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "비닐장판은 비닐류 포장재가 아니라 PVC 바닥재로, 조각은 종량제봉투, 큰 장판은 대형폐기물 기준을 안내해야 합니다."
+  },
+  {
+    "query": "캔버스 액자는 어떻게 버려?",
+    "expectedItemId": "canvas_frame",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "캔버스 천과 프레임, 유리판 분리 여부를 안내하고 크면 대형폐기물 기준을 확인해야 합니다."
+  },
+  {
+    "query": "스탠드형 행거는 그냥 옷걸이처럼 버려?",
+    "expectedItemId": "standing_clothes_hanger",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "스탠드형 행거는 일반 옷걸이와 구분해 대형폐기물 신고 기준을 안내하고 수수료 금액은 단정하지 않아야 합니다."
   }
 ]

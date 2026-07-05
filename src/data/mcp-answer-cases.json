@@ -685,6 +685,18 @@
     "expectedStructuredIncludes": ["\"id\":\"clothes_hanger\"", "\"matchedBy\":\"옷걸이\"", "\"regionalPolicy\""]
   },
   {
+    "id": "standing_clothes_hanger_no_general_hanger_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스탠드형 행거는 그냥 옷걸이처럼 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["스탠드형 행거", "대형폐기물", "작은 세탁소 옷걸이나 단품 옷걸이는 별도", "일반 옷걸이처럼 고철류나 플라스틱류에 통째로 넣지 않습니다", "수수료와 배출일은 지자체별로 확인"],
+    "expectedTextExcludes": ["## 옷걸이", "서울 강남구 대형생활폐기물 수수료 후보"],
+    "expectedStructuredIncludes": ["\"id\":\"standing_clothes_hanger\"", "\"matchedBy\":\"스탠드형 행거\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\""],
+    "expectedStructuredExcludes": ["\"id\":\"clothes_hanger\"", "\"bulkyWasteFees\""]
+  },
+  {
     "id": "sponge_scrubber_general_no_region_noise",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -1285,6 +1297,28 @@
     "expectedStructuredExcludes": ["\"id\":\"cup_noodle_container\""]
   },
   {
+    "id": "paper_cup_noodle_clean_paper_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이 컵라면 용기는 깨끗하면 종이류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["컵라면 용기", "종이 컵라면 용기는 깨끗한 경우 기타 종이류", "국물·기름 오염이 남으면 일반쓰레기", "플라스틱 컵이나 카페 일회용컵까지 넓혀 적용하지 않습니다", "생활폐기물 분리배출 누리집 품목사전 - 종이 컵라면"],
+    "expectedStructuredIncludes": ["\"id\":\"cup_noodle_container\"", "\"matchedBy\":\"종이 컵라면\"", "\"status\":\"verified\""],
+    "expectedStructuredExcludes": ["\"id\":\"paper_cup\"", "\"id\":\"plastic_cup\""]
+  },
+  {
+    "id": "styrofoam_cup_noodle_dirty_general_condition",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스티로폼 컵라면 용기에 국물 묻었는데 재활용 돼?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["컵라면 용기", "발포/스티로폼 용기는 깨끗한 경우 발포합성수지 기준", "오염이 남거나 재질 구분이 어려우면 일반쓰레기", "오염된 스티로폼과 종이 용기는 재활용이 어렵습니다"],
+    "expectedStructuredIncludes": ["\"id\":\"cup_noodle_container\"", "\"matchedBy\":\"스티로폼 컵라면\"", "\"status\":\"verified\""],
+    "expectedStructuredExcludes": ["\"id\":\"styrofoam\""]
+  },
+  {
     "id": "meat_absorbent_pad_general_no_ice_pack",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -1571,20 +1605,33 @@
       "itemName": "스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["스프레이캔", "내용물을 완전히", "금속캔 수거함", "임의로 뚫지", "서울 강남구 공식 출처"],
-    "expectedStructuredIncludes": ["\"id\":\"spray_can\"", "\"matchedBy\":\"스프레이캔\"", "\"regionalPolicy\""],
+    "expectedTextIncludes": ["스프레이캔", "내용물을 완전히", "금속캔 수거함", "찌그러졌더라도", "노즐이 막혔거나", "캔류로 단정하지", "생활계 유해폐기물 전용수거함", "임의로 뚫지", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"spray_can\"", "\"matchedBy\":\"스프레이캔\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""],
     "expectedStructuredExcludes": ["\"id\":\"can\""]
   },
   {
-    "id": "unknown_vinyl_floor_no_vinyl_bag_match",
+    "id": "vinyl_flooring_no_vinyl_bag_match",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "비닐장판은 비닐류로 버려?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
-    "expectedTextExcludes": ["비닐류 포장재", "서울 강남구 공식 출처"],
-    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"비닐장판은 비닐류로 버려?\""]
+    "expectedTextIncludes": ["비닐장판", "PVC 계열 바닥재", "종량제봉투", "대형폐기물", "비닐류 수거함에 넣지 않습니다"],
+    "expectedTextExcludes": ["## 비닐류 포장재"],
+    "expectedStructuredIncludes": ["\"id\":\"vinyl_flooring\"", "\"matchedBy\":\"비닐장판\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\""],
+    "expectedStructuredExcludes": ["\"id\":\"snack_bag\""]
+  },
+  {
+    "id": "vinyl_medicine_bag_no_medicine_overmatch",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비닐약봉지는 폐의약품 수거함이야 비닐류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["비닐류 포장재", "비닐약봉지", "남은 약", "약 자체는 폐의약품 기준으로 따로 배출", "비닐류"],
+    "expectedTextExcludes": ["## 폐의약품", "## 알약 포장재"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐약봉지\"", "\"region\":\"서울 강남구\""],
+    "expectedStructuredExcludes": ["\"id\":\"medicine\"", "\"id\":\"pill_blister_packaging\""]
   },
   {
     "id": "yakgwa_packaging_no_medicine_short_alias",
@@ -1617,9 +1664,9 @@
       "itemName": "캔버스 액자는 캔류야?",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["초기 데이터에서 확실히 찾지 못했습니다", "재질, 오염 여부, 크기, 지역 정보"],
-    "expectedTextExcludes": ["음료캔"],
-    "expectedStructuredIncludes": ["\"found\":false", "\"itemName\":\"캔버스 액자는 캔류야?\""],
+    "expectedTextIncludes": ["캔버스 액자", "천, 나무틀", "유리판", "종량제봉투", "대형폐기물"],
+    "expectedTextExcludes": ["## 음료캔", "금속캔 수거함"],
+    "expectedStructuredIncludes": ["\"id\":\"canvas_frame\"", "\"matchedBy\":\"캔버스 액자\"", "\"region\":\"서울 강남구\"", "\"status\":\"region_review_needed\""],
     "expectedStructuredExcludes": ["\"id\":\"can\""]
   },
   {
@@ -1750,6 +1797,28 @@
     "expectedStructuredIncludes": ["\"id\":\"flower_pot\"", "\"matchedBy\":\"대형 화분\"", "\"region\":\"서울 서초구\"", "\"bulkyWasteFees\""]
   },
   {
+    "id": "mapo_drying_rack_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마포구 빨래건조대 버릴 때 수수료 얼마야?",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": ["서울 마포구 대형생활폐기물 수수료 후보", "빨래건조대 -: 1,000원", "신청 URL", "수수료 출처"],
+    "expectedTextExcludes": ["서울 강남구 대형생활폐기물 수수료 후보", "서울 서초구 대형생활폐기물 수수료 후보"],
+    "expectedStructuredIncludes": ["\"id\":\"drying_rack\"", "\"matchedBy\":\"빨래건조대\"", "\"region\":\"서울 마포구\"", "\"bulkyWasteFees\"", "\"feeKrw\":1000"]
+  },
+  {
+    "id": "mapo_flower_pot_fee_coverage",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마포구 화분 50cm 넘으면 수수료 얼마야?",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": ["서울 마포구 대형생활폐기물 수수료 후보", "화분 50cm 이상(흙, 화초 제외): 1,500원", "화분 50cm 미만(흙, 화초 제외): 1,000원", "신청 URL"],
+    "expectedTextExcludes": ["서울 강남구 대형생활폐기물 수수료 후보", "서울 서초구 대형생활폐기물 수수료 후보"],
+    "expectedStructuredIncludes": ["\"id\":\"flower_pot\"", "\"matchedBy\":\"화분\"", "\"region\":\"서울 마포구\"", "\"bulkyWasteFees\"", "\"feeKrw\":1500"]
+  },
+  {
     "id": "songpa_toy_fee_coverage",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -1800,15 +1869,26 @@
     "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 송파구\"", "\"item\":\"티백\"", "\"itemGuide\"", "1회용 티백"]
   },
   {
+    "id": "gangnam_officetel_vinyl_building_type_guard",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?"
+    },
+    "expectedTextIncludes": ["서울 강남구 지역 확인 안내", "품목: 비닐류 포장재", "단독주택·빌라·소규모 상가 기준", "확인할 정보"],
+    "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준"],
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"비닐류 포장재\"", "강남구 단독주택·빌라·소규모 상가 기준"]
+  },
+  {
     "id": "region_info_unknown_battery_collection",
     "tool": "get_region_disposal_info",
     "arguments": {
       "region": "부산 해운대구",
       "itemName": "폐건전지 수거함 위치 알려줘"
     },
-    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "품목별 전용 수거함 위치", "거주 지자체 청소/자원순환/환경 부서"],
-    "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처"],
+    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "품목별 전용 수거함 위치", "생활계 유해폐기물 수거 장소", "거주 지자체 청소/자원순환/환경 부서"],
+    "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소"],
     "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
-    "expectedStructuredExcludes": ["\"matchedRegion\":\"서울 강남구\""]
+    "expectedStructuredExcludes": ["\"matchedRegion\""]
   }
 ]

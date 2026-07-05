@@ -167,5 +167,85 @@
     "expectedRegionId": "songpa_gu",
     "expectedItemId": "tea_bag",
     "expectedGuideContains": "1회용 티백"
+  },
+  {
+    "region": "서울 마포구",
+    "query": "투명 페트병",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "pet_bottle",
+    "expectedGuideContains": "수요일에 별도 배출"
+  },
+  {
+    "region": "마포구",
+    "query": "종이컵",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "paper_cup",
+    "expectedGuideContains": "일·월·화·목요일"
+  },
+  {
+    "region": "서울시 마포구",
+    "query": "폐건전지",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "battery",
+    "expectedGuideContains": "수거함 배치 현황"
+  },
+  {
+    "region": "mapo-gu",
+    "query": "옥수수대",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "corn_cob_husk",
+    "expectedGuideContains": "옥수수 껍질과 옥수수대"
+  },
+  {
+    "region": "서울 마포구",
+    "query": "빨래건조대 수수료",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "drying_rack",
+    "expectedGuideContains": "수수료 납부",
+    "expectedFeeKrw": 1000
+  },
+  {
+    "region": "서울 마포구",
+    "query": "화분 50cm 이상 수수료",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "flower_pot",
+    "expectedGuideContains": "수수료 납부",
+    "expectedFeeKrw": 1500
+  },
+  {
+    "region": "서울 마포구",
+    "query": "화분 50cm 미만 수수료",
+    "expectedRegionId": "mapo_gu",
+    "expectedItemId": "flower_pot",
+    "expectedGuideContains": "수수료 납부",
+    "expectedFeeKrw": 1000
+  },
+  {
+    "region": "경기도 성남시",
+    "query": "투명 페트병",
+    "expectedRegionId": "seongnam_si",
+    "expectedItemId": "pet_bottle",
+    "expectedGuideContains": "투명페트병 전용수거함"
+  },
+  {
+    "region": "판교",
+    "query": "폐건전지",
+    "expectedRegionId": "seongnam_si",
+    "expectedItemId": "battery",
+    "expectedGuideContains": "동 행정복지센터, 학교"
+  },
+  {
+    "region": "성남시",
+    "query": "양파껍질",
+    "expectedRegionId": "seongnam_si",
+    "expectedItemId": "onion_peel",
+    "expectedGuideContains": "양파·마늘·옥수수껍질"
+  },
+  {
+    "region": "성남시 분당구 판교동",
+    "query": "의자",
+    "expectedRegionId": "seongnam_si",
+    "expectedItemId": "chair",
+    "expectedGuideContains": "전화 또는 인터넷, 모바일"
   }
 ]

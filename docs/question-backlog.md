@@ -80,7 +80,7 @@ Top 50과 1차 사용자 질문 확장 품목을 처리한 뒤, 다음 데이터
 
 현재 상태:
 
-- 전체 110개 중 `covered` 97개, `todo` 13개
+- 전체 110개 중 `covered` 108개, `todo` 2개
 - 2026-07-01 처리 완료: 매니큐어, 향수병, 수은 체온계, 살충제 통, 소화기, 가스 남은 라이터, 부푼 보조배터리, 일회용 면도기, 티백, 시든 꽃, 향초, 콘택트렌즈, CD/DVD, 옷걸이, 수세미, 일회용 숟가락·포크, 실리콘 주걱, 청소기 먼지, 젤 아이스팩 수거함 위치 답변 정책, 큰 리빙박스·플라스틱 수납함, 강아지 배변패드, 요가매트 과매칭 방지, 깨진 보조배터리, 깨진 도자기 화분, 깨진 LED 전구, 누출된 프린터 토너 카트리지, 배터리 내장 일회용 전자담배, 종이호일, 고체 방향제, 귤껍질, 핫팩, 실리카겔 방습제, 액정보호필름, 부직포 장바구니
 - 2026-07-01 추가 처리 완료: 세탁 보풀, 비누 조각, 곰팡이 핀 빵, 고추장 묻은 배달 플라스틱 용기, 물티슈 포장 캡, 드립백 커피 필터
 - 2026-07-01 신규 자동 백로그화: `logs/quality-seed-queries.example.jsonl`에서 실제형 질문 18개를 `todo`로 추가
@@ -110,57 +110,34 @@ Top 50과 1차 사용자 질문 확장 품목을 처리한 뒤, 다음 데이터
 - 2026-07-02 answer smoke 회귀셋 위생 QA: 172개 기준 중복 id와 동일 tool/input 중복 없음. 최근 보강 축은 stale 기대값 없이 통과했고, 약한 text-only `pizza_box_oily_general` smoke만 공식 피자박스 근거와 structured 기대값으로 보강. 새 smoke 추가와 backlog status 변경은 없음
 - 2026-07-02 `needs_source` 7개 보수 안내 smoke 감사: `vacuum_dust`, `laundry_lint`, `soap_bar_piece`, `cotton_swab`, `solvent_contaminated_rag`, `pet_waste_tissue`, `paint_palette` 모두 기존 answer smoke로 방어됨을 확인. 상대적으로 약한 `cotton_swab`, `pet_waste_tissue` smoke에는 단독 근거 부재와 `needs_source` structured 기대값을 보강. 새 smoke 추가와 backlog status 변경은 없음
 - 2026-07-02 `medicine` source 보강 답변 smoke 동기화: 기존 `gangnam_medicine_collection` smoke에 알약·물약·한약·연고 직접 근거, 폐의약품 전용수거함, 우체통 배출 불가, `region_review_needed` 기대값을 보강. `빈 약통`·`알약 포장재` 분리 답변은 기존 smoke로 충분해 새 smoke 추가와 backlog status 변경은 없음
+- 2026-07-03 남은 todo 기존 데이터·smoke 정리: 7개(`약과`, `랩탑`, `젖은 택배상자`, `냉동식품 포장 비닐봉지`, `서초구 투명 페트병`, `플라스틱 약병`, `송파구 거울 수수료`)를 기존 데이터와 MCP answer smoke 기준으로 `covered` 전환. `spray_can` 관련 항목과 당시 데이터 결정 보류 항목은 유지했고, 새 smoke 추가는 없음
+- 2026-07-03 `spray_can` source 보강 동기화: 기존 `gangnam_dented_spray_can_empty_safe` smoke에 찌그러짐, 노즐 불확실, 캔류 단정 방지, 생활계 유해폐기물 전용수거함 기대값을 보강하고 `스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?` todo를 `covered`로 전환. 새 smoke 추가는 없음
+- 2026-07-03 `기름 묻은 피자박스` todo 정리: 기존 `oily_pizza_box_prefers_specific_item`, `pizza_box_oily_general` smoke가 폐식용유 과매칭 방지와 깨끗한 부분/오염 부분 분기를 충분히 고정해 `auto_177776ff7e`를 `covered`로 전환. 새 smoke 추가/보강은 없음
+- 2026-07-03 데이터 결정 보류 todo 과매칭 guard 감사: `캔버스 액자`, `비닐장판`은 당시 매칭 후보가 없어 status를 유지하고, 기존 smoke 기대값만 금속캔류/비닐류 포장재 structured 과매칭 방어 중심으로 보강
+- 2026-07-03 지역·건물유형 guard 감사: `부산 해운대구 폐건전지`는 미지원 지역에서 주소를 지어내지 않도록 기존 smoke를 보강하고, `강남구 오피스텔 비닐봉지`는 단독주택·빌라·소규모 상가 기준을 오피스텔에 확정 적용하지 않도록 직접 smoke를 추가. 두 항목 모두 status는 유지
+- 2026-07-03 마포구 수수료 2차 answer smoke 동기화: `drying_rack`, `flower_pot` 마포구 대형생활폐기물 수수료가 MCP 답변에 노출되는지 `mapo_drying_rack_fee_coverage`, `mapo_flower_pot_fee_coverage`로 고정. 새 backlog/status 변경은 없음
+- 2026-07-05 Source 반영 answer smoke 동기화: `비닐약봉지`는 `snack_bag` 별칭으로 약 자체/알약 포장재와 분리하고, `비닐장판`, `캔버스 액자`, `스탠드형 행거`, `cup_noodle_container` 조건 답변을 MCP answer smoke로 고정. `비닐장판`, `캔버스 액자` todo는 Source 승격과 smoke 보강 기준으로 `covered` 전환
 
 남은 백로그 방향:
 
-- 우선순위 high: 3개(`약과` 과매칭, 찌그러진 스프레이캔, 부산 해운대구 폐건전지 지역)
-- 우선순위 medium: 10개(랩탑, 캔버스 액자, 기름 묻은 피자박스, 비닐장판, 젖은 택배상자, 냉동식품 비닐봉지, 서초구 페트병, 강남구 오피스텔 비닐봉지, 약병 표현, 송파구 거울 수수료)
+- 우선순위 high: 1개(부산 해운대구 폐건전지 지역)
+- 우선순위 medium: 1개(강남구 오피스텔 비닐봉지)
 - 다음 데이터 보강 후보는 새 `todo` 항목과 `needs_source` 항목 재검수에서 선별한다.
 
-### Todo 13개 현재 분류
+### Todo 2개 현재 분류
 
-새 데이터 승격으로 `빈 약통`, `알약 포장재`, `공유기`, `휴대용 선풍기`는 `covered`로 전환했다. 남은 13개 분류는 다음과 같다.
+새 데이터 승격과 smoke 동기화 정리로 `빈 약통`, `알약 포장재`, `공유기`, `휴대용 선풍기`, `약과`, `랩탑`, `젖은 택배상자`, `냉동식품 포장 비닐봉지`, `서초구 투명 페트병`, `플라스틱 약병`, `송파구 거울 수수료`, `찌그러진 스프레이캔`, `기름 묻은 피자박스`, `비닐장판`, `캔버스 액자`는 `covered`로 전환했다. 남은 2개 분류는 다음과 같다.
 
-- 공식 근거/데이터 모델링 필요: 1개
-  - 비닐장판은 비닐류로 버려?
 - 지역 데이터 필요: 2개
   - 부산 해운대구 폐건전지 수거함 위치 알려줘
   - 강남구 오피스텔은 비닐봉지 목요일 배출 맞아?
-- 매칭 방어/오답 방지 smoke 고정 완료, covered 전환 보류: 4개
-  - 약과 포장지는 폐의약품 수거함에 넣어? (`yakgwa_packaging_no_medicine_short_alias`)
-  - 랩탑은 소형가전으로 버리면 돼? (`laptop_no_plastic_wrap_short_alias`)
-  - 캔버스 액자는 캔류야? (`canvas_frame_no_can_short_alias`)
-  - 기름 조금 묻은 피자박스 깨끗한 부분만 종이로 가능해? (`oily_pizza_box_prefers_specific_item`)
-- 기존 데이터로 smoke 고정 완료, covered 전환 보류: 4개
-  - 젖은 택배상자는 말리면 종이류야?
-  - 스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?
-  - 냉동식품 포장 비닐봉지에 성에랑 음식물 묻었는데 비닐류야?
-  - 서초구에서 투명 페트병은 목요일에 내놓는 거야?
-- seed-backlog 신규 후보, 기존 데이터로 smoke 고정 완료, covered 전환 보류: 2개
-  - 약 다 먹은 플라스틱 약병은 플라스틱으로 버려? (`empty_medicine_bottle_plastic_medicine_bottle_alias`)
-  - 송파구 거울 버릴 때 수수료 얼마야? (`songpa_mirror_fee_question_short_alias`)
 
-### Todo 13개 Smoke Coverage Index
+### Todo 2개 Smoke Coverage Index
 
-이번 인덱스는 추적성 메모이며 `src/data/question-backlog.json`의 status는 변경하지 않는다.
+이 인덱스는 현재 남은 `todo` 2개의 smoke coverage 추적성 메모다.
 
-- 공식 근거/데이터 모델링 필요
-  - 비닐장판은 비닐류로 버려? (`unknown_vinyl_floor_no_vinyl_bag_match`)
 - 지역 데이터 필요
   - 부산 해운대구 폐건전지 수거함 위치 알려줘 (`region_info_unknown_battery_collection`)
-  - 강남구 오피스텔은 비닐봉지 목요일 배출 맞아? 직접 smoke 없음. 관련 기본 비닐/강남 요일 smoke는 `gangnam_parcel_plastic_bag_thursday`, `gangnam_food_contaminated_vinyl_region_phrase`; 건물 유형 기준은 기존 open decision 유지
-- 매칭 방어/오답 방지
-  - 약과 포장지는 폐의약품 수거함에 넣어? (`yakgwa_packaging_no_medicine_short_alias`)
-  - 랩탑은 소형가전으로 버리면 돼? (`laptop_no_plastic_wrap_short_alias`)
-  - 캔버스 액자는 캔류야? (`canvas_frame_no_can_short_alias`)
-  - 기름 조금 묻은 피자박스 깨끗한 부분만 종이로 가능해? (`oily_pizza_box_prefers_specific_item`)
-- 기존 데이터 smoke
-  - 젖은 택배상자는 말리면 종이류야? (`damp_delivery_box_condition_no_region_noise`)
-  - 스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야? (`gangnam_dented_spray_can_empty_safe`)
-  - 냉동식품 포장 비닐봉지에 성에랑 음식물 묻었는데 비닐류야? (`gangnam_frozen_food_vinyl_contamination`)
-  - 서초구에서 투명 페트병은 목요일에 내놓는 거야? (`seocho_pet_bottle_explicit_thursday_known_region`)
-- seed-backlog 신규 후보
-  - 약 다 먹은 플라스틱 약병은 플라스틱으로 버려? (`empty_medicine_bottle_plastic_medicine_bottle_alias`)
-  - 송파구 거울 버릴 때 수수료 얼마야? (`songpa_mirror_fee_question_short_alias`)
+  - 강남구 오피스텔은 비닐봉지 목요일 배출 맞아? (`gangnam_officetel_vinyl_building_type_guard`); 관련 기본 비닐/강남 요일 smoke는 `gangnam_parcel_plastic_bag_thursday`, `gangnam_food_contaminated_vinyl_region_phrase`; 2026-07-05 결정에 따라 오피스텔 전용 모델링 없이 보수 안내 유지
 
 우선순위는 안전 리스크가 큰 품목을 `high`로 두고, 생활 빈출이지만 공식 근거 확인이 필요한 품목은 `medium`, 제품 범위 확장 성격이 강한 품목은 `low`로 둔다. 현재 high-priority 신규 위험 품목 8개, 음식물·식물 오인 2개, 복합재질 생활용품 8개는 데이터와 MCP 답변 회귀 케이스까지 승격했다.
