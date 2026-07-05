@@ -15,7 +15,8 @@
 - 한 세션은 자기 트랙의 primary files만 주도적으로 수정한다.
 - 공유 파일은 변경 전후로 조율 세션에서 확인한다.
 - `src/data/mcp-answer-cases.json`, `src/data/question-backlog.json`, `docs/question-backlog.md`는 여러 트랙이 만질 수 있으므로, 변경 이유와 카운트를 최종 답변에 반드시 남긴다.
-- 애매한 데이터셋 모델링 결정은 즉시 사용자에게 묻지 않고 `docs/data-decision-backlog.md`의 `Open Decisions`에 쌓는다. 열린 결정이 10건 이상이면 조율 세션에서 사용자에게 묶어서 확인한다.
+- 크리티컬한 사용자 결정만 즉시 묻는다. 크리티컬 기준은 원격 push/PR/배포, 큰 리팩터링, 위험한 삭제, 보안/개인정보/운영 영향, 제품 범위·데이터 모델의 큰 변경, 또는 합리적인 기본값 없이 다음 작업이 막히는 경우다.
+- 시급도가 낮거나 진행을 막지 않는 데이터셋 모델링 결정은 즉시 사용자에게 묻지 않고 `docs/data-decision-backlog.md`의 `Open Decisions`에 출처/후보/추천안과 함께 쌓는다. 열린 결정이 10건 이상이면 조율 세션에서 사용자에게 묶어서 확인한다.
 - `src/server.ts`, `src/data.ts`, `scripts/*.mjs`는 동작 변경이므로 다른 세션의 데이터 작업 중에는 최소 범위만 수정한다.
 - 지역 데이터가 늘어난 뒤에는 unknown-region 기준 smoke 케이스가 실제 지역 기준과 충돌할 수 있으므로 Answer Quality 트랙에서 기대값을 재확인한다.
 - 품목 데이터가 늘어난 뒤에는 Source Gap 트랙이 `source-coverage.md` 카운트, Answer Quality 트랙이 매칭/과매칭 회귀를 확인한다.
