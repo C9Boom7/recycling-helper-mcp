@@ -38,7 +38,7 @@ const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join("
   .split(",")
   .map((host) => host.trim())
   .filter(Boolean);
-const DEFAULT_ALLOWED_ORIGINS = ["https://playmcp.kakaocloud.io"];
+const DEFAULT_ALLOWED_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? DEFAULT_ALLOWED_ORIGINS.join(","))
   .split(",")
   .map((origin) => origin.trim())
