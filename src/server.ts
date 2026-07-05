@@ -277,6 +277,17 @@ function textResult(text: string, structuredContent?: ToolResult): CallToolResul
   };
 }
 
+function briefSourceLabel(item: WasteItem): string {
+  const source = item.sources[0];
+  if (source) {
+    const basis = source.basis ? ` - ${source.basis}` : "";
+    const url = source.url ? ` (${source.url})` : "";
+    return `${source.title}${basis}${url}`;
+  }
+
+  return item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
+}
+
 function unknownItemResult(itemName: string): CallToolResult {
   const candidates = findWasteItems(itemName, 3).map((match) => match.item.name);
   const candidateText = candidates.length > 0 ? `\n\n비슷한 후보: ${candidates.join(", ")}` : "";
@@ -378,6 +389,7 @@ function registerTools(server: McpServer): void {
         `- 결론: ${item.summary}`,
         `- 확신도: ${confidenceLabel(item.confidence)}`,
         `- 지역 영향: ${itemRegionCheckLabel(item)}`,
+        `- 대표 근거: ${briefSourceLabel(item)}`,
         itemNeedsCriticalRegionCheck(item)
           ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
           : itemNeedsRegionCheck(item)
@@ -472,6 +484,7 @@ function registerTools(server: McpServer): void {
           `   - 결론: ${match.item.summary}`,
           `   - 주의: ${match.item.cautions[0] ?? "지역별 기준을 확인하세요."}`,
           `   - 지역 영향: ${itemRegionCheckLabel(match.item)}`,
+          `   - 대표 근거: ${briefSourceLabel(match.item)}`,
           `   - 확신도: ${confidenceLabel(match.item.confidence)}`,
         ]),
       ];
@@ -535,6 +548,8 @@ function registerTools(server: McpServer): void {
           needsRegionCheck: itemNeedsRegionCheck(match.item),
           regionCheckLevel: itemRegionCheckLabel(match.item),
           conditions: match.item.conditions,
+          sourceRefs: itemSourceRefs(match.item),
+          sources: match.item.sources,
         };
       });
 
@@ -551,10 +566,13 @@ function registerTools(server: McpServer): void {
         "",
         ...Array.from(groups.entries()).flatMap(([group, entries]) => [
           `## ${group}`,
-          ...entries.map((entry) => {
+          ...entries.flatMap((entry) => {
             const label = entry.found ? `${entry.input} -> ${entry.itemName}` : entry.input;
             const regionImpact = entry.found ? ` (지역 영향: ${entry.regionCheckLevel})` : "";
-            return `- ${label}: ${entry.summary}${regionImpact}`;
+            return [
+              `- ${label}: ${entry.summary}${regionImpact}`,
+              entry.found ? `  - 대표 근거: ${entry.sourceRefs[0] ?? "재활용척척 보수 안내 정책"}` : undefined,
+            ].filter((line): line is string => line !== undefined);
           }),
           "",
         ]),
@@ -615,6 +633,9 @@ function registerTools(server: McpServer): void {
         "",
         "확인할 정보",
         ...checkList.map((item, index) => `${index + 1}. ${item}`),
+        match ? "" : undefined,
+        match ? "품목 판단 근거" : undefined,
+        match ? `- ${briefSourceLabel(match.item)}` : undefined,
         "",
         "공식 확인처",
         ...(regionMatch

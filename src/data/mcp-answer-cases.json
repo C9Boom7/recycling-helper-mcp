@@ -1952,7 +1952,7 @@
       "region": "부산 해운대구",
       "itemName": "폐건전지 수거함 위치 알려줘"
     },
-    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "전용 수거함 위치", "지정 수거처", "배출 가능 시간", "거주 지자체 청소/자원순환/환경 부서"],
+    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "전용 수거함 위치", "지정 수거처", "배출 가능 시간", "품목 판단 근거", "거주 지자체 청소/자원순환/환경 부서"],
     "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소", "대형폐기물 신고 페이지와 수수료"],
     "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
     "expectedStructuredExcludes": ["\"matchedRegion\""]
@@ -1964,7 +1964,7 @@
       "itemName": "우산",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["분류 결과: 우산", "지역 영향: 참고", "기본 판단은 가능"],
+    "expectedTextIncludes": ["분류 결과: 우산", "지역 영향: 참고", "대표 근거", "기본 판단은 가능"],
     "expectedTextExcludes": ["지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
     "expectedStructuredIncludes": ["\"matchedItem\":\"우산\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\""]
   },
@@ -1975,7 +1975,7 @@
       "itemName": "폐건전지",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["분류 결과: 건전지", "지역 영향: 필수", "지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
+    "expectedTextIncludes": ["분류 결과: 건전지", "지역 영향: 필수", "대표 근거", "지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
     "expectedStructuredIncludes": ["\"matchedItem\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\""]
   },
   {
@@ -1985,7 +1985,7 @@
       "itemName": "칫솔",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": ["분류 결과: 칫솔", "지역 영향: 낮음"],
+    "expectedTextIncludes": ["분류 결과: 칫솔", "지역 영향: 낮음", "대표 근거"],
     "expectedTextExcludes": ["입력 지역: 서울 강남구", "기본 판단은 가능", "지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
     "expectedStructuredIncludes": ["\"matchedItem\":\"칫솔\"", "\"needsRegionCheck\":false", "\"regionCheckLevel\":\"낮음\""]
   },
@@ -1995,7 +1995,7 @@
     "arguments": {
       "itemName": "비닐봉지"
     },
-    "expectedTextIncludes": ["헷갈림 체크", "비닐류 포장재", "지역 영향: 참고"],
+    "expectedTextIncludes": ["헷갈림 체크", "비닐류 포장재", "지역 영향: 참고", "대표 근거"],
     "expectedTextExcludes": ["지역 영향: 필수"],
     "expectedStructuredIncludes": ["\"itemName\":\"비닐류 포장재\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\""]
   },
@@ -2005,7 +2005,7 @@
     "arguments": {
       "itemName": "폐건전지"
     },
-    "expectedTextIncludes": ["헷갈림 체크", "건전지", "지역 영향: 필수"],
+    "expectedTextIncludes": ["헷갈림 체크", "건전지", "지역 영향: 필수", "대표 근거"],
     "expectedStructuredIncludes": ["\"itemName\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\""]
   },
   {
@@ -2021,6 +2021,7 @@
       "우산 -> 우산",
       "폐건전지 -> 건전지",
       "칫솔 -> 칫솔",
+      "대표 근거",
       "(지역 영향: 참고)",
       "(지역 영향: 필수)",
       "(지역 영향: 낮음)",
@@ -2054,6 +2055,7 @@
       "우산 -> 우산",
       "비닐봉지 -> 비닐류 포장재",
       "칫솔 -> 칫솔",
+      "대표 근거",
       "(지역 영향: 참고)",
       "(지역 영향: 낮음)",
       "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
