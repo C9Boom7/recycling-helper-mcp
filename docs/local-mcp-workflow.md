@@ -40,7 +40,7 @@ pnpm smoke:mcp
 확인하는 대표 회귀 포인트:
 
 - `/health`의 품목 수가 `src/data/waste-items.json`의 품목 수와 일치하는지
-- `tools/list`가 5개 도구를 반환하는지
+- `tools/list`가 5개 도구를 반환하고 각 도구의 `description`, `inputSchema`, PlayMCP 필수 `annotations`를 포함하는지
 - `책상의자 + 서울 강남구` 답변에 대형폐기물 수수료 후보가 포함되는지
 - `깨진 유리컵 + 서울 강남구` 답변에 PP봉투 안내가 포함되는지
 - `닭뼈 + 서울 강남구` 답변에 음식물쓰레기 제외 안내가 포함되는지

@@ -7,6 +7,20 @@ const HOST = "127.0.0.1";
 const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
 const PLAYMCP_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
 const STARTUP_TIMEOUT_MS = 15_000;
+const EXPECTED_TOOL_NAMES = [
+  "check_confusing_item",
+  "classify_waste_item",
+  "get_disposal_steps",
+  "get_region_disposal_info",
+  "make_cleanup_plan",
+];
+const REQUIRED_TOOL_ANNOTATION_FIELDS = [
+  "title",
+  "readOnlyHint",
+  "destructiveHint",
+  "openWorldHint",
+  "idempotentHint",
+];
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
 const wasteItemsPath = new URL("../dist/data/waste-items.json", import.meta.url);
 const answerCases = JSON.parse(readFileSync(answerCasesPath, "utf8"));
@@ -16,6 +30,10 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 async function getFreePort() {
@@ -227,6 +245,42 @@ async function callTool(baseUrl, name, args, id) {
   );
 }
 
+function assertToolMetadata(tool, context) {
+  assert(typeof tool.name === "string" && tool.name.length > 0, `${context} tool was missing name`);
+  assert(EXPECTED_TOOL_NAMES.includes(tool.name), `${context} returned unexpected tool ${tool.name}`);
+  assert(
+    typeof tool.description === "string" && tool.description.trim().length > 0,
+    `${context} ${tool.name} was missing description`,
+  );
+  assert(isPlainObject(tool.inputSchema), `${context} ${tool.name} was missing inputSchema`);
+  assert(tool.inputSchema.type === "object", `${context} ${tool.name} inputSchema.type must be object`);
+  assert(isPlainObject(tool.inputSchema.properties), `${context} ${tool.name} inputSchema.properties must be an object`);
+  assert(isPlainObject(tool.annotations), `${context} ${tool.name} was missing annotations`);
+
+  for (const field of REQUIRED_TOOL_ANNOTATION_FIELDS) {
+    assert(field in tool.annotations, `${context} ${tool.name} annotations.${field} was missing`);
+  }
+
+  assert(
+    typeof tool.annotations.title === "string" && tool.annotations.title.trim().length > 0,
+    `${context} ${tool.name} annotations.title must be a non-empty string`,
+  );
+  for (const field of REQUIRED_TOOL_ANNOTATION_FIELDS.filter((entry) => entry !== "title")) {
+    assert(typeof tool.annotations[field] === "boolean", `${context} ${tool.name} annotations.${field} must be boolean`);
+  }
+}
+
+function assertToolList(toolList, context) {
+  assert(Array.isArray(toolList.tools), `${context} tools/list result did not include tools array`);
+  const toolNames = toolList.tools.map((tool) => tool.name).sort();
+  assert(toolNames.length === EXPECTED_TOOL_NAMES.length, `${context} expected ${EXPECTED_TOOL_NAMES.length} tools, got ${toolNames.length}`);
+  assert(toolNames.join(",") === EXPECTED_TOOL_NAMES.join(","), `${context} returned a different tool list`);
+  for (const tool of toolList.tools) {
+    assertToolMetadata(tool, context);
+  }
+  return toolNames;
+}
+
 function resultText(result) {
   return result.content?.find((entry) => entry.type === "text")?.text ?? "";
 }
@@ -303,56 +357,29 @@ async function runSmoke() {
     assert(health.items === wasteItems.length, `Expected ${wasteItems.length} waste items, got ${health.items}`);
 
     const toolsList = await mcpRequest(baseUrl, "tools/list", {}, 1);
-    const toolNames = toolsList.tools.map((tool) => tool.name).sort();
-    assert(toolNames.length === 5, `Expected 5 tools, got ${toolNames.length}`);
-    for (const toolName of [
-      "check_confusing_item",
-      "classify_waste_item",
-      "get_disposal_steps",
-      "get_region_disposal_info",
-      "make_cleanup_plan",
-    ]) {
-      assert(toolNames.includes(toolName), `Missing tool ${toolName}`);
-    }
+    assertToolList(toolsList, "SSE tools/list");
 
     const playMcpToolsList = await mcpRequest(baseUrl, "tools/list", {}, 2, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
-    const playMcpToolNames = playMcpToolsList.tools.map((tool) => tool.name).sort();
-    assert(
-      playMcpToolNames.length === 5,
-      `Expected 5 tools with PlayMCP endpoint host, got ${playMcpToolNames.length}`,
-    );
-    assert(
-      playMcpToolNames.join(",") === toolNames.join(","),
-      "PlayMCP endpoint host returned a different tool list",
-    );
+    assertToolList(playMcpToolsList, "PlayMCP endpoint SSE tools/list");
 
     const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 3, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
-    const jsonOnlyToolNames = jsonOnlyToolsList.tools.map((tool) => tool.name).sort();
-    assert(
-      jsonOnlyToolNames.join(",") === toolNames.join(","),
-      "JSON-only discovery returned a different tool list",
-    );
+    assertToolList(jsonOnlyToolsList, "JSON-only tools/list");
 
     const getDiscovery = await mcpGetDiscovery(baseUrl, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
-    const getDiscoveryToolNames = getDiscovery.tools.map((tool) => tool.name).sort();
-    assert(
-      getDiscoveryToolNames.join(",") === toolNames.join(","),
-      "GET discovery returned a different tool list",
-    );
+    assertToolList(getDiscovery, "GET discovery");
 
     let requestId = 4;
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
 
       const corsToolsList = await jsonOnlyMcpCorsRequest(baseUrl, "tools/list", {}, requestId, origin);
-      const corsToolNames = corsToolsList.tools.map((tool) => tool.name).sort();
-      assert(corsToolNames.join(",") === toolNames.join(","), `CORS discovery returned a different tool list for ${origin}`);
+      assertToolList(corsToolsList, `CORS JSON-only tools/list for ${origin}`);
       requestId += 1;
     }
     for (const answerCase of answerCases) {
