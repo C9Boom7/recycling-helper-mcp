@@ -1123,7 +1123,11 @@
     "expectedTextIncludes": ["우산", "젖었", "재질별", "일반 종량제봉투", "강남구"],
     "expectedTextExcludes": ["서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"umbrella\"", "\"matchedBy\":\"젖은 우산은 그냥 일반쓰레기야 고철이야\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"frying_pan\"", "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"]
+    "expectedStructuredExcludes": ["\"id\":\"frying_pan\"", "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   },
   {
     "id": "gangnam_broken_umbrella_rib_metal_split",
@@ -1135,7 +1139,11 @@
     "expectedTextIncludes": ["우산", "고철", "분리", "종량제봉투", "강남구"],
     "expectedTextExcludes": ["서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"umbrella\"", "\"matchedBy\":\"부러진 우산살은 고철로 따로 버려도 돼\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"cooking_pot\"", "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"]
+    "expectedStructuredExcludes": ["\"id\":\"cooking_pot\"", "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "minimal"
+    }
   },
   {
     "id": "dish_brush_general_no_plastic_match",

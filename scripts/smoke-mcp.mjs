@@ -235,6 +235,27 @@ function structuredContentText(result) {
   return JSON.stringify(result.structuredContent ?? {});
 }
 
+function assertRegionalPolicyExpectation(result, testCase) {
+  const expectation = testCase.expectedRegionalPolicy;
+  if (!expectation) return;
+
+  const policy = result.structuredContent?.regionalPolicy;
+  assert(policy && typeof policy === "object" && !Array.isArray(policy), `${testCase.id} structuredContent.regionalPolicy was missing`);
+
+  if (expectation.level !== undefined) {
+    assert(
+      policy.regionCheckLevel === expectation.level,
+      `${testCase.id} regionalPolicy.regionCheckLevel expected "${expectation.level}", got "${policy.regionCheckLevel}"`,
+    );
+  }
+
+  if (expectation.shape === "minimal") {
+    for (const field of ["summary", "recycling", "itemGuide", "sources", "bulkyWasteFees"]) {
+      assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for minimal regional policy`);
+    }
+  }
+}
+
 async function runAnswerCase(baseUrl, testCase, id) {
   const result = await callTool(baseUrl, testCase.tool, testCase.arguments, id);
   const text = resultText(result);
@@ -255,6 +276,8 @@ async function runAnswerCase(baseUrl, testCase, id) {
   for (const unexpected of testCase.expectedStructuredExcludes ?? []) {
     assert(!structured.includes(unexpected), `${testCase.id} structuredContent unexpectedly included "${unexpected}"`);
   }
+
+  assertRegionalPolicyExpectation(result, testCase);
 
   return result;
 }

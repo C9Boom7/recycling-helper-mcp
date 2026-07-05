@@ -32,6 +32,8 @@ const mcpToolNames = new Set([
   "make_cleanup_plan",
   "get_region_disposal_info",
 ]);
+const expectedRegionalPolicyLevels = new Set(["필수", "참고", "낮음"]);
+const expectedRegionalPolicyShapes = new Set(["minimal"]);
 
 const errors = [];
 const warnings = [];
@@ -321,12 +323,33 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     }
   }
 
+  if (testCase.expectedRegionalPolicy !== undefined) {
+    if (
+      !testCase.expectedRegionalPolicy ||
+      typeof testCase.expectedRegionalPolicy !== "object" ||
+      Array.isArray(testCase.expectedRegionalPolicy)
+    ) {
+      errors.push(`${prefix}.expectedRegionalPolicy must be an object when present`);
+    } else {
+      const { level, shape } = testCase.expectedRegionalPolicy;
+      if (level !== undefined && !expectedRegionalPolicyLevels.has(level)) {
+        errors.push(`${prefix}.expectedRegionalPolicy.level must be one of ${Array.from(expectedRegionalPolicyLevels).join(", ")}`);
+      }
+      if (shape !== undefined && !expectedRegionalPolicyShapes.has(shape)) {
+        errors.push(`${prefix}.expectedRegionalPolicy.shape must be one of ${Array.from(expectedRegionalPolicyShapes).join(", ")}`);
+      }
+      if (level === undefined && shape === undefined) {
+        errors.push(`${prefix}.expectedRegionalPolicy must include level or shape`);
+      }
+    }
+  }
+
   const hasExpectation = [
     "expectedTextIncludes",
     "expectedTextExcludes",
     "expectedStructuredIncludes",
     "expectedStructuredExcludes",
-  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0);
+  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionalPolicy !== undefined;
   if (!hasExpectation) {
     errors.push(`${prefix} must include at least one expectation`);
   }
