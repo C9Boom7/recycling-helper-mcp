@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -36,6 +36,18 @@ const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join("
   .split(",")
   .map((host) => host.trim())
   .filter(Boolean);
+const DEFAULT_ALLOWED_ORIGINS = ["https://playmcp.kakaocloud.io"];
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? DEFAULT_ALLOWED_ORIGINS.join(","))
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const DEFAULT_CORS_ALLOWED_HEADERS = [
+  "accept",
+  "content-type",
+  "last-event-id",
+  "mcp-protocol-version",
+  "mcp-session-id",
+].join(", ");
 const SERVER_INFO = {
   name: "recycling-helper",
   version: "0.1.0",
@@ -581,6 +593,27 @@ function createServer(): McpServer {
 const app = createMcpExpressApp({
   host: HOST,
   allowedHosts: ALLOWED_HOSTS,
+});
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const origin = req.get("origin");
+  const corsAllowed = origin ? ALLOWED_ORIGINS.includes(origin) : false;
+
+  if (corsAllowed && origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", req.get("access-control-request-headers") ?? DEFAULT_CORS_ALLOWED_HEADERS);
+    res.setHeader("Access-Control-Expose-Headers", "mcp-session-id");
+    res.vary("Origin");
+  }
+
+  if (req.method === "OPTIONS" && origin) {
+    res.status(corsAllowed ? 204 : 403).end();
+    return;
+  }
+
+  next();
 });
 
 app.get("/health", (_req: Request, res: Response) => {

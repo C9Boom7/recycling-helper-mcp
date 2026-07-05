@@ -5,6 +5,7 @@ import { createServer } from "node:net";
 
 const HOST = "127.0.0.1";
 const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
+const PLAYMCP_ORIGIN = "https://playmcp.kakaocloud.io";
 const STARTUP_TIMEOUT_MS = 15_000;
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
 const wasteItemsPath = new URL("../dist/data/waste-items.json", import.meta.url);
@@ -156,6 +157,64 @@ async function mcpGetDiscovery(baseUrl, extraHeaders = {}) {
   return message.result ?? message;
 }
 
+async function mcpCorsPreflight(baseUrl) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "OPTIONS",
+    headers: {
+      Origin: PLAYMCP_ORIGIN,
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type,accept",
+      Host: PLAYMCP_ENDPOINT_HOST,
+    },
+  });
+
+  const body = await response.text();
+  assert(response.status === 204, `MCP CORS preflight returned HTTP ${response.status}:\n${body}`);
+  assert(
+    response.headers.get("access-control-allow-origin") === PLAYMCP_ORIGIN,
+    "MCP CORS preflight did not allow the PlayMCP origin",
+  );
+  assert(
+    response.headers.get("access-control-allow-methods")?.includes("POST"),
+    "MCP CORS preflight did not allow POST",
+  );
+  assert(
+    response.headers.get("access-control-allow-headers")?.includes("content-type"),
+    "MCP CORS preflight did not allow content-type",
+  );
+}
+
+async function jsonOnlyMcpCorsRequest(baseUrl, method, params, id) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Origin: PLAYMCP_ORIGIN,
+      Host: PLAYMCP_ENDPOINT_HOST,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id,
+      method,
+      params,
+    }),
+  });
+
+  const body = await response.text();
+  assert(response.ok, `CORS JSON-only MCP ${method} returned HTTP ${response.status}:\n${body}`);
+  assert(
+    response.headers.get("access-control-allow-origin") === PLAYMCP_ORIGIN,
+    "CORS JSON-only MCP response did not allow the PlayMCP origin",
+  );
+
+  const message = JSON.parse(body);
+  if (message.error) {
+    throw new Error(`CORS JSON-only MCP error: ${JSON.stringify(message.error)}`);
+  }
+  return message.result;
+}
+
 async function callTool(baseUrl, name, args, id) {
   return mcpRequest(
     baseUrl,
@@ -264,7 +323,13 @@ async function runSmoke() {
       "GET discovery returned a different tool list",
     );
 
-    let requestId = 4;
+    await mcpCorsPreflight(baseUrl);
+
+    const corsToolsList = await jsonOnlyMcpCorsRequest(baseUrl, "tools/list", {}, 4);
+    const corsToolNames = corsToolsList.tools.map((tool) => tool.name).sort();
+    assert(corsToolNames.join(",") === toolNames.join(","), "CORS discovery returned a different tool list");
+
+    let requestId = 5;
     for (const answerCase of answerCases) {
       await runAnswerCase(baseUrl, answerCase, requestId);
       requestId += 1;
