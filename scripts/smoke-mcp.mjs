@@ -213,10 +213,7 @@ async function mcpCorsPreflight(baseUrl, origin) {
 
   const body = await response.text();
   assert(response.status === 204, `MCP CORS preflight returned HTTP ${response.status}:\n${body}`);
-  assert(
-    response.headers.get("access-control-allow-origin") === origin,
-    `MCP CORS preflight did not allow the PlayMCP origin ${origin}`,
-  );
+  assertCorsAllowOrigin(response, origin, "MCP CORS preflight");
   assert(
     response.headers.get("access-control-allow-methods")?.includes("POST"),
     "MCP CORS preflight did not allow POST",
@@ -225,6 +222,13 @@ async function mcpCorsPreflight(baseUrl, origin) {
   for (const header of requestedHeaders) {
     assert(allowedHeaders.includes(header), `MCP CORS preflight did not allow ${header}`);
   }
+}
+
+function assertCorsAllowOrigin(response, origin, context) {
+  assert(
+    response.headers.get("access-control-allow-origin") === origin,
+    `${context} did not allow the PlayMCP origin ${origin}`,
+  );
 }
 
 async function jsonOnlyMcpCorsRequest(baseUrl, method, params, id, origin) {
@@ -246,16 +250,34 @@ async function jsonOnlyMcpCorsRequest(baseUrl, method, params, id, origin) {
 
   const body = await response.text();
   assert(response.ok, `CORS JSON-only MCP ${method} returned HTTP ${response.status}:\n${body}`);
-  assert(
-    response.headers.get("access-control-allow-origin") === origin,
-    `CORS JSON-only MCP response did not allow the PlayMCP origin ${origin}`,
-  );
+  assertCorsAllowOrigin(response, origin, `CORS JSON-only MCP ${method}`);
 
   const message = JSON.parse(body);
   if (message.error) {
     throw new Error(`CORS JSON-only MCP error: ${JSON.stringify(message.error)}`);
   }
   return message.result;
+}
+
+async function jsonOnlyMcpCorsNotification(baseUrl, method, params, origin) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Origin: origin,
+      Host: PLAYMCP_ENDPOINT_HOST,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method,
+      params,
+    }),
+  });
+
+  const body = await response.text();
+  assert(response.status === 202, `CORS JSON-only MCP notification ${method} returned HTTP ${response.status}:\n${body}`);
+  assertCorsAllowOrigin(response, origin, `CORS JSON-only MCP notification ${method}`);
 }
 
 async function callTool(baseUrl, name, args, id) {
@@ -448,6 +470,29 @@ async function runSmoke() {
     let requestId = 6;
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
+
+      const corsInitialize = await jsonOnlyMcpCorsRequest(
+        baseUrl,
+        "initialize",
+        {
+          protocolVersion: EXPECTED_PROTOCOL_VERSION,
+          capabilities: {},
+          clientInfo: {
+            name: "recycling-helper-smoke-cors",
+            version: "0.0.0",
+          },
+        },
+        requestId,
+        origin,
+      );
+      assertInitializeResult(corsInitialize, `CORS JSON-only initialize for ${origin}`);
+      requestId += 1;
+
+      const corsPing = await jsonOnlyMcpCorsRequest(baseUrl, "ping", {}, requestId, origin);
+      assert(isPlainObject(corsPing), `CORS JSON-only ping result for ${origin} must be an object`);
+      requestId += 1;
+
+      await jsonOnlyMcpCorsNotification(baseUrl, "notifications/initialized", {}, origin);
 
       const corsToolsList = await jsonOnlyMcpCorsRequest(baseUrl, "tools/list", {}, requestId, origin);
       assertToolList(corsToolsList, `CORS JSON-only tools/list for ${origin}`);
