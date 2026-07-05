@@ -1912,5 +1912,37 @@
     "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소"],
     "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
     "expectedStructuredExcludes": ["\"matchedRegion\""]
+  },
+  {
+    "id": "classify_umbrella_region_advisory",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "우산",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["분류 결과: 우산", "지역 영향: 참고", "기본 판단은 가능"],
+    "expectedTextExcludes": ["지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
+    "expectedStructuredIncludes": ["\"matchedItem\":\"우산\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\""]
+  },
+  {
+    "id": "classify_battery_region_required",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "폐건전지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["분류 결과: 건전지", "지역 영향: 필수", "지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
+    "expectedStructuredIncludes": ["\"matchedItem\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\""]
+  },
+  {
+    "id": "classify_toothbrush_region_low",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "칫솔",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["분류 결과: 칫솔", "지역 영향: 낮음"],
+    "expectedTextExcludes": ["입력 지역: 서울 강남구", "기본 판단은 가능", "지역 기준이 실제 배출 방법을 바꿀 수 있습니다"],
+    "expectedStructuredIncludes": ["\"matchedItem\":\"칫솔\"", "\"needsRegionCheck\":false", "\"regionCheckLevel\":\"낮음\""]
   }
 ]
