@@ -36,8 +36,168 @@ const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join("
   .split(",")
   .map((host) => host.trim())
   .filter(Boolean);
+const SERVER_INFO = {
+  name: "recycling-helper",
+  version: "0.1.0",
+};
+const SERVER_INSTRUCTIONS =
+  "Use RecyclingHelper(재활용척척) tools to answer Korean household waste disposal questions. Prefer concise, source-aware answers. If local rules may differ, say that regional verification is needed.";
+
+type JsonRpcId = string | number | null;
+type JsonRpcBody = {
+  jsonrpc?: unknown;
+  id?: JsonRpcId;
+  method?: string;
+  params?: Record<string, unknown>;
+};
 
 type ToolResult = Record<string, unknown>;
+
+const itemNameSchema = {
+  type: "string",
+  minLength: 1,
+  maxLength: 80,
+  description: "Household waste item name or short description in Korean.",
+};
+const optionalRegionSchema = {
+  type: "string",
+  maxLength: 80,
+  description: "Optional Korean city, district, or neighborhood.",
+};
+const readOnlyToolAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  openWorldHint: false,
+  idempotentHint: true,
+};
+const COMPAT_TOOLS = [
+  {
+    name: "classify_waste_item",
+    title: "Classify Waste Item",
+    description:
+      "Classifies a household waste item with RecyclingHelper(재활용척척), returning the likely disposal category, confidence, and whether local rules should be checked.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        itemName: itemNameSchema,
+        region: optionalRegionSchema,
+      },
+      required: ["itemName"],
+      additionalProperties: false,
+      $schema: "http://json-schema.org/draft-07/schema#",
+    },
+    annotations: {
+      title: "Classify Waste Item",
+      ...readOnlyToolAnnotations,
+    },
+  },
+  {
+    name: "get_disposal_steps",
+    title: "Get Disposal Steps",
+    description:
+      "Returns practical step-by-step disposal instructions from RecyclingHelper(재활용척척), including cautions and source references for a household waste item.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        itemName: itemNameSchema,
+        region: optionalRegionSchema,
+      },
+      required: ["itemName"],
+      additionalProperties: false,
+      $schema: "http://json-schema.org/draft-07/schema#",
+    },
+    annotations: {
+      title: "Get Disposal Steps",
+      ...readOnlyToolAnnotations,
+    },
+  },
+  {
+    name: "check_confusing_item",
+    title: "Check Confusing Item",
+    description:
+      "Checks if a household waste item is commonly confused and explains the exception with RecyclingHelper(재활용척척).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        itemName: {
+          type: "string",
+          minLength: 1,
+          maxLength: 80,
+          description: "Confusing household waste item name or situation in Korean.",
+        },
+      },
+      required: ["itemName"],
+      additionalProperties: false,
+      $schema: "http://json-schema.org/draft-07/schema#",
+    },
+    annotations: {
+      title: "Check Confusing Item",
+      ...readOnlyToolAnnotations,
+    },
+  },
+  {
+    name: "make_cleanup_plan",
+    title: "Make Cleanup Plan",
+    description:
+      "Groups multiple household waste items into disposal buckets with RecyclingHelper(재활용척척), useful for moving, cleaning, or decluttering.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          items: {
+            type: "string",
+            minLength: 1,
+            maxLength: 80,
+          },
+          minItems: 1,
+          maxItems: 30,
+          description: "List of household waste item names in Korean.",
+        },
+        region: optionalRegionSchema,
+      },
+      required: ["items"],
+      additionalProperties: false,
+      $schema: "http://json-schema.org/draft-07/schema#",
+    },
+    annotations: {
+      title: "Make Cleanup Plan",
+      ...readOnlyToolAnnotations,
+    },
+  },
+  {
+    name: "get_region_disposal_info",
+    title: "Get Region Disposal Info",
+    description:
+      "Explains what local disposal information should be checked for a Korean region using RecyclingHelper(재활용척척), with official regional data sources to verify.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        region: {
+          type: "string",
+          minLength: 1,
+          maxLength: 80,
+          description: "Korean city, district, or neighborhood.",
+        },
+        itemName: {
+          type: "string",
+          maxLength: 80,
+          description: "Optional household waste item name in Korean.",
+        },
+      },
+      required: ["region"],
+      additionalProperties: false,
+      $schema: "http://json-schema.org/draft-07/schema#",
+    },
+    annotations: {
+      title: "Get Region Disposal Info",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true,
+      idempotentHint: true,
+    },
+  },
+];
 
 function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem): ToolResult | undefined {
   if (!region) return undefined;
@@ -400,13 +560,9 @@ function registerTools(server: McpServer): void {
 
 function createServer(): McpServer {
   const server = new McpServer(
+    SERVER_INFO,
     {
-      name: "recycling-helper",
-      version: "0.1.0",
-    },
-    {
-      instructions:
-        "Use RecyclingHelper(재활용척척) tools to answer Korean household waste disposal questions. Prefer concise, source-aware answers. If local rules may differ, say that regional verification is needed.",
+      instructions: SERVER_INSTRUCTIONS,
     },
   );
 
@@ -427,7 +583,60 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
+function jsonRpcResult(id: JsonRpcId | undefined, result: Record<string, unknown>): Record<string, unknown> {
+  return {
+    jsonrpc: "2.0",
+    id: id ?? null,
+    result,
+  };
+}
+
+function handleJsonOnlyDiscovery(req: Request, res: Response): boolean {
+  const accept = req.get("accept") ?? "";
+  if (accept.includes("text/event-stream")) return false;
+
+  const body = req.body as JsonRpcBody | JsonRpcBody[];
+  if (Array.isArray(body) || !body || typeof body !== "object") return false;
+
+  switch (body.method) {
+    case "initialize": {
+      const protocolVersion =
+        typeof body.params?.protocolVersion === "string" ? body.params.protocolVersion : "2025-03-26";
+      res.json(
+        jsonRpcResult(body.id, {
+          protocolVersion,
+          capabilities: {
+            tools: {
+              listChanged: true,
+            },
+          },
+          serverInfo: SERVER_INFO,
+          instructions: SERVER_INSTRUCTIONS,
+        }),
+      );
+      return true;
+    }
+
+    case "tools/list":
+      res.json(jsonRpcResult(body.id, { tools: COMPAT_TOOLS }));
+      return true;
+
+    case "ping":
+      res.json(jsonRpcResult(body.id, {}));
+      return true;
+
+    case "notifications/initialized":
+      res.status(202).end();
+      return true;
+
+    default:
+      return false;
+  }
+}
+
 app.post("/mcp", async (req: Request, res: Response) => {
+  if (handleJsonOnlyDiscovery(req, res)) return;
+
   const server = createServer();
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,

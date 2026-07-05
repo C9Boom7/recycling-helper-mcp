@@ -114,6 +114,32 @@ async function mcpRequest(baseUrl, method, params, id, extraHeaders = {}) {
   return parseSseJson(body);
 }
 
+async function jsonOnlyMcpRequest(baseUrl, method, params, id, extraHeaders = {}) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...extraHeaders,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id,
+      method,
+      params,
+    }),
+  });
+
+  const body = await response.text();
+  assert(response.ok, `JSON-only MCP ${method} returned HTTP ${response.status}:\n${body}`);
+
+  const message = JSON.parse(body);
+  if (message.error) {
+    throw new Error(`JSON-only MCP error: ${JSON.stringify(message.error)}`);
+  }
+  return message.result;
+}
+
 async function callTool(baseUrl, name, args, id) {
   return mcpRequest(
     baseUrl,
@@ -204,7 +230,16 @@ async function runSmoke() {
       "PlayMCP endpoint host returned a different tool list",
     );
 
-    let requestId = 3;
+    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 3, {
+      Host: PLAYMCP_ENDPOINT_HOST,
+    });
+    const jsonOnlyToolNames = jsonOnlyToolsList.tools.map((tool) => tool.name).sort();
+    assert(
+      jsonOnlyToolNames.join(",") === toolNames.join(","),
+      "JSON-only discovery returned a different tool list",
+    );
+
+    let requestId = 4;
     for (const answerCase of answerCases) {
       await runAnswerCase(baseUrl, answerCase, requestId);
       requestId += 1;
