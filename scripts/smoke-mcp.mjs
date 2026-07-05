@@ -140,6 +140,22 @@ async function jsonOnlyMcpRequest(baseUrl, method, params, id, extraHeaders = {}
   return message.result;
 }
 
+async function mcpGetDiscovery(baseUrl, extraHeaders = {}) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      ...extraHeaders,
+    },
+  });
+
+  const body = await response.text();
+  assert(response.ok, `MCP GET discovery returned HTTP ${response.status}:\n${body}`);
+
+  const message = JSON.parse(body);
+  return message.result ?? message;
+}
+
 async function callTool(baseUrl, name, args, id) {
   return mcpRequest(
     baseUrl,
@@ -237,6 +253,15 @@ async function runSmoke() {
     assert(
       jsonOnlyToolNames.join(",") === toolNames.join(","),
       "JSON-only discovery returned a different tool list",
+    );
+
+    const getDiscovery = await mcpGetDiscovery(baseUrl, {
+      Host: PLAYMCP_ENDPOINT_HOST,
+    });
+    const getDiscoveryToolNames = getDiscovery.tools.map((tool) => tool.name).sort();
+    assert(
+      getDiscoveryToolNames.join(",") === toolNames.join(","),
+      "GET discovery returned a different tool list",
     );
 
     let requestId = 4;

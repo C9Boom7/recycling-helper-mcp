@@ -70,6 +70,9 @@ const readOnlyToolAnnotations = {
   openWorldHint: false,
   idempotentHint: true,
 };
+const defaultToolExecution = {
+  taskSupport: "forbidden",
+};
 const COMPAT_TOOLS = [
   {
     name: "classify_waste_item",
@@ -90,6 +93,7 @@ const COMPAT_TOOLS = [
       title: "Classify Waste Item",
       ...readOnlyToolAnnotations,
     },
+    execution: defaultToolExecution,
   },
   {
     name: "get_disposal_steps",
@@ -110,6 +114,7 @@ const COMPAT_TOOLS = [
       title: "Get Disposal Steps",
       ...readOnlyToolAnnotations,
     },
+    execution: defaultToolExecution,
   },
   {
     name: "check_confusing_item",
@@ -134,6 +139,7 @@ const COMPAT_TOOLS = [
       title: "Check Confusing Item",
       ...readOnlyToolAnnotations,
     },
+    execution: defaultToolExecution,
   },
   {
     name: "make_cleanup_plan",
@@ -164,6 +170,7 @@ const COMPAT_TOOLS = [
       title: "Make Cleanup Plan",
       ...readOnlyToolAnnotations,
     },
+    execution: defaultToolExecution,
   },
   {
     name: "get_region_disposal_info",
@@ -196,6 +203,7 @@ const COMPAT_TOOLS = [
       openWorldHint: true,
       idempotentHint: true,
     },
+    execution: defaultToolExecution,
   },
 ];
 
@@ -665,7 +673,20 @@ app.post("/mcp", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/mcp", (_req: Request, res: Response) => {
+app.get("/mcp", (req: Request, res: Response) => {
+  const accept = req.get("accept") ?? "";
+  if (!accept.includes("text/event-stream")) {
+    res.json({
+      jsonrpc: "2.0",
+      id: null,
+      result: {
+        tools: COMPAT_TOOLS,
+      },
+      tools: COMPAT_TOOLS,
+    });
+    return;
+  }
+
   res.status(405).json({
     jsonrpc: "2.0",
     error: {
