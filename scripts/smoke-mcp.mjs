@@ -164,6 +164,25 @@ async function jsonOnlyMcpRequest(baseUrl, method, params, id, extraHeaders = {}
   return message.result;
 }
 
+async function jsonOnlyMcpNotification(baseUrl, method, params, extraHeaders = {}) {
+  const response = await fetch(`${baseUrl}/mcp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...extraHeaders,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method,
+      params,
+    }),
+  });
+
+  const body = await response.text();
+  assert(response.status === 202, `JSON-only MCP notification ${method} returned HTTP ${response.status}:\n${body}`);
+}
+
 async function mcpGetDiscovery(baseUrl, extraHeaders = {}) {
   const response = await fetch(`${baseUrl}/mcp`, {
     method: "GET",
@@ -181,12 +200,13 @@ async function mcpGetDiscovery(baseUrl, extraHeaders = {}) {
 }
 
 async function mcpCorsPreflight(baseUrl, origin) {
+  const requestedHeaders = ["content-type", "accept", "mcp-protocol-version", "mcp-session-id", "last-event-id"];
   const response = await fetch(`${baseUrl}/mcp`, {
     method: "OPTIONS",
     headers: {
       Origin: origin,
       "Access-Control-Request-Method": "POST",
-      "Access-Control-Request-Headers": "content-type,accept",
+      "Access-Control-Request-Headers": requestedHeaders.join(","),
       Host: PLAYMCP_ENDPOINT_HOST,
     },
   });
@@ -201,10 +221,10 @@ async function mcpCorsPreflight(baseUrl, origin) {
     response.headers.get("access-control-allow-methods")?.includes("POST"),
     "MCP CORS preflight did not allow POST",
   );
-  assert(
-    response.headers.get("access-control-allow-headers")?.includes("content-type"),
-    "MCP CORS preflight did not allow content-type",
-  );
+  const allowedHeaders = response.headers.get("access-control-allow-headers")?.toLowerCase() ?? "";
+  for (const header of requestedHeaders) {
+    assert(allowedHeaders.includes(header), `MCP CORS preflight did not allow ${header}`);
+  }
 }
 
 async function jsonOnlyMcpCorsRequest(baseUrl, method, params, id, origin) {
@@ -397,6 +417,15 @@ async function runSmoke() {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
     assert(isPlainObject(ping), "JSON-only ping result must be an object");
+
+    await jsonOnlyMcpNotification(
+      baseUrl,
+      "notifications/initialized",
+      {},
+      {
+        Host: PLAYMCP_ENDPOINT_HOST,
+      },
+    );
 
     const toolsList = await mcpRequest(baseUrl, "tools/list", {}, 3);
     assertToolList(toolsList, "SSE tools/list");
