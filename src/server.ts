@@ -33,6 +33,7 @@ const DEFAULT_ALLOWED_HOSTS = [
   "[::1]",
   "recyling-helper-mcp.playmcp-endpoint.kakaocloud.io",
   "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io",
+  "recycle-helper-mcp-v2.playmcp-endpoint.kakaocloud.io",
   "recycling-helper-mcp.playmcp-endpoint.kakaocloud.io",
 ];
 const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join(","))
