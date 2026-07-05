@@ -7,6 +7,11 @@ const HOST = "127.0.0.1";
 const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
 const PLAYMCP_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
 const STARTUP_TIMEOUT_MS = 15_000;
+const EXPECTED_PROTOCOL_VERSION = "2025-03-26";
+const EXPECTED_SERVER_INFO = {
+  name: "recycling-helper",
+  version: "0.1.0",
+};
 const EXPECTED_TOOL_NAMES = [
   "check_confusing_item",
   "classify_waste_item",
@@ -281,6 +286,20 @@ function assertToolList(toolList, context) {
   return toolNames;
 }
 
+function assertInitializeResult(result, context) {
+  assert(result.protocolVersion === EXPECTED_PROTOCOL_VERSION, `${context} returned unexpected protocolVersion ${result.protocolVersion}`);
+  assert(isPlainObject(result.capabilities), `${context} was missing capabilities`);
+  assert(isPlainObject(result.capabilities.tools), `${context} was missing capabilities.tools`);
+  assert(result.capabilities.tools.listChanged === true, `${context} capabilities.tools.listChanged must be true`);
+  assert(isPlainObject(result.serverInfo), `${context} was missing serverInfo`);
+  assert(result.serverInfo.name === EXPECTED_SERVER_INFO.name, `${context} returned unexpected serverInfo.name`);
+  assert(result.serverInfo.version === EXPECTED_SERVER_INFO.version, `${context} returned unexpected serverInfo.version`);
+  assert(
+    typeof result.instructions === "string" && result.instructions.includes("RecyclingHelper"),
+    `${context} was missing RecyclingHelper instructions`,
+  );
+}
+
 function resultText(result) {
   return result.content?.find((entry) => entry.type === "text")?.text ?? "";
 }
@@ -356,15 +375,38 @@ async function runSmoke() {
     assert(health.ok === true, "Health response did not report ok=true");
     assert(health.items === wasteItems.length, `Expected ${wasteItems.length} waste items, got ${health.items}`);
 
-    const toolsList = await mcpRequest(baseUrl, "tools/list", {}, 1);
+    const initialize = await jsonOnlyMcpRequest(
+      baseUrl,
+      "initialize",
+      {
+        protocolVersion: EXPECTED_PROTOCOL_VERSION,
+        capabilities: {},
+        clientInfo: {
+          name: "recycling-helper-smoke",
+          version: "0.0.0",
+        },
+      },
+      1,
+      {
+        Host: PLAYMCP_ENDPOINT_HOST,
+      },
+    );
+    assertInitializeResult(initialize, "JSON-only initialize");
+
+    const ping = await jsonOnlyMcpRequest(baseUrl, "ping", {}, 2, {
+      Host: PLAYMCP_ENDPOINT_HOST,
+    });
+    assert(isPlainObject(ping), "JSON-only ping result must be an object");
+
+    const toolsList = await mcpRequest(baseUrl, "tools/list", {}, 3);
     assertToolList(toolsList, "SSE tools/list");
 
-    const playMcpToolsList = await mcpRequest(baseUrl, "tools/list", {}, 2, {
+    const playMcpToolsList = await mcpRequest(baseUrl, "tools/list", {}, 4, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
     assertToolList(playMcpToolsList, "PlayMCP endpoint SSE tools/list");
 
-    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 3, {
+    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 5, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
     assertToolList(jsonOnlyToolsList, "JSON-only tools/list");
@@ -374,7 +416,7 @@ async function runSmoke() {
     });
     assertToolList(getDiscovery, "GET discovery");
 
-    let requestId = 4;
+    let requestId = 6;
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
 
