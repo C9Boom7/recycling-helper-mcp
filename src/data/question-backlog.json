@@ -2483,10 +2483,10 @@
     "query": "부산 해운대구 폐건전지 수거함 위치 알려줘",
     "region": "부산 해운대구",
     "type": "region_gap",
-    "status": "todo",
+    "status": "wont_fix",
     "priority": "high",
-    "observed": "자동 백로그화: 테스트 판정(missing_region)상 지역별 수거 방식, 수거함, 수수료, 신청 방식 확인이 필요합니다. 현재 자동 후보는 \"건전지\"(battery)입니다.",
-    "expectedAction": "강남구 기준을 우선 확인하고 지역 가이드 또는 지역 회귀 케이스를 추가합니다.",
+    "observed": "사용자 결정에 따라 부산 해운대구 수거함 위치 탐색은 진행하지 않습니다. 미지원 지역에서는 기존 smoke로 주소를 지어내지 않고 공식 확인처로 안내합니다.",
+    "expectedAction": "제품 범위에서 제외하고, 기존 MCP answer smoke로 미지원 지역의 위치 단정 방지만 유지합니다.",
     "candidateItemIds": [
       "battery"
     ],
@@ -2501,7 +2501,10 @@
       "topCandidate: battery/건전지 matchedBy=폐건전지 score=92",
       "itemConfidence: high",
       "reviewStatus: region_review_needed",
-      "otherCandidates: nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=17; induction_cooktop_broken_glass/깨진 인덕션 유리 상판 matchedBy=인덕션 유리 상판 깨진 건 대형폐기물이야 score=10"
+      "otherCandidates: nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=17; induction_cooktop_broken_glass/깨진 인덕션 유리 상판 matchedBy=인덕션 유리 상판 깨진 건 대형폐기물이야 score=10",
+      "wontFixAt: 2026-07-05",
+      "wontFixReason: 사용자 결정에 따라 부산 해운대구 폐건전지 수거함 위치 탐색은 진행하지 않음",
+      "guardedBy: MCP answer case region_info_unknown_battery_collection"
     ]
   },
   {
@@ -2509,10 +2512,10 @@
     "query": "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?",
     "region": "서울 강남구",
     "type": "region_gap",
-    "status": "todo",
+    "status": "covered",
     "priority": "medium",
-    "observed": "자동 백로그화: 테스트 판정(missing_region)상 지역별 수거 방식, 수거함, 수수료, 신청 방식 확인이 필요합니다. 현재 자동 후보는 \"비닐류 포장재\"(snack_bag)입니다.",
-    "expectedAction": "강남구 기준을 우선 확인하고 지역 가이드 또는 지역 회귀 케이스를 추가합니다.",
+    "observed": "사용자 결정에 따라 오피스텔 같은 세부 건물유형은 별도 모델링하지 않고, 강남구 일반 배출 기준과 관리사무소·자체 수거계약 확인을 보수 안내로 처리합니다.",
+    "expectedAction": "신규 지역/건물유형 데이터 없이 기존 MCP answer smoke로 오피스텔 전용 목요일 배출 단정을 방지합니다.",
     "candidateItemIds": [
       "snack_bag",
       "blanket"
@@ -2528,7 +2531,10 @@
       "topCandidate: snack_bag/비닐류 포장재 matchedBy=비닐봉지 score=92",
       "itemConfidence: high",
       "reviewStatus: region_review_needed",
-      "otherCandidates: blanket/이불 matchedBy=요 score=89; pet_waste_tissue/반려동물 배설물 묻은 휴지 matchedBy=강아지 배설물 묻은 휴지 score=16"
+      "otherCandidates: blanket/이불 matchedBy=요 score=89; pet_waste_tissue/반려동물 배설물 묻은 휴지 matchedBy=강아지 배설물 묻은 휴지 score=16",
+      "coveredAt: 2026-07-05",
+      "coveredBy: MCP answer case gangnam_officetel_vinyl_building_type_guard",
+      "userDecision: 오피스텔 같은 세부 건물유형은 별도 모델링하지 않음"
     ]
   },
   {
