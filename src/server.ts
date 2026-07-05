@@ -222,19 +222,26 @@ const COMPAT_TOOLS = [
   },
 ];
 
-function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem): ToolResult | undefined {
+function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem, includeGeneralRegion = false): ToolResult | undefined {
   if (!region) return undefined;
 
   const hasSpecificItemGuide = Boolean(item && findRegionItemGuide(region.region, item));
-  const includeItemSpecificRegion = !item || itemNeedsCriticalRegionCheck(item) || hasSpecificItemGuide;
+  const includeItemSpecificRegion = includeGeneralRegion || !item || itemNeedsCriticalRegionCheck(item) || hasSpecificItemGuide;
   const itemGuide = item && includeItemSpecificRegion ? formatRegionItemGuide(item, region) : undefined;
   const bulkyWasteFees = item ? findBulkyWasteFees(region.region, item) : [];
   const bulkyWasteFeeSchedule = bulkyWasteFees.length > 0 ? findBulkyWasteFeeSchedule(region.region) : undefined;
 
-  return {
+  const compact: ToolResult = {
     id: region.region.id,
     name: region.region.name,
     checkedAt: region.region.checkedAt,
+    regionCheckLevel: item ? itemRegionCheckLabel(item) : undefined,
+  };
+
+  if (!includeItemSpecificRegion) return compact;
+
+  return {
+    ...compact,
     summary: region.region.summary,
     recycling: {
       time: region.region.recycling.time,
@@ -242,7 +249,6 @@ function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: W
       otherDays: region.region.recycling.otherDays,
     },
     itemGuide,
-    regionCheckLevel: item ? itemRegionCheckLabel(item) : undefined,
     ...(bulkyWasteFeeSchedule
       ? {
           bulkyWasteFees: {
@@ -583,7 +589,7 @@ function registerTools(server: McpServer): void {
         matchedRegion: regionMatch?.region.name,
         item: match?.item.name,
         defaultSummary: match?.item.summary,
-        regionalPolicy: compactRegionalPolicy(regionMatch, match?.item),
+        regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
         officialSources: regionMatch
           ? regionMatch.region.sources
           : [
