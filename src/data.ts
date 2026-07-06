@@ -149,6 +149,7 @@ export function normalizeText(value: string): string {
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
+const MAX_AMBIGUOUS_CANDIDATES = 7;
 const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
 
 function normalizedTokens(value: string): string[] {
@@ -314,6 +315,49 @@ export function findBestWasteItem(query: string): WasteMatch | undefined {
   return findWasteItems(query, 1)[0];
 }
 
+function hasReadableGenericFragmentLabel(query: string, match: WasteMatch): boolean {
+  const normalizedQuery = normalizeText(query);
+  const normalizedItemName = normalizeText(match.item.name);
+  if (!normalizedQuery) return false;
+
+  if (normalizedItemName.includes(normalizedQuery)) {
+    return true;
+  }
+
+  const matchedTokens = normalizedTokens(match.matchedBy);
+  const isCompactAlias = matchedTokens.length <= 3 && match.matchedBy.length <= 18;
+  if (!isCompactAlias) {
+    return false;
+  }
+
+  return matchedTokens.some((token) => {
+    const stripped = stripShortAliasParticle(token);
+    return token === normalizedQuery || stripped === normalizedQuery || token.endsWith(normalizedQuery);
+  });
+}
+
+function genericFragmentCandidateRank(query: string, match: WasteMatch): number {
+  const normalizedQuery = normalizeText(query);
+  const normalizedItemName = normalizeText(match.item.name);
+  const matchedTokens = normalizedTokens(match.matchedBy);
+  let rank = 0;
+
+  if (normalizedItemName.includes(normalizedQuery)) rank += 40;
+  if (match.matchedBy === match.item.name) rank += 10;
+  if (
+    matchedTokens.some((token) => {
+      const stripped = stripShortAliasParticle(token);
+      return token === normalizedQuery || stripped === normalizedQuery;
+    })
+  ) {
+    rank += 30;
+  } else if (matchedTokens.some((token) => token.endsWith(normalizedQuery))) {
+    rank += 20;
+  }
+
+  return rank;
+}
+
 export type WasteQueryResolution =
   | { status: "match"; match: WasteMatch }
   | { status: "ambiguous"; candidates: WasteMatch[] }
@@ -327,16 +371,26 @@ export type WasteQueryResolution =
  * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
  */
 export function resolveWasteItem(query: string): WasteQueryResolution {
-  const matches = findWasteItems(query, 5);
+  const matches = findWasteItems(query, wasteItems.length);
   if (matches.length === 0) {
     return { status: "not_found" };
   }
 
   const [best, ...rest] = matches;
   if (best.matchKind === "generic_fragment" && best.score < HIGH_CONFIDENCE_SCORE) {
-    const tied = rest.filter((match) => match.score === best.score);
-    if (tied.length > 0) {
-      return { status: "ambiguous", candidates: [best, ...tied] };
+    const tied = [best, ...rest].filter((match) => match.score === best.score && match.matchKind === "generic_fragment");
+    const readableCandidates = tied
+      .filter((match) => hasReadableGenericFragmentLabel(query, match))
+      .sort(
+        (a, b) =>
+          genericFragmentCandidateRank(query, b) - genericFragmentCandidateRank(query, a) ||
+          a.matchedBy.localeCompare(b.matchedBy, "ko") ||
+          a.item.name.localeCompare(b.item.name, "ko"),
+      );
+
+    const candidates = (readableCandidates.length > 1 ? readableCandidates : tied).slice(0, MAX_AMBIGUOUS_CANDIDATES);
+    if (candidates.length > 1) {
+      return { status: "ambiguous", candidates };
     }
   }
 

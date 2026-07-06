@@ -2159,5 +2159,47 @@
       "level": "참고",
       "shape": "minimal"
     }
+  },
+  {
+    "id": "classify_ambiguous_short_cup_candidates",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "컵"
+    },
+    "expectedTextIncludes": ["여러 품목에 해당할 수 있어", "후보:", "플라스틱 컵", "종이컵", "컵라면 용기", "머그컵 (도자기 그릇)"],
+    "expectedTextExcludes": ["알루미늄 포일", "컵라면 뚜껑 은박지"],
+    "expectedStructuredIncludes": ["\"ambiguous\":true", "\"itemName\":\"컵\"", "\"matchedBy\":\"종이컵\"", "\"matchedBy\":\"머그컵\""],
+    "expectedStructuredExcludes": ["\"itemName\":\"알루미늄 포일\"", "\"matchedBy\":\"컵라면 뚜껑 은박지\""]
+  },
+  {
+    "id": "classify_ambiguous_short_container_candidates",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "통"
+    },
+    "expectedTextIncludes": ["여러 품목에 해당할 수 있어", "후보:", "빈 약통", "샴푸통", "페인트통"],
+    "expectedTextExcludes": ["곰팡이 핀 빵", "유통기한 지난 빵", "음료캔"],
+    "expectedStructuredIncludes": ["\"ambiguous\":true", "\"itemName\":\"통\"", "\"matchedBy\":\"빈 약통\"", "\"matchedBy\":\"샴푸통\""],
+    "expectedStructuredExcludes": ["\"itemName\":\"곰팡이 핀 빵\"", "\"matchedBy\":\"유통기한 지난 빵\"", "\"matchedBy\":\"통조림캔\""]
+  },
+  {
+    "id": "classify_ambiguous_short_bottle_candidates",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "병"
+    },
+    "expectedTextIncludes": ["여러 품목에 해당할 수 있어", "후보:", "유리병", "페트병", "향수병"],
+    "expectedStructuredIncludes": ["\"ambiguous\":true", "\"itemName\":\"병\"", "\"matchedBy\":\"유리병\"", "\"matchedBy\":\"페트병\""]
+  },
+  {
+    "id": "classify_ambiguous_short_vessel_candidates",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "용기"
+    },
+    "expectedTextIncludes": ["여러 품목에 해당할 수 있어", "후보:", "배달 플라스틱 용기", "컵라면 용기", "화장품 용기"],
+    "expectedTextExcludes": ["석고방향제", "다 쓴 고체 방향제는 플라스틱 용기만 분리해"],
+    "expectedStructuredIncludes": ["\"ambiguous\":true", "\"itemName\":\"용기\"", "\"matchedBy\":\"배달 플라스틱 용기\"", "\"matchedBy\":\"컵라면 용기\""],
+    "expectedStructuredExcludes": ["\"itemName\":\"석고방향제\"", "\"matchedBy\":\"다 쓴 고체 방향제는 플라스틱 용기만 분리해\""]
   }
 ]

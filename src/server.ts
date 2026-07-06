@@ -312,20 +312,38 @@ function unknownItemResult(itemName: string): CallToolResult {
   );
 }
 
+function ambiguousCandidateLabel(match: WasteMatch): string {
+  if (match.matchedBy === match.item.name) {
+    return match.item.name;
+  }
+
+  return `${match.matchedBy} (${match.item.name})`;
+}
+
+function ambiguousCandidateDetails(match: WasteMatch): ToolResult {
+  return {
+    itemId: match.item.id,
+    itemName: match.item.name,
+    matchedBy: match.matchedBy,
+    score: match.score,
+  };
+}
+
 function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallToolResult {
-  const candidateNames = candidates.map((match) => match.item.name);
+  const candidateLabels = candidates.map(ambiguousCandidateLabel);
 
   return textResult(
     [
       `입력한 품목 "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다.`,
-      `후보: ${candidateNames.join(", ")}`,
+      `후보: ${candidateLabels.join(", ")}`,
       "재질, 용도, 크기를 조금 더 구체적으로 알려주시면 정확히 판단할 수 있습니다.",
     ].join("\n"),
     {
       found: false,
       ambiguous: true,
       itemName,
-      candidates: candidateNames,
+      candidates: candidateLabels,
+      candidateDetails: candidates.map(ambiguousCandidateDetails),
     },
   );
 }
@@ -570,12 +588,14 @@ function registerTools(server: McpServer): void {
         }
 
         if (resolved.status === "ambiguous") {
-          const candidateNames = resolved.candidates.map((candidate) => candidate.item.name);
+          const candidateLabels = resolved.candidates.map(ambiguousCandidateLabel);
           return {
             input: rawName,
             found: false as const,
             group: "확인 필요",
-            summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateNames.join(", ")}).`,
+            summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateLabels.join(", ")}).`,
+            candidates: candidateLabels,
+            candidateDetails: resolved.candidates.map(ambiguousCandidateDetails),
           };
         }
 
@@ -658,7 +678,9 @@ function registerTools(server: McpServer): void {
       const resolved = itemName ? resolveWasteItem(itemName) : undefined;
       const match = resolved?.status === "match" ? resolved.match : undefined;
       const ambiguousCandidates =
-        resolved?.status === "ambiguous" ? resolved.candidates.map((candidate) => candidate.item.name) : undefined;
+        resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateLabel) : undefined;
+      const ambiguousCandidateDetailList =
+        resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateDetails) : undefined;
       const regionMatch = findRegionalPolicy(region);
       const checkList = itemRegionCheckList(regionMatch, match?.item);
 
@@ -708,6 +730,7 @@ function registerTools(server: McpServer): void {
         matchedRegion: regionMatch?.region.name,
         item: match?.item.name,
         ambiguousCandidates,
+        ambiguousCandidateDetails: ambiguousCandidateDetailList,
         defaultSummary: match?.item.summary,
         regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
         regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
