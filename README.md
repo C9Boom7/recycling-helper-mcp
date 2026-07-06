@@ -1,24 +1,42 @@
 # 재활용척척 MCP
 
-재활용척척은 헷갈리는 생활폐기물의 올바른 배출 방법을 안내하는 PlayMCP용 Remote MCP 서버입니다.
+재활용척척은 헷갈리는 생활폐기물의 올바른 배출 방법을 안내하는 PlayMCP용 Remote MCP 서버입니다. 카카오톡에서 PlayMCP를 통해 호출되며, 품목 분류부터 지역별 확인 항목까지 하나의 무상태(stateless) MCP 서버로 제공합니다.
 
-## PlayMCP 등록 기준
+## 아키텍처
+
+```
+카카오톡 사용자 → PlayMCP (Kakao Cloud) → MCP 서버 (Express, Streamable HTTP, 무상태) → 데이터 레이어 (품목·지역·수수료 JSON)
+```
 
 - Transport: Streamable HTTP
 - Endpoint: `/mcp`
-- Session: stateless
+- Session: stateless (요청마다 서버·도구를 새로 구성)
 - Auth: 인증 사용하지 않음
 - MCP name: `재활용척척`
 - MCP identifier: `recyclingHelper`
-- Tool count: 5
+- 구성: TypeScript, Express 5, `@modelcontextprotocol/sdk`(McpServer, StreamableHTTPServerTransport), Zod
 
 ## Tools
 
-- `classify_waste_item`
-- `get_disposal_steps`
-- `check_confusing_item`
-- `make_cleanup_plan`
-- `get_region_disposal_info`
+| Tool | 역할 |
+| --- | --- |
+| `classify_waste_item` | 품목을 분류하고 확신도·지역 영향까지 안내 |
+| `get_disposal_steps` | 단계별 배출 방법과 근거 출처를 안내 |
+| `check_confusing_item` | 헷갈리는 품목의 예외를 후보와 함께 설명 |
+| `make_cleanup_plan` | 여러 품목을 배출 그룹별로 묶어 계획 생성 |
+| `get_region_disposal_info` | 지역별 확인 항목과 공식 출처를 안내 |
+
+## 매칭 엔진
+
+사용자가 입력한 자유 형식 질의(`itemName`)는 `src/data.ts`의 `scoreItem()`이 아래 기준으로 점수를 매겨 가장 가까운 품목을 찾습니다.
+
+- `exact` (100점): 품목명/별칭과 완전히 일치
+- `query_contains_name` (88~99점): 질의 안에 품목명 전체가 포함
+- `short_alias_standalone` (78점~): 2글자 이하 별칭이 독립된 단어로 등장
+- `generic_fragment` (82점~): 품목명이 짧은 질의어를 단순 포함 — 동점 후보가 있으면 확정하지 않음
+- `fuzzy_overlap` (~30점): 글자 유사도 기반 fallback
+
+`resolveWasteItem()`은 이 점수를 `match` / `ambiguous` / `not_found` 세 가지 결과로 정리합니다. "컵", "통", "병"처럼 여러 품목에 동시에 해당하는 포괄어는 `ambiguous`로 처리해 임의로 하나를 확정하지 않고, 후보 목록과 함께 재질·용도를 되묻습니다.
 
 ## Run
 
@@ -76,15 +94,27 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 환경부 분리수거 요령: https://www.me.go.kr/webdata/education/class21/8-03.html
 - 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do
 
-현재 MVP는 공식 기준과 자주 헷갈리는 품목 seed 데이터를 함께 사용합니다. 지역별 상세 배출 요일과 조례 정보는 `get_region_disposal_info`의 다음 확장 대상으로 둡니다.
+현재는 공식 기준과 자주 헷갈리는 품목 seed 데이터에 더해, 서울 강남구·서초구·송파구·마포구와 경기 성남시 등 5개 지역의 배출 요일·수거함·대형폐기물 수수료 기준을 함께 사용합니다. 신규 지역 확장은 사용자 질문 로그와 자동 백로그에서 필요가 확인될 때 진행합니다.
+
+## 데이터 신뢰도 파이프라인
+
+품목·지역 데이터는 아래 4단계를 통과해야 반영됩니다.
+
+1. `pnpm validate:data` — 스키마와 문서 카운트 정합성 확인
+2. `pnpm eval:data` — 품목·지역 평가 케이스 1:1 매칭 검증
+3. `pnpm smoke:mcp` — 실제 MCP 서버에 답변 회귀 케이스 실행
+4. 질문 백로그 (`pnpm log:query`, `pnpm backlog:auto`) — 새로 발견한 갭을 추적하고 후속 작업으로 승격
 
 ## Data quality
 
 정확도 개선은 품목 데이터와 대표 질문 평가셋을 함께 관리합니다.
 
-- 품목 데이터: `src/data/waste-items.json`
-- 대표 질문 평가셋: `src/data/evaluation-cases.json`
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json`
+- 품목 데이터: `src/data/waste-items.json` (130개)
+- 대표 질문 평가셋: `src/data/evaluation-cases.json` (130개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (196개)
+- 지역 정책 데이터: `src/data/region-policies.json` (5개 지역)
+- 지역 평가셋: `src/data/region-evaluation-cases.json` (35개)
+- 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (강남·서초·송파·마포 4개 지역)
 - 질문 백로그: `src/data/question-backlog.json`
 - 작업 가이드: [docs/data-quality.md](docs/data-quality.md)
 - 질문 백로그 흐름: [docs/question-backlog.md](docs/question-backlog.md)
@@ -95,6 +125,8 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 강남구 지역 기준: [docs/gangnam-region-policy.md](docs/gangnam-region-policy.md)
 - 지역 정책 비교: [docs/region-policy-comparison.md](docs/region-policy-comparison.md)
 - 로컬 MCP 검증 흐름: [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)
+
+품목 리뷰 상태: `verified` 39 / `region_review_needed` 84 / `needs_source` 7. 질문 백로그: `covered` 109 / `wont_fix` 1 / `todo` 1.
 
 검증:
 
