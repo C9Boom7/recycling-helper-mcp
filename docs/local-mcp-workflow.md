@@ -18,6 +18,7 @@
 - `낮음`: 칫솔, 고무장갑, 샤프심처럼 지역 정보가 답변 정확도를 거의 바꾸지 않는 품목에는 지역 섹션과 지역 공식 출처를 붙이지 않는다.
 
 회귀 테스트에서는 우산·비닐류처럼 `region_review_needed`이지만 안내가 과하면 품질이 떨어지는 품목에 `서울 강남구 공식 출처` 제외 조건과 `regionalPolicy` 레벨 기대값을 둔다. `classify_waste_item`와 `make_cleanup_plan`도 `필수/참고/낮음` 지역 영향 라벨을 검증한다. 반대로 폐건전지, 폐의약품, 소형가전, 대형폐기물, 가스류는 강한 지역 확인과 공식 출처를 유지한다.
+사용자에게 보이는 답변과 구조화 응답에는 `판단 범위`/`regionGuidance`를 함께 두어, 전국 기준으로 결론을 낼 수 있는 품목과 실제 배출 방식이 지역 기준에 좌우되는 품목을 분리한다.
 `get_region_disposal_info`는 품목 없이 지역만 물으면 지역 전체 기준을 안내하지만, 품목을 함께 입력하면 해당 품목의 `regionPolicy.checkItems`, 지역 item guide, 대형폐기물 수수료 후보 중심으로 확인 항목을 좁힌다.
 
 ## 로컬 검증 명령
@@ -37,6 +38,7 @@ pnpm smoke:mcp
 답변 품질 회귀 케이스는 `src/data/mcp-answer-cases.json`에서 관리한다.
 같은 `tool`과 같은 입력 인자를 가진 중복 answer case는 `pnpm validate:data`에서 실패시켜, 새 케이스를 추가할 때 기존 케이스를 보강할지 새 질문으로 분리할지 먼저 결정하게 한다.
 각 케이스의 include/exclude 기대값도 같은 배열 안에서 중복되거나 include와 exclude에 동시에 들어가면 `pnpm validate:data`에서 실패한다.
+지역 정책 구조화 응답을 고정하는 케이스는 `expectedRegionalPolicy.level`, `shape`, `guidance`를 사용해 `regionCheckLevel`, 최소/지역가이드 전용 shape, `regionGuidance`를 함께 검증할 수 있다.
 
 확인하는 대표 회귀 포인트:
 

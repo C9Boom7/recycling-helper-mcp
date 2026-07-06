@@ -496,15 +496,18 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     ) {
       errors.push(`${prefix}.expectedRegionalPolicy must be an object when present`);
     } else {
-      const { level, shape } = testCase.expectedRegionalPolicy;
+      const { level, shape, guidance } = testCase.expectedRegionalPolicy;
       if (level !== undefined && !expectedRegionalPolicyLevels.has(level)) {
         errors.push(`${prefix}.expectedRegionalPolicy.level must be one of ${Array.from(expectedRegionalPolicyLevels).join(", ")}`);
       }
       if (shape !== undefined && !expectedRegionalPolicyShapes.has(shape)) {
         errors.push(`${prefix}.expectedRegionalPolicy.shape must be one of ${Array.from(expectedRegionalPolicyShapes).join(", ")}`);
       }
-      if (level === undefined && shape === undefined) {
-        errors.push(`${prefix}.expectedRegionalPolicy must include level or shape`);
+      if (guidance !== undefined && !isNonEmptyString(guidance)) {
+        errors.push(`${prefix}.expectedRegionalPolicy.guidance must be a non-empty string when present`);
+      }
+      if (level === undefined && shape === undefined && guidance === undefined) {
+        errors.push(`${prefix}.expectedRegionalPolicy must include level, shape, or guidance`);
       }
       if (shape !== undefined && level === undefined) {
         errors.push(`${prefix}.expectedRegionalPolicy.shape must be paired with level`);

@@ -646,6 +646,7 @@
     "expectedStructuredIncludes": ["\"id\":\"wilted_flower\"", "\"matchedBy\":\"시든 꽃\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
     "expectedRegionalPolicy": {
       "level": "참고",
+      "guidance": "기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
       "shape": "itemGuideOnly"
     }
   },
@@ -1627,7 +1628,7 @@
     },
     "expectedTextIncludes": ["비닐류 포장재", "음식물이나 기름이 묻었다면", "오염 제거가 어렵다면 일반쓰레기", "목요일", "### 지역 참고"],
     "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
-    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"비닐봉지\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"냉동식품 포장 비닐\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\"", "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\""],
     "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""],
     "expectedRegionalPolicy": {
       "level": "참고",
@@ -1654,7 +1655,11 @@
     },
     "expectedTextIncludes": ["스프레이캔", "내용물을 완전히", "금속캔 수거함", "찌그러졌더라도", "노즐이 막혔거나", "캔류로 단정하지", "생활계 유해폐기물 전용수거함", "임의로 뚫지", "서울 강남구 공식 출처"],
     "expectedStructuredIncludes": ["\"id\":\"spray_can\"", "\"matchedBy\":\"스프레이캔\"", "\"status\":\"region_review_needed\"", "\"regionalPolicy\""],
-    "expectedStructuredExcludes": ["\"id\":\"can\""]
+    "expectedStructuredExcludes": ["\"id\":\"can\""],
+    "expectedRegionalPolicy": {
+      "level": "필수",
+      "guidance": "지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다."
+    }
   },
   {
     "id": "vinyl_flooring_no_vinyl_bag_match",
@@ -1936,6 +1941,7 @@
     "expectedTextIncludes": [
       "서울 강남구 지역 확인 안내",
       "품목: 비닐류 포장재",
+      "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
       "단독주택·빌라·소규모 상가 기준",
       "확인할 정보",
       "비닐류 배출 요일",
@@ -1943,7 +1949,7 @@
       "오염 비닐 일반쓰레기 전환 기준"
     ],
     "expectedTextExcludes": ["오피스텔은 목요일", "오피스텔 기준", "대형생활폐기물 사전 신청", "폐건전지, 폐형광등"],
-    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"비닐류 포장재\"", "강남구 단독주택·빌라·소규모 상가 기준"]
+    "expectedStructuredIncludes": ["\"matchedRegion\":\"서울 강남구\"", "\"item\":\"비닐류 포장재\"", "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"", "강남구 단독주택·빌라·소규모 상가 기준"]
   },
   {
     "id": "region_info_unknown_battery_collection",
@@ -1952,9 +1958,9 @@
       "region": "부산 해운대구",
       "itemName": "폐건전지 수거함 위치 알려줘"
     },
-    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "전용 수거함 위치", "지정 수거처", "배출 가능 시간", "품목 판단 근거", "거주 지자체 청소/자원순환/환경 부서"],
+    "expectedTextIncludes": ["부산 해운대구 지역 확인 안내", "품목: 건전지", "판단 범위: 지역 기준이 실제 배출 방법을 바꿀 수 있습니다.", "전용 수거함 위치", "지정 수거처", "배출 가능 시간", "품목 판단 근거", "거주 지자체 청소/자원순환/환경 부서"],
     "expectedTextExcludes": ["강남구 기본 배출 기준", "서울 강남구 공식 출처", "부산 해운대구 공식 출처", "수거함 주소", "대형폐기물 신고 페이지와 수수료"],
-    "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"https://www.분리배출.kr/front/region/region.do\""],
+    "expectedStructuredIncludes": ["\"region\":\"부산 해운대구\"", "\"item\":\"건전지\"", "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\"", "\"https://www.분리배출.kr/front/region/region.do\""],
     "expectedStructuredExcludes": ["\"matchedRegion\""]
   },
   {
@@ -1990,14 +1996,57 @@
     "expectedStructuredIncludes": ["\"matchedItem\":\"칫솔\"", "\"needsRegionCheck\":false", "\"regionCheckLevel\":\"낮음\""]
   },
   {
+    "id": "steps_frozen_food_packaging_vinyl_contaminated_short",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉동식품 포장 비닐에 음식물 묻었는데?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "비닐류 포장재",
+      "음식물이나 기름이 묻었다면",
+      "오염 제거가 어렵다면 일반쓰레기",
+      "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
+      "### 지역 참고"
+    ],
+    "expectedTextExcludes": ["### 지역 확인 필요", "서울 강남구 공식 출처"],
+    "expectedStructuredIncludes": ["\"id\":\"snack_bag\"", "\"matchedBy\":\"냉동식품 포장 비닐\"", "\"regionalPolicy\"", "\"regionCheckLevel\":\"참고\""],
+    "expectedStructuredExcludes": ["\"id\":\"plastic_food_container\""],
+    "expectedRegionalPolicy": {
+      "level": "참고",
+      "shape": "itemGuideOnly"
+    }
+  },
+  {
+    "id": "classify_delivery_box_national_decision_scope",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "젖은 종이상자는 어떻게 버려?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["분류 결과: 택배상자", "지역 영향: 낮음", "판단 범위: 전국 공통 기준으로 바로 안내 가능합니다."],
+    "expectedTextExcludes": ["지역 기준이 실제 배출 방법을 바꿀 수 있습니다", "기본 판단은 가능"],
+    "expectedStructuredIncludes": ["\"matchedItem\":\"택배상자\"", "\"needsRegionCheck\":false", "\"regionCheckLevel\":\"낮음\"", "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""]
+  },
+  {
+    "id": "classify_spray_can_condition_required_scope",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "스프레이캔이 찌그러졌는데 남은 가스 없어도 캔류야?",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": ["분류 결과: 스프레이캔", "지역 영향: 필수", "판단 범위: 지역 기준이 실제 배출 방법을 바꿀 수 있습니다.", "전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다."],
+    "expectedStructuredIncludes": ["\"matchedItem\":\"스프레이캔\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\"", "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\""]
+  },
+  {
     "id": "confusing_vinyl_bag_region_advisory",
     "tool": "check_confusing_item",
     "arguments": {
       "itemName": "비닐봉지"
     },
-    "expectedTextIncludes": ["헷갈림 체크", "비닐류 포장재", "지역 영향: 참고", "대표 근거"],
+    "expectedTextIncludes": ["헷갈림 체크", "비닐류 포장재", "지역 영향: 참고", "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.", "대표 근거"],
     "expectedTextExcludes": ["지역 영향: 필수"],
-    "expectedStructuredIncludes": ["\"itemName\":\"비닐류 포장재\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\""]
+    "expectedStructuredIncludes": ["\"itemName\":\"비닐류 포장재\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"참고\"", "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\""]
   },
   {
     "id": "confusing_battery_region_required",
@@ -2005,8 +2054,8 @@
     "arguments": {
       "itemName": "폐건전지"
     },
-    "expectedTextIncludes": ["헷갈림 체크", "건전지", "지역 영향: 필수", "대표 근거"],
-    "expectedStructuredIncludes": ["\"itemName\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\""]
+    "expectedTextIncludes": ["헷갈림 체크", "건전지", "지역 영향: 필수", "판단 범위: 지역 기준이 실제 배출 방법을 바꿀 수 있습니다.", "대표 근거"],
+    "expectedStructuredIncludes": ["\"itemName\":\"건전지\"", "\"needsRegionCheck\":true", "\"regionCheckLevel\":\"필수\"", "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\""]
   },
   {
     "id": "cleanup_plan_region_impact_mixed_levels",
@@ -2038,7 +2087,10 @@
       "\"regionCheckLevel\":\"필수\"",
       "\"input\":\"칫솔\"",
       "\"itemName\":\"칫솔\"",
-      "\"regionCheckLevel\":\"낮음\""
+      "\"regionCheckLevel\":\"낮음\"",
+      "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\"",
+      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"",
+      "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""
     ],
     "expectedStructuredExcludes": ["\"regionalPolicy\""]
   },
@@ -2072,7 +2124,9 @@
       "\"itemName\":\"비닐류 포장재\"",
       "\"input\":\"칫솔\"",
       "\"itemName\":\"칫솔\"",
-      "\"regionCheckLevel\":\"낮음\""
+      "\"regionCheckLevel\":\"낮음\"",
+      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"",
+      "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""
     ],
     "expectedStructuredExcludes": ["\"regionalPolicy\""]
   },

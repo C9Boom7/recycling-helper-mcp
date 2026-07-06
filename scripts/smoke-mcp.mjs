@@ -369,6 +369,13 @@ function assertRegionalPolicyExpectation(result, testCase) {
     );
   }
 
+  if (expectation.guidance !== undefined) {
+    assert(
+      policy.regionGuidance === expectation.guidance,
+      `${testCase.id} regionalPolicy.regionGuidance expected "${expectation.guidance}", got "${policy.regionGuidance}"`,
+    );
+  }
+
   if (expectation.shape === "minimal") {
     for (const field of ["summary", "recycling", "itemGuide", "sources", "bulkyWasteFees"]) {
       assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for minimal regional policy`);

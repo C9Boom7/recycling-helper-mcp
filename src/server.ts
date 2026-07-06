@@ -20,6 +20,7 @@ import {
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
+  itemRegionGuidance,
   itemSourceRefs,
   wasteItems,
 } from "./data.js";
@@ -239,6 +240,7 @@ function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: W
     name: region.region.name,
     checkedAt: region.region.checkedAt,
     regionCheckLevel: item ? itemRegionCheckLabel(item) : undefined,
+    regionGuidance: item ? itemRegionGuidance(item) : undefined,
   };
 
   if (!includeItemSpecificRegion) return compact;
@@ -390,6 +392,7 @@ function registerTools(server: McpServer): void {
         `- 결론: ${item.summary}`,
         `- 확신도: ${confidenceLabel(item.confidence)}`,
         `- 지역 영향: ${itemRegionCheckLabel(item)}`,
+        `- 판단 범위: ${itemRegionGuidance(item)}`,
         `- 대표 근거: ${briefSourceLabel(item)}`,
         itemNeedsCriticalRegionCheck(item)
           ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
@@ -412,6 +415,7 @@ function registerTools(server: McpServer): void {
         confidence: item.confidence,
         needsRegionCheck: itemNeedsRegionCheck(item),
         regionCheckLevel: itemRegionCheckLabel(item),
+        regionGuidance: itemRegionGuidance(item),
         regionPolicy: item.regionPolicy,
         region,
         sourceRefs: itemSourceRefs(item),
@@ -451,6 +455,8 @@ function registerTools(server: McpServer): void {
         matchedBy: match.matchedBy,
         score: match.score,
         region,
+        regionCheckLevel: itemRegionCheckLabel(match.item),
+        regionGuidance: itemRegionGuidance(match.item),
         regionalPolicy: compactRegionalPolicy(regionMatch, match.item),
       });
     },
@@ -485,6 +491,7 @@ function registerTools(server: McpServer): void {
           `   - 결론: ${match.item.summary}`,
           `   - 주의: ${match.item.cautions[0] ?? "지역별 기준을 확인하세요."}`,
           `   - 지역 영향: ${itemRegionCheckLabel(match.item)}`,
+          `   - 판단 범위: ${itemRegionGuidance(match.item)}`,
           `   - 대표 근거: ${briefSourceLabel(match.item)}`,
           `   - 확신도: ${confidenceLabel(match.item.confidence)}`,
         ]),
@@ -501,6 +508,7 @@ function registerTools(server: McpServer): void {
           confidence: match.item.confidence,
           needsRegionCheck: itemNeedsRegionCheck(match.item),
           regionCheckLevel: itemRegionCheckLabel(match.item),
+          regionGuidance: itemRegionGuidance(match.item),
           conditions: match.item.conditions,
           review: match.item.review,
         })),
@@ -548,6 +556,7 @@ function registerTools(server: McpServer): void {
           summary: match.item.summary,
           needsRegionCheck: itemNeedsRegionCheck(match.item),
           regionCheckLevel: itemRegionCheckLabel(match.item),
+          regionGuidance: itemRegionGuidance(match.item),
           conditions: match.item.conditions,
           sourceRefs: itemSourceRefs(match.item),
           sources: match.item.sources,
@@ -621,6 +630,7 @@ function registerTools(server: McpServer): void {
         "",
         match ? `품목: ${match.item.name}` : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.",
         match ? `기본 판단: ${match.item.summary}` : undefined,
+        match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
         regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
         "",
         regionMatch ? `${regionMatch.region.name} 기본 배출 기준` : undefined,
@@ -653,6 +663,7 @@ function registerTools(server: McpServer): void {
         matchedRegion: regionMatch?.region.name,
         item: match?.item.name,
         defaultSummary: match?.item.summary,
+        regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
         regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
         officialSources: regionMatch
           ? regionMatch.region.sources

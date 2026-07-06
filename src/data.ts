@@ -189,10 +189,53 @@ function isLikelyDisposalTargetMention(query: string, normalizedQuery: string, n
   return hasTopicBefore && looksLikeTarget && query.includes("?");
 }
 
+const CONDITION_QUERY_SIGNALS: Array<{ condition: string; patterns: RegExp[]; score: number }> = [
+  { condition: "contaminated", patterns: [/오염/u, /묻/u, /이물질/u, /찌꺼기/u, /더러/u, /국물/u, /양념/u, /소스/u, /크림/u, /성에/u, /핏물/u], score: 5 },
+  { condition: "food_contaminated", patterns: [/음식물/u, /국물/u, /양념/u, /소스/u, /크림/u, /성에/u, /핏물/u, /고기/u], score: 6 },
+  { condition: "oily", patterns: [/기름/u, /오일/u, /유분/u], score: 5 },
+  { condition: "damaged", patterns: [/깨진/u, /깨졌/u, /부서/u, /금간/u, /금 간/u, /파손/u, /찌그러/u, /부푼/u, /부풀/u, /터진/u], score: 5 },
+  { condition: "remaining_content", patterns: [/남았/u, /남은/u, /잔여/u, /내용물/u, /가스/u], score: 5 },
+  { condition: "pressurized", patterns: [/가스/u, /스프레이/u, /부탄/u, /압축/u, /에어로졸/u], score: 5 },
+  { condition: "electronics", patterns: [/배터리/u, /전지/u, /충전/u, /전자/u, /전동/u], score: 4 },
+  { condition: "safe_wrap_required", patterns: [/깨진/u, /파손/u, /날카/u, /신문지/u, /테이프/u, /싸서/u], score: 4 },
+  { condition: "separate_parts", patterns: [/분리/u, /뚜껑/u, /라벨/u, /스티커/u, /테이프/u, /송장/u], score: 4 },
+  { condition: "mixed_material", patterns: [/복합/u, /재질/u, /플라스틱/u, /고철/u, /금속/u, /유리/u, /종이/u, /비닐/u], score: 4 },
+];
+
+function hasQuerySignal(query: string, patterns: RegExp[]): boolean {
+  return patterns.some((pattern) => pattern.test(query));
+}
+
+function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
+  const loweredQuery = query.toLowerCase();
+  let bonus = 0;
+
+  for (const signal of CONDITION_QUERY_SIGNALS) {
+    if (item.conditions.includes(signal.condition) && hasQuerySignal(loweredQuery, signal.patterns)) {
+      bonus += signal.score;
+    }
+  }
+
+  if (item.category.includes("vinyl") && /비닐|봉지|파우치|필름|포장/u.test(loweredQuery)) {
+    bonus += 6;
+  }
+
+  if ((item.category.includes("paper") || item.category.includes("cardboard")) && /종이|상자|박스/u.test(loweredQuery)) {
+    bonus += 5;
+  }
+
+  if ((item.category.includes("can") || item.category.includes("metal")) && /캔|금속|고철/u.test(loweredQuery)) {
+    bonus += 5;
+  }
+
+  return Math.min(bonus, 18);
+}
+
 function scoreItem(query: string, item: WasteItem): WasteMatch {
   const normalizedQuery = normalizeText(query);
   const queryTokens = normalizedTokens(query);
   const names = [item.name, ...item.aliases];
+  const semanticBonus = scoreQuerySemanticSignals(query, item);
   let bestScore = 0;
   let matchedBy = item.name;
 
@@ -230,7 +273,8 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
     }
   }
 
-  return { item, score: bestScore, matchedBy };
+  const adjustedScore = bestScore > 0 && bestScore < 88 ? Math.min(99, bestScore + semanticBonus) : bestScore;
+  return { item, score: adjustedScore, matchedBy };
 }
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
@@ -341,6 +385,15 @@ export function itemRegionCheckLabel(item: WasteItem): string {
   return "참고";
 }
 
+export function itemRegionGuidance(item: WasteItem): string {
+  if (!itemNeedsRegionCheck(item)) return "전국 공통 기준으로 바로 안내 가능합니다.";
+  if (itemNeedsCriticalRegionCheck(item)) {
+    return "지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.";
+  }
+
+  return "기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.";
+}
+
 export function itemSourceRefs(item: WasteItem): string[] {
   if (item.sources?.length > 0) {
     return item.sources.map((source) => source.title);
@@ -447,6 +500,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     `- 배출 판단: ${item.disposalType}`,
     `- 결론: ${item.summary}`,
     `- 확신도: ${confidenceLabel(item.confidence)}`,
+    `- 판단 범위: ${itemRegionGuidance(item)}`,
     item.conditions.length > 0 ? `- 판단 조건: ${item.conditions.map(conditionLabel).join(", ")}` : undefined,
     "",
     "### 배출 방법",

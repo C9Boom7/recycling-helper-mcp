@@ -82,7 +82,7 @@
 5. `src/data/waste-items.json`에 품목을 추가한다.
 6. 같은 품목의 대표 질문을 `src/data/evaluation-cases.json`에 추가한다.
 7. Top 50 품목과 사용자 질문에서 승격한 확장 품목은 품목당 정확히 1개의 대표 질문 평가 케이스를 유지한다.
-8. 실제 답변 문구나 구조화 응답이 중요하면 `src/data/mcp-answer-cases.json`에 MCP 답변 케이스를 추가한다.
+8. 실제 답변 문구나 구조화 응답이 중요하면 `src/data/mcp-answer-cases.json`에 MCP 답변 케이스를 추가한다. 지역 정책 응답은 `expectedRegionalPolicy.level`, `shape`, `guidance`로 `regionCheckLevel`, 구조 축약 형태, `regionGuidance`를 함께 고정할 수 있다.
 9. 백로그에서 승격한 질문은 `covered`로 바꾼다.
 10. `pnpm check`를 실행한다.
 11. 대표 MCP 호출로 실제 답변 톤을 확인한다.
@@ -127,7 +127,7 @@ pnpm local:test
 
 `pnpm backlog:auto`는 실제 질문 로그를 분석해 미매칭, 낮은 매칭 점수, `needs_source`, 낮은 confidence 품목을 자동으로 `question-backlog.json` 후보로 만든다. 기본은 dry-run이고, 저장하려면 `--write`를 붙인다.
 
-`pnpm backlog:auto:quality`는 개인정보 없는 재현용 질문 묶음인 `logs/quality-seed-queries.example.jsonl`을 분석한다. 현재 quality seed는 88개 질문을 담고 있으며, 실제 백로그에 추가하려면 dry-run 후보를 검토한 뒤 `pnpm backlog:auto:quality -- --write`를 붙인다.
+`pnpm backlog:auto:quality`는 개인정보 없는 재현용 질문 묶음인 `logs/quality-seed-queries.example.jsonl`을 분석한다. 현재 quality seed는 116개 질문을 담고 있으며, 실제 백로그에 추가하려면 dry-run 후보를 검토한 뒤 `pnpm backlog:auto:quality -- --write`를 붙인다.
 
 `pnpm log:query`는 수동 테스트 또는 사용자 피드백 질문을 `logs/manual-queries.jsonl`에 JSONL로 남긴다. 실제 로그 파일은 Git에 커밋하지 않고, `logs/manual-queries.example.jsonl`만 형식 예시로 관리한다.
 
