@@ -2669,5 +2669,26 @@
       "coveredAt: 2026-07-03",
       "coveredBy: MCP answer case songpa_mirror_fee_question_short_alias"
     ]
+  },
+  {
+    "id": "auto_b6aece0913",
+    "query": "정수기 필터는 어떻게 버려?",
+    "region": "서울 강남구",
+    "type": "new_item_candidate",
+    "status": "todo",
+    "priority": "medium",
+    "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
+    "expectedAction": "공식 출처를 확인해 신규 품목 추가 여부를 결정하고, 필요하면 평가 케이스와 MCP 답변 케이스를 추가합니다.",
+    "candidateItemIds": [],
+    "notes": [
+      "autoSource: auto-backlog",
+      "autoReason: no_match",
+      "minScore: 70",
+      "sourceIndex: 1",
+      "topCandidate: home_injection_needle/자가주사기 주사바늘 matchedBy=주사바늘 달린 자가주사기는 어떻게 버려 score=19",
+      "itemConfidence: medium",
+      "reviewStatus: region_review_needed",
+      "otherCandidates: canvas_frame/캔버스 액자 matchedBy=캔버스 액자는 어떻게 버려 score=16; glass_bottle/유리병 matchedBy=간장 유리병에 플라스틱 뚜껑 붙어있으면 어떻게 버려 score=14"
+    ]
   }
 ]

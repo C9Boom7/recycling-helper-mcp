@@ -129,6 +129,7 @@ export type WasteMatch = {
   item: WasteItem;
   score: number;
   matchedBy: string;
+  matchKind: MatchKind;
 };
 
 const dataPath = fileURLToPath(new URL("./data/waste-items.json", import.meta.url));
@@ -147,6 +148,7 @@ export function normalizeText(value: string): string {
 }
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
+const HIGH_CONFIDENCE_SCORE = 88;
 const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
 
 function normalizedTokens(value: string): string[] {
@@ -231,6 +233,15 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
   return Math.min(bonus, 18);
 }
 
+/**
+ * "generic_fragment" marks the one branch below (query is a short substring of
+ * the candidate name/alias, e.g. "컵" inside "깨진 유리컵") that scores purely on
+ * containment with no standalone-word check. Every other branch already requires
+ * an exact, prefix, or standalone-token match, so only this one needs a tie check
+ * in resolveWasteItem before it's safe to answer with confidence.
+ */
+type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_overlap" | "target_mention";
+
 function scoreItem(query: string, item: WasteItem): WasteMatch {
   const normalizedQuery = normalizeText(query);
   const queryTokens = normalizedTokens(query);
@@ -238,43 +249,52 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
   const semanticBonus = scoreQuerySemanticSignals(query, item);
   let bestScore = 0;
   let matchedBy = item.name;
+  let matchKind: MatchKind = "none";
 
   for (const name of names) {
     const normalizedName = normalizeText(name);
     const isShortAlias = normalizedName.length <= SHORT_ALIAS_MAX_LENGTH;
     let score = 0;
+    let kind: MatchKind = "none";
 
     if (normalizedQuery === normalizedName) {
       score = 100;
+      kind = "exact";
     } else if (normalizedQuery.includes(normalizedName)) {
       if (isLikelyDisposalTargetMention(query, normalizedQuery, normalizedName)) {
         score = 20;
+        kind = "target_mention";
       } else if (isShortAlias) {
         score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? 78 : 0;
+        kind = "short_alias_standalone";
       } else {
         const startsWithName = normalizedQuery.startsWith(normalizedName);
         const lengthBonus = Math.min(normalizedName.length, 5);
         score = Math.min(99, 88 + lengthBonus + (startsWithName ? 5 : 0));
+        kind = "query_contains_name";
       }
     } else if (normalizedName.includes(normalizedQuery)) {
       score = 82;
+      kind = "generic_fragment";
     } else {
       if (!isShortAlias) {
         const queryChars = Array.from(new Set(normalizedQuery.split("")));
         const nameChars = new Set(normalizedName.split(""));
         const overlap = queryChars.filter((char) => nameChars.has(char)).length;
         score = Math.round((overlap / Math.max(queryChars.length, 1)) * 30);
+        kind = "fuzzy_overlap";
       }
     }
 
     if (score > bestScore) {
       bestScore = score;
       matchedBy = name;
+      matchKind = kind;
     }
   }
 
-  const adjustedScore = bestScore > 0 && bestScore < 88 ? Math.min(99, bestScore + semanticBonus) : bestScore;
-  return { item, score: adjustedScore, matchedBy };
+  const adjustedScore = bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE ? Math.min(99, bestScore + semanticBonus) : bestScore;
+  return { item, score: adjustedScore, matchedBy, matchKind };
 }
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
@@ -292,6 +312,35 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
 
 export function findBestWasteItem(query: string): WasteMatch | undefined {
   return findWasteItems(query, 1)[0];
+}
+
+export type WasteQueryResolution =
+  | { status: "match"; match: WasteMatch }
+  | { status: "ambiguous"; candidates: WasteMatch[] }
+  | { status: "not_found" };
+
+/**
+ * Only the "generic_fragment" match kind is a bare containment check (e.g. "컵"
+ * inside "깨진 유리컵", "종이컵", "컵라면 용기") with no standalone-word guard, so a
+ * tie there is a real coin flip. Other kinds (short alias, exact, prefix) already
+ * require a standalone-token or full match, so ties among those are resolved as
+ * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
+ */
+export function resolveWasteItem(query: string): WasteQueryResolution {
+  const matches = findWasteItems(query, 5);
+  if (matches.length === 0) {
+    return { status: "not_found" };
+  }
+
+  const [best, ...rest] = matches;
+  if (best.matchKind === "generic_fragment" && best.score < HIGH_CONFIDENCE_SCORE) {
+    const tied = rest.filter((match) => match.score === best.score);
+    if (tied.length > 0) {
+      return { status: "ambiguous", candidates: [best, ...tied] };
+    }
+  }
+
+  return { status: "match", match: best };
 }
 
 export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undefined {
@@ -400,6 +449,15 @@ export function itemSourceRefs(item: WasteItem): string[] {
   }
 
   return item.sourceRefs;
+}
+
+/**
+ * Drops internal editorial fields (reviewer, notes) before an item's review
+ * metadata reaches tool responses. Those are for the data-maintenance workflow,
+ * not for MCP callers or end users.
+ */
+export function publicReviewMetadata(item: WasteItem): Pick<ReviewMetadata, "status"> {
+  return { status: item.review.status };
 }
 
 export function formatSourceList(item: WasteItem): string[] {

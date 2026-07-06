@@ -4,13 +4,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import type { MatchedRegionPolicy, WasteItem } from "./data.js";
+import type { MatchedRegionPolicy, WasteItem, WasteMatch } from "./data.js";
 import {
   confidenceLabel,
   disposalGroupLabel,
   findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
-  findBestWasteItem,
   findRegionalPolicy,
   findRegionItemGuide,
   findWasteItems,
@@ -22,6 +21,8 @@ import {
   itemRegionCheckLabel,
   itemRegionGuidance,
   itemSourceRefs,
+  publicReviewMetadata,
+  resolveWasteItem,
   wasteItems,
 } from "./data.js";
 
@@ -311,6 +312,24 @@ function unknownItemResult(itemName: string): CallToolResult {
   );
 }
 
+function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallToolResult {
+  const candidateNames = candidates.map((match) => match.item.name);
+
+  return textResult(
+    [
+      `입력한 품목 "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다.`,
+      `후보: ${candidateNames.join(", ")}`,
+      "재질, 용도, 크기를 조금 더 구체적으로 알려주시면 정확히 판단할 수 있습니다.",
+    ].join("\n"),
+    {
+      found: false,
+      ambiguous: true,
+      itemName,
+      candidates: candidateNames,
+    },
+  );
+}
+
 function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
   return [
     `일반쓰레기: ${region.region.generalWaste.time}, ${region.region.generalWaste.place}`,
@@ -381,9 +400,11 @@ function registerTools(server: McpServer): void {
       },
     },
     async ({ itemName, region }): Promise<CallToolResult> => {
-      const match = findBestWasteItem(itemName);
-      if (!match) return unknownItemResult(itemName);
+      const resolved = resolveWasteItem(itemName);
+      if (resolved.status === "not_found") return unknownItemResult(itemName);
+      if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
 
+      const { match } = resolved;
       const { item } = match;
       const text = [
         `분류 결과: ${item.name}`,
@@ -420,7 +441,7 @@ function registerTools(server: McpServer): void {
         region,
         sourceRefs: itemSourceRefs(item),
         sources: item.sources,
-        review: item.review,
+        review: publicReviewMetadata(item),
       });
     },
   );
@@ -444,14 +465,16 @@ function registerTools(server: McpServer): void {
       },
     },
     async ({ itemName, region }): Promise<CallToolResult> => {
-      const match = findBestWasteItem(itemName);
-      if (!match) return unknownItemResult(itemName);
+      const resolved = resolveWasteItem(itemName);
+      if (resolved.status === "not_found") return unknownItemResult(itemName);
+      if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
 
+      const { match } = resolved;
       const regionMatch = itemNeedsRegionCheck(match.item) ? findRegionalPolicy(region) : undefined;
       const text = formatItemGuide(match.item, region);
       return textResult(text, {
         found: true,
-        item: match.item,
+        item: { ...match.item, review: publicReviewMetadata(match.item) },
         matchedBy: match.matchedBy,
         score: match.score,
         region,
@@ -510,7 +533,7 @@ function registerTools(server: McpServer): void {
           regionCheckLevel: itemRegionCheckLabel(match.item),
           regionGuidance: itemRegionGuidance(match.item),
           conditions: match.item.conditions,
-          review: match.item.review,
+          review: publicReviewMetadata(match.item),
         })),
       });
     },
@@ -536,8 +559,8 @@ function registerTools(server: McpServer): void {
     },
     async ({ items, region }): Promise<CallToolResult> => {
       const planned = items.map((rawName) => {
-        const match = findBestWasteItem(rawName);
-        if (!match) {
+        const resolved = resolveWasteItem(rawName);
+        if (resolved.status === "not_found") {
           return {
             input: rawName,
             found: false as const,
@@ -546,6 +569,17 @@ function registerTools(server: McpServer): void {
           };
         }
 
+        if (resolved.status === "ambiguous") {
+          const candidateNames = resolved.candidates.map((candidate) => candidate.item.name);
+          return {
+            input: rawName,
+            found: false as const,
+            group: "확인 필요",
+            summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateNames.join(", ")}).`,
+          };
+        }
+
+        const { match } = resolved;
         return {
           input: rawName,
           found: true as const,
@@ -621,14 +655,25 @@ function registerTools(server: McpServer): void {
       },
     },
     async ({ region, itemName }): Promise<CallToolResult> => {
-      const match = itemName ? findBestWasteItem(itemName) : undefined;
+      const resolved = itemName ? resolveWasteItem(itemName) : undefined;
+      const match = resolved?.status === "match" ? resolved.match : undefined;
+      const ambiguousCandidates =
+        resolved?.status === "ambiguous" ? resolved.candidates.map((candidate) => candidate.item.name) : undefined;
       const regionMatch = findRegionalPolicy(region);
       const checkList = itemRegionCheckList(regionMatch, match?.item);
+
+      const itemLine = match
+        ? `품목: ${match.item.name}`
+        : ambiguousCandidates
+        ? `품목: "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다. (후보: ${ambiguousCandidates.join(", ")})`
+        : itemName
+        ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
+        : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";
 
       const lines = [
         `${regionMatch?.region.name ?? region} 지역 확인 안내`,
         "",
-        match ? `품목: ${match.item.name}` : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.",
+        itemLine,
         match ? `기본 판단: ${match.item.summary}` : undefined,
         match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
         regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
@@ -662,6 +707,7 @@ function registerTools(server: McpServer): void {
         region,
         matchedRegion: regionMatch?.region.name,
         item: match?.item.name,
+        ambiguousCandidates,
         defaultSummary: match?.item.summary,
         regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
         regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
@@ -835,6 +881,26 @@ app.delete("/mcp", (_req: Request, res: Response) => {
     error: {
       code: -32000,
       message: "Method not allowed. This MCP server is stateless.",
+    },
+    id: null,
+  });
+});
+
+// Malformed JSON bodies throw before any route handler runs. Without this,
+// Express falls back to its default HTML error page (stack trace included
+// outside NODE_ENV=production), which is neither valid JSON-RPC nor safe to
+// expose on a public, unauthenticated endpoint.
+app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if (!(err instanceof SyntaxError) || !("status" in err) || (err as { status?: number }).status !== 400 || res.headersSent) {
+    next(err);
+    return;
+  }
+
+  res.status(400).json({
+    jsonrpc: "2.0",
+    error: {
+      code: -32700,
+      message: "Parse error",
     },
     id: null,
   });
