@@ -103,10 +103,10 @@ QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 �
 
 ## 완료 체크리스트
 
-- [ ] R1 allowlist 와일드카드
-- [ ] R2 CORS origins
-- [ ] R3 descriptions + SERVER_INSTRUCTIONS
-- [ ] R4 단일 소스 툴 정의 + smoke 동등성 케이스
-- [ ] R5 structuredContent 다이어트 + 케이스 갱신
-- [ ] R6 호출 로깅
-- [ ] DoD 전 항목
+- [x] R1 allowlist 와일드카드 — 자체 host 미들웨어 (`*.playmcp-endpoint.kakaocloud.io`), smoke에 node:http 기반 허용/차단(403) 검증 추가 (undici fetch는 커스텀 Host를 무시하는 것을 발견, 기존 host 테스트는 유명무실했음)
+- [x] R2 CORS origins — preview-chatgpt.kakao.com, tools.kakao.com 추가, smoke origin 루프 확장
+- [x] R3 descriptions + SERVER_INSTRUCTIONS — PRD 초안 그대로 적용
+- [x] R4 단일 소스 툴 정의 — `TOOL_DEFS`에서 SSE/JSON-only 양쪽 생성 (zod-to-json-schema, SDK와 동일 옵션), smoke에 두 경로 byte-identical 검증 추가. SDK가 execution taskSupport "forbidden"을 기본 부여하므로 COMPAT에도 미러링
+- [x] R5 structuredContent 다이어트 — get_disposal_steps 전체 품목 덤프 제거(대표 응답 512B, 기존 대비 1/4 이하). 기존 196 케이스 중 케이스 수정 0건 (cleanup plan의 품목별 regionGuidance는 이전 세션의 의도된 회귀 케이스라 필드 유지로 대응)
+- [x] R6 호출 로깅 — withCallLog, stdout JSONL {ts, tool, input, status, matchedId, score, ms}
+- [x] DoD — pnpm local:test 통과 (196 answer cases), curl로 임의 host 403/와일드카드 200 확인, 로컬 main 머지

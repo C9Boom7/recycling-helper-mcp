@@ -66,10 +66,10 @@ Phase 3은 `src/server.ts`의 `get_disposal_steps` 핸들러를 만지므로 Pha
 
 | Phase | 상태 | 브랜치 | 비고 |
 | --- | --- | --- | --- |
-| 0 | 미착수 | - | |
-| 1 | 미착수 | - | |
-| 2 | 미착수 | - | |
-| 3 | 미착수 | - | |
+| 0 | 완료 (main 머지) | claude/kakaotalk-mcp-analysis-4dfb43 | push 대기 |
+| 1 | 미착수 | - | Phase 0 머지됨 — 착수 가능 |
+| 2 | 미착수 | - | Phase 0 머지됨 — 착수 가능, Phase 1과 병렬 가능 |
+| 3 | 미착수 | - | Phase 1 머지 후 권장 |
 | 4 | 미착수 | - | |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.

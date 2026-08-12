@@ -1,8 +1,10 @@
+import express from "express";
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
+import type { ZodRawShape } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, WasteItem, WasteMatch } from "./data.js";
 import {
@@ -20,7 +22,6 @@ import {
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
   itemRegionGuidance,
-  itemSourceRefs,
   publicReviewMetadata,
   resolveWasteItem,
   wasteItems,
@@ -29,20 +30,19 @@ import {
 const SERVICE_NAME = "RecyclingHelper(재활용척척)";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
 const HOST = process.env.HOST ?? "127.0.0.1";
-const DEFAULT_ALLOWED_HOSTS = [
-  "localhost",
-  "127.0.0.1",
-  "[::1]",
-  "recyling-helper-mcp.playmcp-endpoint.kakaocloud.io",
-  "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io",
-  "recycle-helper-mcp-v2.playmcp-endpoint.kakaocloud.io",
-  "recycling-helper-mcp.playmcp-endpoint.kakaocloud.io",
-];
+// Suffix wildcards (leading "*.") cover whatever hostname PlayMCP in KC assigns
+// to a newly created server, so a redeploy never needs a code change.
+const DEFAULT_ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "*.playmcp-endpoint.kakaocloud.io"];
 const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS ?? DEFAULT_ALLOWED_HOSTS.join(","))
   .split(",")
-  .map((host) => host.trim())
+  .map((host) => host.trim().toLowerCase())
   .filter(Boolean);
-const DEFAULT_ALLOWED_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://playmcp.kakaocloud.io",
+  "https://playmcp.kakao.com",
+  "https://preview-chatgpt.kakao.com",
+  "https://tools.kakao.com",
+];
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? DEFAULT_ALLOWED_ORIGINS.join(","))
   .split(",")
   .map((origin) => origin.trim())
@@ -59,7 +59,11 @@ const SERVER_INFO = {
   version: "0.1.0",
 };
 const SERVER_INSTRUCTIONS =
-  "Use RecyclingHelper(재활용척척) tools to answer Korean household waste disposal questions. Prefer concise, source-aware answers. If local rules may differ, say that regional verification is needed.";
+  "Use RecyclingHelper(재활용척척) tools to answer Korean household waste disposal questions. " +
+  "Prefer get_disposal_steps whenever the user asks how to throw away, discard, or recycle an item. " +
+  "If a result is ambiguous, show the candidates and ask the user about material or usage instead of guessing. " +
+  "If the user mentions where they live, pass it as the region argument. " +
+  "Keep answers concise and cite the provided sources; if local rules may differ, say that regional verification is needed.";
 
 type JsonRpcId = string | number | null;
 type JsonRpcBody = {
@@ -71,148 +75,101 @@ type JsonRpcBody = {
 
 type ToolResult = Record<string, unknown>;
 
-const itemNameSchema = {
-  type: "string",
-  minLength: 1,
-  maxLength: 80,
-  description: "Household waste item name or short description in Korean.",
-};
-const optionalRegionSchema = {
-  type: "string",
-  maxLength: 80,
-  description: "Optional Korean city, district, or neighborhood.",
-};
-const readOnlyToolAnnotations = {
+const itemNameParam = z
+  .string()
+  .min(1)
+  .max(80)
+  .describe("Household waste item name or short description in Korean.");
+const optionalRegionParam = z.string().max(80).optional().describe("Optional Korean city, district, or neighborhood.");
+
+const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
   destructiveHint: false,
   openWorldHint: false,
   idempotentHint: true,
 };
-const defaultToolExecution = {
-  taskSupport: "forbidden",
+
+type ToolDef = {
+  name: string;
+  title: string;
+  description: string;
+  inputShape: ZodRawShape;
+  annotations: Record<string, unknown> & { title: string };
 };
-const COMPAT_TOOLS = [
+
+/**
+ * Single source of truth for tool metadata. Both the McpServer registration
+ * (SSE path) and the JSON-only discovery response are generated from this
+ * list, so the two can never drift apart.
+ */
+const TOOL_DEFS: ToolDef[] = [
   {
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Classifies a household waste item with RecyclingHelper(재활용척척), returning the likely disposal category, confidence, and whether local rules should be checked.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        itemName: itemNameSchema,
-        region: optionalRegionSchema,
-      },
-      required: ["itemName"],
-      additionalProperties: false,
-      $schema: "http://json-schema.org/draft-07/schema#",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/대형폐기물/특수폐기물), confidence, and whether local municipality rules matter. Use for quick yes/no judgment questions like '피자박스 재활용 돼?', '이거 분리수거 되나?', '스티로폼은 어디에 버려?'. For full step-by-step disposal instructions, prefer get_disposal_steps.",
+    inputShape: {
+      itemName: itemNameParam,
+      region: optionalRegionParam,
     },
     annotations: {
       title: "Classify Waste Item",
-      ...readOnlyToolAnnotations,
+      ...READ_ONLY_ANNOTATIONS,
     },
-    execution: defaultToolExecution,
   },
   {
     name: "get_disposal_steps",
     title: "Get Disposal Steps",
     description:
-      "Returns practical step-by-step disposal instructions from RecyclingHelper(재활용척척), including cautions and source references for a household waste item.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        itemName: itemNameSchema,
-        region: optionalRegionSchema,
-      },
-      required: ["itemName"],
-      additionalProperties: false,
-      $schema: "http://json-schema.org/draft-07/schema#",
+      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. This is the primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Accepts vague or partial item names; if ambiguous, the result lists candidates so you can ask the user which one they mean.",
+    inputShape: {
+      itemName: itemNameParam,
+      region: optionalRegionParam,
     },
     annotations: {
       title: "Get Disposal Steps",
-      ...readOnlyToolAnnotations,
+      ...READ_ONLY_ANNOTATIONS,
     },
-    execution: defaultToolExecution,
   },
   {
     name: "check_confusing_item",
     title: "Check Confusing Item",
     description:
-      "Checks if a household waste item is commonly confused and explains the exception with RecyclingHelper(재활용척척).",
-    inputSchema: {
-      type: "object",
-      properties: {
-        itemName: {
-          type: "string",
-          minLength: 1,
-          maxLength: 80,
-          description: "Confusing household waste item name or situation in Korean.",
-        },
-      },
-      required: ["itemName"],
-      additionalProperties: false,
-      $schema: "http://json-schema.org/draft-07/schema#",
+      "Explains commonly confused Korean waste-sorting cases with RecyclingHelper(재활용척척), comparing up to 3 similar items and their exceptions. Use when the user is unsure between categories or asks why — e.g. '영수증은 종이인데 왜 재활용 안 돼?', '컵라면 용기는 종이야 플라스틱이야?', '이것도 재활용 되는 거 맞아?'.",
+    inputShape: {
+      itemName: z.string().min(1).max(80).describe("Confusing household waste item name or situation in Korean."),
     },
     annotations: {
       title: "Check Confusing Item",
-      ...readOnlyToolAnnotations,
+      ...READ_ONLY_ANNOTATIONS,
     },
-    execution: defaultToolExecution,
   },
   {
     name: "make_cleanup_plan",
     title: "Make Cleanup Plan",
     description:
-      "Groups multiple household waste items into disposal buckets with RecyclingHelper(재활용척척), useful for moving, cleaning, or decluttering.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        items: {
-          type: "array",
-          items: {
-            type: "string",
-            minLength: 1,
-            maxLength: 80,
-          },
-          minItems: 1,
-          maxItems: 30,
-          description: "List of household waste item names in Korean.",
-        },
-        region: optionalRegionSchema,
-      },
-      required: ["items"],
-      additionalProperties: false,
-      $schema: "http://json-schema.org/draft-07/schema#",
+      "Groups multiple Korean household waste items into disposal buckets (재활용/일반쓰레기/대형폐기물/특수폐기물) with RecyclingHelper(재활용척척) and returns an organized disposal plan. Use when the user lists two or more items to throw away, or mentions moving out, decluttering, or a big cleanup — e.g. '이사 가는데 침대, 옷, 화분 버려야 해', '대청소했더니 버릴 게 한가득이야'.",
+    inputShape: {
+      items: z
+        .array(z.string().min(1).max(80))
+        .min(1)
+        .max(30)
+        .describe("List of household waste item names in Korean."),
+      region: optionalRegionParam,
     },
     annotations: {
       title: "Make Cleanup Plan",
-      ...readOnlyToolAnnotations,
+      ...READ_ONLY_ANNOTATIONS,
     },
-    execution: defaultToolExecution,
   },
   {
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Explains what local disposal information should be checked for a Korean region using RecyclingHelper(재활용척척), with official regional data sources to verify.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        region: {
-          type: "string",
-          minLength: 1,
-          maxLength: 80,
-          description: "Korean city, district, or neighborhood.",
-        },
-        itemName: {
-          type: "string",
-          maxLength: 80,
-          description: "Optional household waste item name in Korean.",
-        },
-      },
-      required: ["region"],
-      additionalProperties: false,
-      $schema: "http://json-schema.org/draft-07/schema#",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): collection days, bulky-waste application links and fees, and official local sources. Use when the user names where they live or asks region-specific questions — e.g. '강남구 재활용 무슨 요일에 버려?', '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 폐건전지 어디 버려?'. Optional itemName narrows the checklist to that item.",
+    inputShape: {
+      region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
+      itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
     },
     annotations: {
       title: "Get Region Disposal Info",
@@ -221,9 +178,27 @@ const COMPAT_TOOLS = [
       openWorldHint: true,
       idempotentHint: true,
     },
-    execution: defaultToolExecution,
   },
 ];
+
+const COMPAT_TOOLS = TOOL_DEFS.map((def) => ({
+  name: def.name,
+  title: def.title,
+  description: def.description,
+  inputSchema: zodToJsonSchema(z.object(def.inputShape), { strictUnions: true, pipeStrategy: "input" }),
+  annotations: def.annotations,
+  // The SDK defaults registered tools to taskSupport "forbidden"; mirror it so
+  // the JSON-only list stays byte-identical to the SSE list.
+  execution: { taskSupport: "forbidden" },
+}));
+
+function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?: string }> {
+  if (item.sources?.length > 0) {
+    return item.sources.slice(0, limit).map((source) => ({ title: source.title, url: source.url }));
+  }
+
+  return item.sourceRefs.slice(0, limit).map((title) => ({ title }));
+}
 
 function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem, includeGeneralRegion = false): ToolResult | undefined {
   if (!region) return undefined;
@@ -325,7 +300,6 @@ function ambiguousCandidateDetails(match: WasteMatch): ToolResult {
     itemId: match.item.id,
     itemName: match.item.name,
     matchedBy: match.matchedBy,
-    score: match.score,
   };
 }
 
@@ -398,352 +372,355 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
   return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
 }
 
+async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<CallToolResult> {
+  const resolved = resolveWasteItem(itemName);
+  if (resolved.status === "not_found") return unknownItemResult(itemName);
+  if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
+
+  const { match } = resolved;
+  const { item } = match;
+  const text = [
+    `분류 결과: ${item.name}`,
+    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
+    `- 세부 판단: ${item.disposalType}`,
+    `- 결론: ${item.summary}`,
+    `- 확신도: ${confidenceLabel(item.confidence)}`,
+    `- 지역 영향: ${itemRegionCheckLabel(item)}`,
+    `- 판단 범위: ${itemRegionGuidance(item)}`,
+    `- 대표 근거: ${briefSourceLabel(item)}`,
+    itemNeedsCriticalRegionCheck(item)
+      ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
+      : itemNeedsRegionCheck(item)
+      ? "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      : undefined,
+    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const primarySource = item.sources[0];
+  return textResult(text, {
+    found: true,
+    matchedItem: item.name,
+    matchedBy: match.matchedBy,
+    score: match.score,
+    disposalGroup: disposalGroupLabel(item.disposalType),
+    disposalType: item.disposalType,
+    summary: item.summary,
+    confidence: item.confidence,
+    needsRegionCheck: itemNeedsRegionCheck(item),
+    regionCheckLevel: itemRegionCheckLabel(item),
+    regionGuidance: itemRegionGuidance(item),
+    region,
+    primarySource: primarySource
+      ? { title: primarySource.title, url: primarySource.url }
+      : { title: item.sourceRefs[0] ?? "재활용척척 보수 안내 정책" },
+  });
+}
+
+async function handleGetDisposalSteps({ itemName, region }: { itemName: string; region?: string }): Promise<CallToolResult> {
+  const resolved = resolveWasteItem(itemName);
+  if (resolved.status === "not_found") return unknownItemResult(itemName);
+  if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
+
+  const { match } = resolved;
+  const { item } = match;
+  const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+  const text = formatItemGuide(item, region);
+  return textResult(text, {
+    found: true,
+    id: item.id,
+    itemName: item.name,
+    matchedBy: match.matchedBy,
+    score: match.score,
+    disposalGroup: disposalGroupLabel(item.disposalType),
+    summary: item.summary,
+    review: publicReviewMetadata(item),
+    region,
+    regionCheckLevel: itemRegionCheckLabel(item),
+    regionGuidance: itemRegionGuidance(item),
+    sources: itemTopSources(item),
+    regionalPolicy: compactRegionalPolicy(regionMatch, item),
+  });
+}
+
+async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<CallToolResult> {
+  const matches = findWasteItems(itemName, 3);
+  if (matches.length === 0) return unknownItemResult(itemName);
+
+  const lines = [
+    `헷갈림 체크: "${itemName}"`,
+    "",
+    ...matches.flatMap((match, index) => [
+      `${index + 1}. ${match.item.name}`,
+      `   - 결론: ${match.item.summary}`,
+      `   - 주의: ${match.item.cautions[0] ?? "지역별 기준을 확인하세요."}`,
+      `   - 지역 영향: ${itemRegionCheckLabel(match.item)}`,
+      `   - 판단 범위: ${itemRegionGuidance(match.item)}`,
+      `   - 대표 근거: ${briefSourceLabel(match.item)}`,
+      `   - 확신도: ${confidenceLabel(match.item.confidence)}`,
+    ]),
+  ];
+
+  return textResult(lines.join("\n"), {
+    found: true,
+    matches: matches.map((match) => ({
+      itemName: match.item.name,
+      matchedBy: match.matchedBy,
+      summary: match.item.summary,
+      caution: match.item.cautions[0],
+      confidence: match.item.confidence,
+      needsRegionCheck: itemNeedsRegionCheck(match.item),
+      regionCheckLevel: itemRegionCheckLabel(match.item),
+      regionGuidance: itemRegionGuidance(match.item),
+    })),
+  });
+}
+
+async function handleMakeCleanupPlan({ items, region }: { items: string[]; region?: string }): Promise<CallToolResult> {
+  const planned = items.map((rawName) => {
+    const resolved = resolveWasteItem(rawName);
+    if (resolved.status === "not_found") {
+      return {
+        input: rawName,
+        found: false as const,
+        group: "확인 필요",
+        summary: "초기 데이터에서 확실히 찾지 못했습니다.",
+      };
+    }
+
+    if (resolved.status === "ambiguous") {
+      const candidateLabels = resolved.candidates.map(ambiguousCandidateLabel);
+      return {
+        input: rawName,
+        found: false as const,
+        group: "확인 필요",
+        summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateLabels.join(", ")}).`,
+        candidates: candidateLabels,
+      };
+    }
+
+    const { match } = resolved;
+    return {
+      input: rawName,
+      found: true as const,
+      itemName: match.item.name,
+      matchedBy: match.matchedBy,
+      group: disposalGroupLabel(match.item.disposalType),
+      summary: match.item.summary,
+      regionCheckLevel: itemRegionCheckLabel(match.item),
+      regionGuidance: itemRegionGuidance(match.item),
+      sourceRef: briefSourceLabel(match.item),
+    };
+  });
+
+  const groups = new Map<string, typeof planned>();
+  for (const entry of planned) {
+    const existing = groups.get(entry.group) ?? [];
+    existing.push(entry);
+    groups.set(entry.group, existing);
+  }
+
+  const lines = [
+    "대청소 배출 계획",
+    region ? `지역: ${region}` : undefined,
+    "",
+    ...Array.from(groups.entries()).flatMap(([group, entries]) => [
+      `## ${group}`,
+      ...entries.flatMap((entry) => {
+        const label = entry.found ? `${entry.input} -> ${entry.itemName}` : entry.input;
+        const regionImpact = entry.found ? ` (지역 영향: ${entry.regionCheckLevel})` : "";
+        return [
+          `- ${label}: ${entry.summary}${regionImpact}`,
+          entry.found ? `  - 대표 근거: ${entry.sourceRef}` : undefined,
+        ].filter((line): line is string => line !== undefined);
+      }),
+      "",
+    ]),
+    planned.some((entry) => entry.found && entry.regionCheckLevel === "필수")
+      ? "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
+      : undefined,
+    planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
+      ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      : undefined,
+  ].filter(Boolean);
+
+  const structuredItems = planned.map((entry) =>
+    entry.found
+      ? {
+          input: entry.input,
+          found: true,
+          group: entry.group,
+          itemName: entry.itemName,
+          matchedBy: entry.matchedBy,
+          summary: entry.summary,
+          regionCheckLevel: entry.regionCheckLevel,
+          regionGuidance: entry.regionGuidance,
+        }
+      : {
+          input: entry.input,
+          found: false,
+          group: entry.group,
+          summary: entry.summary,
+          ...("candidates" in entry && entry.candidates ? { candidates: entry.candidates } : {}),
+        },
+  );
+
+  return textResult(lines.join("\n"), {
+    region,
+    items: structuredItems,
+  });
+}
+
+async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<CallToolResult> {
+  const resolved = itemName ? resolveWasteItem(itemName) : undefined;
+  const match = resolved?.status === "match" ? resolved.match : undefined;
+  const ambiguousCandidates =
+    resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateLabel) : undefined;
+  const regionMatch = findRegionalPolicy(region);
+  const checkList = itemRegionCheckList(regionMatch, match?.item);
+
+  const itemLine = match
+    ? `품목: ${match.item.name}`
+    : ambiguousCandidates
+    ? `품목: "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다. (후보: ${ambiguousCandidates.join(", ")})`
+    : itemName
+    ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
+    : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";
+
+  const lines = [
+    `${regionMatch?.region.name ?? region} 지역 확인 안내`,
+    "",
+    itemLine,
+    match ? `기본 판단: ${match.item.summary}` : undefined,
+    match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
+    regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
+    "",
+    regionMatch ? `${regionMatch.region.name} 기본 배출 기준` : undefined,
+    regionMatch ? `- 일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}` : undefined,
+    regionMatch ? `- 재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}` : undefined,
+    regionMatch ? `- ${regionMatch.region.recycling.vinylAndPetDay}` : undefined,
+    regionMatch ? `- ${regionMatch.region.recycling.otherDays}` : undefined,
+    match && regionMatch ? "" : undefined,
+    match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
+    match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
+    "",
+    "확인할 정보",
+    ...checkList.map((item, index) => `${index + 1}. ${item}`),
+    match ? "" : undefined,
+    match ? "품목 판단 근거" : undefined,
+    match ? `- ${briefSourceLabel(match.item)}` : undefined,
+    "",
+    "공식 확인처",
+    ...(regionMatch
+      ? formatRegionSourceList(regionMatch.region)
+      : [
+          "- 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do",
+          "- 거주 지자체 청소/자원순환/환경 부서 안내 페이지",
+          "- 대형폐기물은 지자체 대형폐기물 신고 페이지",
+        ]),
+  ].filter(Boolean);
+
+  return textResult(lines.join("\n"), {
+    region,
+    matchedRegion: regionMatch?.region.name,
+    item: match?.item.name,
+    ambiguousCandidates,
+    defaultSummary: match?.item.summary,
+    regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
+    regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
+    officialSources: regionMatch
+      ? regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url }))
+      : [
+          "https://www.분리배출.kr/front/region/region.do",
+          "거주 지자체 청소/자원순환/환경 부서 안내 페이지",
+        ],
+    checkList,
+  });
+}
+
+// The dynamic TOOL_DEFS loop cannot carry per-tool arg types, so handlers are
+// typed loosely here; each handler destructures and narrows its own args.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ToolHandler = (args: any) => Promise<CallToolResult>;
+
+const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  classify_waste_item: handleClassifyWasteItem,
+  get_disposal_steps: handleGetDisposalSteps,
+  check_confusing_item: handleCheckConfusingItem,
+  make_cleanup_plan: handleMakeCleanupPlan,
+  get_region_disposal_info: handleGetRegionDisposalInfo,
+};
+
+function callStatus(result: CallToolResult): string {
+  const structured = result.structuredContent as { found?: unknown; ambiguous?: unknown } | undefined;
+  if (!structured) return "ok";
+  if (structured.ambiguous === true) return "ambiguous";
+  if (structured.found === false) return "not_found";
+  if (structured.found === true) return "match";
+  return "ok";
+}
+
+/**
+ * Emits one JSON line per tool call to stdout (collected as container logs).
+ * Inputs here are only item/region names, never free-form user prompts, so
+ * there is no personal data concern — do not log anything beyond these fields.
+ */
+function withCallLog(tool: string, handler: ToolHandler): ToolHandler {
+  return async (args: Record<string, unknown>) => {
+    const startedAt = Date.now();
+    const input = {
+      itemName: typeof args.itemName === "string" ? args.itemName : undefined,
+      region: typeof args.region === "string" ? args.region : undefined,
+      items: Array.isArray(args.items) ? args.items : undefined,
+    };
+
+    try {
+      const result = await handler(args);
+      const structured = result.structuredContent as
+        | { id?: unknown; matchedItem?: unknown; matchedRegion?: unknown; score?: unknown }
+        | undefined;
+      console.log(
+        JSON.stringify({
+          ts: new Date().toISOString(),
+          tool,
+          input,
+          status: callStatus(result),
+          matchedId: structured?.id ?? structured?.matchedItem ?? structured?.matchedRegion,
+          score: structured?.score,
+          ms: Date.now() - startedAt,
+        }),
+      );
+      return result;
+    } catch (error) {
+      console.log(
+        JSON.stringify({
+          ts: new Date().toISOString(),
+          tool,
+          input,
+          status: "error",
+          message: error instanceof Error ? error.message : String(error),
+          ms: Date.now() - startedAt,
+        }),
+      );
+      throw error;
+    }
+  };
+}
+
 function registerTools(server: McpServer): void {
-  server.registerTool(
-    "classify_waste_item",
-    {
-      title: "Classify Waste Item",
-      description:
-        "Classifies a household waste item with RecyclingHelper(재활용척척), returning the likely disposal category, confidence, and whether local rules should be checked.",
-      inputSchema: {
-        itemName: z.string().min(1).max(80).describe("Household waste item name or short description in Korean."),
-        region: z.string().max(80).optional().describe("Optional Korean city, district, or neighborhood."),
+  for (const def of TOOL_DEFS) {
+    server.registerTool(
+      def.name,
+      {
+        title: def.title,
+        description: def.description,
+        inputSchema: def.inputShape,
+        annotations: def.annotations,
       },
-      annotations: {
-        title: "Classify Waste Item",
-        readOnlyHint: true,
-        destructiveHint: false,
-        openWorldHint: false,
-        idempotentHint: true,
-      },
-    },
-    async ({ itemName, region }): Promise<CallToolResult> => {
-      const resolved = resolveWasteItem(itemName);
-      if (resolved.status === "not_found") return unknownItemResult(itemName);
-      if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
-
-      const { match } = resolved;
-      const { item } = match;
-      const text = [
-        `분류 결과: ${item.name}`,
-        `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
-        `- 세부 판단: ${item.disposalType}`,
-        `- 결론: ${item.summary}`,
-        `- 확신도: ${confidenceLabel(item.confidence)}`,
-        `- 지역 영향: ${itemRegionCheckLabel(item)}`,
-        `- 판단 범위: ${itemRegionGuidance(item)}`,
-        `- 대표 근거: ${briefSourceLabel(item)}`,
-        itemNeedsCriticalRegionCheck(item)
-          ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
-          : itemNeedsRegionCheck(item)
-          ? "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
-          : undefined,
-        region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      return textResult(text, {
-        found: true,
-        matchedItem: item.name,
-        matchedBy: match.matchedBy,
-        score: match.score,
-        disposalGroup: disposalGroupLabel(item.disposalType),
-        disposalType: item.disposalType,
-        conditions: item.conditions,
-        confidence: item.confidence,
-        needsRegionCheck: itemNeedsRegionCheck(item),
-        regionCheckLevel: itemRegionCheckLabel(item),
-        regionGuidance: itemRegionGuidance(item),
-        regionPolicy: item.regionPolicy,
-        region,
-        sourceRefs: itemSourceRefs(item),
-        sources: item.sources,
-        review: publicReviewMetadata(item),
-      });
-    },
-  );
-
-  server.registerTool(
-    "get_disposal_steps",
-    {
-      title: "Get Disposal Steps",
-      description:
-        "Returns practical step-by-step disposal instructions from RecyclingHelper(재활용척척), including cautions and source references for a household waste item.",
-      inputSchema: {
-        itemName: z.string().min(1).max(80).describe("Household waste item name or short description in Korean."),
-        region: z.string().max(80).optional().describe("Optional Korean city, district, or neighborhood."),
-      },
-      annotations: {
-        title: "Get Disposal Steps",
-        readOnlyHint: true,
-        destructiveHint: false,
-        openWorldHint: false,
-        idempotentHint: true,
-      },
-    },
-    async ({ itemName, region }): Promise<CallToolResult> => {
-      const resolved = resolveWasteItem(itemName);
-      if (resolved.status === "not_found") return unknownItemResult(itemName);
-      if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
-
-      const { match } = resolved;
-      const regionMatch = itemNeedsRegionCheck(match.item) ? findRegionalPolicy(region) : undefined;
-      const text = formatItemGuide(match.item, region);
-      return textResult(text, {
-        found: true,
-        item: { ...match.item, review: publicReviewMetadata(match.item) },
-        matchedBy: match.matchedBy,
-        score: match.score,
-        region,
-        regionCheckLevel: itemRegionCheckLabel(match.item),
-        regionGuidance: itemRegionGuidance(match.item),
-        regionalPolicy: compactRegionalPolicy(regionMatch, match.item),
-      });
-    },
-  );
-
-  server.registerTool(
-    "check_confusing_item",
-    {
-      title: "Check Confusing Item",
-      description:
-        "Checks if a household waste item is commonly confused and explains the exception with RecyclingHelper(재활용척척).",
-      inputSchema: {
-        itemName: z.string().min(1).max(80).describe("Confusing household waste item name or situation in Korean."),
-      },
-      annotations: {
-        title: "Check Confusing Item",
-        readOnlyHint: true,
-        destructiveHint: false,
-        openWorldHint: false,
-        idempotentHint: true,
-      },
-    },
-    async ({ itemName }): Promise<CallToolResult> => {
-      const matches = findWasteItems(itemName, 3);
-      if (matches.length === 0) return unknownItemResult(itemName);
-
-      const lines = [
-        `헷갈림 체크: "${itemName}"`,
-        "",
-        ...matches.flatMap((match, index) => [
-          `${index + 1}. ${match.item.name}`,
-          `   - 결론: ${match.item.summary}`,
-          `   - 주의: ${match.item.cautions[0] ?? "지역별 기준을 확인하세요."}`,
-          `   - 지역 영향: ${itemRegionCheckLabel(match.item)}`,
-          `   - 판단 범위: ${itemRegionGuidance(match.item)}`,
-          `   - 대표 근거: ${briefSourceLabel(match.item)}`,
-          `   - 확신도: ${confidenceLabel(match.item.confidence)}`,
-        ]),
-      ];
-
-      return textResult(lines.join("\n"), {
-        found: true,
-        matches: matches.map((match) => ({
-          itemName: match.item.name,
-          matchedBy: match.matchedBy,
-          score: match.score,
-          summary: match.item.summary,
-          cautions: match.item.cautions,
-          confidence: match.item.confidence,
-          needsRegionCheck: itemNeedsRegionCheck(match.item),
-          regionCheckLevel: itemRegionCheckLabel(match.item),
-          regionGuidance: itemRegionGuidance(match.item),
-          conditions: match.item.conditions,
-          review: publicReviewMetadata(match.item),
-        })),
-      });
-    },
-  );
-
-  server.registerTool(
-    "make_cleanup_plan",
-    {
-      title: "Make Cleanup Plan",
-      description:
-        "Groups multiple household waste items into disposal buckets with RecyclingHelper(재활용척척), useful for moving, cleaning, or decluttering.",
-      inputSchema: {
-        items: z.array(z.string().min(1).max(80)).min(1).max(30).describe("List of household waste item names in Korean."),
-        region: z.string().max(80).optional().describe("Optional Korean city, district, or neighborhood."),
-      },
-      annotations: {
-        title: "Make Cleanup Plan",
-        readOnlyHint: true,
-        destructiveHint: false,
-        openWorldHint: false,
-        idempotentHint: true,
-      },
-    },
-    async ({ items, region }): Promise<CallToolResult> => {
-      const planned = items.map((rawName) => {
-        const resolved = resolveWasteItem(rawName);
-        if (resolved.status === "not_found") {
-          return {
-            input: rawName,
-            found: false as const,
-            group: "확인 필요",
-            summary: "초기 데이터에서 확실히 찾지 못했습니다.",
-          };
-        }
-
-        if (resolved.status === "ambiguous") {
-          const candidateLabels = resolved.candidates.map(ambiguousCandidateLabel);
-          return {
-            input: rawName,
-            found: false as const,
-            group: "확인 필요",
-            summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateLabels.join(", ")}).`,
-            candidates: candidateLabels,
-            candidateDetails: resolved.candidates.map(ambiguousCandidateDetails),
-          };
-        }
-
-        const { match } = resolved;
-        return {
-          input: rawName,
-          found: true as const,
-          itemName: match.item.name,
-          matchedBy: match.matchedBy,
-          score: match.score,
-          group: disposalGroupLabel(match.item.disposalType),
-          summary: match.item.summary,
-          needsRegionCheck: itemNeedsRegionCheck(match.item),
-          regionCheckLevel: itemRegionCheckLabel(match.item),
-          regionGuidance: itemRegionGuidance(match.item),
-          conditions: match.item.conditions,
-          sourceRefs: itemSourceRefs(match.item),
-          sources: match.item.sources,
-        };
-      });
-
-      const groups = new Map<string, typeof planned>();
-      for (const entry of planned) {
-        const existing = groups.get(entry.group) ?? [];
-        existing.push(entry);
-        groups.set(entry.group, existing);
-      }
-
-      const lines = [
-        "대청소 배출 계획",
-        region ? `지역: ${region}` : undefined,
-        "",
-        ...Array.from(groups.entries()).flatMap(([group, entries]) => [
-          `## ${group}`,
-          ...entries.flatMap((entry) => {
-            const label = entry.found ? `${entry.input} -> ${entry.itemName}` : entry.input;
-            const regionImpact = entry.found ? ` (지역 영향: ${entry.regionCheckLevel})` : "";
-            return [
-              `- ${label}: ${entry.summary}${regionImpact}`,
-              entry.found ? `  - 대표 근거: ${entry.sourceRefs[0] ?? "재활용척척 보수 안내 정책"}` : undefined,
-            ].filter((line): line is string => line !== undefined);
-          }),
-          "",
-        ]),
-        planned.some((entry) => entry.found && entry.regionCheckLevel === "필수")
-          ? "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
-          : undefined,
-        planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
-          ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
-          : undefined,
-      ].filter(Boolean);
-
-      return textResult(lines.join("\n"), {
-        region,
-        items: planned,
-        groups: Object.fromEntries(groups),
-      });
-    },
-  );
-
-  server.registerTool(
-    "get_region_disposal_info",
-    {
-      title: "Get Region Disposal Info",
-      description:
-        "Explains what local disposal information should be checked for a Korean region using RecyclingHelper(재활용척척), with official regional data sources to verify.",
-      inputSchema: {
-        region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
-        itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
-      },
-      annotations: {
-        title: "Get Region Disposal Info",
-        readOnlyHint: true,
-        destructiveHint: false,
-        openWorldHint: true,
-        idempotentHint: true,
-      },
-    },
-    async ({ region, itemName }): Promise<CallToolResult> => {
-      const resolved = itemName ? resolveWasteItem(itemName) : undefined;
-      const match = resolved?.status === "match" ? resolved.match : undefined;
-      const ambiguousCandidates =
-        resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateLabel) : undefined;
-      const ambiguousCandidateDetailList =
-        resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateDetails) : undefined;
-      const regionMatch = findRegionalPolicy(region);
-      const checkList = itemRegionCheckList(regionMatch, match?.item);
-
-      const itemLine = match
-        ? `품목: ${match.item.name}`
-        : ambiguousCandidates
-        ? `품목: "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다. (후보: ${ambiguousCandidates.join(", ")})`
-        : itemName
-        ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
-        : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";
-
-      const lines = [
-        `${regionMatch?.region.name ?? region} 지역 확인 안내`,
-        "",
-        itemLine,
-        match ? `기본 판단: ${match.item.summary}` : undefined,
-        match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
-        regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
-        "",
-        regionMatch ? `${regionMatch.region.name} 기본 배출 기준` : undefined,
-        regionMatch ? `- 일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}` : undefined,
-        regionMatch ? `- 재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}` : undefined,
-        regionMatch ? `- ${regionMatch.region.recycling.vinylAndPetDay}` : undefined,
-        regionMatch ? `- ${regionMatch.region.recycling.otherDays}` : undefined,
-        match && regionMatch ? "" : undefined,
-        match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
-        match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
-        "",
-        "확인할 정보",
-        ...checkList.map((item, index) => `${index + 1}. ${item}`),
-        match ? "" : undefined,
-        match ? "품목 판단 근거" : undefined,
-        match ? `- ${briefSourceLabel(match.item)}` : undefined,
-        "",
-        "공식 확인처",
-        ...(regionMatch
-          ? formatRegionSourceList(regionMatch.region)
-          : [
-              "- 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do",
-              "- 거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-              "- 대형폐기물은 지자체 대형폐기물 신고 페이지",
-            ]),
-      ].filter(Boolean);
-
-      return textResult(lines.join("\n"), {
-        region,
-        matchedRegion: regionMatch?.region.name,
-        item: match?.item.name,
-        ambiguousCandidates,
-        ambiguousCandidateDetails: ambiguousCandidateDetailList,
-        defaultSummary: match?.item.summary,
-        regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
-        regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
-        officialSources: regionMatch
-          ? regionMatch.region.sources
-          : [
-              "https://www.분리배출.kr/front/region/region.do",
-              "거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-            ],
-        checkList,
-      });
-    },
-  );
+      withCallLog(def.name, TOOL_HANDLERS[def.name]),
+    );
+  }
 }
 
 function createServer(): McpServer {
@@ -758,10 +735,56 @@ function createServer(): McpServer {
   return server;
 }
 
-const app = createMcpExpressApp({
-  host: HOST,
-  allowedHosts: ALLOWED_HOSTS,
-});
+function hostnameAllowed(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return ALLOWED_HOSTS.some((entry) =>
+    entry.startsWith("*.") ? normalized.endsWith(entry.slice(1)) : normalized === entry,
+  );
+}
+
+/**
+ * Host header validation with suffix-wildcard support. The SDK's built-in
+ * hostHeaderValidation only does exact matching, which would reject the
+ * hostname PlayMCP in KC assigns to a newly created server.
+ */
+function hostValidation(req: Request, res: Response, next: NextFunction): void {
+  const hostHeader = req.headers.host;
+  if (!hostHeader) {
+    res.status(403).json({
+      jsonrpc: "2.0",
+      error: { code: -32000, message: "Missing Host header" },
+      id: null,
+    });
+    return;
+  }
+
+  let hostname: string;
+  try {
+    hostname = new URL(`http://${hostHeader}`).hostname;
+  } catch {
+    res.status(403).json({
+      jsonrpc: "2.0",
+      error: { code: -32000, message: "Invalid Host header" },
+      id: null,
+    });
+    return;
+  }
+
+  if (!hostnameAllowed(hostname)) {
+    res.status(403).json({
+      jsonrpc: "2.0",
+      error: { code: -32000, message: `Invalid Host: ${hostname}` },
+      id: null,
+    });
+    return;
+  }
+
+  next();
+}
+
+const app = express();
+app.use(express.json());
+app.use(hostValidation);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.get("origin");

@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { readFileSync } from "node:fs";
+import { request as httpRequest } from "node:http";
 import { createServer } from "node:net";
 
 const HOST = "127.0.0.1";
@@ -8,9 +9,17 @@ const PLAYMCP_ENDPOINT_HOSTS = [
   "recyling-helper-mcp.playmcp-endpoint.kakaocloud.io",
   "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io",
   "recycling-helper-mcp.playmcp-endpoint.kakaocloud.io",
+  // Any hostname under the wildcard must pass, so a finals server created with
+  // a new name works without a code change.
+  "some-brand-new-server.playmcp-endpoint.kakaocloud.io",
 ];
 const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
-const PLAYMCP_ORIGINS = ["https://playmcp.kakaocloud.io", "https://playmcp.kakao.com"];
+const PLAYMCP_ORIGINS = [
+  "https://playmcp.kakaocloud.io",
+  "https://playmcp.kakao.com",
+  "https://preview-chatgpt.kakao.com",
+  "https://tools.kakao.com",
+];
 const STARTUP_TIMEOUT_MS = 15_000;
 const EXPECTED_PROTOCOL_VERSION = "2025-03-26";
 const EXPECTED_SERVER_INFO = {
@@ -120,6 +129,32 @@ function parseSseJson(body) {
   }
 
   throw new Error(`MCP response did not contain a result:\n${body}`);
+}
+
+// fetch (undici) silently drops a custom Host header, so host-allowlist checks
+// must go through node:http, which sends it verbatim.
+function rawStatusWithHost(port, hostHeader) {
+  return new Promise((resolve, reject) => {
+    const req = httpRequest(
+      {
+        host: HOST,
+        port,
+        path: "/mcp",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Host: hostHeader,
+        },
+      },
+      (res) => {
+        res.resume();
+        resolve(res.statusCode);
+      },
+    );
+    req.on("error", reject);
+    req.end(JSON.stringify({ jsonrpc: "2.0", id: 999, method: "ping" }));
+  });
 }
 
 async function mcpRequest(baseUrl, method, params, id, extraHeaders = {}) {
@@ -481,6 +516,14 @@ async function runSmoke() {
     });
     assertToolList(jsonOnlyToolsList, "JSON-only tools/list");
 
+    // The SSE path (SDK-registered tools) and the JSON-only compat path are
+    // generated from a single TOOL_DEFS source; assert they can never drift.
+    const sortByName = (tools) => [...tools].sort((a, b) => a.name.localeCompare(b.name));
+    assert(
+      JSON.stringify(sortByName(playMcpToolsList.tools)) === JSON.stringify(sortByName(jsonOnlyToolsList.tools)),
+      "SSE tools/list and JSON-only tools/list must be identical",
+    );
+
     const getDiscovery = await mcpGetDiscovery(baseUrl, {
       Host: PLAYMCP_ENDPOINT_HOST,
     });
@@ -494,6 +537,13 @@ async function runSmoke() {
       assertToolList(endpointHostToolsList, `JSON-only tools/list for endpoint host ${endpointHost}`);
       requestId += 1;
     }
+
+    for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
+      const status = await rawStatusWithHost(port, endpointHost);
+      assert(status === 200, `Allowed host ${endpointHost} should return 200, got ${status}`);
+    }
+    const disallowedStatus = await rawStatusWithHost(port, "evil.example.com");
+    assert(disallowedStatus === 403, `Disallowed host should return 403, got ${disallowedStatus}`);
 
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
