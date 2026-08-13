@@ -443,11 +443,17 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
     return [];
   }
 
-  return wasteItems
+  const matches = wasteItems
     .map((item) => scoreItem(query, item))
     .filter((match) => match.score >= 35)
-    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"))
-    .slice(0, limit);
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"));
+
+  // Typo guesses only matter when nothing confident matched. With an exact or
+  // contains hit present, fuzzy_jamo entries are near-miss noise that would
+  // pollute list-shaped outputs (e.g. check_confusing_item's top 3).
+  const hasConfidentMatch = matches.some((match) => match.score >= HIGH_CONFIDENCE_SCORE);
+  const visible = hasConfidentMatch ? matches.filter((match) => match.matchKind !== "fuzzy_jamo") : matches;
+  return visible.slice(0, limit);
 }
 
 export function findBestWasteItem(query: string): WasteMatch | undefined {
