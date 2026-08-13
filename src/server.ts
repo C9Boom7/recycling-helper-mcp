@@ -2,15 +2,17 @@ import express from "express";
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import type { ZodRawShape } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+// The SDK uses this same helper (with these defaults) when serializing
+// registered tools, so the JSON-only list cannot drift from the SSE list
+// even across zod major versions.
+import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-schema-compat.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, WasteItem, WasteMatch } from "./data.js";
 import {
   confidenceLabel,
   disposalGroupLabel,
-  findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findRegionalPolicy,
   findRegionItemGuide,
@@ -89,21 +91,46 @@ const READ_ONLY_ANNOTATIONS = {
   idempotentHint: true,
 };
 
-type ToolDef = {
+/**
+ * Per-call log metadata. Handlers attach this as `_log` on their result;
+ * withCallLog strips it before the result reaches any client. `matchedId` is
+ * always a stable waste-item id (never a display name) so QA-window log
+ * analysis can group across tools; matched regions go in `matchedRegion`.
+ */
+type ToolLogMeta = {
+  matchedId?: string;
+  matchedRegion?: string;
+  score?: number;
+  status?: string;
+  matched?: number;
+  total?: number;
+};
+
+type LoggedToolResult = CallToolResult & { _log?: ToolLogMeta };
+
+type ToolDef<Shape extends ZodRawShape = ZodRawShape> = {
   name: string;
   title: string;
   description: string;
-  inputShape: ZodRawShape;
+  inputShape: Shape;
   annotations: Record<string, unknown> & { title: string };
+  handler: (args: z.objectOutputType<Shape, z.ZodTypeAny>) => Promise<LoggedToolResult>;
 };
 
+// Erases the per-tool shape generic so defs can live in one array while each
+// handler still type-checks against its own inputShape at the definition site.
+function defineTool<Shape extends ZodRawShape>(def: ToolDef<Shape>): ToolDef {
+  return def as unknown as ToolDef;
+}
+
 /**
- * Single source of truth for tool metadata. Both the McpServer registration
- * (SSE path) and the JSON-only discovery response are generated from this
- * list, so the two can never drift apart.
+ * Single source of truth for tool metadata and handlers. The McpServer
+ * registration (SSE path), the JSON-only discovery response, and JSON-only
+ * tools/call dispatch are all generated from this list, so they can never
+ * drift apart.
  */
 const TOOL_DEFS: ToolDef[] = [
-  {
+  defineTool({
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
@@ -116,8 +143,9 @@ const TOOL_DEFS: ToolDef[] = [
       title: "Classify Waste Item",
       ...READ_ONLY_ANNOTATIONS,
     },
-  },
-  {
+    handler: handleClassifyWasteItem,
+  }),
+  defineTool({
     name: "get_disposal_steps",
     title: "Get Disposal Steps",
     description:
@@ -130,8 +158,9 @@ const TOOL_DEFS: ToolDef[] = [
       title: "Get Disposal Steps",
       ...READ_ONLY_ANNOTATIONS,
     },
-  },
-  {
+    handler: handleGetDisposalSteps,
+  }),
+  defineTool({
     name: "check_confusing_item",
     title: "Check Confusing Item",
     description:
@@ -143,8 +172,9 @@ const TOOL_DEFS: ToolDef[] = [
       title: "Check Confusing Item",
       ...READ_ONLY_ANNOTATIONS,
     },
-  },
-  {
+    handler: handleCheckConfusingItem,
+  }),
+  defineTool({
     name: "make_cleanup_plan",
     title: "Make Cleanup Plan",
     description:
@@ -161,8 +191,9 @@ const TOOL_DEFS: ToolDef[] = [
       title: "Make Cleanup Plan",
       ...READ_ONLY_ANNOTATIONS,
     },
-  },
-  {
+    handler: handleMakeCleanupPlan,
+  }),
+  defineTool({
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
@@ -178,14 +209,15 @@ const TOOL_DEFS: ToolDef[] = [
       openWorldHint: true,
       idempotentHint: true,
     },
-  },
+    handler: handleGetRegionDisposalInfo,
+  }),
 ];
 
 const COMPAT_TOOLS = TOOL_DEFS.map((def) => ({
   name: def.name,
   title: def.title,
   description: def.description,
-  inputSchema: zodToJsonSchema(z.object(def.inputShape), { strictUnions: true, pipeStrategy: "input" }),
+  inputSchema: toJsonSchemaCompat(z.object(def.inputShape)),
   annotations: def.annotations,
   // The SDK defaults registered tools to taskSupport "forbidden"; mirror it so
   // the JSON-only list stays byte-identical to the SSE list.
@@ -200,59 +232,27 @@ function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?
   return item.sourceRefs.slice(0, limit).map((title) => ({ title }));
 }
 
-function compactRegionalPolicy(region: MatchedRegionPolicy | undefined, item?: WasteItem, includeGeneralRegion = false): ToolResult | undefined {
-  if (!region) return undefined;
+/**
+ * Region-specific guidance lines for structuredContent, gated the same way the
+ * text path (formatItemGuide) gates them: only when the item has a
+ * region-specific guide or the region check is critical. Advisory-only items
+ * get no region lines, keeping "no region noise" responses noise-free.
+ */
+function buildRegionNotes(item: WasteItem, regionMatch?: MatchedRegionPolicy): string[] | undefined {
+  if (!regionMatch || !itemNeedsRegionCheck(item)) return undefined;
 
-  const hasSpecificItemGuide = Boolean(item && findRegionItemGuide(region.region, item));
-  const includeItemSpecificRegion = includeGeneralRegion || !item || itemNeedsCriticalRegionCheck(item) || hasSpecificItemGuide;
-  const includeRegionOverview = includeGeneralRegion || !item || itemNeedsCriticalRegionCheck(item);
-  const includeRegionalSources = includeGeneralRegion || !item || itemNeedsCriticalRegionCheck(item);
-  const itemGuide = item && includeItemSpecificRegion ? formatRegionItemGuide(item, region) : undefined;
-  const bulkyWasteFees = item ? findBulkyWasteFees(region.region, item) : [];
-  const bulkyWasteFeeSchedule = bulkyWasteFees.length > 0 ? findBulkyWasteFeeSchedule(region.region) : undefined;
+  const hasSpecificGuide = Boolean(findRegionItemGuide(regionMatch.region, item));
+  if (!hasSpecificGuide && !itemNeedsCriticalRegionCheck(item)) return undefined;
 
-  const compact: ToolResult = {
-    id: region.region.id,
-    name: region.region.name,
-    checkedAt: region.region.checkedAt,
-    regionCheckLevel: item ? itemRegionCheckLabel(item) : undefined,
-    regionGuidance: item ? itemRegionGuidance(item) : undefined,
-  };
-
-  if (!includeItemSpecificRegion) return compact;
-
-  return {
-    ...compact,
-    ...(includeRegionOverview
-      ? {
-          summary: region.region.summary,
-          recycling: {
-            time: region.region.recycling.time,
-            vinylAndPetDay: region.region.recycling.vinylAndPetDay,
-            otherDays: region.region.recycling.otherDays,
-          },
-        }
-      : {}),
-    itemGuide,
-    ...(bulkyWasteFeeSchedule
-      ? {
-          bulkyWasteFees: {
-            checkedAt: bulkyWasteFeeSchedule.checkedAt,
-            applicationUrl: bulkyWasteFeeSchedule.applicationUrl,
-            feeUrl: bulkyWasteFeeSchedule.feeUrl,
-            phone: bulkyWasteFeeSchedule.phone,
-            fees: bulkyWasteFees,
-          },
-        }
-      : {}),
-    ...(includeRegionalSources ? { sources: region.region.sources } : {}),
-  };
+  const lines = formatRegionItemGuide(item, regionMatch);
+  return lines.length > 0 ? lines : undefined;
 }
 
-function textResult(text: string, structuredContent?: ToolResult): CallToolResult {
+function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
   return {
     content: [{ type: "text", text }],
     ...(structuredContent ? { structuredContent } : {}),
+    ...(log ? { _log: log } : {}),
   };
 }
 
@@ -265,6 +265,12 @@ function briefSourceLabel(item: WasteItem): string {
   }
 
   return item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
+}
+
+// Title-only variant for list-shaped outputs (cleanup plan) where the full
+// basis + URL label would balloon the text for every item.
+function briefSourceTitle(item: WasteItem): string {
+  return item.sources[0]?.title ?? item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
 }
 
 function unknownItemResult(itemName: string): CallToolResult {
@@ -372,7 +378,7 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
   return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
 }
 
-async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<CallToolResult> {
+async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return unknownItemResult(itemName);
   if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
@@ -398,27 +404,25 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     .filter(Boolean)
     .join("\n");
 
-  const primarySource = item.sources[0];
-  return textResult(text, {
-    found: true,
-    matchedItem: item.name,
-    matchedBy: match.matchedBy,
-    score: match.score,
-    disposalGroup: disposalGroupLabel(item.disposalType),
-    disposalType: item.disposalType,
-    summary: item.summary,
-    confidence: item.confidence,
-    needsRegionCheck: itemNeedsRegionCheck(item),
-    regionCheckLevel: itemRegionCheckLabel(item),
-    regionGuidance: itemRegionGuidance(item),
-    region,
-    primarySource: primarySource
-      ? { title: primarySource.title, url: primarySource.url }
-      : { title: item.sourceRefs[0] ?? "재활용척척 보수 안내 정책" },
-  });
+  return textResult(
+    text,
+    {
+      found: true,
+      matchedItem: item.name,
+      matchedBy: match.matchedBy,
+      disposalGroup: disposalGroupLabel(item.disposalType),
+      disposalType: item.disposalType,
+      summary: item.summary,
+      confidence: item.confidence,
+      regionCheckLevel: itemRegionCheckLabel(item),
+      regionGuidance: itemRegionGuidance(item),
+      primarySource: itemTopSources(item, 1)[0] ?? { title: "재활용척척 보수 안내 정책" },
+    },
+    { matchedId: item.id, score: match.score },
+  );
 }
 
-async function handleGetDisposalSteps({ itemName, region }: { itemName: string; region?: string }): Promise<CallToolResult> {
+async function handleGetDisposalSteps({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return unknownItemResult(itemName);
   if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
@@ -426,25 +430,30 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const { match } = resolved;
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+  const regionNotes = buildRegionNotes(item, regionMatch);
   const text = formatItemGuide(item, region);
-  return textResult(text, {
-    found: true,
-    id: item.id,
-    itemName: item.name,
-    matchedBy: match.matchedBy,
-    score: match.score,
-    disposalGroup: disposalGroupLabel(item.disposalType),
-    summary: item.summary,
-    review: publicReviewMetadata(item),
-    region,
-    regionCheckLevel: itemRegionCheckLabel(item),
-    regionGuidance: itemRegionGuidance(item),
-    sources: itemTopSources(item),
-    regionalPolicy: compactRegionalPolicy(regionMatch, item),
-  });
+  return textResult(
+    text,
+    {
+      found: true,
+      id: item.id,
+      itemName: item.name,
+      matchedBy: match.matchedBy,
+      disposalGroup: disposalGroupLabel(item.disposalType),
+      summary: item.summary,
+      steps: item.steps,
+      cautions: item.cautions,
+      review: publicReviewMetadata(item),
+      region,
+      regionCheckLevel: itemRegionCheckLabel(item),
+      ...(regionNotes ? { regionNotes } : {}),
+      sources: itemTopSources(item),
+    },
+    { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name },
+  );
 }
 
-async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<CallToolResult> {
+async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<LoggedToolResult> {
   const matches = findWasteItems(itemName, 3);
   if (matches.length === 0) return unknownItemResult(itemName);
 
@@ -462,22 +471,23 @@ async function handleCheckConfusingItem({ itemName }: { itemName: string }): Pro
     ]),
   ];
 
-  return textResult(lines.join("\n"), {
-    found: true,
-    matches: matches.map((match) => ({
-      itemName: match.item.name,
-      matchedBy: match.matchedBy,
-      summary: match.item.summary,
-      caution: match.item.cautions[0],
-      confidence: match.item.confidence,
-      needsRegionCheck: itemNeedsRegionCheck(match.item),
-      regionCheckLevel: itemRegionCheckLabel(match.item),
-      regionGuidance: itemRegionGuidance(match.item),
-    })),
-  });
+  return textResult(
+    lines.join("\n"),
+    {
+      found: true,
+      matches: matches.map((match) => ({
+        itemName: match.item.name,
+        summary: match.item.summary,
+        caution: match.item.cautions[0],
+        confidence: match.item.confidence,
+        regionCheckLevel: itemRegionCheckLabel(match.item),
+      })),
+    },
+    { matchedId: matches[0].item.id, score: matches[0].score },
+  );
 }
 
-async function handleMakeCleanupPlan({ items, region }: { items: string[]; region?: string }): Promise<CallToolResult> {
+async function handleMakeCleanupPlan({ items, region }: { items: string[]; region?: string }): Promise<LoggedToolResult> {
   const planned = items.map((rawName) => {
     const resolved = resolveWasteItem(rawName);
     if (resolved.status === "not_found") {
@@ -509,8 +519,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
       group: disposalGroupLabel(match.item.disposalType),
       summary: match.item.summary,
       regionCheckLevel: itemRegionCheckLabel(match.item),
-      regionGuidance: itemRegionGuidance(match.item),
-      sourceRef: briefSourceLabel(match.item),
+      sourceRef: briefSourceTitle(match.item),
     };
   });
 
@@ -552,10 +561,8 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
           found: true,
           group: entry.group,
           itemName: entry.itemName,
-          matchedBy: entry.matchedBy,
           summary: entry.summary,
           regionCheckLevel: entry.regionCheckLevel,
-          regionGuidance: entry.regionGuidance,
         }
       : {
           input: entry.input,
@@ -566,13 +573,22 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
         },
   );
 
-  return textResult(lines.join("\n"), {
-    region,
-    items: structuredItems,
-  });
+  const matched = planned.filter((entry) => entry.found).length;
+  return textResult(
+    lines.join("\n"),
+    {
+      region,
+      items: structuredItems,
+    },
+    {
+      status: matched === planned.length ? "match" : matched === 0 ? "not_found" : "partial",
+      matched,
+      total: planned.length,
+    },
+  );
 }
 
-async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<CallToolResult> {
+async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
   const resolved = itemName ? resolveWasteItem(itemName) : undefined;
   const match = resolved?.status === "match" ? resolved.match : undefined;
   const ambiguousCandidates =
@@ -621,36 +637,29 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
         ]),
   ].filter(Boolean);
 
-  return textResult(lines.join("\n"), {
-    region,
-    matchedRegion: regionMatch?.region.name,
-    item: match?.item.name,
-    ambiguousCandidates,
-    defaultSummary: match?.item.summary,
-    regionGuidance: match ? itemRegionGuidance(match.item) : undefined,
-    regionalPolicy: compactRegionalPolicy(regionMatch, match?.item, true),
-    officialSources: regionMatch
-      ? regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url }))
-      : [
-          "https://www.분리배출.kr/front/region/region.do",
-          "거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-        ],
-    checkList,
-  });
+  return textResult(
+    lines.join("\n"),
+    {
+      region,
+      matchedRegion: regionMatch?.region.name,
+      item: match?.item.name,
+      ambiguousCandidates,
+      defaultSummary: match?.item.summary,
+      checkList,
+      officialSources: regionMatch
+        ? regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url }))
+        : [
+            { title: "생활폐기물 분리배출 누리집", url: "https://www.분리배출.kr/front/region/region.do" },
+            { title: "거주 지자체 청소/자원순환/환경 부서 안내 페이지" },
+          ],
+    },
+    {
+      matchedId: match?.item.id,
+      score: match?.score,
+      matchedRegion: regionMatch?.region.name,
+    },
+  );
 }
-
-// The dynamic TOOL_DEFS loop cannot carry per-tool arg types, so handlers are
-// typed loosely here; each handler destructures and narrows its own args.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ToolHandler = (args: any) => Promise<CallToolResult>;
-
-const TOOL_HANDLERS: Record<string, ToolHandler> = {
-  classify_waste_item: handleClassifyWasteItem,
-  get_disposal_steps: handleGetDisposalSteps,
-  check_confusing_item: handleCheckConfusingItem,
-  make_cleanup_plan: handleMakeCleanupPlan,
-  get_region_disposal_info: handleGetRegionDisposalInfo,
-};
 
 function callStatus(result: CallToolResult): string {
   const structured = result.structuredContent as { found?: unknown; ambiguous?: unknown } | undefined;
@@ -665,8 +674,13 @@ function callStatus(result: CallToolResult): string {
  * Emits one JSON line per tool call to stdout (collected as container logs).
  * Inputs here are only item/region names, never free-form user prompts, so
  * there is no personal data concern — do not log anything beyond these fields.
+ * Log identifiers come from the handler's `_log` metadata (stripped here so it
+ * never reaches a client), not from client-facing structuredContent fields.
  */
-function withCallLog(tool: string, handler: ToolHandler): ToolHandler {
+function withCallLog(
+  tool: string,
+  handler: (args: never) => Promise<LoggedToolResult>,
+): (args: Record<string, unknown>) => Promise<CallToolResult> {
   return async (args: Record<string, unknown>) => {
     const startedAt = Date.now();
     const input = {
@@ -676,18 +690,18 @@ function withCallLog(tool: string, handler: ToolHandler): ToolHandler {
     };
 
     try {
-      const result = await handler(args);
-      const structured = result.structuredContent as
-        | { id?: unknown; matchedItem?: unknown; matchedRegion?: unknown; score?: unknown }
-        | undefined;
+      const { _log, ...result } = await handler(args as never);
       console.log(
         JSON.stringify({
           ts: new Date().toISOString(),
           tool,
           input,
-          status: callStatus(result),
-          matchedId: structured?.id ?? structured?.matchedItem ?? structured?.matchedRegion,
-          score: structured?.score,
+          status: _log?.status ?? callStatus(result),
+          matchedId: _log?.matchedId,
+          matchedRegion: _log?.matchedRegion,
+          score: _log?.score,
+          matched: _log?.matched,
+          total: _log?.total,
           ms: Date.now() - startedAt,
         }),
       );
@@ -708,8 +722,15 @@ function withCallLog(tool: string, handler: ToolHandler): ToolHandler {
   };
 }
 
+// Built once at module load; shared by the SSE registration and the JSON-only
+// tools/call dispatch so both paths run the identical logged handler.
+const REGISTERED_TOOLS = TOOL_DEFS.map((def) => ({
+  def,
+  handler: withCallLog(def.name, def.handler),
+}));
+
 function registerTools(server: McpServer): void {
-  for (const def of TOOL_DEFS) {
+  for (const { def, handler } of REGISTERED_TOOLS) {
     server.registerTool(
       def.name,
       {
@@ -718,7 +739,7 @@ function registerTools(server: McpServer): void {
         inputSchema: def.inputShape,
         annotations: def.annotations,
       },
-      withCallLog(def.name, TOOL_HANDLERS[def.name]),
+      handler,
     );
   }
 }
@@ -784,7 +805,10 @@ function hostValidation(req: Request, res: Response, next: NextFunction): void {
 
 const app = express();
 app.use(express.json());
-app.use(hostValidation);
+// Host validation is DNS-rebinding protection for the MCP surface only.
+// /health stays open: k8s-style probes send the pod IP as the Host header,
+// which no allowlist entry can anticipate.
+app.use("/mcp", hostValidation);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.get("origin");
@@ -823,7 +847,51 @@ function jsonRpcResult(id: JsonRpcId | undefined, result: Record<string, unknown
   };
 }
 
-function handleJsonOnlyDiscovery(req: Request, res: Response): boolean {
+function jsonRpcError(id: JsonRpcId | undefined, code: number, message: string): Record<string, unknown> {
+  return {
+    jsonrpc: "2.0",
+    id: id ?? null,
+    error: { code, message },
+  };
+}
+
+/**
+ * Runs a tools/call for clients that accept only application/json. The SDK
+ * transport rejects POSTs whose Accept header lacks text/event-stream with a
+ * 406, so without this path a JSON-only client could list tools but never
+ * invoke one. Dispatches through the same logged handlers as the SSE path.
+ */
+async function handleJsonOnlyToolCall(body: JsonRpcBody, res: Response): Promise<void> {
+  const params = body.params ?? {};
+  const toolName = typeof params.name === "string" ? params.name : "";
+  const registered = REGISTERED_TOOLS.find(({ def }) => def.name === toolName);
+  if (!registered) {
+    res.json(jsonRpcError(body.id, -32602, `Unknown tool: ${toolName}`));
+    return;
+  }
+
+  const parsed = z.object(registered.def.inputShape).safeParse(params.arguments ?? {});
+  if (!parsed.success) {
+    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${parsed.error.message}`));
+    return;
+  }
+
+  try {
+    const result = await registered.handler(parsed.data);
+    res.json(jsonRpcResult(body.id, result));
+  } catch (error) {
+    // Mirror the SDK: handler failures become an isError tool result, not a
+    // protocol-level error.
+    res.json(
+      jsonRpcResult(body.id, {
+        content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }],
+        isError: true,
+      }),
+    );
+  }
+}
+
+async function handleJsonOnlyDiscovery(req: Request, res: Response): Promise<boolean> {
   const accept = req.get("accept") ?? "";
   if (accept.includes("text/event-stream")) return false;
 
@@ -853,6 +921,10 @@ function handleJsonOnlyDiscovery(req: Request, res: Response): boolean {
       res.json(jsonRpcResult(body.id, { tools: COMPAT_TOOLS }));
       return true;
 
+    case "tools/call":
+      await handleJsonOnlyToolCall(body, res);
+      return true;
+
     case "ping":
       res.json(jsonRpcResult(body.id, {}));
       return true;
@@ -867,7 +939,7 @@ function handleJsonOnlyDiscovery(req: Request, res: Response): boolean {
 }
 
 app.post("/mcp", async (req: Request, res: Response) => {
-  if (handleJsonOnlyDiscovery(req, res)) return;
+  if (await handleJsonOnlyDiscovery(req, res)) return;
 
   const server = createServer();
   const transport = new StreamableHTTPServerTransport({

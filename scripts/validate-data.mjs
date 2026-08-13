@@ -39,8 +39,6 @@ const mcpToolNames = new Set([
   "make_cleanup_plan",
   "get_region_disposal_info",
 ]);
-const expectedRegionalPolicyLevels = new Set(["필수", "참고", "낮음"]);
-const expectedRegionalPolicyShapes = new Set(["minimal", "itemGuideOnly"]);
 const regionCheckLevelToExpectedPolicyLevel = {
   required: "필수",
   advisory: "참고",
@@ -488,39 +486,24 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     }
   }
 
-  if (testCase.expectedRegionalPolicy !== undefined) {
-    if (
-      !testCase.expectedRegionalPolicy ||
-      typeof testCase.expectedRegionalPolicy !== "object" ||
-      Array.isArray(testCase.expectedRegionalPolicy)
-    ) {
-      errors.push(`${prefix}.expectedRegionalPolicy must be an object when present`);
+  if (testCase.expectedRegionNotes !== undefined) {
+    const expectation = testCase.expectedRegionNotes;
+    if (!expectation || typeof expectation !== "object" || Array.isArray(expectation)) {
+      errors.push(`${prefix}.expectedRegionNotes must be an object when present`);
     } else {
-      const { level, shape, guidance } = testCase.expectedRegionalPolicy;
-      if (level !== undefined && !expectedRegionalPolicyLevels.has(level)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.level must be one of ${Array.from(expectedRegionalPolicyLevels).join(", ")}`);
+      if (typeof expectation.present !== "boolean") {
+        errors.push(`${prefix}.expectedRegionNotes.present must be a boolean`);
       }
-      if (shape !== undefined && !expectedRegionalPolicyShapes.has(shape)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape must be one of ${Array.from(expectedRegionalPolicyShapes).join(", ")}`);
+      if (expectation.includes !== undefined) {
+        if (!Array.isArray(expectation.includes) || expectation.includes.some((value) => !isNonEmptyString(value))) {
+          errors.push(`${prefix}.expectedRegionNotes.includes must be an array of non-empty strings when present`);
+        }
+        if (expectation.present === false) {
+          errors.push(`${prefix}.expectedRegionNotes.includes cannot be combined with present=false`);
+        }
       }
-      if (guidance !== undefined && !isNonEmptyString(guidance)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.guidance must be a non-empty string when present`);
-      }
-      if (level === undefined && shape === undefined && guidance === undefined) {
-        errors.push(`${prefix}.expectedRegionalPolicy must include level, shape, or guidance`);
-      }
-      if (shape !== undefined && level === undefined) {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape must be paired with level`);
-      }
-      if (shape === "itemGuideOnly" && level !== "참고") {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape=itemGuideOnly is only valid for advisory regional policy cases`);
-      }
-      if (
-        testCase.tool === "get_disposal_steps" &&
-        level === "참고" &&
-        !(testCase.expectedTextExcludes ?? []).some((entry) => entry.includes("공식 출처"))
-      ) {
-        errors.push(`${prefix}.expectedTextExcludes must exclude 공식 출처 for advisory get_disposal_steps cases`);
+      if (testCase.tool !== "get_disposal_steps") {
+        errors.push(`${prefix}.expectedRegionNotes is only valid for get_disposal_steps cases`);
       }
     }
   }
@@ -530,7 +513,7 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     "expectedTextExcludes",
     "expectedStructuredIncludes",
     "expectedStructuredExcludes",
-  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionalPolicy !== undefined;
+  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionNotes !== undefined;
   if (!hasExpectation) {
     errors.push(`${prefix} must include at least one expectation`);
   }
@@ -542,16 +525,17 @@ for (const item of items) {
 
   const expectedLevel = regionCheckLevelToExpectedPolicyLevel[regionCheckLevel];
   const expectedItemId = `"id":"${item.id}"`;
+  const expectedLevelAssertion = `"regionCheckLevel":"${expectedLevel}"`;
   const hasAnswerCoverage = mcpAnswerCases.some(
     (testCase) =>
-      testCase.expectedRegionalPolicy?.level === expectedLevel &&
       Array.isArray(testCase.expectedStructuredIncludes) &&
-      testCase.expectedStructuredIncludes.includes(expectedItemId),
+      testCase.expectedStructuredIncludes.includes(expectedItemId) &&
+      testCase.expectedStructuredIncludes.includes(expectedLevelAssertion),
   );
 
   if (!hasAnswerCoverage) {
     errors.push(
-      `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case with expectedRegionalPolicy.level=${expectedLevel}`,
+      `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case asserting ${expectedLevelAssertion}`,
     );
   }
 }

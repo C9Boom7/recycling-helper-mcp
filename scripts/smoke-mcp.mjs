@@ -13,7 +13,6 @@ const PLAYMCP_ENDPOINT_HOSTS = [
   // a new name works without a code change.
   "some-brand-new-server.playmcp-endpoint.kakaocloud.io",
 ];
-const PLAYMCP_ENDPOINT_HOST = "recycle-helper-mcp.playmcp-endpoint.kakaocloud.io";
 const PLAYMCP_ORIGINS = [
   "https://playmcp.kakaocloud.io",
   "https://playmcp.kakao.com",
@@ -40,6 +39,58 @@ const REQUIRED_TOOL_ANNOTATION_FIELDS = [
   "openWorldHint",
   "idempotentHint",
 ];
+// PRD phase-0 R5: per-tool structuredContent whitelists. Every answer case
+// runs through this, so a handler emitting a field outside its contract fails
+// the smoke suite instead of silently regrowing the payload.
+const NOT_FOUND_KEYS = ["found", "itemName", "candidates"];
+const AMBIGUOUS_KEYS = ["found", "ambiguous", "itemName", "candidates", "candidateDetails"];
+const STRUCTURED_KEY_WHITELIST = {
+  classify_waste_item: [
+    "found",
+    "matchedItem",
+    "matchedBy",
+    "disposalGroup",
+    "disposalType",
+    "summary",
+    "confidence",
+    "regionCheckLevel",
+    "regionGuidance",
+    "primarySource",
+  ],
+  get_disposal_steps: [
+    "found",
+    "id",
+    "itemName",
+    "matchedBy",
+    "disposalGroup",
+    "summary",
+    "steps",
+    "cautions",
+    "review",
+    "region",
+    "regionCheckLevel",
+    "regionNotes",
+    "sources",
+  ],
+  check_confusing_item: ["found", "matches"],
+  make_cleanup_plan: ["region", "items"],
+  get_region_disposal_info: [
+    "region",
+    "matchedRegion",
+    "item",
+    "ambiguousCandidates",
+    "defaultSummary",
+    "checkList",
+    "officialSources",
+  ],
+};
+const NESTED_KEY_WHITELIST = {
+  check_confusing_item: { field: "matches", keys: ["itemName", "summary", "caution", "confidence", "regionCheckLevel"] },
+  make_cleanup_plan: {
+    field: "items",
+    keys: ["input", "found", "group", "itemName", "summary", "regionCheckLevel", "candidates"],
+  },
+};
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
 const wasteItemsPath = new URL("../dist/data/waste-items.json", import.meta.url);
 const answerCases = JSON.parse(readFileSync(answerCasesPath, "utf8"));
@@ -131,16 +182,18 @@ function parseSseJson(body) {
   throw new Error(`MCP response did not contain a result:\n${body}`);
 }
 
-// fetch (undici) silently drops a custom Host header, so host-allowlist checks
-// must go through node:http, which sends it verbatim.
-function rawStatusWithHost(port, hostHeader) {
+// fetch (undici) silently drops a custom Host header (it is a forbidden fetch
+// header), so host-allowlist checks must go through node:http, which sends it
+// verbatim. Never pass a Host header to the fetch-based helpers in this file —
+// it would be ignored and the check would silently test 127.0.0.1 instead.
+function rawStatusWithHost(port, hostHeader, path = "/mcp", method = "POST") {
   return new Promise((resolve, reject) => {
     const req = httpRequest(
       {
         host: HOST,
         port,
-        path: "/mcp",
-        method: "POST",
+        path,
+        method,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -153,7 +206,7 @@ function rawStatusWithHost(port, hostHeader) {
       },
     );
     req.on("error", reject);
-    req.end(JSON.stringify({ jsonrpc: "2.0", id: 999, method: "ping" }));
+    req.end(method === "POST" ? JSON.stringify({ jsonrpc: "2.0", id: 999, method: "ping" }) : undefined);
   });
 }
 
@@ -247,7 +300,6 @@ async function mcpCorsPreflight(baseUrl, origin) {
       Origin: origin,
       "Access-Control-Request-Method": "POST",
       "Access-Control-Request-Headers": requestedHeaders.join(","),
-      Host: PLAYMCP_ENDPOINT_HOST,
     },
   });
 
@@ -278,7 +330,6 @@ async function jsonOnlyMcpCorsRequest(baseUrl, method, params, id, origin) {
       "Content-Type": "application/json",
       Accept: "application/json",
       Origin: origin,
-      Host: PLAYMCP_ENDPOINT_HOST,
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
@@ -306,7 +357,6 @@ async function jsonOnlyMcpCorsNotification(baseUrl, method, params, origin) {
       "Content-Type": "application/json",
       Accept: "application/json",
       Origin: origin,
-      Host: PLAYMCP_ENDPOINT_HOST,
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
@@ -390,38 +440,53 @@ function structuredContentText(result) {
   return JSON.stringify(result.structuredContent ?? {});
 }
 
-function assertRegionalPolicyExpectation(result, testCase) {
-  const expectation = testCase.expectedRegionalPolicy;
+function assertStructuredKeys(result, testCase) {
+  const structured = result.structuredContent;
+  if (!structured) return;
+
+  const keys = Object.keys(structured);
+  const allowed =
+    structured.ambiguous === true
+      ? AMBIGUOUS_KEYS
+      : structured.found === false
+      ? NOT_FOUND_KEYS
+      : STRUCTURED_KEY_WHITELIST[testCase.tool];
+  assert(allowed, `${testCase.id} has no structured key whitelist for tool ${testCase.tool}`);
+  for (const key of keys) {
+    assert(allowed.includes(key), `${testCase.id} structuredContent has non-whitelisted key "${key}"`);
+  }
+
+  const nested = NESTED_KEY_WHITELIST[testCase.tool];
+  if (nested && structured.found !== false && Array.isArray(structured[nested.field])) {
+    for (const entry of structured[nested.field]) {
+      for (const key of Object.keys(entry)) {
+        assert(nested.keys.includes(key), `${testCase.id} ${nested.field}[] has non-whitelisted key "${key}"`);
+      }
+    }
+  }
+
+  if (testCase.tool === "get_disposal_steps" && structured.found === true) {
+    assert(Array.isArray(structured.steps) && structured.steps.length > 0, `${testCase.id} found response is missing steps[]`);
+    assert(Array.isArray(structured.cautions), `${testCase.id} found response is missing cautions[]`);
+  }
+}
+
+function assertRegionNotesExpectation(result, testCase) {
+  const expectation = testCase.expectedRegionNotes;
   if (!expectation) return;
 
-  const policy = result.structuredContent?.regionalPolicy;
-  assert(policy && typeof policy === "object" && !Array.isArray(policy), `${testCase.id} structuredContent.regionalPolicy was missing`);
+  const notes = result.structuredContent?.regionNotes;
+  if (expectation.present === false) {
+    assert(notes === undefined, `${testCase.id} structuredContent.regionNotes should be omitted`);
+    return;
+  }
 
-  if (expectation.level !== undefined) {
+  assert(Array.isArray(notes) && notes.length > 0, `${testCase.id} structuredContent.regionNotes was missing`);
+  for (const expected of expectation.includes ?? []) {
     assert(
-      policy.regionCheckLevel === expectation.level,
-      `${testCase.id} regionalPolicy.regionCheckLevel expected "${expectation.level}", got "${policy.regionCheckLevel}"`,
+      notes.some((line) => line.includes(expected)),
+      `${testCase.id} regionNotes did not include "${expected}"`,
     );
-  }
-
-  if (expectation.guidance !== undefined) {
-    assert(
-      policy.regionGuidance === expectation.guidance,
-      `${testCase.id} regionalPolicy.regionGuidance expected "${expectation.guidance}", got "${policy.regionGuidance}"`,
-    );
-  }
-
-  if (expectation.shape === "minimal") {
-    for (const field of ["summary", "recycling", "itemGuide", "sources", "bulkyWasteFees"]) {
-      assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for minimal regional policy`);
-    }
-  }
-
-  if (expectation.shape === "itemGuideOnly") {
-    assert(Array.isArray(policy.itemGuide), `${testCase.id} regionalPolicy.itemGuide should be included`);
-    for (const field of ["summary", "recycling", "sources", "bulkyWasteFees"]) {
-      assert(policy[field] === undefined, `${testCase.id} regionalPolicy.${field} should be omitted for itemGuideOnly regional policy`);
-    }
   }
 }
 
@@ -446,7 +511,8 @@ async function runAnswerCase(baseUrl, testCase, id) {
     assert(!structured.includes(unexpected), `${testCase.id} structuredContent unexpectedly included "${unexpected}"`);
   }
 
-  assertRegionalPolicyExpectation(result, testCase);
+  assertStructuredKeys(result, testCase);
+  assertRegionNotesExpectation(result, testCase);
 
   return result;
 }
@@ -483,67 +549,64 @@ async function runSmoke() {
         },
       },
       1,
-      {
-        Host: PLAYMCP_ENDPOINT_HOST,
-      },
     );
     assertInitializeResult(initialize, "JSON-only initialize");
 
-    const ping = await jsonOnlyMcpRequest(baseUrl, "ping", {}, 2, {
-      Host: PLAYMCP_ENDPOINT_HOST,
-    });
+    const ping = await jsonOnlyMcpRequest(baseUrl, "ping", {}, 2);
     assert(isPlainObject(ping), "JSON-only ping result must be an object");
 
-    await jsonOnlyMcpNotification(
-      baseUrl,
-      "notifications/initialized",
-      {},
-      {
-        Host: PLAYMCP_ENDPOINT_HOST,
-      },
-    );
+    await jsonOnlyMcpNotification(baseUrl, "notifications/initialized", {});
 
     const toolsList = await mcpRequest(baseUrl, "tools/list", {}, 3);
     assertToolList(toolsList, "SSE tools/list");
 
-    const playMcpToolsList = await mcpRequest(baseUrl, "tools/list", {}, 4, {
-      Host: PLAYMCP_ENDPOINT_HOST,
-    });
-    assertToolList(playMcpToolsList, "PlayMCP endpoint SSE tools/list");
-
-    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 5, {
-      Host: PLAYMCP_ENDPOINT_HOST,
-    });
+    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, 5);
     assertToolList(jsonOnlyToolsList, "JSON-only tools/list");
 
     // The SSE path (SDK-registered tools) and the JSON-only compat path are
     // generated from a single TOOL_DEFS source; assert they can never drift.
     const sortByName = (tools) => [...tools].sort((a, b) => a.name.localeCompare(b.name));
     assert(
-      JSON.stringify(sortByName(playMcpToolsList.tools)) === JSON.stringify(sortByName(jsonOnlyToolsList.tools)),
+      JSON.stringify(sortByName(toolsList.tools)) === JSON.stringify(sortByName(jsonOnlyToolsList.tools)),
       "SSE tools/list and JSON-only tools/list must be identical",
     );
 
-    const getDiscovery = await mcpGetDiscovery(baseUrl, {
-      Host: PLAYMCP_ENDPOINT_HOST,
-    });
+    const getDiscovery = await mcpGetDiscovery(baseUrl);
     assertToolList(getDiscovery, "GET discovery");
 
     let requestId = 6;
-    for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
-      const endpointHostToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, requestId, {
-        Host: endpointHost,
-      });
-      assertToolList(endpointHostToolsList, `JSON-only tools/list for endpoint host ${endpointHost}`);
-      requestId += 1;
-    }
 
+    // A JSON-only client (Accept: application/json without text/event-stream)
+    // must be able to invoke tools, not just list them — the SDK transport
+    // alone would reject such POSTs with 406.
+    const jsonOnlyCall = await jsonOnlyMcpRequest(
+      baseUrl,
+      "tools/call",
+      { name: "get_disposal_steps", arguments: { itemName: "기름 묻은 피자박스" } },
+      requestId,
+    );
+    assert(
+      Array.isArray(jsonOnlyCall.content) && jsonOnlyCall.content.some((entry) => entry.type === "text"),
+      "JSON-only tools/call did not return text content",
+    );
+    assert(
+      jsonOnlyCall.structuredContent?.found === true,
+      "JSON-only tools/call did not return structuredContent",
+    );
+    requestId += 1;
+
+    // Host allowlist checks must use node:http — see rawStatusWithHost.
     for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
       const status = await rawStatusWithHost(port, endpointHost);
       assert(status === 200, `Allowed host ${endpointHost} should return 200, got ${status}`);
     }
     const disallowedStatus = await rawStatusWithHost(port, "evil.example.com");
     assert(disallowedStatus === 403, `Disallowed host should return 403, got ${disallowedStatus}`);
+
+    // Host validation is scoped to /mcp: /health must stay reachable for
+    // probes that send a pod IP (or any other hostname) as the Host header.
+    const healthProbeStatus = await rawStatusWithHost(port, "10.244.0.7:3000", "/health", "GET");
+    assert(healthProbeStatus === 200, `/health with pod-IP Host should return 200, got ${healthProbeStatus}`);
 
     for (const origin of PLAYMCP_ORIGINS) {
       await mcpCorsPreflight(baseUrl, origin);
