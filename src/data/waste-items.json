@@ -275,7 +275,9 @@
       "종이팩",
       "팩우유",
       "주스팩",
-      "음료팩"
+      "음료팩",
+      "우유곽",
+      "우유갑"
     ],
     "category": "paper_pack",
     "disposalType": "recycle",
@@ -428,7 +430,8 @@
       "생수병",
       "투명 페트병",
       "PET병",
-      "음료수병"
+      "음료수병",
+      "페트"
     ],
     "category": "plastic",
     "disposalType": "recycle",
@@ -2744,7 +2747,8 @@
       "폐건전지",
       "AA 건전지",
       "AAA 건전지",
-      "리튬 건전지"
+      "리튬 건전지",
+      "밧데리"
     ],
     "category": "hazardous",
     "disposalType": "special_collection",
@@ -7147,7 +7151,10 @@
       "스폰지 수세미",
       "아크릴 수세미",
       "부직포 수세미",
-      "철수세미"
+      "철수세미",
+      "멜라민 스펀지",
+      "매직 스펀지",
+      "매직블럭"
     ],
     "category": "contaminated_mixed_household",
     "disposalType": "general",

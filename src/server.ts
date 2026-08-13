@@ -9,17 +9,19 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 // even across zod major versions.
 import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-schema-compat.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import type { MatchedRegionPolicy, WasteItem, WasteMatch } from "./data.js";
+import type { MatchedRegionPolicy, MaterialGuideline, WasteItem, WasteMatch } from "./data.js";
 import {
   confidenceLabel,
   disposalGroupLabel,
   findBulkyWasteFees,
+  findMaterialGuideline,
   findRegionalPolicy,
   findRegionItemGuide,
   findWasteItems,
   formatItemGuide,
   formatRegionItemGuide,
   formatRegionSourceList,
+  inferMaterialCategories,
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
@@ -273,24 +275,64 @@ function briefSourceTitle(item: WasteItem): string {
   return item.sources[0]?.title ?? item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
 }
 
+const FALLBACK_ASK_FOR = ["재질", "오염 여부", "크기", "지역"];
+// Material menu shown when the query gives no material hint. Kept to 5 one-line
+// rules to respect the Phase 0 response-size budget.
+const FALLBACK_MENU_MATERIAL_IDS = ["plastic_container", "vinyl_film", "paper_cardboard", "can_metal", "general_trash"];
+
 function unknownItemResult(itemName: string): CallToolResult {
   const candidates = findWasteItems(itemName, 3).map((match) => match.item.name);
   const candidateText = candidates.length > 0 ? `\n\n비슷한 후보: ${candidates.join(", ")}` : "";
+  const inferred = inferMaterialCategories(itemName)
+    .map((id) => findMaterialGuideline(id))
+    .filter((guideline): guideline is MaterialGuideline => guideline !== undefined);
 
-  return textResult(
-    [
-      `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`,
-      "품목의 재질, 오염 여부, 크기, 지역 정보를 함께 알려주면 더 정확히 판단할 수 있습니다.",
-      candidateText,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-    {
-      found: false,
-      itemName,
-      candidates,
+  const lines = [
+    `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`,
+    "품목의 재질, 오염 여부, 크기, 지역 정보를 함께 알려주면 더 정확히 판단할 수 있습니다.",
+  ];
+
+  if (inferred.length > 0) {
+    lines.push("", "재질로 추정한 일반 원칙:");
+    for (const guideline of inferred) {
+      lines.push(`- ${guideline.label}: ${guideline.quickRule}`);
+      for (const step of guideline.steps.slice(0, 2)) {
+        lines.push(`  - ${step}`);
+      }
+      lines.push(`  - 재활용이 어려운 경우: ${guideline.whenGeneral}`);
+    }
+  } else {
+    lines.push("", "주요 재질별 한 줄 원칙:");
+    for (const id of FALLBACK_MENU_MATERIAL_IDS) {
+      const guideline = findMaterialGuideline(id);
+      if (guideline) lines.push(`- ${guideline.label}: ${guideline.quickRule}`);
+    }
+  }
+
+  const materials =
+    inferred.length > 0
+      ? inferred.map((guideline) => ({
+          id: guideline.id,
+          label: guideline.label,
+          quickRule: guideline.quickRule,
+          steps: guideline.steps.slice(0, 2),
+          whenGeneral: guideline.whenGeneral,
+          source: guideline.source,
+        }))
+      : FALLBACK_MENU_MATERIAL_IDS.map((id) => findMaterialGuideline(id))
+          .filter((guideline): guideline is MaterialGuideline => guideline !== undefined)
+          .map((guideline) => ({ id: guideline.id, label: guideline.label, quickRule: guideline.quickRule }));
+
+  return textResult(lines.join("\n") + candidateText, {
+    found: false,
+    itemName,
+    candidates,
+    fallback: {
+      inferred: inferred.length > 0,
+      materials,
+      askFor: FALLBACK_ASK_FOR,
     },
-  );
+  });
 }
 
 function ambiguousCandidateLabel(match: WasteMatch): string {
@@ -311,21 +353,25 @@ function ambiguousCandidateDetails(match: WasteMatch): ToolResult {
 
 function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallToolResult {
   const candidateLabels = candidates.map(ambiguousCandidateLabel);
+  const text =
+    candidateLabels.length === 1
+      ? [
+          `입력한 품목 "${itemName}"을(를) 정확히 찾지 못했습니다. 혹시 "${candidateLabels[0]}"을(를) 찾으시나요?`,
+          "맞다면 그 품목명으로 다시 물어봐 주세요. 아니라면 재질, 용도, 크기를 알려주시면 다시 판단하겠습니다.",
+        ].join("\n")
+      : [
+          `입력한 품목 "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다.`,
+          `후보: ${candidateLabels.join(", ")}`,
+          "재질, 용도, 크기를 조금 더 구체적으로 알려주시면 정확히 판단할 수 있습니다.",
+        ].join("\n");
 
-  return textResult(
-    [
-      `입력한 품목 "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다.`,
-      `후보: ${candidateLabels.join(", ")}`,
-      "재질, 용도, 크기를 조금 더 구체적으로 알려주시면 정확히 판단할 수 있습니다.",
-    ].join("\n"),
-    {
-      found: false,
-      ambiguous: true,
-      itemName,
-      candidates: candidateLabels,
-      candidateDetails: candidates.map(ambiguousCandidateDetails),
-    },
-  );
+  return textResult(text, {
+    found: false,
+    ambiguous: true,
+    itemName,
+    candidates: candidateLabels,
+    candidateDetails: candidates.map(ambiguousCandidateDetails),
+  });
 }
 
 function generalRegionCheckList(region: MatchedRegionPolicy): string[] {

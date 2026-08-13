@@ -42,7 +42,9 @@ const REQUIRED_TOOL_ANNOTATION_FIELDS = [
 // PRD phase-0 R5: per-tool structuredContent whitelists. Every answer case
 // runs through this, so a handler emitting a field outside its contract fails
 // the smoke suite instead of silently regrowing the payload.
-const NOT_FOUND_KEYS = ["found", "itemName", "candidates"];
+// Phase 1 R1 extends the not_found contract with a material-principles
+// fallback block: { inferred, materials[], askFor[] }.
+const NOT_FOUND_KEYS = ["found", "itemName", "candidates", "fallback"];
 const AMBIGUOUS_KEYS = ["found", "ambiguous", "itemName", "candidates", "candidateDetails"];
 const STRUCTURED_KEY_WHITELIST = {
   classify_waste_item: [
