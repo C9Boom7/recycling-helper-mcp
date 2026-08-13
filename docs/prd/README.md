@@ -67,9 +67,9 @@ Phase 3은 `src/server.ts`의 `get_disposal_steps` 핸들러를 만지므로 Pha
 | Phase | 상태 | 브랜치 | 비고 |
 | --- | --- | --- | --- |
 | 0 | 완료 (main 머지) | claude/kakaotalk-mcp-analysis-4dfb43 | push 대기 |
-| 1 | 미착수 | - | Phase 0 머지됨 — 착수 가능 |
-| 2 | 미착수 | - | Phase 0 머지됨 — 착수 가능, Phase 1과 병렬 가능 |
-| 3 | 미착수 | - | Phase 1 머지 후 권장 |
+| 1 | 완료 (main 머지) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹, smoke 211케이스. push 대기 |
+| 2 | 미착수 | - | Phase 0 머지됨 — 착수 가능. 랩탑·정수기 필터·햇반 용기 신규 품목 후보는 data-decision-backlog 참고 |
+| 3 | 미착수 | - | Phase 1 머지됨 — 착수 가능 |
 | 4 | 미착수 | - | |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.

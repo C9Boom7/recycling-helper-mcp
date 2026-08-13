@@ -132,13 +132,64 @@ export type WasteMatch = {
   matchKind: MatchKind;
 };
 
+export type MaterialGuideline = {
+  id: string;
+  label: string;
+  quickRule: string;
+  steps: string[];
+  cautions: string[];
+  whenGeneral: string;
+  source: { title: string; url?: string };
+};
+
 const dataPath = fileURLToPath(new URL("./data/waste-items.json", import.meta.url));
 const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", import.meta.url));
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
+const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
 export const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8")) as RegionalPolicyData[];
 export const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeePath, "utf8")) as BulkyWasteFeeSchedule[];
+export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath, "utf8")) as MaterialGuideline[];
+
+const materialGuidelineById = new Map(materialGuidelines.map((guideline) => [guideline.id, guideline]));
+
+export function findMaterialGuideline(id: string): MaterialGuideline | undefined {
+  return materialGuidelineById.get(id);
+}
+
+// Material inference for the not_found fallback. The ids are the material axis
+// of material-guidelines.json — a deliberately separate system from the
+// item-classification `category` field on waste items, even where strings
+// overlap. Concrete material words come before disposal-channel words so a
+// query like "약과 포장지 폐의약품 수거함?" leads with the packaging material.
+const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
+  { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
+  { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
+  { category: "paper_cardboard", pattern: /종이|박스|상자|골판지|신문|서류|공책/u },
+  { category: "can_metal", pattern: /캔|깡통|고철|금속|알루미늄|스텐|스테인리스|양은/u },
+  { category: "glass_bottle", pattern: /유리|글라스/u },
+  { category: "plastic_container", pattern: /플라스틱|페트|트레이|아크릴/u },
+  { category: "textile", pattern: /옷|의류|섬유|이불|담요|커튼|수건|헝겊/u },
+  { category: "electronics_battery", pattern: /배터리|건전지|전지|충전|전동|전자|전기|가전|노트북|랩탑|케이블|충전기/u },
+  { category: "hazardous_pressurized", pattern: /의약품|알약|물약|연고|시럽|형광등|가스|스프레이|부탄|에어로졸|살충|농약|페인트|소화기/u },
+  { category: "food_waste", pattern: /음식물|먹다\s*남|껍질|과일|채소/u },
+  { category: "bulky", pattern: /대형|가구|침대|소파|장롱|매트리스/u },
+  { category: "general_trash", pattern: /실리콘|고무|라텍스|가죽|멜라민|스펀지|스폰지|복합\s*재질/u },
+];
+
+export function inferMaterialCategories(query: string, limit = 2): string[] {
+  const lowered = query.toLowerCase();
+  const categories: string[] = [];
+  for (const { category, pattern } of MATERIAL_QUERY_PATTERNS) {
+    if (categories.length >= limit) break;
+    if (pattern.test(lowered) && !categories.includes(category)) {
+      categories.push(category);
+    }
+  }
+
+  return categories;
+}
 
 export function normalizeText(value: string): string {
   return value
@@ -150,6 +201,11 @@ export function normalizeText(value: string): string {
 const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
 const MAX_AMBIGUOUS_CANDIDATES = 7;
+// fuzzy_jamo must stay below generic_fragment (82): it is a typo guess, never
+// stronger evidence than an actual substring hit.
+const FUZZY_JAMO_STRONG_SCORE = 70;
+const FUZZY_JAMO_STRONG_SIMILARITY = 0.85;
+const FUZZY_JAMO_MIN_SIMILARITY = 0.7;
 const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
 
 function normalizedTokens(value: string): string[] {
@@ -172,6 +228,84 @@ function stripShortAliasParticle(token: string): string {
 
 function hasStandaloneShortAliasMatch(queryTokens: string[], normalizedName: string): boolean {
   return queryTokens.some((token) => token === normalizedName || stripShortAliasParticle(token) === normalizedName);
+}
+
+const HANGUL_CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+const HANGUL_JUNGSEONG = ["ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅘ", "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ"];
+const HANGUL_JONGSEONG = ["", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅄ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+
+// Compound jongseong stays a single compatibility jamo character so syllable
+// counts stay predictable (e.g. "패트병"/"페트병" are both 7 jamo — the 0.857
+// boundary case pinned in the Phase 1 PRD).
+function decomposeHangulJamo(value: string): string {
+  let result = "";
+  for (const char of value) {
+    const code = char.codePointAt(0) ?? 0;
+    if (code >= 0xac00 && code <= 0xd7a3) {
+      const offset = code - 0xac00;
+      result += HANGUL_CHOSEONG[Math.floor(offset / 588)];
+      result += HANGUL_JUNGSEONG[Math.floor((offset % 588) / 28)];
+      result += HANGUL_JONGSEONG[offset % 28];
+    } else {
+      result += char;
+    }
+  }
+
+  return result;
+}
+
+function levenshteinDistance(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  let current = new Array<number>(b.length + 1);
+
+  for (let i = 1; i <= a.length; i += 1) {
+    current[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const substitutionCost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + substitutionCost);
+    }
+    [previous, current] = [current, previous];
+  }
+
+  return previous[b.length];
+}
+
+function jamoSimilarity(a: string, b: string): number {
+  if (!a || !b) return 0;
+  const jamoA = decomposeHangulJamo(a);
+  const jamoB = decomposeHangulJamo(b);
+  const maxLength = Math.max(jamoA.length, jamoB.length);
+  if (maxLength === 0) return 0;
+
+  return 1 - levenshteinDistance(jamoA, jamoB) / maxLength;
+}
+
+function fuzzyJamoScore(normalizedQuery: string, queryTokens: string[], normalizedName: string): number {
+  let bestSimilarity = jamoSimilarity(normalizedQuery, normalizedName);
+  for (const token of queryTokens) {
+    if (token.length <= 1) continue;
+    bestSimilarity = Math.max(
+      bestSimilarity,
+      jamoSimilarity(token, normalizedName),
+      jamoSimilarity(stripShortAliasParticle(token), normalizedName),
+    );
+  }
+
+  if (bestSimilarity >= FUZZY_JAMO_STRONG_SIMILARITY) return FUZZY_JAMO_STRONG_SCORE;
+
+  // The weak band only fires on bare item-name queries (≤2 tokens). In full
+  // sentences, generic compound tokens sit ~0.7 from unrelated items
+  // ("포장지"↔"화장지"), and the not_found material fallback answers those
+  // queries better than a coin-flip suggestion would.
+  if (queryTokens.length <= 2 && bestSimilarity >= FUZZY_JAMO_MIN_SIMILARITY) {
+    return Math.min(55, 40 + Math.round(((bestSimilarity - FUZZY_JAMO_MIN_SIMILARITY) / 0.15) * 15));
+  }
+
+  return 0;
 }
 
 function isLikelyDisposalTargetMention(query: string, normalizedQuery: string, normalizedName: string): boolean {
@@ -241,7 +375,7 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  * an exact, prefix, or standalone-token match, so only this one needs a tie check
  * in resolveWasteItem before it's safe to answer with confidence.
  */
-type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_overlap" | "target_mention";
+type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_jamo" | "target_mention";
 
 function scoreItem(query: string, item: WasteItem): WasteMatch {
   const normalizedQuery = normalizeText(query);
@@ -279,11 +413,11 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
       kind = "generic_fragment";
     } else {
       if (!isShortAlias) {
-        const queryChars = Array.from(new Set(normalizedQuery.split("")));
-        const nameChars = new Set(normalizedName.split(""));
-        const overlap = queryChars.filter((char) => nameChars.has(char)).length;
-        score = Math.round((overlap / Math.max(queryChars.length, 1)) * 30);
-        kind = "fuzzy_overlap";
+        const fuzzyScore = fuzzyJamoScore(normalizedQuery, queryTokens, normalizedName);
+        if (fuzzyScore > 0) {
+          score = fuzzyScore;
+          kind = "fuzzy_jamo";
+        }
       }
     }
 
@@ -294,7 +428,12 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
     }
   }
 
-  const adjustedScore = bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE ? Math.min(99, bestScore + semanticBonus) : bestScore;
+  // fuzzy_jamo never receives the semantic bonus: 70 + 18 would overtake
+  // generic_fragment (82) and break the typo-guess-stays-weakest invariant.
+  const adjustedScore =
+    bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE && matchKind !== "fuzzy_jamo"
+      ? Math.min(99, bestScore + semanticBonus)
+      : bestScore;
   return { item, score: adjustedScore, matchedBy, matchKind };
 }
 
@@ -377,6 +516,20 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   }
 
   const [best, ...rest] = matches;
+
+  // Typo guesses confirm only when exactly one candidate clears the strong
+  // similarity bar; anything weaker is surfaced as an "is this what you
+  // meant?" candidate list, even when there is just one candidate.
+  if (best.matchKind === "fuzzy_jamo") {
+    const fuzzyMatches = [best, ...rest].filter((match) => match.matchKind === "fuzzy_jamo");
+    const strongMatches = fuzzyMatches.filter((match) => match.score >= FUZZY_JAMO_STRONG_SCORE);
+    if (strongMatches.length === 1 && best.score >= FUZZY_JAMO_STRONG_SCORE) {
+      return { status: "match", match: best };
+    }
+
+    return { status: "ambiguous", candidates: fuzzyMatches.slice(0, MAX_AMBIGUOUS_CANDIDATES) };
+  }
+
   if (best.matchKind === "generic_fragment" && best.score < HIGH_CONFIDENCE_SCORE) {
     const tied = [best, ...rest].filter((match) => match.score === best.score && match.matchKind === "generic_fragment");
     const readableCandidates = tied

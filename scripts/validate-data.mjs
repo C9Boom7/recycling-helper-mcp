@@ -6,6 +6,7 @@ const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.m
 const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.meta.url);
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
+const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -14,6 +15,7 @@ const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8
 const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
+const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
@@ -191,6 +193,10 @@ if (!Array.isArray(mcpAnswerCases)) {
 
 if (!Array.isArray(questionBacklog)) {
   throw new Error("src/data/question-backlog.json must contain an array");
+}
+
+if (!Array.isArray(materialGuidelines) || materialGuidelines.length === 0) {
+  throw new Error("src/data/material-guidelines.json must contain a non-empty array");
 }
 
 const reviewCounts = countBy(items, (item) => item?.review?.status);
@@ -553,6 +559,48 @@ for (const item of items) {
     errors.push(
       `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case with expectedRegionalPolicy.level=${expectedLevel}`,
     );
+  }
+}
+
+const materialGuidelineIds = new Set();
+for (const [index, guideline] of materialGuidelines.entries()) {
+  const prefix = `materialGuideline[${index}]${guideline?.id ? `(${guideline.id})` : ""}`;
+
+  if (!isNonEmptyString(guideline.id)) {
+    errors.push(`${prefix}.id must be a non-empty string`);
+  } else {
+    if (!/^[a-z0-9_]+$/.test(guideline.id)) errors.push(`${prefix}.id must use lowercase snake_case`);
+    if (materialGuidelineIds.has(guideline.id)) errors.push(`${prefix}.id is duplicated`);
+    materialGuidelineIds.add(guideline.id);
+  }
+
+  for (const field of ["label", "quickRule", "whenGeneral"]) {
+    if (!isNonEmptyString(guideline[field])) errors.push(`${prefix}.${field} must be a non-empty string`);
+  }
+
+  if (!Array.isArray(guideline.steps) || guideline.steps.length < 2 || guideline.steps.length > 3) {
+    errors.push(`${prefix}.steps must contain 2 to 3 entries`);
+  } else {
+    for (const [stepIndex, step] of guideline.steps.entries()) {
+      if (!isNonEmptyString(step)) errors.push(`${prefix}.steps[${stepIndex}] must be a non-empty string`);
+    }
+  }
+
+  if (!Array.isArray(guideline.cautions) || guideline.cautions.length < 1 || guideline.cautions.length > 2) {
+    errors.push(`${prefix}.cautions must contain 1 to 2 entries`);
+  } else {
+    for (const [cautionIndex, caution] of guideline.cautions.entries()) {
+      if (!isNonEmptyString(caution)) errors.push(`${prefix}.cautions[${cautionIndex}] must be a non-empty string`);
+    }
+  }
+
+  if (!guideline.source || typeof guideline.source !== "object") {
+    errors.push(`${prefix}.source is required`);
+  } else {
+    if (!isNonEmptyString(guideline.source.title)) errors.push(`${prefix}.source.title must be a non-empty string`);
+    if (guideline.source.url !== undefined && !/^https?:\/\//.test(guideline.source.url)) {
+      errors.push(`${prefix}.source.url must start with http:// or https://`);
+    }
   }
 }
 
