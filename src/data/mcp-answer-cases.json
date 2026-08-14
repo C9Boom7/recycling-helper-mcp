@@ -6678,10 +6678,11 @@
       "여러 품목에 해당할 수 있어",
       "후보:",
       "노트북 컴퓨터 (노트북)",
-      "컴퓨터 모니터 (모니터)"
+      "데스크탑 컴퓨터"
     ],
     "expectedTextExcludes": [
-      "## 노트북"
+      "## 노트북",
+      "## 데스크탑 컴퓨터"
     ],
     "expectedStructuredIncludes": [
       "\"ambiguous\":true",
