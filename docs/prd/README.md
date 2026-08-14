@@ -30,7 +30,7 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 5개로 나�
 | 1 | [phase-1-matching-fallback.md](phase-1-matching-fallback.md) | not_found 폴백, 자모 오타 허용, 별칭 보강 | Phase 0 머지 후 |
 | 2 | [phase-2-coverage.md](phase-2-coverage.md) | 표준 티어 품목 벌크 확장 (데이터 중심) | Phase 0 머지 후, Phase 1과 병렬 가능 |
 | 3 | [phase-3-widget.md](phase-3-widget.md) | get_disposal_steps 확정 매칭 위젯 + copy_text | Phase 0 머지 후 — 1·2와 병렬 가능 |
-| 4a | [phase-4-release.md](phase-4-release.md) §전제 | 본선 서버 배포 + Preview 연결·툴콜 확인 | Phase 0 배포 직후 — **즉시 착수** |
+| 4a | [phase-4-release.md](phase-4-release.md) §4a | 본선 서버 배포 + Preview 연결·툴콜 확인 | Phase 0 배포 직후 — **즉시 착수** |
 | 4b | [phase-4-release.md](phase-4-release.md) | 발화 테스트 매트릭스, description 튜닝, 회귀, 마감 | Phase 1~3 배포 이후 |
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
@@ -78,11 +78,11 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 
 | Phase | 상태 | 브랜치 | 비고 |
 | --- | --- | --- | --- |
-| 0 | 완료 (origin/main 푸시됨) | claude/kakaotalk-mcp-analysis-4dfb43 | 코드리뷰 지적 10건 수정 포함(32757f5). 재배포는 사용자 클릭 대기 |
-| 1 | 완료 (origin/main 푸시됨) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹, smoke 211케이스. 재배포는 사용자 클릭 대기 |
-| 2 | 완료 (PR #4, 머지 대기) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272. 최신 main 통합 후 local:test 통과 |
-| 3 | 구현 완료 (PR #5, 리뷰·머지 대기) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. 로컬 검증 통과. DoD의 Preview 렌더링(R6)은 머지·재배포 이후 확인 |
-| 4a | 미착수 | - | Phase 0 배포 후 즉시 — 최우선 |
-| 4b | 미착수 | - | 1~3 배포 이후 |
+| 0 | 완료 (main 반영) | claude/kakaotalk-mcp-analysis-4dfb43 | 코드리뷰 지적 10건 수정 포함(32757f5) |
+| 1 | 완료 (main 반영) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹. 코드리뷰 후속 수정은 PR #6으로 머지 |
+| 2 | 완료 (PR #4 머지됨) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272 |
+| 3 | 완료 (PR #5 머지됨) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. Preview 렌더링(R6) 확인은 4a로 이관 |
+| 4a | 대기 (재배포 클릭 필요) | claude/prd4-analysis-review-56f5e3 | Phase 0~3 전부 main 반영됨 — 사용자 재배포 후 즉시 착수 |
+| 4b | 미착수 | - | 4a 완주 이후 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
