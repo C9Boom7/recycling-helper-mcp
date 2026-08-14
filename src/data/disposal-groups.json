@@ -1,5 +1,6 @@
 {
   "bulky_waste": "대형폐기물",
+  "bulky_waste_or_construction_waste": "대형폐기물/공사장폐기물",
   "bulky_waste_or_metal_recycle_if_disassembled": "대형폐기물",
   "bulky_waste_special_handling": "대형폐기물",
   "collection_point_or_absorb": "전용수거함/일반쓰레기",

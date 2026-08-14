@@ -6707,5 +6707,257 @@
       "\"ambiguous\":true",
       "\"itemName\":\"유리\""
     ]
+  },
+  {
+    "id": "phase7_shoe_rack_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "신발장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 신발장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"shoe_rack\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_display_cabinet_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장식장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 장식장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"display_cabinet\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_low_chest_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "문갑",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 문갑"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"low_chest\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_cupboard_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "찬장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 찬장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cupboard\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_side_table_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "탁자",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 탁자"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"side_table\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_folding_screen_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "병풍",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 병풍"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"folding_screen\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_partition_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "파티션",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 파티션"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"partition\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_filing_cabinet_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "캐비닛",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 캐비닛"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"filing_cabinet\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_sink_unit_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 싱크대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sink_unit\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_bathtub_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 욕조"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathtub\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_toilet_bowl_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 변기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_bowl\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_washbasin_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "세면대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 세면대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"washbasin\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_door_panel_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "문짝",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 문짝"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"door_panel\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_water_tank_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "물탱크",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 물탱크"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"water_tank\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
   }
 ]

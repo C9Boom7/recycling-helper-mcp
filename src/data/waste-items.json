@@ -18183,5 +18183,929 @@
         "Phase 7 대형폐기물 품목 확장. R1 이후 '컴퓨터' 질의가 노트북으로 오매칭되던 것을 이 품목으로 해소."
       ]
     }
+  },
+  {
+    "id": "shoe_rack",
+    "name": "신발장",
+    "aliases": [
+      "신발 수납장",
+      "슈즈랙",
+      "현관 신발장"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "신발장은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 138개 지자체가 \"신발장\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "display_cabinet",
+    "name": "장식장",
+    "aliases": [
+      "진열장",
+      "수납장",
+      "거실장"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "장식장은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 122개 지자체가 \"장식장\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "low_chest",
+    "name": "문갑",
+    "aliases": [
+      "좌식 문갑",
+      "전통 문갑"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "문갑은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 130개 지자체가 \"문갑\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "cupboard",
+    "name": "찬장",
+    "aliases": [
+      "그릇장",
+      "주방 수납장",
+      "food cupboard"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "찬장은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 73개 지자체가 \"찬장\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "side_table",
+    "name": "탁자",
+    "aliases": [
+      "좌탁",
+      "티테이블",
+      "사이드 테이블"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "탁자은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 74개 지자체가 \"탁자\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "folding_screen",
+    "name": "병풍",
+    "aliases": [
+      "전통 병풍",
+      "가리개 병풍"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "병풍은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 89개 지자체가 \"병풍\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "partition",
+    "name": "파티션",
+    "aliases": [
+      "칸막이",
+      "사무용 파티션"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "파티션은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 62개 지자체가 \"파티션\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "filing_cabinet",
+    "name": "캐비닛",
+    "aliases": [
+      "철제 캐비닛",
+      "사무용 캐비닛",
+      "수납 캐비닛"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "캐비닛은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "가정에서 나오는 목재 가구는 표면 처리 때문에 물질 재활용이 어려워 고철·목재류로 따로 배출하지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 서랍장",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%9C%EB%9E%8D%EC%9E%A5",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "서랍장은 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 물질 재활용이 어려워 주로 소각하거나 고형연료로 에너지 재활용됩니다. 상태가 좋은 폐가구는 재활용센터 판매·무상수거가 가능할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 101개 지자체가 \"캐비닛\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (목재 가구 계열)."
+      ]
+    }
+  },
+  {
+    "id": "sink_unit",
+    "name": "싱크대",
+    "aliases": [
+      "씽크대",
+      "주방 싱크대",
+      "개수대"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "싱크대은(는) 대형폐기물로 신고해 배출하고, 인테리어 공사로 여러 개가 나왔다면 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 88개 지자체가 \"싱크대\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "bathtub",
+    "name": "욕조",
+    "aliases": [
+      "욕실 욕조",
+      "이동식 욕조"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "욕조은(는) 대형폐기물로 신고해 배출하고, 인테리어 공사로 여러 개가 나왔다면 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 128개 지자체가 \"욕조\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "toilet_bowl",
+    "name": "변기",
+    "aliases": [
+      "양변기",
+      "좌변기",
+      "화장실 변기"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "변기는 세라믹 재질이라 재활용되지 않으므로 대형폐기물로 신고해 배출하고, 공사로 나왔다면 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 127개 지자체가 \"변기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "washbasin",
+    "name": "세면대",
+    "aliases": [
+      "세면기",
+      "화장실 세면대"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "세면대은(는) 대형폐기물로 신고해 배출하고, 인테리어 공사로 여러 개가 나왔다면 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 82개 지자체가 \"세면대\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "door_panel",
+    "name": "문짝",
+    "aliases": [
+      "방문",
+      "출입문",
+      "중문"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "문짝은 대형폐기물로 신고해 배출하고, 인테리어 공사로 여러 개가 나왔다면 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 112개 지자체가 \"문짝\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "water_tank",
+    "name": "물탱크",
+    "aliases": [
+      "저수조",
+      "물탱크 통"
+    ],
+    "category": "bathroom_fixture",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "conditions": [
+      "bulky",
+      "nonburnable"
+    ],
+    "summary": "물탱크는 부피가 커 대형폐기물로 신고해 배출하고, 공사로 철거한 경우에는 공사장생활폐기물로 처리합니다.",
+    "steps": [
+      "가정에서 한두 개 나온 경우에는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "인테리어 공사로 발생했다면 불연성 폐기물 마대 또는 대형폐기물로 배출합니다.",
+      "공사로 다량 발생한 경우에는 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+    ],
+    "cautions": [
+      "세라믹·대리석 재질이라 재활용되지 않으므로 재활용품으로 내놓지 않습니다.",
+      "지역마다 불연성 마대 사용 기준이 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고와 불연성 마대·공사장폐기물 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "불연성 폐기물 마대 판매처",
+        "공사장생활폐기물 처리 절차"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 욕조",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9A%95%EC%A1%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "욕조는 대형폐기물로 배출합니다. 세라믹·대리석·플라스틱 등으로 만들어져 재활용이 어렵고, 인테리어 공사로 발생한 경우 불연성 마대 또는 대형폐기물로 배출하며 다량이면 지자체에 문의해 공사장생활폐기물 전문 수거업체에 연락합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 103개 지자체가 \"물탱크\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
   }
 ]
