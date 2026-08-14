@@ -6667,5 +6667,44 @@
     "expectedTextIncludes": [
       "## 온수매트"
     ]
+  },
+  {
+    "id": "phase7_modifier_keeps_computer_ambiguous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "컴퓨터"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:",
+      "노트북 컴퓨터 (노트북)",
+      "컴퓨터 모니터 (모니터)"
+    ],
+    "expectedTextExcludes": [
+      "## 노트북"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"컴퓨터\""
+    ]
+  },
+  {
+    "id": "phase7_modifier_keeps_glass_ambiguous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:",
+      "유리병"
+    ],
+    "expectedTextExcludes": [
+      "## 깨진 보온병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"유리\""
+    ]
   }
 ]
