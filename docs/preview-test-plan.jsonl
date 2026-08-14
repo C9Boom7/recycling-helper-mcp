@@ -1,0 +1,25 @@
+{"id":"D1","category":"직접","utterance":"기름 묻은 피자박스 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":true,"note":"오염 분리 배출 안내"}
+{"id":"D2","category":"직접","utterance":"깨진 유리컵 버리는 법 알려줘","expectTool":"get_disposal_steps","expectWidget":true,"note":"부상 경고 caution이 앞에 와야 함"}
+{"id":"D3","category":"직접","utterance":"폐건전지 어디다 버려?","expectTool":"get_disposal_steps","expectWidget":true,"note":"전용 수거함 안내"}
+{"id":"D4","category":"직접","utterance":"보조배터리는 어디에 배출해?","expectTool":"get_disposal_steps","expectWidget":true,"note":"특수·유해 폐기물 경로"}
+{"id":"D5","category":"직접","utterance":"아이스팩 어떻게 버리는 게 맞아?","expectTool":"get_disposal_steps","expectWidget":true,"note":"내용물 재질별 분기"}
+{"id":"J1","category":"판단형","utterance":"스티로폼 재활용 돼?","expectTool":"classify_waste_item|get_disposal_steps","expectWidget":null,"note":"예/아니오 판단"}
+{"id":"J2","category":"판단형","utterance":"영수증은 종이인데 왜 재활용 안 돼?","expectTool":"check_confusing_item|get_disposal_steps","expectWidget":null,"note":"감열지 예외 설명"}
+{"id":"J3","category":"판단형","utterance":"프라이팬 분리수거 되나?","expectTool":"classify_waste_item|get_disposal_steps","expectWidget":null,"note":"코팅 프라이팬 판단"}
+{"id":"J4","category":"판단형","utterance":"도자기 그릇도 유리류로 버리면 돼?","expectTool":"check_confusing_item|classify_waste_item","expectWidget":null,"note":"불연성 구분"}
+{"id":"T1","category":"오타/변형","utterance":"패트병 라벨 떼야돼?","expectTool":"get_disposal_steps","expectWidget":true,"note":"Phase 1 자모 매칭 → 페트병"}
+{"id":"T2","category":"오타/변형","utterance":"스치로폼 버리는법","expectTool":"get_disposal_steps","expectWidget":true,"note":"자모 매칭 → 스티로폼"}
+{"id":"T3","category":"오타/변형","utterance":"형광등 어케 버려","expectTool":"get_disposal_steps","expectWidget":true,"note":"구어체 축약"}
+{"id":"T4","category":"오타/변형","utterance":"텀블러 버릴때 뚜껑 따로?","expectTool":"get_disposal_steps","expectWidget":true,"note":"조사 생략 + 부분 질문"}
+{"id":"U1","category":"미등재","utterance":"실리콘 뒤집개 버리는 법","expectTool":"get_disposal_steps","expectWidget":null,"note":"Phase 1 재질 폴백이 유용한 답으로 이어지는지"}
+{"id":"U2","category":"미등재","utterance":"고양이 모래 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":null,"note":"미등재 시 폴백 문구 품질"}
+{"id":"U3","category":"미등재","utterance":"방수 코팅된 등산자켓 버리려면?","expectTool":"get_disposal_steps","expectWidget":null,"note":"재질 폴백 경로"}
+{"id":"A1","category":"포괄어","utterance":"컵 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"ambiguous → 후보 제시 후 되물음. 툴 호출 여부 판별이 어려우므로 후보에 컵홀더·컵라면 용기가 언급되는지로 확인"}
+{"id":"A2","category":"포괄어","utterance":"플라스틱 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"ambiguous 또는 재질 안내"}
+{"id":"M1","category":"다품목","utterance":"이사가서 침대랑 화분이랑 옷 버려야 해","expectTool":"make_cleanup_plan","expectWidget":false,"note":"버킷 분류 계획"}
+{"id":"M2","category":"다품목","utterance":"대청소했더니 버릴 게 한가득이야. 우산, 이불, 가습기, 옷걸이","expectTool":"make_cleanup_plan","expectWidget":false,"note":"4개 이상 품목"}
+{"id":"R1","category":"지역","utterance":"강남구 대형폐기물 신고 어떻게 해?","expectTool":"get_region_disposal_info","expectWidget":false,"note":"신고 링크 + 수수료"}
+{"id":"R2","category":"지역","utterance":"성남시 재활용 무슨 요일에 버려?","expectTool":"get_region_disposal_info","expectWidget":false,"note":"배출 요일"}
+{"id":"R3","category":"지역","utterance":"강남구 사는데 침대 어떻게 버려?","expectTool":"get_disposal_steps|get_region_disposal_info","expectWidget":true,"note":"Phase 3 R2-1: 카드에 지역 기준 + 수수료 1줄이 실려야 함"}
+{"id":"N1","category":"비의도","utterance":"오늘 저녁 뭐 먹지","expectTool":null,"expectWidget":false,"note":"과호출 점검 — 툴이 호출되지 않아야 함"}
+{"id":"N2","category":"비의도","utterance":"주말에 서울 놀러갈 만한 데 추천해줘","expectTool":null,"expectWidget":false,"note":"과호출 점검"}
