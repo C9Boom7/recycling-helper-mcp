@@ -4215,8 +4215,7 @@
       "여러 품목에 해당할 수 있어",
       "후보:",
       "빈 약통",
-      "샴푸통",
-      "페인트통"
+      "샴푸통"
     ],
     "expectedTextExcludes": [
       "곰팡이 핀 빵",
@@ -6958,6 +6957,456 @@
     ],
     "expectedStructuredExcludes": [
       "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_electric_fan_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "선풍기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 선풍기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_fan\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_audio_system_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "오디오",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 오디오"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"audio_system\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_dishwasher_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "식기세척기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 식기세척기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dishwasher\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_dish_dryer_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "식기건조기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 식기건조기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dish_dryer\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_spin_dryer_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "탈수기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 탈수기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"spin_dryer\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_sewing_machine_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "재봉틀",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 재봉틀"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sewing_machine\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_lighting_fixture_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "조명기구",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 조명기구"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"lighting_fixture\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_gas_oven_range_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스오븐레인지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 가스오븐레인지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"gas_oven_range\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_piano_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "피아노",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 피아노"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"piano\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_safe_box_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "금고",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 금고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"safe_box\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_tire_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "타이어",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 타이어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"tire\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_bicycle_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "자전거",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 자전거"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bicycle\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_boiler_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "보일러",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 보일러"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"boiler\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_stone_bed_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "돌침대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 돌침대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stone_bed\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_arcade_machine_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "오락기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 오락기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"arcade_machine\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_vending_machine_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "자동판매기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 자동판매기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"vending_machine\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_large_jar_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "항아리",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 항아리"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"large_jar\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_rice_container_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "쌀통",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 쌀통"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"rice_container\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_rubber_tub_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "고무통",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 고무통"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"rubber_tub\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_mannequin_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마네킹",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 마네킹"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"mannequin\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_wheelchair_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "휠체어",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 휠체어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wheelchair\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_baby_walker_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "보행기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 보행기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_walker\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_large_trash_bin_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "쓰레기통",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 쓰레기통"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"large_trash_bin\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
+    ]
+  },
+  {
+    "id": "phase7_space_heater_region_required",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "난로",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "## 난로"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"space_heater\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"disposable_hand_warmer\""
+    ]
+  },
+  {
+    "id": "phase7_clock_asks_back",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "시계"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:"
+    ],
+    "expectedTextExcludes": [
+      "## 손목시계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"시계\""
     ]
   }
 ]

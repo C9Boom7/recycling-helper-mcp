@@ -3483,8 +3483,7 @@
       "무선 공유기",
       "휴대용 선풍기",
       "미니 선풍기",
-      "USB 선풍기",
-      "선풍기"
+      "USB 선풍기"
     ],
     "category": "electronics",
     "disposalType": "special_collection",
@@ -13325,7 +13324,6 @@
     "id": "wrist_watch",
     "name": "손목시계",
     "aliases": [
-      "시계",
       "전자시계",
       "디지털 시계",
       "쿼츠 시계"
@@ -19105,6 +19103,1676 @@
       "lastReviewedAt": "2026-08-14",
       "notes": [
         "Phase 7 대형폐기물 품목 확장 (욕실·설비 계열)."
+      ]
+    }
+  },
+  {
+    "id": "water_purifier",
+    "name": "정수기",
+    "aliases": [
+      "냉온정수기",
+      "얼음정수기",
+      "폐정수기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "정수기은(는) 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우 판매·설치 업체에 기존 제품 역회수를 함께 요청할 수 있습니다.",
+      "무상수거가 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다.",
+      "렌탈 제품은 소유권이 업체에 있으므로 버리기 전에 렌탈사에 회수를 요청합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 정수기",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 정수기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%A0%95%EC%88%98%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "정수기는 폐가전제품 무상방문수거 서비스(1599-0903)로 배출하거나, 어려운 경우 대형폐기물로 배출합니다. 대형가전제품으로 분류되어 1개 이상 배출 시 무상방문수거를 이용할 수 있습니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "exercise_machine",
+    "name": "운동기구",
+    "aliases": [
+      "런닝머신",
+      "러닝머신",
+      "실내자전거",
+      "스텝퍼",
+      "헬스기구"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "운동기구은(는) 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우 판매·설치 업체에 기존 제품 역회수를 함께 요청할 수 있습니다.",
+      "무상수거가 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 런닝머신",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 런닝머신",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%9F%B0%EB%8B%9D%EB%A8%B8%EC%8B%A0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "런닝머신은 폐가전제품 무상방문수거 서비스(1599-0903)로 배출합니다. 대형가전제품 단일배출품목에 해당해 1개 이상 배출 시 무상방문수거를 이용할 수 있고, 어려우면 대형폐기물로 배출합니다. 실내자전거·스텝퍼·철봉 운동기구도 같은 방법을 따릅니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "massage_chair",
+    "name": "안마의자",
+    "aliases": [
+      "마사지체어",
+      "안마 의자"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "안마의자은(는) 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우 판매·설치 업체에 기존 제품 역회수를 함께 요청할 수 있습니다.",
+      "무상수거가 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다.",
+      "무게가 무겁고 분해가 필요할 수 있어 예약할 때 제품 크기와 설치 상태를 함께 알립니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 런닝머신",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 런닝머신",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%9F%B0%EB%8B%9D%EB%A8%B8%EC%8B%A0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "런닝머신은 폐가전제품 무상방문수거 서비스(1599-0903)로 배출합니다. 대형가전제품 단일배출품목에 해당해 1개 이상 배출 시 무상방문수거를 이용할 수 있고, 어려우면 대형폐기물로 배출합니다. 실내자전거·스텝퍼·철봉 운동기구도 같은 방법을 따릅니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "electric_fan",
+    "name": "선풍기",
+    "aliases": [
+      "탁상 선풍기",
+      "스탠드 선풍기",
+      "폐선풍기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "선풍기은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 102개 지자체가 \"선풍기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "audio_system",
+    "name": "오디오",
+    "aliases": [
+      "오디오 세트",
+      "전축",
+      "미니컴포넌트",
+      "스피커 세트"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "오디오은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 95개 지자체가 \"오디오\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "dishwasher",
+    "name": "식기세척기",
+    "aliases": [
+      "식기 세척기",
+      "빌트인 식기세척기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "식기세척기은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 68개 지자체가 \"식기세척기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "dish_dryer",
+    "name": "식기건조기",
+    "aliases": [
+      "식기 건조기",
+      "그릇 건조기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "식기건조기은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 61개 지자체가 \"식기건조기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "spin_dryer",
+    "name": "탈수기",
+    "aliases": [
+      "소형 탈수기",
+      "빨래 탈수기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "탈수기은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 88개 지자체가 \"탈수기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "sewing_machine",
+    "name": "재봉틀",
+    "aliases": [
+      "미싱",
+      "가정용 재봉틀"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "재봉틀은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 98개 지자체가 \"재봉틀\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "lighting_fixture",
+    "name": "조명기구",
+    "aliases": [
+      "형광등 기구",
+      "천장 조명",
+      "샹들리에"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "조명기구은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 44개 지자체가 \"조명기구\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "gas_oven_range",
+    "name": "가스오븐레인지",
+    "aliases": [
+      "가스오븐렌지",
+      "가스레인지 오븐",
+      "오븐레인지"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "small_item"
+    ],
+    "summary": "가스오븐레인지은(는) 소형전기전자제품 전용수거함으로 배출하고, 수거함이 없거나 크기가 크면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다.",
+      "중소형 가전이 5개 이상이거나 대형가전과 함께 내놓는 경우에는 무상방문수거(1599-0903)를 이용합니다.",
+      "인근에 전용수거함이 없거나 크기가 커서 들어가지 않으면 지자체에 문의해 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "종량제봉투에 넣어 일반쓰레기로 버리지 않습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "선풍기는 소형전기전자제품 전용수거함으로 배출합니다. 중소형 전기전자제품이 5개 이상이거나 대형 제품과 함께 배출할 때는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하고, 인근에 전용수거함이 없으면 지자체에 문의한 후 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 57개 지자체가 \"가스오븐레인지\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (소형가전 계열)."
+      ]
+    }
+  },
+  {
+    "id": "piano",
+    "name": "피아노",
+    "aliases": [
+      "업라이트 피아노",
+      "그랜드 피아노",
+      "디지털 피아노"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "피아노는 크기가 커서 지자체에 대형폐기물로 신고한 뒤 배출하며, 폐가전 무상방문수거로는 배출할 수 없습니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "무상방문수거 서비스로는 배출할 수 없습니다.",
+      "수수료가 다른 품목보다 높은 편이므로 신고할 때 금액을 확인합니다.",
+      "상태가 좋으면 중고 매입·기증을 먼저 알아볼 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 피아노",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 피아노",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%ED%94%BC%EC%95%84%EB%85%B8",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "피아노는 크기가 커 대형폐기물로 배출합니다. 무상방문수거 서비스로는 배출할 수 없습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 137개 지자체가 \"피아노\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "safe_box",
+    "name": "금고",
+    "aliases": [
+      "소형 금고",
+      "가정용 금고",
+      "내화 금고"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "소형 금고는 대형폐기물로 신고해 배출하고, 대형 금고는 전문수거업체에 문의합니다. 고철로는 배출할 수 없습니다.",
+    "steps": [
+      "소형 금고는 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다.",
+      "혼자 옮길 수 없는 대형 금고는 지자체에 문의해 전문수거업체를 안내받습니다.",
+      "배출 전에 내부 서류와 귀중품을 반드시 확인해 비웁니다."
+    ],
+    "cautions": [
+      "내부가 콘크리트, 외부가 플라스틱과 금속인 복합재질이라 고철로 배출할 수 없습니다.",
+      "폐가전 무상방문수거 대상에서 제외되는 품목입니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 금고",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 금고",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EA%B8%88%EA%B3%A0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "소형 금고는 대형폐기물로 배출하고, 대형 금고는 전문수거업체에 문의해 배출합니다. 내부가 콘크리트, 외부가 플라스틱과 금속이라 고철로는 배출할 수 없습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 115개 지자체가 \"금고\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "tire",
+    "name": "타이어",
+    "aliases": [
+      "폐타이어",
+      "자동차 타이어"
+    ],
+    "category": "vehicle_part",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "타이어는 자동차 정비소나 타이어 판매소에 역회수를 맡기는 것이 우선이고, 어려우면 대형폐기물로 배출합니다.",
+    "steps": [
+      "타이어를 교체한 정비소나 판매소에 역회수를 요청합니다.",
+      "역회수가 어려우면 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다."
+    ],
+    "cautions": [
+      "고무 재질이라 재활용품이나 고철로 배출하지 않습니다.",
+      "지역마다 타이어 수거 방식이 달라 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 타이어",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 타이어",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%ED%83%80%EC%9D%B4%EC%96%B4",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "타이어는 자동차 정비소·타이어 판매소를 통해 역회수 처리하거나 대형폐기물로 배출합니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 74개 지자체가 \"타이어\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "bicycle",
+    "name": "자전거",
+    "aliases": [
+      "폐자전거",
+      "어린이 자전거",
+      "성인 자전거"
+    ],
+    "category": "vehicle_part",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "자전거은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "탈 수 있는 상태라면 지자체 자전거 재생사업이나 기증을 먼저 알아볼 수 있습니다.",
+      "전기자전거는 배터리를 분리해 별도로 배출해야 하므로 지자체에 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 122개 지자체가 \"자전거\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "boiler",
+    "name": "보일러",
+    "aliases": [
+      "가정용 보일러",
+      "가스보일러",
+      "기름보일러"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "보일러은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "철거는 전문 기사에게 맡기고, 배관과 연료를 정리한 뒤 배출합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 112개 지자체가 \"보일러\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "stone_bed",
+    "name": "돌침대",
+    "aliases": [
+      "흙침대",
+      "옥침대",
+      "전기 돌침대"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "돌침대은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "전기 가열 기능이 있는 침대형 제품은 폐가전 무상방문수거 대상에서 제외됩니다.",
+      "돌판이 무거워 수거 인력이 필요하므로 신고할 때 규격을 정확히 알립니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 46개 지자체가 \"돌침대\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "arcade_machine",
+    "name": "오락기",
+    "aliases": [
+      "게임기 본체",
+      "아케이드 게임기"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "오락기은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 90개 지자체가 \"오락기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "vending_machine",
+    "name": "자동판매기",
+    "aliases": [
+      "자판기",
+      "음료 자판기"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "자동판매기은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 52개 지자체가 \"자동판매기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "large_jar",
+    "name": "항아리",
+    "aliases": [
+      "장독",
+      "옹기 항아리"
+    ],
+    "category": "ceramic",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "항아리은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "도자기·옹기는 불연성 폐기물이라 유리병 수거함에 넣지 않습니다.",
+      "작게 깨진 조각은 신문지에 싸서 불연성 폐기물 마대나 종량제봉투로 배출합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 98개 지자체가 \"항아리\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "rice_container",
+    "name": "쌀통",
+    "aliases": [
+      "쌀독",
+      "쌀 보관통"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "쌀통은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 130개 지자체가 \"쌀통\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "rubber_tub",
+    "name": "고무통",
+    "aliases": [
+      "고무 대야",
+      "고무 함지박"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "고무통은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "고무는 재활용되지 않으므로 플라스틱 수거함에 넣지 않습니다.",
+      "종량제봉투에 들어가는 작은 것은 일반쓰레기로 배출할 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 63개 지자체가 \"고무통\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "mannequin",
+    "name": "마네킹",
+    "aliases": [
+      "전신 마네킹",
+      "매장 마네킹"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "마네킹은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 50개 지자체가 \"마네킹\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "wheelchair",
+    "name": "휠체어",
+    "aliases": [
+      "수동 휠체어",
+      "접이식 휠체어"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "휠체어은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "전동휠체어는 배터리를 분리해 따로 배출해야 하므로 지자체에 확인합니다.",
+      "쓸 수 있는 상태라면 복지관·보조기기센터 기증을 먼저 알아볼 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 61개 지자체가 \"휠체어\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "baby_walker",
+    "name": "보행기",
+    "aliases": [
+      "유아 보행기",
+      "아기 보행기"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "보행기은(는) 지자체에 대형폐기물로 신고한 뒤 수수료를 납부하고 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다.",
+      "상태가 좋으면 재활용센터 판매나 무상수거가 가능한지 먼저 문의해 볼 수 있습니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 111개 지자체가 \"보행기\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "large_trash_bin",
+    "name": "쓰레기통",
+    "aliases": [
+      "대형 쓰레기통",
+      "분리수거함",
+      "휴지통"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "쓰레기통은 크기가 작으면 재질에 따라 배출하고, 종량제봉투에 들어가지 않는 큰 제품은 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "작은 플라스틱 휴지통은 이물질을 비우고 플라스틱 수거함으로 배출합니다.",
+      "종량제봉투에 들어가지 않는 큰 쓰레기통은 지자체에 대형폐기물로 신고해 배출합니다."
+    ],
+    "cautions": [
+      "수수료와 신고 방법은 지자체마다 다르므로 신고할 때 확인합니다.",
+      "발판·뚜껑에 금속 부품이 섞인 제품은 재활용이 어려워 대형폐기물로 배출합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물은 지자체 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 33개 지자체가 \"쓰레기통\"을(를) 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장 (대형폐기물 계열)."
+      ]
+    }
+  },
+  {
+    "id": "space_heater",
+    "name": "난로",
+    "aliases": [
+      "석유난로",
+      "등유난로",
+      "가스난로",
+      "화목난로"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "난로는 전기식이면 소형전기전자제품 전용수거함이나 무상방문수거로, 석유·가스난로는 연료를 완전히 비운 뒤 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "석유·가스난로는 남은 연료와 부탄가스를 완전히 비우고 분리합니다.",
+      "전기난로처럼 작은 제품은 소형전기전자제품 전용수거함에 넣거나, 중소형 가전 5개 이상이면 무상방문수거(1599-0903)를 이용합니다.",
+      "크기가 크거나 연료식이면 지자체에 대형폐기물로 신고하고 스티커를 받아 배출합니다."
+    ],
+    "cautions": [
+      "연료가 남은 상태로 배출하면 화재·폭발 위험이 있으므로 반드시 비웁니다.",
+      "부탄가스 용기는 분리해 생활계 유해폐기물 기준에 맞춰 따로 배출합니다.",
+      "전용수거함 위치와 대형폐기물 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준, 유해폐기물 처리가 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "생활계 유해폐기물 배출 기준"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "소형 전기전자제품은 전용수거함으로 배출하고, 5개 이상이거나 대형 제품과 함께 낼 때는 무상방문수거(1599-0903)를 이용합니다. 전용수거함이 없으면 지자체에 문의합니다.",
+        "note": "난로 개별 항목이 없어 소형 전기전자제품 공통 안내를 전기난로 기준으로 적용했습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "전국 118개 지자체가 \"난로\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "연료식 난로가 대형폐기물로 처리된다는 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. 난로 질의가 일회용 손난로로 오매칭되던 것을 해소."
       ]
     }
   }

@@ -11,13 +11,13 @@ Top 50 데이터와 사용자 질문에서 승격한 확장 품목은 공식 출
 
 현재 상태:
 
-- 총 품목: 291
-- 평가 케이스: 291
-- MCP 답변 회귀 케이스: 351
+- 총 품목: 318
+- 평가 케이스: 318
+- MCP 답변 회귀 케이스: 376
 - `verified`: 39
 - `region_review_needed`: 84
 - `needs_source`: 7
-- `standard_import`: 161
+- `standard_import`: 188
 
 ## Primary Sources
 
