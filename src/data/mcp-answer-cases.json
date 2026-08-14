@@ -5955,10 +5955,12 @@
     },
     "expectedTextIncludes": [
       "초기 데이터에서 확실히 찾지 못했습니다",
-      "재질, 오염 여부, 크기, 지역 정보"
+      "주요 재질별 한 줄 원칙",
+      "일반쓰레기(종량제)"
     ],
     "expectedStructuredIncludes": [
       "\"found\":false",
+      "\"inferred\":false",
       "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
     ]
   },
@@ -5984,10 +5986,33 @@
       "itemName": "사료 포대 버리기"
     },
     "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙",
+      "플라스틱 용기류"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"quickRule\""
+    ]
+  },
+  {
+    "id": "steps_fallback_broken_glass_vase",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리 화병 깨진 거 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "재질로 추정한 일반 원칙",
+      "유리병류"
+    ],
+    "expectedTextExcludes": [
       "주요 재질별 한 줄 원칙"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false"
+      "\"found\":false",
+      "\"inferred\":true",
+      "\"id\":\"glass_bottle\""
     ]
   }
 ]

@@ -111,7 +111,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 - 품목 데이터: `src/data/waste-items.json` (272개)
 - 대표 질문 평가셋: `src/data/evaluation-cases.json` (272개)
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (289개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (290개)
 - 지역 정책 데이터: `src/data/region-policies.json` (5개 지역)
 - 지역 평가셋: `src/data/region-evaluation-cases.json` (35개)
 - 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (강남·서초·송파·마포 4개 지역)
