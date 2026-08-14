@@ -229,7 +229,7 @@ Top 50 품목과 백로그에서 승격한 확장 품목은 대부분 공식 품
 `get_region_disposal_info`는 지역 전체 안내가 필요한 경우 broad checklist를 유지하지만, `itemName`이 매칭되면 품목별 `regionPolicy.checkItems`, 지역 item guide, 대형폐기물 수수료 후보 중심으로 체크리스트를 좁힌다.
 
 지역별 세부 정책 데이터는 Region Data 트랙에서 관리하며, 최신 구조화 데이터는 `src/data/region-policies.json`과 관련 `docs/*region*` 문서를 기준으로 확인한다.
-대형폐기물 수수료는 지역 기본 정책과 분리해 `src/data/bulky-waste-fees.json`에 저장하지만, 2026-07-05 사용자 결정에 따라 신규 수수료 금액 구조화는 당분간 중단한다.
+대형폐기물 수수료는 지역 기본 정책과 분리해 `src/data/bulky-waste-fees.json`에 저장한다. 2026-07-05 사용자 결정으로 신규 수수료 금액 구조화를 중단했으나, **2026-08-15에 재개했다** — 법제처 자치법규 API와 공공데이터포털 표준데이터로 자동 수집이 가능해져 중단 사유(수작업 비용)가 사라졌다. 범위는 이미 등록된 지역과 기존 대형폐기물 품목으로 한정한다([Phase 6 PRD](prd/phase-6-bulky-fee-etl.md)).
 
 대표 그룹:
 
