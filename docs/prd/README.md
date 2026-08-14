@@ -29,12 +29,18 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 5개로 나�
 | 0 | [phase-0-compliance.md](phase-0-compliance.md) | 본선 규격 정비: allowlist/CORS, description 개편, 툴 정의 일원화, 응답 다이어트, 호출 로깅 | 없음 — 최우선, 단독 진행 |
 | 1 | [phase-1-matching-fallback.md](phase-1-matching-fallback.md) | not_found 폴백, 자모 오타 허용, 별칭 보강 | Phase 0 머지 후 |
 | 2 | [phase-2-coverage.md](phase-2-coverage.md) | 표준 티어 품목 벌크 확장 (데이터 중심) | Phase 0 머지 후, Phase 1과 병렬 가능 |
-| 3 | [phase-3-widget.md](phase-3-widget.md) | get_disposal_steps 확정 매칭 위젯 + copy_text | Phase 0 머지 후 |
-| 4 | [phase-4-release.md](phase-4-release.md) | Preview 발화 테스트, description 튜닝, 회귀, 마감 | Phase 1~3 이후 |
+| 3 | [phase-3-widget.md](phase-3-widget.md) | get_disposal_steps 확정 매칭 위젯 + copy_text | Phase 0 머지 후 — 1·2와 병렬 가능 |
+| 4a | [phase-4-release.md](phase-4-release.md) §전제 | 본선 서버 배포 + Preview 연결·툴콜 확인 | Phase 0 배포 직후 — **즉시 착수** |
+| 4b | [phase-4-release.md](phase-4-release.md) | 발화 테스트 매트릭스, description 튜닝, 회귀, 마감 | Phase 1~3 배포 이후 |
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
 단, 둘 다 `evaluation-cases.json`/`mcp-answer-cases.json`을 만지므로 케이스 추가는 append-only로 하고 id 충돌만 피한다.
-Phase 3은 `src/server.ts`의 `get_disposal_steps` 핸들러를 만지므로 Phase 1 머지 후 시작을 권장한다.
+Phase 3도 1·2와 병렬 가능하다. 같은 `src/server.ts`를 만지지만 Phase 1은 `unknownItemResult`(not_found 경로)와 `src/data.ts`,
+Phase 3은 확정 매칭 경로와 신규 `src/widgets.ts`라 겹치는 함수가 없다.
+
+**실제 병목은 코드 의존성이 아니라 배포 사이클이다.** `push → (사람) 재배포 → Active 대기 → Preview 테스트 → 수정`은
+병렬화되지 않고 사람 손이 필요하다. 8/23까지 이 사이클을 여러 번 돌려야 하므로, Phase 1~3 완료를 기다리지 말고
+Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증한다(4a). 여기서 막히면 이후 작업이 전부 무의미해진다.
 
 ## Git 워크플로
 
@@ -66,10 +72,11 @@ Phase 3은 `src/server.ts`의 `get_disposal_steps` 핸들러를 만지므로 Pha
 
 | Phase | 상태 | 브랜치 | 비고 |
 | --- | --- | --- | --- |
-| 0 | 완료 (main 머지) | claude/kakaotalk-mcp-analysis-4dfb43 | push 대기 |
-| 1 | 완료 (main 머지) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹, smoke 211케이스. push 대기 |
+| 0 | 완료 (origin/main 푸시됨) | claude/kakaotalk-mcp-analysis-4dfb43 | 코드리뷰 지적 10건 수정 포함(32757f5). 재배포는 사용자 클릭 대기 |
+| 1 | 완료 (로컬 main 머지) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹, smoke 211케이스. push 대기 |
 | 2 | 미착수 | - | Phase 0 머지됨 — 착수 가능. 랩탑·정수기 필터·햇반 용기 신규 품목 후보는 data-decision-backlog 참고 |
-| 3 | 미착수 | - | Phase 1 머지됨 — 착수 가능 |
-| 4 | 미착수 | - | |
+| 3 | 미착수 | - | 1·2와 병렬 착수 가능 |
+| 4a | 미착수 | - | Phase 0 배포 후 즉시 — 최우선 |
+| 4b | 미착수 | - | 1~3 배포 이후 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
