@@ -12,13 +12,17 @@
  * 실행: node scripts/fetch-bulky-fee-standard-data.mjs [출력경로]
  *   기본 출력: logs/bulky-fee-standard-data.json (gitignore 대상 — 원본은 커밋하지 않는다)
  */
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 
 const PUBLIC_DATA_PK = "15114146";
 const PER_PAGE = 10_000;
 const BASE = "https://www.data.go.kr";
 const REFERER = `${BASE}/data/${PUBLIC_DATA_PK}/standard.do`;
 const outputPath = process.argv[2] ?? "logs/bulky-fee-standard-data.json";
+
+// 22,831행을 다 받은 뒤 ENOENT로 날리지 않도록, 출력 경로는 내려받기 전에 뚫는다.
+mkdirSync(dirname(outputPath), { recursive: true });
 
 async function fetchJson(url) {
   const res = await fetch(url, { headers: { Referer: REFERER } });
@@ -43,9 +47,12 @@ for (let page = 1; page <= pages; page++) {
   rows.push(...pageRows);
 }
 
-if (rows.length !== totalCount) {
-  console.warn(`경고: 수집 ${rows.length}행 ≠ 신고 ${totalCount}행. 페이지네이션을 확인하세요.`);
-}
-
 writeFileSync(outputPath, JSON.stringify(rows));
 console.log(`저장: ${outputPath} (${rows.length}행)`);
+
+// 부분 수집을 경고만 하고 정상 종료하면 잘린 파일이 그대로 인제스트 입력이 된다.
+// 파일은 남겨 두되(디버깅용) 종료 코드로 실패를 알린다 — 재실행 재현성이 이 스크립트의 존재 이유다.
+if (rows.length !== totalCount) {
+  console.error(`실패: 수집 ${rows.length}행 ≠ 신고 ${totalCount}행. 인제스트에 쓰지 말고 페이지네이션을 확인하세요.`);
+  process.exitCode = 1;
+}
