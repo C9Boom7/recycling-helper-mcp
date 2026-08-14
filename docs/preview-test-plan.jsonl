@@ -24,3 +24,5 @@
 {"id":"R3","category":"지역","utterance":"강남구 사는데 침대 어떻게 버려?","expectTool":"get_disposal_steps|get_region_disposal_info","expectWidget":true,"note":"Phase 3 R2-1: 카드에 지역 기준 + 수수료 1줄이 실려야 함"}
 {"id":"N1","category":"비의도","utterance":"오늘 저녁 뭐 먹지","expectTool":null,"expectWidget":false,"note":"과호출 점검 — 툴이 호출되지 않아야 함"}
 {"id":"N2","category":"비의도","utterance":"주말에 서울 놀러갈 만한 데 추천해줘","expectTool":null,"expectWidget":false,"note":"과호출 점검"}
+{"id":"C1","category":"카테고리어","utterance":"대형폐기물 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"카테고리어는 품목이 아니다 — found:false 폴백이 정답. 품목 카드가 뜨면 fail(수정 전 '깨진 인덕션 유리 상판')"}
+{"id":"C2","category":"카테고리어","utterance":"음식물 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"카테고리어는 품목이 아니다 — found:false 폴백이 정답. 품목 카드가 뜨면 fail(수정 전 '곰팡이 핀 빵')"}
