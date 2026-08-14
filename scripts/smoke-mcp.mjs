@@ -802,6 +802,14 @@ async function runWidgetBuilderCases() {
   assert(longCopy.length <= 6, "truncated copy_text must stay within 6 lines");
   assert(longCopy.at(-1).startsWith("(남은 "), "truncated copy_text must say how many steps it left out");
   assert(!buildDisposalWidget({ item: nationwide, sourceTitle: "테스트 출처" }).copy_text.includes("(남은 "), "untruncated copy_text must not claim it left steps out");
+
+  // R3's floor from the other side: a one-step item would share as a title and a
+  // bare instruction, so the conclusion fills it out.
+  const oneStep = items.find((item) => item.steps.length === 1);
+  assert(oneStep, "widget builder cases are missing their single-step fixture");
+  const shortCopy = buildDisposalWidget({ item: oneStep, sourceTitle: "테스트 출처" }).copy_text.split("\n");
+  assert(shortCopy.length >= 3, `single-step copy_text is ${shortCopy.length} lines, under the 3-line floor`);
+  assert(shortCopy.includes(oneStep.summary), "single-step copy_text should carry the conclusion");
 }
 
 /**
@@ -889,7 +897,15 @@ async function runWidgetSmoke() {
     const ambiguous = await callTool(baseUrl, "get_disposal_steps", { itemName: "전구" }, requestId);
     requestId += 1;
     assert(ambiguous.structuredContent?.ambiguous === true, "전구 should still resolve as ambiguous");
-    assert(resultText(ambiguous).includes("형광등"), "ambiguous response lost its candidates");
+    // Which candidates 전구 resolves to is data, and Phase 1·2 already moved it
+    // once. What this case owns is that the ask-back keeps its candidates — so
+    // it reads them off the response instead of naming one.
+    const candidates = ambiguous.structuredContent?.candidates ?? [];
+    assert(candidates.length > 0, "ambiguous response lost its candidates");
+    assert(
+      candidates.every((candidate) => resultText(ambiguous).includes(candidate)),
+      `ambiguous text is missing a candidate: ${candidates.join(", ")}`,
+    );
     assertPlainTextResponse(ambiguous, "ambiguous response");
 
     const notFound = await callTool(baseUrl, "get_disposal_steps", { itemName: "존재하지않는품목zzz" }, requestId);

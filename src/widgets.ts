@@ -27,6 +27,9 @@ const MAX_COPY_TEXT_STEPS = 5;
 // When steps are cut, one line of that budget buys the "there is more" marker.
 // Silent truncation reads as a complete procedure to whoever receives the share.
 const MAX_COPY_TEXT_STEPS_WHEN_TRUNCATED = MAX_COPY_TEXT_STEPS - 1;
+// R3's floor. 11 items resolve to a single step, and a two-line share is a title
+// plus one instruction with no verdict attached.
+const MIN_COPY_TEXT_LINES = 3;
 // The data has no severity field, so injury/fire wording is the only signal that
 // a caution must not be the one MAX_CARD_CAUTIONS drops. Ordering, not filtering:
 // nothing is removed that the cap would have kept.
@@ -146,8 +149,12 @@ export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetP
 export function buildCopyText(item: WasteItem): string {
   const truncated = item.steps.length > MAX_COPY_TEXT_STEPS;
   const steps = item.steps.slice(0, truncated ? MAX_COPY_TEXT_STEPS_WHEN_TRUNCATED : MAX_COPY_TEXT_STEPS);
+  // Title + steps can fall under the floor on a one-step item. The conclusion is
+  // what the recipient is missing there, so it fills the gap rather than padding.
+  const lead = steps.length + 1 < MIN_COPY_TEXT_LINES ? [item.summary] : [];
   return [
     `**${item.name} 버리는 법** — ${SERVICE_LABEL}`,
+    ...lead,
     ...steps.map((step, index) => `${index + 1}. ${step}`),
     ...(truncated ? [`(남은 ${item.steps.length - steps.length}단계는 카드에서 확인하세요)`] : []),
   ].join("\n");
