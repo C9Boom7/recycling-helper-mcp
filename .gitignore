@@ -8,3 +8,5 @@ logs/*
 !logs/
 !logs/README.md
 !logs/*.example.jsonl
+# 자치법규 별표 원문·파싱 결과 (Phase 6 R1). 검수용 중간 산출물이라 커밋하지 않는다.
+data/ordinance-raw/

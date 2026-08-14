@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "validate:data": "node scripts/validate-data.mjs",
     "check:links": "node scripts/check-region-links.mjs",
+    "fees:fetch": "node scripts/fetch-ordinance-fees.mjs",
     "measure:region": "tsx scripts/measure-region-resolution.ts",
     "measure:bulky": "pnpm build && node scripts/measure-bulky-items.mjs",
     "eval:data": "node scripts/evaluate-data.mjs",
