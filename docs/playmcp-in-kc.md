@@ -74,8 +74,54 @@ MCP Endpoint: PlayMCP in KC에서 발급받은 Endpoint URL
 
 | 용도 | 엔드포인트 | 비고 |
 | --- | --- | --- |
-| **본선** (Kakao Tools) | `https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp` | 현재 작업 대상. main 브랜치 Git 소스 빌드 |
-| 예선 (PlayMCP AI채팅) | `https://recycle-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp` (서버 ID `1498`) | **절대 건드리지 않습니다.** 예선 제출 상태 보존 |
+| **본선** (Kakao Tools) | `https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp` | 재배포 대상. main 브랜치 Git 소스 빌드 |
+| ⚠️ **PlayMCP에 등록된 주소** | `https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp` (`-kakaotools` 없음) | 개발자 콘솔의 재활용척척 MCP가 **이 주소**를 가리킵니다. 2026-08-14 기준 Phase 0 이전 빌드(items 130) |
+| 예선 (PlayMCP AI채팅) | `https://recycle-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp` (서버 ID `1498`) | **절대 건드리지 않습니다.** 예선 제출 상태 보존. 현재 dex 인증 뒤로 들어가 외부 호출 불가 |
+
+이름이 셋 다 비슷합니다. `recycle`/`recycling` 한 글자 차이에 더해, `-kakaotools` 접미사 유무로 또 갈립니다.
+
+### ⚠️ 등록 주소와 재배포 주소가 어긋나 있습니다 (2026-08-14 확인, 미해결)
+
+재배포는 `-kakaotools` 서버에 하는데, PlayMCP 개발자 콘솔에 등록된 MCP Endpoint는 접미사 없는 `recycling-helper-mcp`입니다.
+그 결과 **Phase 0~3 결과물이 실사용자에게 전혀 도달하지 않았습니다.** 콘솔 지표 기준 Tool call 79회, 적용 사용자 8명이 모두 구버전을 사용했습니다.
+
+| 항목 | `-kakaotools` (재배포 대상) | `recycling-helper-mcp` (등록된 주소) |
+| --- | --- | --- |
+| items | 272 (Phase 2 반영) | 130 (Phase 2 이전) |
+| `get_disposal_steps` description | 482자, 한국어 발화 예시·툴 경계 포함 (Phase 0 R3) | 150자, Phase 0 이전 원문 |
+| 위젯 (Phase 3) | 있음 | 없음 |
+
+콘솔에는 툴 목록 JSON이 **등록 시점 스냅샷**으로 저장됩니다. 새 endpoint로 임시 등록해 보니 "정보 불러오기"가 그때 tools/list를 다시 읽어 왔습니다.
+즉 서버를 고쳐도 등록을 갱신하지 않으면 ChatGPT는 계속 옛 description으로 툴을 고릅니다.
+
+#### 테스트용 임시 등록 (2026-08-14 생성)
+
+카카오 매뉴얼 안내대로, 기존 `심사 완료` 등록은 그대로 두고 신규 서버를 **임시 등록**해 테스트 경로를 따로 만들었습니다.
+
+| 항목 | 값 |
+| --- | --- |
+| 이름 | 재활용척척 테스트 |
+| MCP 식별자 | `recycleHelperV2` (툴 이름 prefix로 붙습니다) |
+| Endpoint | `https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp` |
+| 등록 상태 | 심사 전 (임시 등록) |
+
+도구함에는 이 임시 등록본만 활성화하고 기존 `재활용척척`은 껐습니다 (가이드 §4: 도구함에는 테스트할 MCP만 담는다).
+Preview의 "도구 상세"에서 `recycleHelperV2-*` 5개가 Phase 0 개편 description으로 노출되는 것까지 확인했습니다.
+
+운영 등록(`심사 완료`, 전체 공개)은 **아직 구버전 서버를 가리킨 채**입니다. 최종 반영 방법은 사용자 결정이 필요합니다.
+
+1. 콘솔에서 운영 등록의 MCP Endpoint를 `-kakaotools` 주소로 **수정**한다. `심사 완료` 상태라 수정이 재심사를 유발하는지 먼저 확인해야 합니다.
+2. 임시 등록본을 **심사 요청**해 새로 올린다. 식별자가 `recycleHelperV2`로 바뀌므로 툴 이름 prefix도 함께 바뀝니다.
+3. 등록된 `recycling-helper-mcp` 서버 자체를 main 기준으로 **재배포**한다. 등록 정보는 안 건드리지만, 위에 적었듯 description 스냅샷 갱신 문제가 남습니다.
+
+### Preview 발화 테스트는 자동화할 수 없습니다
+
+Phase 4 PRD는 "Preview 테스트는 Claude가 Chrome 확장으로 대행한다"를 전제로 했지만, 실제로는 불가능합니다.
+Preview의 채팅 영역은 `<chatgpt-shell>` 커스텀 엘리먼트의 shadow DOM 안에 있는 `cdn.platform.openai.com` **교차 출처 iframe**이라,
+Chrome 확장의 합성 클릭·키 입력이 입력창에 닿지 않습니다 (한글·ASCII 모두 실패).
+
+읽기 쪽은 됩니다 — 툴 목록, description, 등록 상태, 도구함 설정은 확인·조작할 수 있습니다.
+따라서 **발화 입력과 위젯 렌더링 육안 확인은 사람이 직접** 해야 하고, Claude는 시나리오 목록 작성·결과 기록·서버 측 교차검증을 맡습니다.
 
 서버 코드의 host allowlist는 `*.playmcp-endpoint.kakaocloud.io` suffix 와일드카드라, 서버를 새로 만들어 호스트명이 바뀌어도 코드 수정 없이 동작합니다.
 
