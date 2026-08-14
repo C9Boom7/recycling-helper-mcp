@@ -32,6 +32,7 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 5개로 나�
 | 3 | [phase-3-widget.md](phase-3-widget.md) | get_disposal_steps 확정 매칭 위젯 + copy_text | Phase 0 머지 후 — 1·2와 병렬 가능 |
 | 4a | [phase-4-release.md](phase-4-release.md) §4a | 본선 서버 배포 + Preview 연결·툴콜 확인 | Phase 0 배포 직후 — **즉시 착수** |
 | 4b | [phase-4-release.md](phase-4-release.md) | 발화 테스트 매트릭스, description 튜닝, 회귀, 마감 | Phase 1~3 배포 이후 |
+| 5 | [phase-5-region-expansion.md](phase-5-region-expansion.md) | 지역 표준 티어 — 스키마 티어링, 동명 자치구 매칭 교정, 미등록 지역 폴백, 완결 기준 지역 확장(최소 서울 21곳) | Phase 4a 완주 이후, 4b와 병렬 |
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
 단, 둘 다 `evaluation-cases.json`/`mcp-answer-cases.json`을 만지므로 케이스 추가는 append-only로 하고 id 충돌만 피한다.
@@ -84,5 +85,6 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 3 | 완료 (PR #5 머지됨) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. Preview 렌더링(R6) 확인은 4a로 이관 |
 | 4a | 대기 (재배포 클릭 필요) | claude/prd4-analysis-review-56f5e3 | Phase 0~3 전부 main 반영됨 — 사용자 재배포 후 즉시 착수 |
 | 4b | 미착수 | - | 4a 완주 이후 |
+| 5 | 미착수 (PRD 초안) | - | R1~R3(코드)는 8/21 기능 변경 마감 전, R4~R5(데이터)는 그 이후 창에 배치 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
