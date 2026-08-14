@@ -5593,15 +5593,13 @@
     "id": "canvas_frame",
     "name": "캔버스 액자",
     "aliases": [
-      "캔버스 액자",
       "캔버스액자",
       "캔버스 그림",
       "캔버스 그림 액자",
       "그림 캔버스",
       "천 액자",
       "천 그림 액자",
-      "액자 캔버스",
-      "캔버스 액자는 어떻게 버려"
+      "액자 캔버스"
     ],
     "category": "mixed_material_art_frame",
     "disposalType": "general_or_bulky_by_size",
@@ -17870,6 +17868,318 @@
       "notes": [
         "Phase 2 표준 티어 벌크 확장으로 추가.",
         "후보 김치통·도시락통을 별칭으로 흡수."
+      ]
+    }
+  },
+  {
+    "id": "refrigerator",
+    "name": "냉장고",
+    "aliases": [
+      "김치냉장고",
+      "소형냉장고",
+      "가정용 냉장고",
+      "냉장고 버리기",
+      "폐냉장고"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "냉장고는 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우에는 판매·설치 업체에 기존 제품 역회수(무상 회수)를 함께 요청할 수 있습니다.",
+      "무상수거와 역회수가 모두 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "수거 기사가 방문할 때 집 안에서 동행해야 하고, 설치된 제품은 미리 철거해 두어야 합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 냉장고",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 냉장고",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%83%89%EC%9E%A5%EA%B3%A0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "냉장고: 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하여 배출하고, 이용이 어려운 경우 대형폐기물로 배출합니다. 신제품 구매 시 생산·판매업체의 역회수 서비스를 이용할 수 있습니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전(냉장고·세탁기·에어컨·31인치 이상 TV/모니터)은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류(장롱·책상·의자 등)는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. 표준데이터 빈출 상위 품목 중 미커버분."
+      ]
+    }
+  },
+  {
+    "id": "washing_machine",
+    "name": "세탁기",
+    "aliases": [
+      "통돌이 세탁기",
+      "드럼세탁기",
+      "폐세탁기",
+      "세탁기 버리기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "세탁기는 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우에는 판매·설치 업체에 기존 제품 역회수(무상 회수)를 함께 요청할 수 있습니다.",
+      "무상수거와 역회수가 모두 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "수거 기사가 방문할 때 집 안에서 동행해야 하고, 설치된 제품은 미리 철거해 두어야 합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 세탁기",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 세탁기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%B8%ED%83%81%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "세탁기: 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하여 배출하고, 이용이 어려운 경우 대형폐기물로 배출합니다. 신제품 구매 시 생산·판매업체의 역회수 서비스를 이용할 수 있습니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전(냉장고·세탁기·에어컨·31인치 이상 TV/모니터)은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류(장롱·책상·의자 등)는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. 표준데이터 빈출 상위 품목 중 미커버분."
+      ]
+    }
+  },
+  {
+    "id": "air_conditioner",
+    "name": "에어컨",
+    "aliases": [
+      "벽걸이 에어컨",
+      "스탠드 에어컨",
+      "실외기",
+      "폐에어컨"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "에어컨는 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우에는 판매·설치 업체에 기존 제품 역회수(무상 회수)를 함께 요청할 수 있습니다.",
+      "무상수거와 역회수가 모두 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "수거 기사가 방문할 때 집 안에서 동행해야 하고, 설치된 제품은 미리 철거해 두어야 합니다.",
+      "실외기와 배관 철거는 전문 기사에게 맡기고, 철거된 상태로 수거를 신청합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 에어컨",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 에어컨",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%97%90%EC%96%B4%EC%BB%A8",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "에어컨: 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하여 배출하고, 이용이 어려운 경우 대형폐기물로 배출합니다. 신제품 구매 시 생산·판매업체의 역회수 서비스를 이용할 수 있습니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전(냉장고·세탁기·에어컨·31인치 이상 TV/모니터)은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류(장롱·책상·의자 등)는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. 표준데이터 빈출 상위 품목 중 미커버분."
+      ]
+    }
+  },
+  {
+    "id": "television",
+    "name": "텔레비전",
+    "aliases": [
+      "TV",
+      "티비",
+      "티브이",
+      "평면 TV",
+      "LED TV",
+      "폐티비"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "텔레비전는 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 대형가전은 1개부터 무상 수거됩니다.",
+      "신제품을 사는 경우에는 판매·설치 업체에 기존 제품 역회수(무상 회수)를 함께 요청할 수 있습니다.",
+      "무상수거와 역회수가 모두 어려우면 지자체에 대형폐기물로 신고하고 수수료를 납부한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 제외됩니다.",
+      "수거 기사가 방문할 때 집 안에서 동행해야 하고, 설치된 제품은 미리 철거해 두어야 합니다.",
+      "31인치 이상은 1대만으로 무상수거되지만, 30인치 이하는 소형가전이라 5개 이상 모아야 무상수거 대상입니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 텔레비전",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 텔레비전",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%ED%85%94%EB%A0%88%EB%B9%84%EC%A0%84",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "텔레비전: 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하여 배출하고, 이용이 어려운 경우 대형폐기물로 배출합니다. 신제품 구매 시 생산·판매업체의 역회수 서비스를 이용할 수 있습니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전(냉장고·세탁기·에어컨·31인치 이상 TV/모니터)은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류(장롱·책상·의자 등)는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. 표준데이터 빈출 상위 품목 중 미커버분."
+      ]
+    }
+  },
+  {
+    "id": "desktop_computer",
+    "name": "컴퓨터",
+    "aliases": [
+      "PC",
+      "데스크탑",
+      "데스크톱",
+      "컴퓨터 본체",
+      "PC세트",
+      "폐컴퓨터"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics"
+    ],
+    "summary": "컴퓨터는 본체와 모니터를 PC세트로 묶어 폐가전제품 무상방문수거 서비스(1599-0903)로 무료 배출할 수 있고, 어려우면 대형폐기물로 배출합니다.",
+    "steps": [
+      "본체·모니터·키보드를 함께 PC세트로 무상방문수거(1599-0903)에 예약합니다.",
+      "배출 전에 하드디스크 등 저장장치의 개인정보를 반드시 삭제하거나 분리합니다.",
+      "무상수거가 어려우면 지자체에 대형폐기물로 신고한 뒤 배출합니다."
+    ],
+    "cautions": [
+      "개인정보가 남은 저장장치는 그대로 배출하지 말고 데이터를 완전히 지운 뒤 내보냅니다.",
+      "본체만 단독으로 내놓으면 소형가전이라 5개 이상부터 무상수거 대상이며, 모니터는 31인치 이상일 때 단독 수거됩니다.",
+      "부품만 따로 분해한 상태는 원형훼손으로 보아 무상수거가 거절될 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "무상방문수거는 전국 공통 제도이고, 대형폐기물로 갈 때만 지역 수수료가 붙습니다."
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - PC세트",
+      "E-순환거버넌스 폐가전 무상방문수거 이용안내"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - PC세트",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%BB%B4%ED%93%A8%ED%84%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "PC세트: 폐가전제품 무상방문수거 서비스(1599-0903)를 이용하여 배출하고, 어려운 경우 대형폐기물로 배출합니다. 품목사전은 본체와 모니터를 구분하지 않고 PC세트로 다룹니다."
+      },
+      {
+        "title": "E-순환거버넌스 폐가전 무상방문수거 이용안내",
+        "url": "https://www.15990903.or.kr/portal/cnts/userGuide.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "대형가전(냉장고·세탁기·에어컨·31인치 이상 TV/모니터)은 1개부터 무상방문수거 대상. 소형가전은 5개 이상. 원형훼손 제품, 금고, 침대형 전기제품, 가구류(장롱·책상·의자 등)는 수거 불가."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-14",
+      "notes": [
+        "Phase 7 대형폐기물 품목 확장. R1 이후 '컴퓨터' 질의가 노트북으로 오매칭되던 것을 이 품목으로 해소."
       ]
     }
   }
