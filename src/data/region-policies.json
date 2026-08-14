@@ -1663,7 +1663,7 @@
     ],
     "coverageTier": "full",
     "metroId": "gyeonggi",
-    "checkedAt": "2026-07-05",
+    "checkedAt": "2026-08-15",
     "summary": "성남시는 생활폐기물을 수거 전날 일몰 후부터 다음날 오전 5시까지 배출하도록 안내하고, 재활용품은 품목별로 비우고 헹군 뒤 분리배출하며, 음식물류는 이물질과 대표 제외 품목을 제거해 전용봉투 또는 수거용기에 배출하도록 안내합니다. 판교는 동 단위 별도 정책이 아니라 성남시 기본 정책 alias로만 처리합니다.",
     "generalWaste": {
       "time": "수거 전날 일몰 후~다음날 05:00, 수거시간 06:00~15:00",
@@ -1753,7 +1753,7 @@
       "phone": "031-729-3205",
       "applicationUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=1",
       "feeUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
-      "contactCheckedAt": "2026-08-15"
+      "contactCheckedAt": "2026-07-05"
     },
     "smallElectronics": {
       "method": [
