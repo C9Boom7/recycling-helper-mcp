@@ -775,14 +775,46 @@ function regionCandidatesAt(
  * 모두 본 뒤에야 광역으로 내려간다. 이래야 "서울 강남"이 광역 서울이 아니라
  * 강남구로 착지한다 — 명확하게 확정되는 가장 작은 단위가 이긴다.
  */
-const REGION_RESOLUTION_ORDER: ReadonlyArray<readonly [RegionMatchLevel, RegionMatchStrength]> = [
+const REGION_DISTRICT_ORDER: ReadonlyArray<readonly [RegionMatchLevel, RegionMatchStrength]> = [
   ["district", 3],
   ["metro", 3],
   ["district", 2],
   ["district", 1],
+];
+
+const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, RegionMatchStrength]> = [
   ["metro", 2],
   ["metro", 1],
 ];
+
+/**
+ * 질의 앞에 붙은 광역명과 그것을 뗀 나머지. 가장 긴 광역 표기를 떼야
+ * "경기도 분당구"에서 `경기`가 아니라 `경기도`가 떨어진다.
+ *
+ * 질의가 통째로 광역명이면 떼지 않는다 — 그건 광역 참조다.
+ */
+function splitLeadingMetro(
+  policies: RegionalPolicyData[],
+  normalizedQuery: string,
+): { metro: RegionalPolicyData; rest: string } | undefined {
+  let best: { metro: RegionalPolicyData; rest: string } | undefined;
+
+  for (const policy of policies) {
+    if (regionMatchLevel(policy) !== "metro") continue;
+
+    for (const name of [policy.name, ...policy.aliases]) {
+      const normalizedName = normalizeText(name);
+      if (!normalizedName || normalizedQuery === normalizedName) continue;
+      if (!normalizedQuery.startsWith(normalizedName)) continue;
+
+      const rest = normalizedQuery.slice(normalizedName.length);
+      if (!rest) continue;
+      if (!best || rest.length < best.rest.length) best = { metro: policy, rest };
+    }
+  }
+
+  return best;
+}
 
 export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?: string): RegionResolution {
   if (!region) return { status: "not_found" };
@@ -792,12 +824,37 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
 
   let ambiguous: MatchedRegionPolicy[] | undefined;
 
-  for (const [level, strength] of REGION_RESOLUTION_ORDER) {
-    const candidates = regionCandidatesAt(policies, normalizedQuery, level, strength);
-    if (candidates.length === 1) return { status: "match", match: candidates[0] };
+  const consider = (candidates: MatchedRegionPolicy[]): MatchedRegionPolicy | undefined => {
+    if (candidates.length === 1) return candidates[0];
     // 되묻기는 더 앞선 단계가 전부 비었을 때만 쓴다. 약한 단계에서 후보가
     // 여럿이어도, 아직 안 본 단계에서 유일 확정이 나오면 그쪽이 이긴다.
     if (candidates.length > 1 && !ambiguous) ambiguous = candidates.slice(0, MAX_AMBIGUOUS_CANDIDATES);
+    return undefined;
+  };
+
+  for (const [level, strength] of REGION_DISTRICT_ORDER) {
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    if (match) return { status: "match", match };
+  }
+
+  // 광역으로 내려앉기 전에, 앞의 광역명을 떼고 그 광역 소속 자치구만 다시 본다.
+  // 광역 표기가 별칭과 다른 형태로 붙으면("경기 성남시" vs 별칭 "경기도 성남시")
+  // 양방향 접두 어느 쪽도 맞지 않아 자치구를 통째로 놓치고, 배출 요일까지 있는
+  // full 티어 데이터가 광역 안내로 덮인다. 서울은 자치구마다 "서울 X구"·"서울시 X구"
+  // 별칭을 전부 달아둬서 가려져 있을 뿐이라, 지역이 늘 때마다 같은 구멍이 난다.
+  const split = splitLeadingMetro(policies, normalizedQuery);
+  if (split) {
+    const withinMetro = policies.filter((policy) => policy.metroId === split.metro.id);
+    for (const [level, strength] of REGION_DISTRICT_ORDER) {
+      if (level !== "district") continue;
+      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength));
+      if (match) return { status: "match", match };
+    }
+  }
+
+  for (const [level, strength] of REGION_METRO_FALLBACK_ORDER) {
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    if (match) return { status: "match", match };
   }
 
   return ambiguous ? { status: "ambiguous", candidates: ambiguous } : { status: "not_found" };
@@ -1009,13 +1066,21 @@ export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegi
     // 대형폐기물이 보조 배출로면 사전 신청은 그 갈래에서만 필요하다. 무조건
     // 신청 절차만 안내하면 종량제봉투가 기본인 품목(빗자루·돗자리 등)에
     // 틀린 절차를 지시하게 된다.
-    return [
-      isBulkySecondaryRoute(item)
+    //
+    // "배출 3일 전"은 자치구에서 확인한 기한이다. 광역으로 착지했을 때 지역명만
+    // 갈아끼워 그대로 쓰면 확인한 적 없는 기한을 광역 전체 기준으로 단정하게 된다
+    // — 바로 아래 "접수는 시·군·구 소관" 안내와도 한 블록 안에서 어긋난다.
+    // 광역에서는 기한을 빼고 신청이 필요하다는 사실만 남긴다.
+    const isMetro = region.coverageTier === "metro";
+    const bulkyLine = isMetro
+      ? isBulkySecondaryRoute(item)
+        ? "- 대형폐기물에 해당할 때만 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다."
+        : "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
+      : isBulkySecondaryRoute(item)
         ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
-        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`,
-      ...formatRegionBulkyContactLines(region),
-      ...bulkyWasteFeeLines,
-    ];
+        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`;
+
+    return [bulkyLine, ...formatRegionBulkyContactLines(region), ...bulkyWasteFeeLines];
   }
 
   if (item.disposalType.includes("special_collection")) {

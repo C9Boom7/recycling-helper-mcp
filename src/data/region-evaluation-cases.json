@@ -450,5 +450,30 @@
     "region": "서울 구로구",
     "expectedRegionId": "seoul",
     "expectedLevel": "metro"
+  },
+  {
+    "region": "경기 성남시",
+    "expectedRegionId": "seongnam_si",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "경기 판교",
+    "expectedRegionId": "seongnam_si",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "경기도 분당구",
+    "expectedRegionId": "seongnam_si",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "경기도 수원시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "부산 해운대구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro"
   }
 ]

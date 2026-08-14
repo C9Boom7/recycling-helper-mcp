@@ -1,5 +1,31 @@
-import { resolveRegionalPolicyIn } from "../src/data.js";
+import { readFileSync } from "node:fs";
+
+import {
+  findBestWasteItem,
+  findBulkyWasteFees,
+  findRegionItemGuide,
+  regionalPolicies,
+  resolveRegionalPolicy,
+  resolveRegionalPolicyIn,
+} from "../src/data.js";
 import type { RegionalPolicyData } from "../src/data.js";
+
+type RegionEvaluationCase = {
+  region: string;
+  expectedStatus?: "ambiguous";
+  expectedCandidateIds?: string[];
+  expectedRegionId?: string;
+  expectedLevel?: "district" | "metro";
+  expectedBulkyApplication?: boolean;
+  query?: string;
+  expectedItemId?: string;
+  expectedGuideContains?: string;
+  expectedFeeKrw?: number;
+};
+
+const regionEvaluationCases = JSON.parse(
+  readFileSync(new URL("../src/data/region-evaluation-cases.json", import.meta.url), "utf8"),
+) as RegionEvaluationCase[];
 
 /**
  * 동명 자치구 되묻기 회귀. 실데이터에는 아직 같은 이름의 구가 둘 이상 없어서
@@ -100,10 +126,105 @@ for (const expectation of expectations) {
   }
 }
 
+// 픽스처만으로는 실데이터의 별칭 충돌을 못 잡는다. 아래 두 검사는 실제
+// region-policies.json을 같은 리졸버에 통과시킨다 — 이 파일에서 함께 도는 이유는
+// `evaluate-data.mjs`가 .mjs라 `src/data.ts`를 못 불러오기 때문이다. 예전에는
+// 거기에 리졸버를 복제해 뒀는데, 사본이 어긋나면 평가가 런타임과 다른 답을
+// 통과시킨다(실제로 되묻기 후보 개수 제한이 한쪽에만 있었다).
+
+// R2의 회귀 방어선. 지역의 이름·별칭을 그대로 입력했을 때 그 지역으로
+// 확정되거나 최소한 되묻기 후보에는 들어가야 한다. 어느 쪽도 아니면 그 별칭은
+// 다른 지역에 뺏긴 것이고, 사용자에게는 조용히 틀린 지역 안내가 나간다.
+for (const region of regionalPolicies) {
+  for (const alias of [region.name, ...region.aliases]) {
+    const resolution = resolveRegionalPolicy(alias);
+    if (resolution.status === "match" && resolution.match.region.id === region.id) continue;
+    if (resolution.status === "ambiguous" && resolution.candidates.some((candidate) => candidate.region.id === region.id)) continue;
+
+    const actual =
+      resolution.status === "match"
+        ? `${resolution.match.region.id}`
+        : resolution.status === "ambiguous"
+          ? `ambiguous(${resolution.candidates.map((candidate) => candidate.region.id).join(", ")})`
+          : "not_found";
+    failures.push(`region ${region.id} alias "${alias}" resolves to ${actual}`);
+  }
+}
+
+for (const testCase of regionEvaluationCases) {
+  const resolution = resolveRegionalPolicy(testCase.region);
+
+  // 동명 자치구는 확정하지 않고 되묻는 게 정답이다. 이 케이스는 "어떤 지역으로
+  // 매칭됐는가"가 아니라 "확정을 거부했는가"를 본다.
+  if (testCase.expectedStatus === "ambiguous") {
+    if (resolution.status !== "ambiguous") {
+      failures.push(`region "${testCase.region}" resolved as ${resolution.status}; expected an ambiguous re-ask`);
+      continue;
+    }
+
+    const candidateIds = resolution.candidates.map((candidate) => candidate.region.id);
+    for (const expectedId of testCase.expectedCandidateIds ?? []) {
+      if (!candidateIds.includes(expectedId)) {
+        failures.push(`region "${testCase.region}" ambiguity candidates ${candidateIds.join(", ")} did not include ${expectedId}`);
+      }
+    }
+    continue;
+  }
+
+  if (resolution.status !== "match") {
+    failures.push(`region "${testCase.region}" did not match any policy; expected ${testCase.expectedRegionId}`);
+    continue;
+  }
+
+  const regionMatch = resolution.match;
+  if (regionMatch.region.id !== testCase.expectedRegionId) {
+    failures.push(`region "${testCase.region}" matched ${regionMatch.region.id}; expected ${testCase.expectedRegionId}`);
+  }
+
+  if (testCase.expectedLevel !== undefined && regionMatch.level !== testCase.expectedLevel) {
+    failures.push(`region "${testCase.region}" resolved at the ${regionMatch.level} level; expected ${testCase.expectedLevel}`);
+  }
+
+  // 표준 티어는 필드가 얕아 케이스도 얕게 간다 — 신청 경로가 실제로 노출되는지만 본다.
+  if (testCase.expectedBulkyApplication && !regionMatch.region.bulkyWaste?.applicationUrl) {
+    failures.push(`region "${testCase.region}" (${regionMatch.region.id}) has no bulkyWaste.applicationUrl to surface`);
+  }
+
+  if (testCase.query === undefined) continue;
+
+  const itemMatch = findBestWasteItem(testCase.query);
+  if (!itemMatch) {
+    failures.push(`"${testCase.query}" did not match any item for region case; expected ${testCase.expectedItemId}`);
+    continue;
+  }
+
+  if (itemMatch.item.id !== testCase.expectedItemId) {
+    failures.push(`"${testCase.query}" matched ${itemMatch.item.id} for region case; expected ${testCase.expectedItemId}`);
+  }
+
+  const guide = findRegionItemGuide(regionMatch.region, itemMatch.item);
+  const guideText = guide ? [guide.summary, ...guide.steps].join(" ") : "";
+  // `query`를 준 케이스는 지역 안내에서 무엇이 나와야 하는지도 함께 적어야 한다.
+  if (testCase.expectedGuideContains === undefined) {
+    failures.push(`region case "${testCase.region}" has a query but no expectedGuideContains`);
+  } else if (!guideText.includes(testCase.expectedGuideContains)) {
+    failures.push(`"${testCase.region}" + "${testCase.query}" regional guide did not include "${testCase.expectedGuideContains}"`);
+  }
+
+  if (testCase.expectedFeeKrw !== undefined) {
+    const fees = findBulkyWasteFees(regionMatch.region, itemMatch.item);
+    if (!fees.some((fee) => fee.feeKrw === testCase.expectedFeeKrw)) {
+      failures.push(`"${testCase.region}" + "${testCase.query}" bulky waste fees did not include ${testCase.expectedFeeKrw}`);
+    }
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Region matching test failed (${failures.length}):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log(`Region matching test passed: ${expectations.length} cases`);
+console.log(
+  `Region matching test passed: ${expectations.length} fixture cases, ${regionEvaluationCases.length} region cases, ${regionalPolicies.length} policies' aliases`,
+);

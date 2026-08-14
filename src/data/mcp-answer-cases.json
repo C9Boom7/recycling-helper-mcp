@@ -6446,5 +6446,46 @@
     "expectedStructuredIncludes": [
       "\"regionStatus\":\"district\""
     ]
+  },
+  {
+    "id": "metro_region_bulky_omits_district_deadline",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대",
+      "region": "경기"
+    },
+    "expectedTextIncludes": [
+      "침대 프레임",
+      "시·군·구"
+    ],
+    "expectedTextExcludes": [
+      "3일 전",
+      "경기도 대형생활폐기물은"
+    ]
+  },
+  {
+    "id": "district_region_keeps_confirmed_deadline",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대",
+      "region": "강남구"
+    },
+    "expectedTextIncludes": [
+      "서울 강남구 대형생활폐기물은 배출 3일 전까지",
+      "1522-3833"
+    ]
+  },
+  {
+    "id": "metro_prefixed_district_still_pins_district",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기 성남시"
+    },
+    "expectedTextIncludes": [
+      "경기도 성남시"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 성남시\""
+    ]
   }
 ]

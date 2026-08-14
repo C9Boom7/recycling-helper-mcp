@@ -1,5 +1,8 @@
 import { readFileSync } from "node:fs";
 
+import { normalizeText, regionalPolicies, resolveRegionalPolicyIn } from "../src/data.js";
+import type { RegionalPolicyData, RegionMatchLevel } from "../src/data.js";
+
 /**
  * Phase 5 R7. 지표는 not_found 비율이 아니라 **지역 해상도 분포**다.
  *
@@ -8,19 +11,16 @@ import { readFileSync } from "node:fs";
  * 시·도 이름은 확정하지 않고 full 티어 5개 지역만 있던 때다. 그 시점에 이미
  * 오매칭은 0이었으므로, Phase 5가 옮긴 것은 오매칭이 아니라 **전국 폴백으로
  * 흘러가던 질의**다. 오매칭 0은 지키는 조건이지 개선 지표가 아니다.
+ *
+ * after는 `src/data.ts`의 리졸버를 그대로 불러 쓴다. 예전에는 여기에 사본을
+ * 뒀는데, 그러면 런타임 매칭을 고쳐도 측정값은 옛 규칙으로 계속 나온다.
  */
+type MeasurementQuery = { query: string; expectedRegionId: string };
+
 const queries = readFileSync(new URL("../logs/region-expansion-queries.example.jsonl", import.meta.url), "utf8")
   .split("\n")
   .filter(Boolean)
-  .map((line) => JSON.parse(line));
-const regionalPolicies = JSON.parse(readFileSync(new URL("../src/data/region-policies.json", import.meta.url), "utf8"));
-
-function normalizeText(value) {
-  return value
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "")
-    .trim();
-}
+  .map((line) => JSON.parse(line) as MeasurementQuery);
 
 /** 시·도 이름은 확정하지 않는다 — Phase 5 직전(PR #9) 상태를 그대로 재현한 목록. */
 const LEGACY_PROVINCE_QUERIES = new Set(
@@ -45,12 +45,15 @@ const LEGACY_PROVINCE_QUERIES = new Set(
 /**
  * Phase 5 직전 매칭(PR #9 기준): 질의가 정책명을 포함하면 즉시 확정하고, 더 넓은
  * 질의는 후보가 정확히 하나일 때만 확정하되 시·도 이름은 아예 확정하지 않는다.
+ *
+ * 이건 지금 코드의 사본이 아니라 **폐기된 옛 규칙의 재현**이라 여기 남는다.
+ * before 열이 없으면 after 숫자만으로는 무엇이 나아졌는지 말할 수 없다.
  */
-function resolveLegacy(policies, region) {
+function resolveLegacy(policies: RegionalPolicyData[], region: string): RegionalPolicyData | undefined {
   const normalizedRegion = normalizeText(region);
   if (!normalizedRegion) return undefined;
 
-  const broaderHits = [];
+  const broaderHits: RegionalPolicyData[] = [];
   for (const policy of policies) {
     for (const name of [policy.name, ...policy.aliases]) {
       const normalizedName = normalizeText(name);
@@ -65,73 +68,30 @@ function resolveLegacy(policies, region) {
   return distinct.size === 1 ? broaderHits[0] : undefined;
 }
 
-const REGION_MIN_FRAGMENT_QUERY_LENGTH = 2;
+type Bucket = "district" | "metro_fallback" | "national_fallback" | "ambiguous" | "mismatch";
+type Row = MeasurementQuery & { resolved?: string; bucket: Bucket };
 
-function matchStrength(normalizedQuery, normalizedName) {
-  if (!normalizedName) return 0;
-  if (normalizedQuery === normalizedName) return 3;
-  if (normalizedQuery.startsWith(normalizedName)) return 2;
-  if (normalizedName.startsWith(normalizedQuery) && normalizedQuery.length >= REGION_MIN_FRAGMENT_QUERY_LENGTH) return 1;
-  return 0;
-}
-
-function candidatesAt(policies, normalizedQuery, level, strength) {
-  const byRegionId = new Map();
-  for (const policy of policies) {
-    const policyLevel = policy.coverageTier === "metro" ? "metro" : "district";
-    if (policyLevel !== level || byRegionId.has(policy.id)) continue;
-    for (const name of [policy.name, ...policy.aliases]) {
-      if (matchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
-      byRegionId.set(policy.id, { region: policy, level });
-      break;
-    }
-  }
-  return Array.from(byRegionId.values());
-}
-
-const REGION_RESOLUTION_ORDER = [
-  ["district", 3],
-  ["metro", 3],
-  ["district", 2],
-  ["district", 1],
-  ["metro", 2],
-  ["metro", 1],
-];
-
-function resolveCurrent(policies, region) {
-  const normalizedQuery = normalizeText(region);
-  if (!normalizedQuery) return { status: "not_found" };
-
-  let ambiguous;
-  for (const [level, strength] of REGION_RESOLUTION_ORDER) {
-    const candidates = candidatesAt(policies, normalizedQuery, level, strength);
-    if (candidates.length === 1) return { status: "match", match: candidates[0] };
-    if (candidates.length > 1 && !ambiguous) ambiguous = candidates;
-  }
-  return ambiguous ? { status: "ambiguous", candidates: ambiguous } : { status: "not_found" };
-}
-
-function classify(resolvedId, resolvedLevel, testCase) {
+function classify(resolvedId: string | undefined, resolvedLevel: RegionMatchLevel | undefined, testCase: MeasurementQuery): Bucket {
   if (!resolvedId) return "national_fallback";
   if (resolvedId !== testCase.expectedRegionId) return "mismatch";
   return resolvedLevel === "metro" ? "metro_fallback" : "district";
 }
 
-function tally(rows) {
-  const counts = { district: 0, metro_fallback: 0, national_fallback: 0, ambiguous: 0, mismatch: 0 };
+function tally(rows: Row[]): Record<Bucket, number> {
+  const counts: Record<Bucket, number> = { district: 0, metro_fallback: 0, national_fallback: 0, ambiguous: 0, mismatch: 0 };
   for (const row of rows) counts[row.bucket] += 1;
   return counts;
 }
 
 const legacyPolicies = regionalPolicies.filter((policy) => policy.coverageTier === "full");
 
-const before = queries.map((testCase) => {
+const before: Row[] = queries.map((testCase) => {
   const matched = resolveLegacy(legacyPolicies, testCase.query);
   return { ...testCase, resolved: matched?.id, bucket: classify(matched?.id, "district", testCase) };
 });
 
-const after = queries.map((testCase) => {
-  const resolution = resolveCurrent(regionalPolicies, testCase.query);
+const after: Row[] = queries.map((testCase) => {
+  const resolution = resolveRegionalPolicyIn(regionalPolicies, testCase.query);
   if (resolution.status === "ambiguous") return { ...testCase, resolved: "(ambiguous)", bucket: "ambiguous" };
   const matched = resolution.status === "match" ? resolution.match : undefined;
   return {
@@ -141,9 +101,9 @@ const after = queries.map((testCase) => {
   };
 });
 
-function report(label, rows) {
+function report(label: string, rows: Row[]): Record<Bucket, number> {
   const counts = tally(rows);
-  const pct = (n) => `${((n / rows.length) * 100).toFixed(1)}%`;
+  const pct = (n: number) => `${((n / rows.length) * 100).toFixed(1)}%`;
   console.log(`\n${label} (n=${rows.length})`);
   console.log(`- 자치구 확정: ${counts.district} (${pct(counts.district)})`);
   console.log(`- 광역시도 폴백: ${counts.metro_fallback} (${pct(counts.metro_fallback)})`);

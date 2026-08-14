@@ -41,6 +41,16 @@ function collectTargets() {
   return Array.from(seen.values());
 }
 
+/**
+ * 같은 사이트 안의 정규화(www 추가·제거, http→https)는 죽은 링크가 아니다.
+ * 호스트 문자열을 그대로 비교하면 www 하나 붙는 것만으로 error가 나고, 마감 직전
+ * 전수 점검이 오탐 하나로 exit 1에 걸린다. 사이트가 실제로 옮겨간 경우만 error다.
+ */
+function isSameSite(a, b) {
+  const bare = (host) => host.replace(/^www\./, "");
+  return bare(a) === bare(b);
+}
+
 async function checkTarget(target) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -60,7 +70,7 @@ async function checkTarget(target) {
       if (!location) return { ...target, level: "warn", detail: `${response.status} redirect without a Location header` };
 
       const redirectHost = new URL(location, target.url).host;
-      const level = redirectHost === new URL(target.url).host ? "warn" : "error";
+      const level = isSameSite(redirectHost, new URL(target.url).host) ? "warn" : "error";
       return { ...target, level, detail: `${response.status} redirect to ${location}` };
     }
 

@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "validate:data": "node scripts/validate-data.mjs",
     "check:links": "node scripts/check-region-links.mjs",
-    "measure:region": "node scripts/measure-region-resolution.mjs",
+    "measure:region": "tsx scripts/measure-region-resolution.ts",
     "eval:data": "node scripts/evaluate-data.mjs",
     "backlog:questions": "node scripts/report-question-backlog.mjs",
     "backlog:resolution": "pnpm build && node scripts/report-backlog-resolution.mjs",
