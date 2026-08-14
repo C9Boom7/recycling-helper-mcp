@@ -30,8 +30,14 @@ import {
   resolveWasteItem,
   wasteItems,
 } from "./data.js";
+import type { DisposalWidgetPayload } from "./widgets.js";
+import { buildDisposalWidget } from "./widgets.js";
 
 const SERVICE_NAME = "RecyclingHelper(재활용척척)";
+// PRD phase-3 R1. Exactly "false" turns widgets off; anything else (including an
+// unset value) leaves them on, so QA can disable a misrendering card by
+// redeploying with one env var instead of shipping a code change.
+const WIDGET_ENABLED = process.env.WIDGET_ENABLED !== "false";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
 const HOST = process.env.HOST ?? "127.0.0.1";
 // Suffix wildcards (leading "*.") cover whatever hostname PlayMCP in KC assigns
@@ -250,11 +256,48 @@ function buildRegionNotes(item: WasteItem, regionMatch?: MatchedRegionPolicy): s
   return lines.length > 0 ? lines : undefined;
 }
 
+/**
+ * PRD phase-3 R2-1. The card can only carry two region lines, and
+ * formatRegionItemGuide orders its output boilerplate-first, fee-table-last — so
+ * the fee, which is the whole reason someone names their 구, was always the part
+ * that got cut. Condensed to one line here (the builder must not recompute) and
+ * rendered outside the card's two-line region budget.
+ */
+function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy): string | undefined {
+  if (!regionMatch) return undefined;
+
+  const fees = findBulkyWasteFees(regionMatch.region, item);
+  if (fees.length === 0) return undefined;
+
+  const krw = (value: number) => `${value.toLocaleString("ko-KR")}원`;
+  const amounts = fees.map((fee) => fee.feeKrw);
+  const min = Math.min(...amounts);
+  const max = Math.max(...amounts);
+
+  // A single tier can name itself; several tiers become a range, because listing
+  // four specs would blow the card and picking one for the user would be a guess.
+  if (fees.length === 1) return `수수료 ${krw(min)} (${fees[0].spec})`;
+  return `수수료 ${krw(min)}~${krw(max)} (규격 ${fees.length}종)`;
+}
+
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
   return {
     content: [{ type: "text", text }],
     ...(structuredContent ? { structuredContent } : {}),
     ...(log ? { _log: log } : {}),
+  };
+}
+
+/**
+ * PRD phase-3 R4. The widget is the whole answer, so no structuredContent rides
+ * along. `status` in `_log` is mandatory here: callStatus() infers the status
+ * from structuredContent, which a widget response does not have, and without it
+ * every confirmed match would be logged as a plain "ok".
+ */
+function widgetResult(payload: DisposalWidgetPayload, log: ToolLogMeta): LoggedToolResult {
+  return {
+    content: [{ type: "text", text: JSON.stringify(payload) }],
+    _log: { ...log, status: "match" },
   };
 }
 
@@ -488,6 +531,21 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const regionNotes = buildRegionNotes(item, regionMatch);
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+
+  if (WIDGET_ENABLED) {
+    return widgetResult(
+      buildDisposalWidget({
+        item,
+        sourceTitle: briefSourceTitle(item),
+        regionName: regionMatch?.region.name,
+        regionNotes,
+        regionFeeLine: buildRegionFeeLine(item, regionMatch),
+      }),
+      log,
+    );
+  }
+
   const text = formatItemGuide(item, region);
   return textResult(
     text,
@@ -506,7 +564,7 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
       ...(regionNotes ? { regionNotes } : {}),
       sources: itemTopSources(item),
     },
-    { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name },
+    log,
   );
 }
 
