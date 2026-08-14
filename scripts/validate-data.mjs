@@ -496,10 +496,11 @@ for (const [index, region] of regionalPolicies.entries()) {
     if (!bulkyWaste) {
       errors.push(`${prefix}.bulkyWaste is required for standard tier`);
     } else {
-      if (!httpsUrl.test(bulkyWaste.applicationUrl ?? "")) errors.push(`${prefix}.bulkyWaste.applicationUrl must be an https URL`);
-      if (!httpsUrl.test(bulkyWaste.feeUrl ?? "")) errors.push(`${prefix}.bulkyWaste.feeUrl must be an https URL`);
+      // 여기는 "있어야 한다"만 본다. 형식은 아래 티어 무관 블록이 검사한다.
+      if (!isNonEmptyString(bulkyWaste.applicationUrl)) errors.push(`${prefix}.bulkyWaste.applicationUrl is required for standard tier`);
+      if (!isNonEmptyString(bulkyWaste.feeUrl)) errors.push(`${prefix}.bulkyWaste.feeUrl is required for standard tier`);
       if (!isNonEmptyString(bulkyWaste.phone)) errors.push(`${prefix}.bulkyWaste.phone is required for standard tier`);
-      if (!isoDate.test(bulkyWaste.contactCheckedAt ?? "")) errors.push(`${prefix}.bulkyWaste.contactCheckedAt must be YYYY-MM-DD`);
+      if (!isNonEmptyString(bulkyWaste.contactCheckedAt)) errors.push(`${prefix}.bulkyWaste.contactCheckedAt is required for standard tier`);
     }
     if (!collectionMethodIsFilled(region.specialCollections?.medicine)) {
       errors.push(`${prefix}.specialCollections.medicine.method is required for standard tier`);
@@ -507,6 +508,20 @@ for (const [index, region] of regionalPolicies.entries()) {
     if (!collectionMethodIsFilled(region.specialCollections?.batteryAndFluorescentLamp)) {
       errors.push(`${prefix}.specialCollections.batteryAndFluorescentLamp.method is required for standard tier`);
     }
+  }
+
+  // 형식 검사는 티어를 보지 않고 "값이 있으면" 건다. `standard`의 필수 여섯 항목
+  // 밖에서도 이 필드들을 담을 수 있고(성남시는 `full`인데 두 URL을 갖는다),
+  // `formatRegionBulkyContactLines`는 티어와 무관하게 값이 있으면 그대로 답변에
+  // 실어 보낸다 — standard 블록 안에만 두면 오타난 URL이 검사 없이 사용자에게 나간다.
+  if (region.bulkyWaste?.applicationUrl !== undefined && !httpsUrl.test(region.bulkyWaste.applicationUrl)) {
+    errors.push(`${prefix}.bulkyWaste.applicationUrl must be an https URL`);
+  }
+  if (region.bulkyWaste?.feeUrl !== undefined && !httpsUrl.test(region.bulkyWaste.feeUrl)) {
+    errors.push(`${prefix}.bulkyWaste.feeUrl must be an https URL`);
+  }
+  if (region.bulkyWaste?.contactCheckedAt !== undefined && !isoDate.test(region.bulkyWaste.contactCheckedAt)) {
+    errors.push(`${prefix}.bulkyWaste.contactCheckedAt must be YYYY-MM-DD`);
   }
 
   if (region.bulkyWaste?.phone !== undefined) {

@@ -86,7 +86,8 @@ Phase 1이 정한 기준은 "확정 매칭 응답과 같은 자릿수 유지"(�
 
 - Phase 5가 main에 반영돼 있다(지역 35곳: full 5, standard 13, metro 17).
 - `bulky-waste-fees.json`을 소비하는 런타임 경로가 이미 있다 — `findBulkyWasteFees`([src/data.ts](../../src/data.ts) 1032행)가 `regionId` + `itemId`로 찾고, `formatBulkyWasteFeeLines`(1040행)가 줄을 만들고, [src/server.ts](../../src/server.ts) 274·485행이 쓴다. **그래서 데이터만 넣으면 동작한다.**
-- 대상 10곳 중 9곳은 이미 `applicationUrl`·`feeUrl`·`phone`을 갖고 있다. **성남시만 예외로 두 URL이 없다** — `region-policies.json`의 `bulkyWaste`에 `definition`·`place`·`collection`·`phone`만 들어 있다. `BulkyWasteFeeSchedule`은 두 URL이 필수이고 validate가 http(s)를 강제하므로(`scripts/validate-data.mjs` 568~570행), **성남시는 R3 전에 두 URL을 사람이 찾아야 한다.** 나머지 9곳은 새로 조사할 필수 필드가 없다.
+- 대상 10곳 전부가 `applicationUrl`·`feeUrl`·`phone`을 갖췄다. 성남시만 두 URL이 비어 있었는데 2026-08-15에 채웠다 — 대형폐기물 인터넷 배출신고(`waste.isdc.co.kr`, 성남도시개발공사 운영)의 배출신청(`cIdx=1`)·처리비용안내(`cIdx=4`) 페이지다. 이미 `sources`에 있던 것은 같은 사이트의 신청안내(`cIdx=3`)였고, 필드에 넣은 두 페이지는 이번에 새로 찾아 확인했다. `BulkyWasteFeeSchedule`의 필수 필드 중 새로 조사해야 하는 것은 이제 없다.
+- 다만 성남시 `bulkyWaste.phone`(`031-729-3205`)은 8/15에 재확인하지 못했다. 시청·`waste.isdc.co.kr` 어느 페이지에도 이 번호가 노출되지 않아 `contactCheckedAt`은 `2026-07-05` 그대로 둔다. 번호 근거 보강은 별도 과제다.
 
 ## 일정 배치 (중요)
 
@@ -194,13 +195,13 @@ R0에서 확인한 대로 **제목으로 고르지 말고 본문을 스캔한다
 4. (지역, 품목)당 12행 상한 위반 0건 — validate로 강제.
 5. 런타임 코드(`src/`) diff 0줄. 변경은 `src/data/*.json`, `scripts/`, `docs/`에만 있다.
 6. R0 타당성 문서와 결과 기록 완료.
-7. 성남시 `applicationUrl`·`feeUrl`을 찾아 넣었다(전제 참조 — 대상 10곳 중 유일하게 비어 있다).
+7. ~~성남시 `applicationUrl`·`feeUrl` 확보~~ — 2026-08-15 완료.
 
 ## 완료 체크리스트
 
 - [x] R0 타당성 확인 — 14/14 확인, 진행 결정 ([조사 결과](../ordinance-fee-availability-2026-08-15.md))
 - [x] 표준데이터 트랙과 지역 분담 확정 — Phase 6은 10곳
-- [ ] 성남시 `applicationUrl`·`feeUrl` 확보
+- [x] 성남시 `applicationUrl`·`feeUrl` 확보 (2026-08-15)
 - [ ] R1 추출 스크립트 (`pnpm fees:fetch`)
 - [ ] R2 골든셋 검증 통과 (`pnpm fees:verify`)
 - [ ] R3 데이터 벌크 (5곳 단위 배치)

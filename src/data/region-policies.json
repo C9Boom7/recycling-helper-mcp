@@ -1663,7 +1663,7 @@
     ],
     "coverageTier": "full",
     "metroId": "gyeonggi",
-    "checkedAt": "2026-07-05",
+    "checkedAt": "2026-08-15",
     "summary": "성남시는 생활폐기물을 수거 전날 일몰 후부터 다음날 오전 5시까지 배출하도록 안내하고, 재활용품은 품목별로 비우고 헹군 뒤 분리배출하며, 음식물류는 이물질과 대표 제외 품목을 제거해 전용봉투 또는 수거용기에 배출하도록 안내합니다. 판교는 동 단위 별도 정책이 아니라 성남시 기본 정책 alias로만 처리합니다.",
     "generalWaste": {
       "time": "수거 전날 일몰 후~다음날 05:00, 수거시간 06:00~15:00",
@@ -1750,7 +1750,10 @@
         "신고한 폐기물을 배출장소에 배출합니다.",
         "대형 가전제품과 소형가전 5품목 이상은 폐가전제품 무상방문수거서비스(1599-0903) 대상 여부를 먼저 확인합니다."
       ],
-      "phone": "031-729-3205"
+      "phone": "031-729-3205",
+      "applicationUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=1",
+      "feeUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
+      "contactCheckedAt": "2026-07-05"
     },
     "smallElectronics": {
       "method": [
@@ -1934,6 +1937,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-07-05",
         "basis": "대형폐기물 정의, 전화·인터넷·모바일 신고, 접수번호·납부필증 부착, 판교동 포함 분당구 수거업체 관할, 대형폐가전 무상 방문수거 안내"
+      },
+      {
+        "title": "성남시 대형폐기물 인터넷 배출신고 - 처리비용안내",
+        "url": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "품목별 처리비용 표. 성남도시개발공사 운영, 대표자 성남시장. 장롱 폭120cm이상 1쪽 15,000원, 책상 상판길이 150cm 이상 8,000원 등이 확인되며 냉장고·세탁기는 무상수거로 표기된다"
       }
     ]
   },
