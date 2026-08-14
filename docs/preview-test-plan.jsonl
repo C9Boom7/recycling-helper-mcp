@@ -26,3 +26,6 @@
 {"id":"N2","category":"비의도","utterance":"주말에 서울 놀러갈 만한 데 추천해줘","expectTool":null,"expectWidget":false,"note":"과호출 점검"}
 {"id":"C1","category":"카테고리어","utterance":"대형폐기물 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"카테고리어는 품목이 아니다 — found:false 폴백이 정답. 품목 카드가 뜨면 fail(수정 전 '깨진 인덕션 유리 상판')"}
 {"id":"C2","category":"카테고리어","utterance":"음식물 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":false,"note":"카테고리어는 품목이 아니다 — found:false 폴백이 정답. 품목 카드가 뜨면 fail(수정 전 '곰팡이 핀 빵')"}
+{"id":"G1","category":"지역","utterance":"부산 사는데 소파 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":true,"note":"광역 착지 — 미등록 자치구의 광역 폴백. 지역 블록에 '배출 3일 전까지'가 나오면 fail — 자치구에서 확인한 기한을 광역 기준으로 단정하는 것이다. '시·군·구를 확인' 안내로 끝나야 한다"}
+{"id":"G2","category":"지역","utterance":"관악구 대형폐기물 신고 어떻게 해?","expectTool":"get_region_disposal_info","expectWidget":false,"note":"standard 티어 확정. matchedRegion '서울 관악구' + 신고 절차·공식 출처. itemName으로 '대형폐기물'이 넘어와도 품목 카드가 뜨면 fail"}
+{"id":"G3","category":"지역","utterance":"경기 성남시 재활용 무슨 요일에 버려?","expectTool":"get_region_disposal_info","expectWidget":false,"note":"광역 접두어가 붙어도 full 티어로 가야 한다. matchedRegion이 '경기도'면 fail — 성남시 배출 요일을 잃는다"}
