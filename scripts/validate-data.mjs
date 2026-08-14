@@ -568,7 +568,7 @@ for (const [index, region] of regionalPolicies.entries()) {
 }
 
 // 지역 별칭 충돌은 문자열 포함 여부가 아니라 실제 매칭 결과로 잡는다
-// (`evaluate-data.mjs`의 alias self-resolution 검사). 포함 규칙은 정상 구성인
+// (`test-region-matching.ts`의 alias self-resolution 검사). 포함 규칙은 정상 구성인
 // 동명 자치구의 대칭 별칭까지 error로 막아버려서 쓰지 못한다 — "중구"를 서울과
 // 부산 양쪽에 다는 건 되묻기를 만드는 올바른 구성이지 충돌이 아니다.
 
