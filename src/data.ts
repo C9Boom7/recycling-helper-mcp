@@ -280,6 +280,18 @@ const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
 const MIN_MATCH_SCORE = 35;
 const MAX_AMBIGUOUS_CANDIDATES = 7;
+// A query that only hits the modifier half of a compound name is not evidence
+// of identity (see scoreItemNames), so it can never confirm an answer on its
+// own — resolveWasteItem drops it before picking a match.
+//
+// It still has to survive ranking, though. Deleting these hits outright let the
+// single surviving head hit confirm alone, turning a query that used to ask
+// back into a confident wrong answer: "컴퓨터" answered 노트북 once 컴퓨터
+// 모니터/책상/의자 were gone, "유리" answered 깨진 보온병 once 35 of its 37
+// candidates were. The hit is weak evidence of identity but good evidence that
+// the query is under-specified, which is exactly what the ask-back needs.
+// Ranked just above MIN_MATCH_SCORE so it always sorts last.
+const MODIFIER_FRAGMENT_SCORE = 36;
 // fuzzy_jamo must stay below generic_fragment (82): it is a typo guess, never
 // stronger evidence than an actual substring hit.
 const FUZZY_JAMO_STRONG_SCORE = 70;
@@ -513,7 +525,7 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  * an exact, prefix, or standalone-token match, so only this one needs a tie check
  * in resolveWasteItem before it's safe to answer with confidence.
  */
-type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_jamo" | "target_mention";
+type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "modifier_fragment" | "fuzzy_jamo" | "target_mention";
 
 function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   const { raw, normalized: normalizedQuery, tokens: queryTokens } = query;
@@ -543,8 +555,18 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
         kind = "query_contains_name";
       }
     } else if (normalizedName.includes(normalizedQuery)) {
-      score = 82;
-      kind = "generic_fragment";
+      // Korean is head-final: the trailing morpheme of a compound noun carries
+      // the identity. "의자" inside "낡은 의자" is the head, so they are the same
+      // object. "에어컨" inside "에어컨 리모컨" is a modifier — a different object
+      // that merely names the query in passing, and answering with it is worse
+      // than not answering. Only a head-position hit counts as identity.
+      if (normalizedName.endsWith(normalizedQuery)) {
+        score = 82;
+        kind = "generic_fragment";
+      } else {
+        score = MODIFIER_FRAGMENT_SCORE;
+        kind = "modifier_fragment";
+      }
     }
 
     if (score > bestScore) {
@@ -554,8 +576,13 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
     }
   }
 
+  // The semantic bonus must not lift a modifier hit back over MIN_MATCH_SCORE —
+  // material keywords in the query say nothing about which half of a compound
+  // name was hit.
   const adjustedScore =
-    bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE ? Math.min(99, bestScore + semanticBonus) : bestScore;
+    matchKind !== "modifier_fragment" && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
+      ? Math.min(99, bestScore + semanticBonus)
+      : bestScore;
   return { item: indexed.item, score: adjustedScore, matchedBy, matchKind };
 }
 
@@ -598,7 +625,10 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
 
   const scoredQuery: ScoredQuery = { raw: query, normalized: normalizedQuery, tokens: normalizedTokens(query) };
   const named = rankMatches(indexedItems.map((indexed) => scoreItemNames(scoredQuery, indexed)));
-  if (named.length > 0) {
+  // Modifier hits alone do not count as a name hit: "에어컨" reaching only
+  // "에어컨 리모컨" has still failed to name anything, so the typo tier below
+  // must run exactly as it did before those hits were kept.
+  if (named.some((match) => match.matchKind !== "modifier_fragment")) {
     return named.slice(0, limit);
   }
 
@@ -678,19 +708,27 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
     return { status: "not_found" };
   }
 
-  const [best, ...rest] = matches;
+  // Modifier hits ride along as an under-specification signal only (see
+  // MODIFIER_FRAGMENT_SCORE). They never become the answer.
+  const modifierHits = matches.filter((match) => match.matchKind === "modifier_fragment");
+  const named = matches.filter((match) => match.matchKind !== "modifier_fragment");
+  if (named.length === 0) {
+    return { status: "not_found" };
+  }
+
+  const [best, ...rest] = named;
 
   // Typo guesses confirm only when exactly one candidate clears the strong
   // similarity bar; anything weaker is surfaced as an "is this what you
   // meant?" candidate list, even when there is just one candidate. The typo
   // tier never mixes with name matches, so every match here is a guess.
   if (best.matchKind === "fuzzy_jamo") {
-    const strongMatches = matches.filter((match) => match.score >= FUZZY_JAMO_STRONG_SCORE);
+    const strongMatches = named.filter((match) => match.score >= FUZZY_JAMO_STRONG_SCORE);
     if (strongMatches.length === 1) {
       return { status: "match", match: strongMatches[0] };
     }
 
-    return { status: "ambiguous", candidates: matches.slice(0, MAX_AMBIGUOUS_CANDIDATES) };
+    return { status: "ambiguous", candidates: named.slice(0, MAX_AMBIGUOUS_CANDIDATES) };
   }
 
   if (best.matchKind === "generic_fragment" && best.score < HIGH_CONFIDENCE_SCORE) {
@@ -707,6 +745,15 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
     const candidates = (readableCandidates.length > 1 ? readableCandidates : tied).slice(0, MAX_AMBIGUOUS_CANDIDATES);
     if (candidates.length > 1) {
       return { status: "ambiguous", candidates };
+    }
+
+    // One head hit left, but other items carry the query as a modifier: the
+    // query named a whole category and this item is one member of it. "컴퓨터"
+    // reaches 노트북 컴퓨터 alone once 컴퓨터 모니터/책상/의자 are set aside, and
+    // answering with 노트북 is the same confident-wrong-answer this tier exists
+    // to avoid. Ask instead.
+    if (modifierHits.length > 0) {
+      return { status: "ambiguous", candidates: [best, ...modifierHits].slice(0, MAX_AMBIGUOUS_CANDIDATES) };
     }
   }
 

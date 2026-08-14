@@ -6487,5 +6487,224 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"경기도 성남시\""
     ]
+  },
+  {
+    "id": "phase7_modifier_aircon_not_aircon",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "에어컨"
+    },
+    "expectedTextExcludes": [
+      "## 리모컨"
+    ]
+  },
+  {
+    "id": "phase7_modifier_tv_not_tv",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "TV"
+    },
+    "expectedTextExcludes": [
+      "## 리모컨"
+    ]
+  },
+  {
+    "id": "phase7_modifier_washer_not_washer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "세탁기"
+    },
+    "expectedTextExcludes": [
+      "## 세탁 보풀"
+    ]
+  },
+  {
+    "id": "phase7_modifier_vanity_not_vanity",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장대"
+    },
+    "expectedTextExcludes": [
+      "## 거울"
+    ]
+  },
+  {
+    "id": "phase7_modifier_boiler_not_boiler",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "보일러"
+    },
+    "expectedTextExcludes": [
+      "## 온수매트"
+    ]
+  },
+  {
+    "id": "phase7_modifier_purifier_not_purifier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "정수기"
+    },
+    "expectedTextExcludes": [
+      "## 정수기 필터"
+    ]
+  },
+  {
+    "id": "phase7_keep_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "쇼파"
+    },
+    "expectedTextIncludes": [
+      "## 소파"
+    ]
+  },
+  {
+    "id": "phase7_keep_wardrobe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장롱"
+    },
+    "expectedTextIncludes": [
+      "## 옷장"
+    ]
+  },
+  {
+    "id": "phase7_keep_carpet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카펫"
+    },
+    "expectedTextIncludes": [
+      "## 카페트"
+    ]
+  },
+  {
+    "id": "phase7_keep_fire_ext",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "폐소화기"
+    },
+    "expectedTextIncludes": [
+      "## 소화기"
+    ]
+  },
+  {
+    "id": "phase7_keep_bookshelf",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책꽂이"
+    },
+    "expectedTextIncludes": [
+      "## 책장"
+    ]
+  },
+  {
+    "id": "phase7_keep_aquarium",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "수족관"
+    },
+    "expectedTextIncludes": [
+      "## 어항"
+    ]
+  },
+  {
+    "id": "phase7_keep_flooring",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장판"
+    },
+    "expectedTextIncludes": [
+      "## 비닐장판"
+    ]
+  },
+  {
+    "id": "phase7_keep_bedframe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대틀"
+    },
+    "expectedTextIncludes": [
+      "## 침대 프레임"
+    ]
+  },
+  {
+    "id": "phase7_keep_table",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "밥상"
+    },
+    "expectedTextIncludes": [
+      "## 식탁"
+    ]
+  },
+  {
+    "id": "phase7_reverse_remote",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "리모컨"
+    },
+    "expectedTextIncludes": [
+      "## 리모컨"
+    ]
+  },
+  {
+    "id": "phase7_reverse_purifier_filter",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "정수기 필터"
+    },
+    "expectedTextIncludes": [
+      "## 정수기 필터"
+    ]
+  },
+  {
+    "id": "phase7_reverse_heat_mat",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "온수매트"
+    },
+    "expectedTextIncludes": [
+      "## 온수매트"
+    ]
+  },
+  {
+    "id": "phase7_modifier_keeps_computer_ambiguous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "컴퓨터"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:",
+      "노트북 컴퓨터 (노트북)",
+      "컴퓨터 모니터 (모니터)"
+    ],
+    "expectedTextExcludes": [
+      "## 노트북"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"컴퓨터\""
+    ]
+  },
+  {
+    "id": "phase7_modifier_keeps_glass_ambiguous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:",
+      "유리병"
+    ],
+    "expectedTextExcludes": [
+      "## 깨진 보온병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"유리\""
+    ]
   }
 ]

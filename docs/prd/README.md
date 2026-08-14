@@ -34,6 +34,7 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 7개로 나�
 | 4b | [phase-4-release.md](phase-4-release.md) | 발화 테스트 매트릭스, description 튜닝, 회귀, 마감 | Phase 1~3 배포 이후 |
 | 5 | [phase-5-region-expansion.md](phase-5-region-expansion.md) | 지역 커버리지 확장 (스키마 티어링, 매칭 단계화, 표준·광역 티어) | Phase 4a 완주 이후, 4b와 병렬 |
 | 6 | [phase-6-bulky-fee-etl.md](phase-6-bulky-fee-etl.md) | 자치법규 ETL로 등록 지역 10곳의 대형폐기물 수수료 금액 채우기 | Phase 5 머지 후. 런타임 코드 무변경이라 4b와 병렬 |
+| 7 | [phase-7-bulky-item-fee-expansion.md](phase-7-bulky-item-fee-expansion.md) | 복합명사 오매칭 교정, 대형폐기물 품목 확장, 표준데이터 수수료 임포트(용산·노원·강서·관악) | Phase 5 이후 — Phase 6과 지역 배타 분담 |
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
 단, 둘 다 `evaluation-cases.json`/`mcp-answer-cases.json`을 만지므로 케이스 추가는 append-only로 하고 id 충돌만 피한다.
@@ -88,5 +89,8 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 4b | 미착수 | - | 4a 완주 이후 |
 | 5 | 완료 (PR #10·#11 머지됨) | claude/phase5-doc-plan-review-4dcfdb 외 | 지역 5 → 35(full 5, standard 13, metro 17). R4는 최소선 21곳 중 13곳, 8곳은 백로그 |
 | 6 | R0 완료 (14/14), R1 대기 | - | 조사 결과는 `docs/ordinance-fee-availability-2026-08-15.md`. 겹치던 4곳(용산·노원·강서·관악)은 공공데이터포털 표준데이터 트랙으로 넘겨 Phase 6은 10곳 담당 |
+| 7 | PRD + R1 완료 (PR #14) | claude/region-expansion-analysis | 복합명사 수식어 오매칭 교정으로 오매칭 13 → 6. R2 품목 확장·R3 별칭·R4 수수료 4곳 남음 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
+
+Phase 6·7은 같은 `src/data/bulky-waste-fees.json`을 채우므로 **지역으로 배타 분담**한다. 상세는 [phase-7 문서의 "트랙 분담"](phase-7-bulky-item-fee-expansion.md#트랙-분담-phase-6과-배타) 참조.
