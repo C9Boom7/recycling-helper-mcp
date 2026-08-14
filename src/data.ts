@@ -219,6 +219,10 @@ export function normalizeText(value: string): string {
  * The 19 sentence aliases stay — they legitimately match full utterances by their
  * item-name part. Only the query side is gated, and only when the whole query is
  * the category term (so "대형폐기물 신고" or "음식물 쓰레기통" still search normally).
+ *
+ * The gate lives in findWasteItems rather than in resolveWasteItem alone, because
+ * check_confusing_item searches directly and would otherwise still list "재활용"
+ * as 배달 플라스틱 용기 — the same wrong-item card by another route.
  */
 const DISPOSAL_CATEGORY_QUERIES = new Set(
   [
@@ -562,7 +566,7 @@ function rankMatches(matches: WasteMatch[]): WasteMatch[] {
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
   const normalizedQuery = normalizeText(query);
-  if (!normalizedQuery) {
+  if (!normalizedQuery || isDisposalCategoryQuery(query)) {
     return [];
   }
 
@@ -641,10 +645,8 @@ export type WasteQueryResolution =
  * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
  */
 export function resolveWasteItem(query: string): WasteQueryResolution {
-  if (isDisposalCategoryQuery(query)) {
-    return { status: "not_found" };
-  }
-
+  // A bare category term comes back empty from findWasteItems, which lands on
+  // the not_found fallback below.
   const matches = findWasteItems(query, wasteItems.length);
   if (matches.length === 0) {
     return { status: "not_found" };
