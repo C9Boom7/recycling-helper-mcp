@@ -15,7 +15,9 @@
 ### R1. 표준 티어 데이터 모델
 
 - `ReviewStatus`에 `standard_import` 추가 ([src/data.ts](../../src/data.ts) 타입 + `scripts/validate-data.mjs` 허용값).
-- 표준 티어 품목의 최소 요건: `name, aliases(≥2), category, disposalType, summary, steps(1~3), cautions(≥1), confidence, needsRegionCheck/regionPolicy, sources(≥1, url+checkedAt 필수), review.status="standard_import"`.
+- 표준 티어 품목의 최소 요건: `id(snake_case), name, aliases(≥2), category, disposalType, summary, steps(1~3), cautions(≥1), sourceRefs(≥1), confidence, needsRegionCheck/regionPolicy, sources(≥1, url+checkedAt 필수), review.status="standard_import"`.
+  - `sourceRefs`는 전 품목 공통 필수 필드다(validate가 비어 있지 않은 배열을 요구하고, 답변 하단 출처 표기에 그대로 쓰인다). 표준 티어도 예외 없음.
+  - `source.url`은 기존 검증에서 optional이므로, `standard_import`에 한해 url 필수를 조건부로 검증한다.
 - 기존 스키마를 그대로 쓰되 조건 분기(conditions)는 명확한 것만 넣는다. 애매하면 비운다.
 - 답변 문구 톤은 기존 130개와 통일 (결론 우선, 보수적 안내).
 
@@ -31,20 +33,25 @@
 규칙:
 
 - **웹에서 확인한 공식 근거가 있는 품목만** 추가한다. 근거를 못 찾으면 추가하지 않는다 (`docs/source-gap-policy.md`의 보수 안내 원칙 준수).
-- 기존 130개와 중복 금지: `normalizeText` 기준으로 name/aliases 전수 대조. 기존 품목의 별칭으로 흡수하는 게 맞으면 그렇게 한다 (Phase 1 R3와 동일 원칙).
+- 기존 130개와 중복 금지: `normalizeText` 기준으로 name/aliases 전수 대조. 수작업에 맡기지 말고 validate에 충돌 검사를 추가한다(R3 참고).
+- 기존 품목의 별칭으로 흡수하는 게 맞으면 그렇게 한다 (Phase 1 R3와 동일 원칙). 단 **Phase 1이 병렬 진행 중이면** 기존 품목의 `aliases`를 직접 수정하지 않는다 — Phase 1 R3(별칭 일괄 보강)가 같은 필드를 만지므로 충돌한다. 흡수 후보는 `docs/data-decision-backlog.md`에 기록만 하고 Phase 1 머지 후 반영한다. 병렬 세션이 없으면 직접 수정해도 된다.
 - 지역 의존이 강한 품목(전용 수거함/신고/수수료류)은 `regionPolicy.regionCheckLevel: "required"`로 표시하되, 지역별 세부 데이터는 만들지 않는다 — 런타임의 기존 "지역 확인 필요" 안내에 태운다.
 - 목표 수량: +200 이상, 400개 도달 시 충분. 수량보다 "빈출인데 없는 품목" 우선.
 
 ### R3. 파이프라인·회귀
 
-- `scripts/validate-data.mjs`: standard_import 허용 + 최소 요건 검증.
-- 평가 케이스: 신규 품목 10개당 1개 이상 샘플링해 evaluation-cases에 추가 (대표 발화형 질의로).
-- README·`docs/source-coverage.md`·`docs/data-quality.md`의 카운트 갱신.
+- `scripts/validate-data.mjs`: standard_import 허용 + 최소 요건 검증(R1의 조건부 규칙 포함).
+- `scripts/validate-data.mjs`: `normalizeText` 기준 name/alias 충돌 검사 추가 — 품목 간 별칭 중복은 error. 현재는 name 중복이 warning일 뿐이고 alias 간 충돌 검사가 없어, 벌크 추가 시 기존 품목의 exact/alias 매칭 가로채기를 자동으로 못 잡는다.
+- 평가 케이스: `evaluate-data.mjs`가 **품목당 정확히 1개**의 평가 케이스를 강제하므로(0개도 2개도 실패), 샘플링이 아니라 신규 품목 전수에 케이스를 1개씩 추가한다. 질의는 품목명이 그대로 들어간 발화형으로 만들고, 평가 스크립트의 단순 매처(정확일치/포함/문자 겹침)에서도 해당 품목이 이기는지 확인한다.
+- MCP answer case: `validate-data.mjs`가 `regionPolicy.regionCheckLevel`이 지정된 품목마다 해당 레벨(`required`→`필수`)의 `expectedRegionalPolicy`와 그 품목 id를 담은 `mcp-answer-cases` 케이스를 강제한다. 표준 티어에서 `required`로 표시한 품목 전수에 최소 케이스(get_disposal_steps + 지역 지정 + level 검증)를 함께 추가해야 `pnpm check`가 통과한다.
+- 카운트 문서 갱신 — validate가 강제하는 곳 포함 **4곳**: README, `docs/source-coverage.md`, `docs/data-quality.md`, `docs/session-coordination.md`(스냅샷 라인의 waste-items/evaluation-cases/review count를 정규식으로 대조하므로 안 고치면 `pnpm check` 실패).
+- `docs/source-coverage.md`의 review status별 카운트에 `standard_import` 라인을 추가하고, `validate-data.mjs`의 `expectDocumentCount` 호출부에도 대응 검증을 추가한다.
 - 대량 추가 후 과매칭 점검: 기존 evaluation-cases 130 + region 35 + mcp-answer-cases 전체 무회귀. 특히 신규 품목이 기존 품목의 exact/alias 매칭을 가로채지 않는지.
 
 ### R4. 효과 측정
 
-- Phase 1과 동일한 측정: 질문 백로그 111개 질의 + 신규 수집한 빈출 발화 50개(리서치 중 함께 작성, `logs/`에 JSONL로 저장)에 대한 not_found 비율 before/after를 이 문서 하단에 기록.
+- Phase 1과 동일한 측정: 질문 백로그 111개 질의 + 신규 수집한 빈출 발화 50개에 대한 not_found 비율 before/after를 이 문서 하단에 기록.
+- 빈출 발화 50개는 `logs/coverage-expansion-queries.example.jsonl`로 저장한다. `.gitignore`가 `logs/*`를 무시하고 `*.example.jsonl`만 추적하므로, 이 네이밍이 아니면 측정 데이터가 커밋되지 않는다. 합성·무PII 질의만 넣는다(logs/README.md 컨벤션).
 
 ## 진행 방식 제안
 
@@ -56,13 +63,60 @@
 
 1. `pnpm local:test` 통과, 무회귀.
 2. 신규 품목 전수: 출처 URL + checkedAt 존재, 중복 없음.
-3. 카운트 문서 3곳 갱신.
+3. 카운트 문서 4곳 갱신 (README, source-coverage, data-quality, session-coordination).
 4. R4 측정 기록.
 5. 로컬 main 머지.
 
 ## 완료 체크리스트
 
-- [ ] R1 표준 티어 모델 + validate 확장
-- [ ] R2 품목 추가 (목표 +200)
-- [ ] R3 평가 케이스 샘플링 + 카운트 갱신
-- [ ] R4 효과 측정 기록
+- [x] R1 표준 티어 모델 + validate 확장
+- [x] R2 품목 추가 (130 → 272, +142)
+- [x] R3 평가 케이스 전수 추가 + 카운트 갱신
+- [x] R4 효과 측정 기록
+
+## R4 효과 측정 결과 (2026-08-14)
+
+측정 명령: `pnpm measure:coverage` ([scripts/measure-coverage.ts](../../scripts/measure-coverage.ts)).
+런타임의 `resolveWasteItem`을 그대로 호출해 상태 분포를 집계한다.
+
+before는 Phase 1이 이미 들어간 main(`a696026`) 기준이다. Phase 1도 not_found를 줄이므로,
+Phase 2 단독 효과를 보려면 Phase 0 시점이 아니라 이 기준과 비교해야 한다.
+
+| 질의 세트 | before (main `a696026`) | after (Phase 2) |
+| --- | --- | --- |
+| 질문 백로그 111개 | 3건 (2.7%) | 1건 (0.9%) |
+| 신규 빈출 발화 50개 | 40건 (80.0%) | 6건 (12.0%) |
+
+참고로 Phase 0 시점(Phase 1 이전) 백로그 not_found는 4건(3.6%)이었다. 즉 백로그 3.6% → 2.7%가
+Phase 1 몫, 2.7% → 0.9%가 Phase 2 몫이다. 빈출 발화 50개는 Phase 1 전후 모두 80.0%로 같았다 —
+이 세트는 미커버 품목 위주라 매칭 개선이 아니라 품목 추가로만 해결되는 성격이다.
+
+빈출 발화 50개는 [logs/coverage-expansion-queries.example.jsonl](../../logs/coverage-expansion-queries.example.jsonl)에 있다.
+
+남은 not_found와 사유:
+
+- 백로그 1건 — "약과 포장지는 폐의약품 수거함에 넣어?": 약과(과자)와 약을 혼동한 질의로, 품목 추가가 아니라 Phase 1 폴백에서 다룰 영역이다.
+- 발화 6건 — 플라스틱 양념통, 변기솔, 선크림 튜브, 가죽 벨트, 젖병, 사료 포대: 리서치에서 공식 근거를 찾지 못해 추측 배출법을 만들지 않고 제외했다. `docs/data-decision-backlog.md` 후보다.
+
+## 실제 반영 내역
+
+- 신규 품목 142개 (`review.status="standard_import"`), 평가 케이스 142개, MCP answer case 79개(지역 확인 필수 품목 전수 75건 + 폴백 보충 4건) 추가.
+- Phase 1과의 통합에서 정리한 것: 멜라민 스펀지는 Phase 1이 이미 `수세미` 별칭으로 흡수해 중복 품목을 뺐고, 폴백 smoke 4건(뒤집개·정수기 필터·노트북·지갑)은 품목이 생겨 정상 매칭 기대로 갱신했다. 대신 아직 미커버인 질의로 폴백 케이스 4건을 채웠다 — 메뉴 분기(`inferred:false`) 2건과 재질 추정 분기(`inferred:true`) 1건, classify 1건으로 양쪽 분기를 모두 덮는다. Phase 1이 짚어준 오타 질의 4건(패트병·스치로폼·형광능·건전기)은 신규 품목이 끼어들지 않아 그대로 유지된다.
+- 리서치 후보 약 220개 중 근거를 확인하지 못했거나 기존 품목에 흡수되는 67개는 추가하지 않았다. 목표치(+200)에는 못 미치지만, "공식 근거 있는 품목만" 원칙(R2)을 수량보다 우선했다.
+- 과매칭 방어로 제거한 별칭: `크리스마스트리`의 "트리"(프린터 카트리지 질의를 가로챔), `멜라민 그릇`의 "멜라민 컵"(포괄어 "컵" 후보 목록에서 기존 머그컵을 밀어냄), `스마트워치`의 "전자시계", `전기포트`의 "티포트".
+- 기존 데이터에서 발견해 정리한 별칭 충돌 1건: "커피 티백"이 `tea_bag`과 `drip_bag_coffee_filter` 양쪽에 있어 배출법이 맞는 후자만 남겼다.
+- 백로그 todo 1건(`정수기 필터`)이 `water_purifier_filter` 품목으로 커버되어 `covered`로 전환했다.
+
+## 코드리뷰 반영 (2026-08-14)
+
+품목이 늘면서 `disposalType` 어휘도 함께 늘었는데, `disposalGroupLabel`이 부분 문자열로
+그룹을 추론하고 있어 신규 값들이 조용히 어긋났다. 라벨을 데이터로 분리하고 validate로
+전수 대응을 강제했다.
+
+- **배출 그룹 매핑을 [src/data/disposal-groups.json](../../src/data/disposal-groups.json)으로 분리.** 부분 문자열 추론을 없앴다. 이전에는 `small_electronics_collection`(27개)·`food_waste`(3개)가 어느 분기에도 걸리지 않아 노트북·프린터·상한 우유 같은 품목이 `배출 그룹: 확인 필요`로 나왔다. 그 라벨은 `make_cleanup_plan`에서 not_found·모호 항목에 쓰는 값이라, 매칭에 성공한 품목이 실패한 것처럼 보였다.
+- **복합 배출로는 "주 배출로/보조 배출로" 순서로 표기.** `bulky`를 먼저 보던 탓에 종량제봉투가 기본인 `general_or_bulky_by_size`(18개) 등이 통째로 `대형폐기물`로 나왔다. 빗자루는 이제 `일반쓰레기/대형폐기물`, 체중계는 `소형가전/대형폐기물`, 전자레인지는 `무상방문수거/대형폐기물`이다.
+- **`nonburnable_special_bag`(5개)은 `불연성 폐기물`로 분리.** `includes("special")`에 걸려 `특수/유해폐기물`로 나오던 것을 바로잡았다. 불연성 마대 대상 품목을 유해폐기물 수거처로 안내하던 문제다.
+- **`formatRegionItemGuide`의 대형폐기물 분기를 조건부로 변경.** 대형폐기물이 보조 배출로일 때는 "대형폐기물에 해당할 때만 사전 신청" 문구를 쓴다. 이전에는 빗자루·돗자리처럼 종량제봉투가 기본인 품목에도 "배출 3일 전까지 사전 신청" 절차만 안내했다.
+- **체중계의 `disposalType`을 `recycle_or_bulky_by_type` → `small_electronics_collection_or_bulky`로 교정.** 결론 문장이 소형가전 수거함을 가리키는데 타입만 `recycle`이라 "세부 판단" 노출도 어긋나 있었다.
+- **회귀 케이스 6건 추가(answer case 290 → 296)** — 고친 그룹별로 `disposalGroup`을 단언하고, 기존 `standard_region_required_broom`에는 조건부 지역 문구 단언을 보강했다. 라벨을 되돌리면 smoke가 깨지는 것을 확인했다.
+- **`scripts/`도 타입 체크 대상에 포함** — `tsconfig.scripts.json`을 추가하고 `pnpm check`에 물렸다. `measure-coverage.ts`가 `include: ["src/**/*"]` 밖이라 `tsc --noEmit`이 한 번도 보지 않던 상태였다.

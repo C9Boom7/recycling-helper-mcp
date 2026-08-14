@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 export type Confidence = "high" | "medium" | "low";
 export type SourceType = "official_guidance" | "local_guidance" | "law" | "safety_guidance" | "manual_review";
-export type ReviewStatus = "draft" | "needs_source" | "verified" | "region_review_needed";
+export type ReviewStatus = "draft" | "needs_source" | "verified" | "region_review_needed" | "standard_import";
 
 export type WasteSource = {
   title: string;
@@ -146,11 +146,16 @@ const dataPath = fileURLToPath(new URL("./data/waste-items.json", import.meta.ur
 const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", import.meta.url));
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
 const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
+const disposalGroupPath = fileURLToPath(new URL("./data/disposal-groups.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
 export const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8")) as RegionalPolicyData[];
 export const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeePath, "utf8")) as BulkyWasteFeeSchedule[];
 export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath, "utf8")) as MaterialGuideline[];
+// disposalType은 자유 문자열이라 라벨을 부분 문자열로 추론하면 새 값이 조용히
+// 폴백으로 떨어진다("small_electronics_collection"이 어느 분기에도 안 걸리는 식).
+// 매핑을 데이터로 두고 validate-data.mjs가 전수 대응을 강제한다.
+export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")) as Record<string, string>;
 
 const materialGuidelineById = new Map(materialGuidelines.map((guideline) => [guideline.id, guideline]));
 
@@ -737,8 +742,13 @@ export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegi
   }
 
   if (item.disposalType.includes("bulky")) {
+    // 대형폐기물이 보조 배출로면 사전 신청은 그 갈래에서만 필요하다. 무조건
+    // 신청 절차만 안내하면 종량제봉투가 기본인 품목(빗자루·돗자리 등)에
+    // 틀린 절차를 지시하게 된다.
     return [
-      `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`,
+      isBulkySecondaryRoute(item)
+        ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
+        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`,
       `- 문의/신청 안내 전화: ${region.bulkyWaste.phone}`,
       ...bulkyWasteFeeLines,
     ];
@@ -814,12 +824,19 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   return lines.join("\n");
 }
 
+/**
+ * 배출 그룹은 `disposal-groups.json`의 명시 매핑으로만 정한다. 복합 배출로는
+ * "주 배출로/보조 배출로" 순서로 적어, 종량제봉투가 기본인 품목이 통째로
+ * "대형폐기물"로 보이지 않게 한다. "확인 필요"는 make_cleanup_plan에서
+ * not_found·모호 항목의 그룹이기도 해서, 매칭된 품목에는 절대 쓰지 않는다 —
+ * validate가 disposalType 전수 대응을 강제하므로 폴백은 도달 불가다.
+ */
 export function disposalGroupLabel(disposalType: string): string {
-  if (disposalType.includes("bulky")) return "대형폐기물";
-  if (disposalType.includes("special") || disposalType.includes("hazardous")) return "특수/유해폐기물";
-  if (disposalType.includes("general") && disposalType.includes("recycle")) return "재활용/일반쓰레기";
-  if (disposalType.includes("general")) return "일반쓰레기";
-  if (disposalType.includes("recycle")) return "재활용";
-  if (disposalType.includes("region")) return "지역 확인 필요";
-  return "확인 필요";
+  return disposalGroups[disposalType] ?? "확인 필요";
+}
+
+/** 대형폐기물이 보조 배출로일 뿐인지 — 주 배출로는 종량제봉투·소형가전 수거함 등. */
+function isBulkySecondaryRoute(item: WasteItem): boolean {
+  const label = disposalGroupLabel(item.disposalType);
+  return label.includes("대형폐기물") && !label.startsWith("대형폐기물");
 }

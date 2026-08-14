@@ -2675,11 +2675,13 @@
     "query": "정수기 필터는 어떻게 버려?",
     "region": "서울 강남구",
     "type": "new_item_candidate",
-    "status": "todo",
+    "status": "covered",
     "priority": "medium",
     "observed": "자동 백로그화: 현재 품목 데이터에서 유의미한 후보를 찾지 못했습니다.",
-    "expectedAction": "공식 출처를 확인해 신규 품목 추가 여부를 결정하고, 필요하면 평가 케이스와 MCP 답변 케이스를 추가합니다.",
-    "candidateItemIds": [],
+    "expectedAction": "Phase 2 표준 티어 확장에서 연수필터 종량제 기준을 근거로 water_purifier_filter 품목과 평가 케이스를 추가했다.",
+    "candidateItemIds": [
+      "water_purifier_filter"
+    ],
     "notes": [
       "autoSource: auto-backlog",
       "autoReason: no_match",
