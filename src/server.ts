@@ -30,8 +30,14 @@ import {
   resolveWasteItem,
   wasteItems,
 } from "./data.js";
+import type { DisposalWidgetPayload } from "./widgets.js";
+import { buildDisposalWidget } from "./widgets.js";
 
 const SERVICE_NAME = "RecyclingHelper(재활용척척)";
+// PRD phase-3 R1. Exactly "false" turns widgets off; anything else (including an
+// unset value) leaves them on, so QA can disable a misrendering card by
+// redeploying with one env var instead of shipping a code change.
+const WIDGET_ENABLED = process.env.WIDGET_ENABLED !== "false";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
 const HOST = process.env.HOST ?? "127.0.0.1";
 // Suffix wildcards (leading "*.") cover whatever hostname PlayMCP in KC assigns
@@ -255,6 +261,19 @@ function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogM
     content: [{ type: "text", text }],
     ...(structuredContent ? { structuredContent } : {}),
     ...(log ? { _log: log } : {}),
+  };
+}
+
+/**
+ * PRD phase-3 R4. The widget is the whole answer, so no structuredContent rides
+ * along. `status` in `_log` is mandatory here: callStatus() infers the status
+ * from structuredContent, which a widget response does not have, and without it
+ * every confirmed match would be logged as a plain "ok".
+ */
+function widgetResult(payload: DisposalWidgetPayload, log: ToolLogMeta): LoggedToolResult {
+  return {
+    content: [{ type: "text", text: JSON.stringify(payload) }],
+    _log: { ...log, status: "match" },
   };
 }
 
@@ -488,6 +507,20 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const regionNotes = buildRegionNotes(item, regionMatch);
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+
+  if (WIDGET_ENABLED) {
+    return widgetResult(
+      buildDisposalWidget({
+        item,
+        sourceTitle: briefSourceTitle(item),
+        regionName: regionMatch?.region.name,
+        regionNotes,
+      }),
+      log,
+    );
+  }
+
   const text = formatItemGuide(item, region);
   return textResult(
     text,
@@ -506,7 +539,7 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
       ...(regionNotes ? { regionNotes } : {}),
       sources: itemTopSources(item),
     },
-    { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name },
+    log,
   );
 }
 

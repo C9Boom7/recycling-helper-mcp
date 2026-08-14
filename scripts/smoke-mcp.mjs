@@ -122,12 +122,17 @@ async function getFreePort() {
   return port;
 }
 
-function startServer(port) {
+function startServer(port, { widgets = false } = {}) {
   const server = spawn(process.execPath, ["dist/server.js"], {
     env: {
       ...process.env,
       HOST,
       PORT: String(port),
+      // PRD phase-3 R4-1: pinned, never inherited. The 183 get_disposal_steps
+      // answer cases assert on human-readable text and structuredContent, which
+      // a widget response replaces — so the suite must not depend on whatever
+      // WIDGET_ENABLED happens to be set to in the caller's shell.
+      WIDGET_ENABLED: widgets ? "true" : "false",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -690,4 +695,135 @@ async function runSmoke() {
   }
 }
 
+function parseWidgetPayload(result, context) {
+  const text = resultText(result);
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    throw new Error(`${context} did not return a serialized widget payload:\n${text}`);
+  }
+  assert(isPlainObject(payload), `${context} widget payload must be an object`);
+  return payload;
+}
+
+function assertPlainTextResponse(result, context) {
+  assert(result.structuredContent !== undefined, `${context} should keep its structuredContent (text response)`);
+  assert(!resultText(result).trimStart().startsWith("{"), `${context} should stay plain text, not a widget payload`);
+}
+
+/**
+ * PRD phase-3 R2-1 branch table, exercised on the builder directly. The
+ * "region matched but no item-specific guide" branch needs an input the server
+ * only produces for a narrow slice of items, so it is pinned here instead.
+ */
+async function runWidgetBuilderCases() {
+  const { buildDisposalWidget } = await import("../dist/widgets.js");
+  const { wasteItems: items } = await import("../dist/data.js");
+
+  const nationwide = items.find((item) => item.id === "pizza_box_oily");
+  const regional = items.find((item) => item.id === "chair");
+  assert(nationwide && regional, "widget builder cases are missing their fixtures");
+
+  const card = (input) => JSON.stringify(buildDisposalWidget({ sourceTitle: "테스트 출처", ...input }).widget);
+
+  const nationwideCard = card({ item: nationwide });
+  assert(!nationwideCard.includes("거주 지역 기준 확인 필요"), "nationally uniform item should carry no region line");
+  assert(!nationwideCard.includes("기준으로 배출 요일"), "nationally uniform item should carry no region line");
+
+  const withNotes = card({ item: regional, regionName: "서울 강남구", regionNotes: ["- 강남구 기준 안내", "- 두 번째 줄", "- 세 번째 줄"] });
+  assert(withNotes.includes("서울 강남구 기준"), "region card is missing the region caption");
+  assert(withNotes.includes("강남구 기준 안내"), "region card is missing the region guidance line");
+  assert(!withNotes.includes("- 강남구 기준 안내"), "region guidance keeps its list bullet");
+  assert(!withNotes.includes("세 번째 줄"), "region guidance should be capped at two lines");
+
+  const withoutNotes = card({ item: regional, regionName: "서울 강남구" });
+  assert(withoutNotes.includes("서울 강남구 기준으로 배출 요일"), "matched region without guidance should still name the region");
+
+  const withoutRegion = card({ item: regional });
+  assert(withoutRegion.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
+
+  const payload = buildDisposalWidget({ item: regional, sourceTitle: "테스트 출처" });
+  assert(!("status" in payload), "widget payload must not define status — Kakao fills it");
+  assert(!("status" in payload.widget), "widget node must not define status — Kakao fills it");
+  assert(typeof payload.copy_text === "string" && payload.copy_text.split("\n").length <= 6, "copy_text must stay within 6 lines");
+  assert(typeof payload.name === "string" && payload.name.length > 0, "widget payload is missing name");
+}
+
+/**
+ * PRD phase-3 R4-1. Widget responses replace both the text body and
+ * structuredContent that the 211 answer cases assert on, so they run against
+ * their own server instance with WIDGET_ENABLED on.
+ */
+async function runWidgetSmoke() {
+  const port = await getFreePort();
+  const baseUrl = `http://${HOST}:${port}`;
+  const { server, getOutput } = startServer(port, { widgets: true });
+
+  const stopServer = () => {
+    if (!server.killed) server.kill("SIGTERM");
+  };
+
+  process.once("exit", stopServer);
+
+  try {
+    await waitForHealth(baseUrl, getOutput);
+    let requestId = 1;
+
+    const match = await callTool(baseUrl, "get_disposal_steps", { itemName: "기름 묻은 피자박스" }, requestId);
+    requestId += 1;
+    const payload = parseWidgetPayload(match, "confirmed match");
+    assert(isPlainObject(payload.widget), "confirmed match is missing the widget wrapper");
+    assert(payload.widget.type === "Card", `widget root should be a Card, got ${payload.widget.type}`);
+    assert(Array.isArray(payload.widget.children) && payload.widget.children.length > 0, "widget Card has no children");
+    assert(!("status" in payload) && !("status" in payload.widget), "widget response must not define status");
+    assert(typeof payload.copy_text === "string" && payload.copy_text.includes("기름 묻은 피자박스"), "copy_text is missing the item name");
+    assert(match.structuredContent === undefined, "widget response must not carry structuredContent");
+    assert(
+      JSON.stringify(payload.widget).includes("깨끗한 부분과 오염된 부분을 분리합니다."),
+      "widget card is missing the disposal steps",
+    );
+
+    const ambiguous = await callTool(baseUrl, "get_disposal_steps", { itemName: "전구" }, requestId);
+    requestId += 1;
+    assert(ambiguous.structuredContent?.ambiguous === true, "전구 should still resolve as ambiguous");
+    assert(resultText(ambiguous).includes("형광등"), "ambiguous response lost its candidates");
+    assertPlainTextResponse(ambiguous, "ambiguous response");
+
+    const notFound = await callTool(baseUrl, "get_disposal_steps", { itemName: "존재하지않는품목zzz" }, requestId);
+    requestId += 1;
+    assert(notFound.structuredContent?.found === false, "unknown item should still resolve as not_found");
+    assertPlainTextResponse(notFound, "not_found response");
+
+    const regional = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const regionalCard = JSON.stringify(parseWidgetPayload(regional, "regional match").widget);
+    assert(regionalCard.includes("서울 강남구 기준"), "regional card is missing the matched region name");
+    assert(!regionalCard.includes("거주 지역 기준 확인 필요"), "regional card should not ask for a region the user already gave");
+
+    const regionless = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자" }, requestId);
+    const regionlessCard = JSON.stringify(parseWidgetPayload(regionless, "regionless match").widget);
+    assert(regionlessCard.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
+
+    // PRD phase-3 R5: a widget response has no structuredContent for callStatus()
+    // to read, so the handler must log status explicitly or every confirmed
+    // match would land in the logs as a plain "ok".
+    const logLines = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"get_disposal_steps"'))
+      .map((line) => JSON.parse(line));
+    assert(logLines.length > 0, "no get_disposal_steps call was logged");
+    assert(
+      logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
+      `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
+    );
+
+    console.log(`Widget smoke passed at ${baseUrl} (WIDGET_ENABLED=true)`);
+  } finally {
+    stopServer();
+  }
+}
+
 await runSmoke();
+await runWidgetBuilderCases();
+await runWidgetSmoke();
