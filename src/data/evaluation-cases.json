@@ -1656,9 +1656,9 @@
     "notes": "Phase 7 대형가전 확장. TV 별칭도 같은 품목으로 확정되어야 합니다."
   },
   {
-    "query": "컴퓨터 어떻게 버리나요",
+    "query": "데스크탑 컴퓨터 어떻게 버려?",
     "expectedItemId": "desktop_computer",
     "expectedDisposalType": "free_visit_collection_or_bulky",
-    "notes": "Phase 7 대형가전 확장. R1 이후 노트북으로 오매칭되던 것을 이 품목이 받습니다."
+    "notes": "Phase 7 대형가전 확장. 포괄어 '컴퓨터'는 노트북·모니터와 답이 갈려 되묻는 것이 정답이라, 특정된 표현으로 케이스를 잡는다."
   }
 ]
