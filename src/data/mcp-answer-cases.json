@@ -7620,5 +7620,65 @@
     "expectedStructuredExcludes": [
       "\"id\":\"cable_wire\""
     ]
+  },
+  {
+    "id": "phase7_fee_yongsan_gu_desk",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "서울 용산구",
+      "수수료"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7_fee_nowon_gu_mattress",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "서울 노원구",
+      "수수료"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7_fee_gangseo_gu_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 강서구"
+    },
+    "expectedTextIncludes": [
+      "서울 강서구",
+      "수수료"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7_fee_gwanak_gu_desk",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상",
+      "region": "서울 관악구"
+    },
+    "expectedTextIncludes": [
+      "서울 관악구",
+      "수수료"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionCheckLevel\":\"필수\""
+    ]
   }
 ]

@@ -20,7 +20,8 @@
     "log:query": "node scripts/log-query.mjs",
     "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && tsx scripts/evaluate-data.ts && tsx scripts/test-region-matching.ts",
     "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
-    "local:test": "pnpm check && pnpm smoke:mcp"
+    "local:test": "pnpm check && pnpm smoke:mcp",
+    "import:fees": "tsx scripts/import-bulky-fees.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",
