@@ -6668,7 +6668,7 @@
     ]
   },
   {
-    "id": "phase7_modifier_keeps_computer_ambiguous",
+    "id": "phase7_computer_stays_ambiguous",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "컴퓨터"
@@ -7407,6 +7407,24 @@
     "expectedStructuredIncludes": [
       "\"ambiguous\":true",
       "\"itemName\":\"시계\""
+    ]
+  },
+  {
+    "id": "phase7_modifier_guard_plastic_asks_back",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "플라스틱"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:"
+    ],
+    "expectedTextExcludes": [
+      "## 치약 튜브"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"플라스틱\""
     ]
   }
 ]
