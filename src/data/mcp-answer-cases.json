@@ -12,8 +12,7 @@
       "신청 URL"
     ],
     "expectedStructuredIncludes": [
-      "\"bulkyWasteFees\"",
-      "\"feeKrw\":2000"
+      "- 서울 강남구 기준: 강남구 자원순환 종합포털에서 품목과 수수료를 확인합니다."
     ]
   },
   {
@@ -61,8 +60,8 @@
       "\"id\":\"mirror\"",
       "\"matchedBy\":\"거울\"",
       "\"status\":\"region_review_needed\"",
-      "\"bulkyWasteFees\"",
-      "\"regionalPolicy\""
+      "- 서울 강남구 기준: 강남구 자원순환 종합포털에서 품목과 수수료를 확인합니다.",
+      "\"regionNotes\""
     ]
   },
   {
@@ -307,7 +306,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"frying_pan\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -324,7 +323,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cooking_pot\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -404,7 +403,7 @@
       "\"matchedBy\":\"폐의약품\"",
       "\"region\":\"서울 강남구\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"empty_medicine_bottle\"",
@@ -439,7 +438,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"ice_pack\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -459,8 +458,7 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"서울 강남구\"",
       "\"item\":\"아이스팩\"",
-      "\"regionalPolicy\"",
-      "\"itemGuide\""
+      "\"checkList\""
     ]
   },
   {
@@ -615,7 +613,7 @@
       "\"id\":\"clothing\"",
       "\"matchedBy\":\"헌옷\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -637,7 +635,7 @@
       "\"id\":\"shoes\"",
       "\"matchedBy\":\"운동화\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -677,7 +675,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"plant_soil\"",
       "\"matchedBy\":\"화분 흙\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -697,7 +695,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"coffee_capsule\"",
       "\"matchedBy\":\"커피 캡슐\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -717,7 +715,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"power_strip\"",
       "\"matchedBy\":\"멀티탭\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -736,7 +734,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_cup\"",
       "\"matchedBy\":\"플라스틱 컵\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -755,7 +753,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"cup_holder\"",
       "\"matchedBy\":\"커피 컵홀더\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -774,7 +772,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_wrap\"",
       "\"matchedBy\":\"비닐랩\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -833,7 +831,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"flower_pot\"",
       "\"matchedBy\":\"도자기 화분\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -853,7 +851,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"cosmetic_container\"",
       "\"matchedBy\":\"화장품 용기\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -872,7 +870,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"drying_rack\"",
       "\"matchedBy\":\"빨래건조대\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -892,7 +890,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"toy\"",
       "\"matchedBy\":\"장난감\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -911,7 +909,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"stuffed_toy\"",
       "\"matchedBy\":\"인형\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -973,7 +971,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"nail_polish\"",
       "\"matchedBy\":\"매니큐어 병\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -993,7 +991,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"perfume_bottle\"",
       "\"matchedBy\":\"향수병\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1013,7 +1011,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"mercury_thermometer\"",
       "\"matchedBy\":\"수은 체온계\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1033,7 +1031,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"pesticide_container\"",
       "\"matchedBy\":\"살충제 통\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1052,7 +1050,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"fire_extinguisher\"",
       "\"matchedBy\":\"소화기\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1071,7 +1069,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"lighter\"",
       "\"matchedBy\":\"라이터\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1091,7 +1089,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"power_bank\"",
       "\"matchedBy\":\"부푼 보조배터리\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1158,13 +1156,11 @@
     "expectedStructuredIncludes": [
       "\"id\":\"wilted_flower\"",
       "\"matchedBy\":\"시든 꽃\"",
-      "\"regionalPolicy\"",
+      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "guidance": "기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
-      "shape": "itemGuideOnly"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -1184,7 +1180,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"candle\"",
       "\"matchedBy\":\"향초\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1205,7 +1201,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"contact_lens\"",
       "\"matchedBy\":\"콘택트렌즈\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1225,7 +1221,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"cd_dvd\"",
       "\"matchedBy\":\"CD\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1245,7 +1241,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"clothes_hanger\"",
       "\"matchedBy\":\"옷걸이\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1315,7 +1311,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"disposable_cutlery\"",
       "\"matchedBy\":\"일회용 숟가락\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1380,7 +1376,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_storage_box\"",
       "\"matchedBy\":\"큰 리빙박스\"",
-      "\"bulkyWasteFees\""
+      "- 서울 강남구 기준: 강남구 수수료 후보는 기타 프라스틱류 5kg당 2,000원 또는 서랍장 4단 이하 3,000원, 5단 이상 5,000원 기준을 확인합니다."
     ]
   },
   {
@@ -1401,7 +1397,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"yoga_mat\"",
       "\"matchedBy\":\"요가매트\"",
-      "\"bulkyWasteFees\""
+      "- 서울 강남구 기준: 강남구 수수료 후보는 돗자리(대자리/놀이매트) 1㎡당 1,000원 기준을 확인합니다."
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"blanket\""
@@ -1447,7 +1443,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"power_bank\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1467,7 +1463,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"flower_pot\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1486,7 +1482,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"led_lamp\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1505,7 +1501,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toner_cartridge\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ]
   },
   {
@@ -1524,7 +1520,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electronic_cigarette\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -1651,12 +1647,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"gypsum_air_freshener\"",
-      "\"regionalPolicy\"",
       "\"regionCheckLevel\":\"참고\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -1676,7 +1670,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"mandarin_peel\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ]
   },
   {
@@ -1779,7 +1773,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"moldy_bread\"",
       "\"matchedBy\":\"곰팡이 핀 빵은 음식물쓰레기야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"pesticide_container\""
@@ -1882,7 +1876,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"home_injection_needle\"",
       "\"matchedBy\":\"주사바늘 달린 자가주사기는 어떻게 버려\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
@@ -1907,7 +1901,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"induction_cooktop_broken_glass\"",
       "\"matchedBy\":\"인덕션 유리 상판 깨진 건 대형폐기물이야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"broken_glass\""
@@ -1932,7 +1926,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"broken_thermos\"",
       "\"matchedBy\":\"깨진 보온병은 유리야 고철이야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"broken_glass\""
@@ -1955,7 +1949,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"샴푸 리필 파우치는 비닐류로 버리면 돼\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"soap_bar_piece\""
@@ -1979,7 +1973,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"aluminum_foil\"",
       "\"matchedBy\":\"요거트 은박 뚜껑은 캔류야 일반쓰레기야\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"blanket\""
@@ -2028,7 +2022,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"electric_toothbrush\"",
       "\"matchedBy\":\"전동칫솔 본체랑 칫솔모는 같이 버려\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"toothbrush\""
@@ -2054,7 +2048,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"fish_bone\"",
       "\"matchedBy\":\"생선가시는 음식물쓰레기야 일반쓰레기야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"drip_bag_coffee_filter\""
@@ -2079,7 +2073,7 @@
       "\"id\":\"fruit_seed\"",
       "\"region\":\"서울 강남구\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -2100,7 +2094,7 @@
       "\"id\":\"onion_peel\"",
       "\"region\":\"서울 강남구\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -2121,8 +2115,7 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"서울 강남구\"",
       "\"item\":\"티백\"",
-      "\"itemGuide\"",
-      "음식물쓰레기가 아닌 일반쓰레기 종량제봉투"
+      "\"checkList\""
     ]
   },
   {
@@ -2164,7 +2157,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"배달 음식 소스 작은 비닐팩은 씻어서 비닐류야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
@@ -2190,15 +2183,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"umbrella\"",
       "\"matchedBy\":\"젖은 우산은 그냥 일반쓰레기야 고철이야\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"frying_pan\"",
       "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -2221,15 +2213,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"umbrella\"",
       "\"matchedBy\":\"부러진 우산살은 고철로 따로 버려도 돼\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"cooking_pot\"",
       "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간"
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -2347,7 +2338,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"perfume_bottle\"",
       "\"matchedBy\":\"향수 샘플 작은 유리병도 향수병이랑 똑같아\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
@@ -2370,7 +2361,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"ceramic_bowl\"",
       "\"matchedBy\":\"금 간 머그컵은 도자기니까 불연성 봉투야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
@@ -2393,7 +2384,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"phone_charger_adapter\"",
       "\"matchedBy\":\"충전 어댑터는 케이블이랑 같이 버리면 돼\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"cable_wire\""
@@ -2420,7 +2411,7 @@
       "\"id\":\"solvent_contaminated_rag\"",
       "\"matchedBy\":\"시너 묻은 걸레는 일반쓰레기로 버리면 위험하지 않아\"",
       "\"status\":\"needs_source\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"cleaning_cloth\""
@@ -2468,7 +2459,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"nut_shell\"",
       "\"matchedBy\":\"호두껍질은 음식물쓰레기 아니지\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"mandarin_peel\""
@@ -2491,7 +2482,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"corn_cob_husk\"",
       "\"matchedBy\":\"옥수수대랑 옥수수껍질은 둘 다 일반쓰레기야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"mandarin_peel\""
@@ -2562,7 +2553,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"aluminum_foil\"",
       "\"matchedBy\":\"컵라면 뚜껑 은박지는 어디 버려\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"cup_noodle_container\""
@@ -2654,7 +2645,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"paper_core\"",
       "\"matchedBy\":\"쿠킹랩 심지는 종이류야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_wrap\""
@@ -2700,7 +2691,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"ceramic_bowl\"",
       "\"matchedBy\":\"깨진 접시는 신문지에 싸서 버리면 돼\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"broken_glass\""
@@ -2820,7 +2811,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"샴푸 리필팩 뚜껑만 플라스틱이야\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
@@ -2871,15 +2862,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"비닐봉지\"",
-      "\"regionalPolicy\"",
+      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"used_cooking_oil\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "itemGuideOnly"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -2906,16 +2896,15 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"비닐봉지\"",
-      "\"regionalPolicy\"",
+      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\"",
       "관리사무소"
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"blanket\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "itemGuideOnly"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -2939,7 +2928,7 @@
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
       "\"region\":\"서울 서초구\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -2966,8 +2955,8 @@
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
       "\"region\":\"서울 송파구\"",
-      "\"regionalPolicy\"",
-      "\"name\":\"서울 송파구\""
+      "\"regionNotes\"",
+      "서울 송파구 기준"
     ]
   },
   {
@@ -2992,8 +2981,8 @@
       "\"id\":\"battery\"",
       "\"matchedBy\":\"폐건전지\"",
       "\"region\":\"서울 서초구\"",
-      "\"regionalPolicy\"",
-      "\"name\":\"서울 서초구\""
+      "\"regionNotes\"",
+      "서울 서초구 기준"
     ]
   },
   {
@@ -3019,8 +3008,8 @@
       "\"id\":\"small_electronics\"",
       "\"matchedBy\":\"드라이기\"",
       "\"region\":\"서울 송파구\"",
-      "\"regionalPolicy\"",
-      "\"name\":\"서울 송파구\""
+      "\"regionNotes\"",
+      "서울 송파구 기준"
     ]
   },
   {
@@ -3039,7 +3028,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"butane_can\"",
       "\"matchedBy\":\"부탄가스\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -3059,7 +3048,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"led_lamp\"",
       "\"matchedBy\":\"LED 전구\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"fluorescent_lamp\""
@@ -3127,7 +3116,7 @@
       "\"id\":\"cat_litter\"",
       "\"matchedBy\":\"고양이 모래\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ]
   },
   {
@@ -3179,7 +3168,7 @@
       "\"id\":\"paper_cup\"",
       "\"matchedBy\":\"종이컵\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_cup\""
@@ -3202,7 +3191,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_wrap\"",
       "\"matchedBy\":\"랩\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -3226,16 +3215,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"냉동식품 포장 비닐\"",
-      "\"regionalPolicy\"",
-      "\"regionCheckLevel\":\"참고\"",
-      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\""
+      "\"regionNotes\"",
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "itemGuideOnly"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -3260,8 +3247,8 @@
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
       "\"region\":\"서울 서초구\"",
-      "\"regionalPolicy\"",
-      "\"name\":\"서울 서초구\""
+      "\"regionNotes\"",
+      "서울 서초구 기준"
     ]
   },
   {
@@ -3286,15 +3273,12 @@
       "\"id\":\"spray_can\"",
       "\"matchedBy\":\"스프레이캔\"",
       "\"status\":\"region_review_needed\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\"",
+      "\"regionCheckLevel\":\"필수\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"can\""
-    ],
-    "expectedRegionalPolicy": {
-      "level": "필수",
-      "guidance": "지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다."
-    }
+    ]
   },
   {
     "id": "vinyl_flooring_no_vinyl_bag_match",
@@ -3471,14 +3455,13 @@
     "expectedStructuredIncludes": [
       "\"id\":\"empty_medicine_bottle\"",
       "\"matchedBy\":\"빈 약통은 폐의약품 수거함이야 플라스틱이야\"",
-      "\"regionalPolicy\""
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"medicine\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -3522,7 +3505,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"small_electronics\"",
       "\"matchedBy\":\"공유기\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -3542,7 +3525,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"small_electronics\"",
       "\"matchedBy\":\"휴대용 선풍기\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -3561,7 +3544,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"chair\"",
       "\"region\":\"서울 서초구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 서초구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3580,7 +3563,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"mattress\"",
       "\"region\":\"서울 송파구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 송파구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3598,7 +3581,7 @@
     "expectedStructuredIncludes": [
       "\"id\":\"mirror\"",
       "\"region\":\"서울 송파구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 송파구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3622,14 +3605,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"empty_medicine_bottle\"",
       "\"matchedBy\":\"약병\"",
-      "\"region\":\"서울 강남구\""
+      "\"region\":\"서울 강남구\"",
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"medicine\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -3653,7 +3636,7 @@
       "\"id\":\"mirror\"",
       "\"matchedBy\":\"거울\"",
       "\"region\":\"서울 송파구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 송파구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3672,7 +3655,7 @@
       "\"id\":\"drying_rack\"",
       "\"matchedBy\":\"빨래건조대\"",
       "\"region\":\"서울 강남구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 강남구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3692,7 +3675,7 @@
       "\"id\":\"flower_pot\"",
       "\"matchedBy\":\"대형 화분\"",
       "\"region\":\"서울 서초구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 서초구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3716,8 +3699,7 @@
       "\"id\":\"drying_rack\"",
       "\"matchedBy\":\"빨래건조대\"",
       "\"region\":\"서울 마포구\"",
-      "\"bulkyWasteFees\"",
-      "\"feeKrw\":1000"
+      "- 서울 마포구 기준: 관할 동주민센터 방문 또는 마포구청 홈페이지에서 배출 신고와 수수료 납부를 진행합니다."
     ]
   },
   {
@@ -3741,8 +3723,7 @@
       "\"id\":\"flower_pot\"",
       "\"matchedBy\":\"화분\"",
       "\"region\":\"서울 마포구\"",
-      "\"bulkyWasteFees\"",
-      "\"feeKrw\":1500"
+      "- 서울 마포구 기준: 관할 동주민센터 방문 또는 마포구청 홈페이지에서 배출 신고와 수수료 납부를 진행합니다."
     ]
   },
   {
@@ -3762,7 +3743,7 @@
       "\"id\":\"toy\"",
       "\"matchedBy\":\"장난감\"",
       "\"region\":\"서울 송파구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 송파구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3782,7 +3763,7 @@
       "\"id\":\"stuffed_toy\"",
       "\"matchedBy\":\"대형 인형\"",
       "\"region\":\"서울 서초구\"",
-      "\"bulkyWasteFees\""
+      "- 서울 서초구 대형생활폐기물 수수료 후보:"
     ]
   },
   {
@@ -3801,8 +3782,7 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"서울 강남구\"",
       "\"item\":\"한약재 찌꺼기\"",
-      "\"regionalPolicy\"",
-      "음식물 제외 품목"
+      "\"checkList\""
     ]
   },
   {
@@ -3827,7 +3807,7 @@
       "\"id\":\"fish_bone\"",
       "\"matchedBy\":\"생선뼈\"",
       "\"region\":\"서울 서초구\"",
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -3847,8 +3827,7 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"서울 송파구\"",
       "\"item\":\"티백\"",
-      "\"itemGuide\"",
-      "1회용 티백"
+      "\"checkList\""
     ]
   },
   {
@@ -3866,7 +3845,8 @@
       "확인할 정보",
       "비닐류 배출 요일",
       "투명·반투명 봉투 또는 그물망 기준",
-      "오염 비닐 일반쓰레기 전환 기준"
+      "오염 비닐 일반쓰레기 전환 기준",
+      "강남구 단독주택·빌라·소규모 상가 기준"
     ],
     "expectedTextExcludes": [
       "오피스텔은 목요일",
@@ -3876,9 +3856,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"서울 강남구\"",
-      "\"item\":\"비닐류 포장재\"",
-      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"",
-      "강남구 단독주택·빌라·소규모 상가 기준"
+      "\"item\":\"비닐류 포장재\""
     ]
   },
   {
@@ -3896,7 +3874,8 @@
       "지정 수거처",
       "배출 가능 시간",
       "품목 판단 근거",
-      "거주 지자체 청소/자원순환/환경 부서"
+      "거주 지자체 청소/자원순환/환경 부서",
+      "판단 범위: 지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다."
     ],
     "expectedTextExcludes": [
       "강남구 기본 배출 기준",
@@ -3908,7 +3887,6 @@
     "expectedStructuredIncludes": [
       "\"region\":\"부산 해운대구\"",
       "\"item\":\"건전지\"",
-      "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\"",
       "\"https://www.분리배출.kr/front/region/region.do\""
     ],
     "expectedStructuredExcludes": [
@@ -3933,8 +3911,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedItem\":\"우산\"",
-      "\"needsRegionCheck\":true",
       "\"regionCheckLevel\":\"참고\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
     ]
   },
   {
@@ -3952,8 +3932,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedItem\":\"건전지\"",
-      "\"needsRegionCheck\":true",
       "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
     ]
   },
   {
@@ -3975,7 +3957,6 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedItem\":\"칫솔\"",
-      "\"needsRegionCheck\":false",
       "\"regionCheckLevel\":\"낮음\""
     ]
   },
@@ -4000,15 +3981,14 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"냉동식품 포장 비닐\"",
-      "\"regionalPolicy\"",
+      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "itemGuideOnly"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4029,7 +4009,6 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedItem\":\"택배상자\"",
-      "\"needsRegionCheck\":false",
       "\"regionCheckLevel\":\"낮음\"",
       "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""
     ]
@@ -4049,9 +4028,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"matchedItem\":\"스프레이캔\"",
-      "\"needsRegionCheck\":true",
       "\"regionCheckLevel\":\"필수\"",
       "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
     ]
   },
   {
@@ -4072,9 +4053,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"itemName\":\"비닐류 포장재\"",
-      "\"needsRegionCheck\":true",
-      "\"regionCheckLevel\":\"참고\"",
-      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\""
+      "\"regionCheckLevel\":\"참고\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
     ]
   },
   {
@@ -4092,9 +4074,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"itemName\":\"건전지\"",
-      "\"needsRegionCheck\":true",
-      "\"regionCheckLevel\":\"필수\"",
-      "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\""
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"regionCheckLevel\":\"낮음\""
     ]
   },
   {
@@ -4133,13 +4116,10 @@
       "\"regionCheckLevel\":\"필수\"",
       "\"input\":\"칫솔\"",
       "\"itemName\":\"칫솔\"",
-      "\"regionCheckLevel\":\"낮음\"",
-      "\"regionGuidance\":\"지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.\"",
-      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"",
-      "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""
+      "\"regionCheckLevel\":\"낮음\""
     ],
     "expectedStructuredExcludes": [
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -4176,12 +4156,10 @@
       "\"itemName\":\"비닐류 포장재\"",
       "\"input\":\"칫솔\"",
       "\"itemName\":\"칫솔\"",
-      "\"regionCheckLevel\":\"낮음\"",
-      "\"regionGuidance\":\"기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.\"",
-      "\"regionGuidance\":\"전국 공통 기준으로 바로 안내 가능합니다.\""
+      "\"regionCheckLevel\":\"낮음\""
     ],
     "expectedStructuredExcludes": [
-      "\"regionalPolicy\""
+      "\"regionNotes\""
     ]
   },
   {
@@ -4202,12 +4180,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"empty_medicine_bottle\"",
-      "\"regionalPolicy\"",
       "\"regionCheckLevel\":\"참고\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -4228,12 +4204,10 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toner_cartridge\"",
-      "\"regionalPolicy\"",
       "\"regionCheckLevel\":\"참고\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "참고",
-      "shape": "minimal"
+    "expectedRegionNotes": {
+      "present": false
     }
   },
   {
@@ -4344,6 +4318,211 @@
     ]
   },
   {
+    "id": "steps_typo_jamo_pet_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "패트병"
+    },
+    "expectedTextIncludes": [
+      "페트병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"itemName\":\"페트병\""
+    ]
+  },
+  {
+    "id": "steps_typo_jamo_styrofoam",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스치로폼"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"itemName\":\"스티로폼\""
+    ]
+  },
+  {
+    "id": "classify_typo_jamo_fluorescent_lamp",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "형광능"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"형광등\""
+    ]
+  },
+  {
+    "id": "classify_typo_jamo_battery",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "건전기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"건전지\""
+    ]
+  },
+  {
+    "id": "classify_weak_jamo_single_candidate_medicine_bag",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "약봉투"
+    },
+    "expectedTextIncludes": [
+      "혹시",
+      "찾으시나요"
+    ],
+    "expectedTextExcludes": [
+      "빈 약통",
+      "폐의약품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"ambiguous\":true",
+      "\"itemName\":\"비닐류 포장재\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"itemId\":\"medicine\""
+    ]
+  },
+  {
+    "id": "classify_typo_guard_medicine_bottle_exact",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "약병"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"빈 약통\""
+    ]
+  },
+  {
+    "id": "steps_fallback_silicone_spatula",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "실리콘 뒤집개 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "뒤집개"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"id\":\"turner\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"general_trash\""
+    ]
+  },
+  {
+    "id": "steps_fallback_water_filter_menu",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "정수기 필터는 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "정수기 필터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"id\":\"water_purifier_filter\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"general_trash\""
+    ]
+  },
+  {
+    "id": "classify_fallback_laptop_electronics",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "랩탑은 소형가전으로 버리면 돼?"
+    },
+    "expectedTextIncludes": [
+      "노트북"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"노트북\""
+    ]
+  },
+  {
+    "id": "steps_fallback_leather_wallet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가죽 지갑 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "지갑"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"id\":\"wallet\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"general_trash\""
+    ]
+  },
+  {
+    "id": "classify_fallback_cork_menu",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "와인 코르크 마개 버리기"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"quickRule\""
+    ]
+  },
+  {
+    "id": "classify_alias_melamine_sponge",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "멜라민 스펀지는 플라스틱으로 재활용 돼?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"수세미\""
+    ]
+  },
+  {
+    "id": "steps_alias_milk_carton_colloquial",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "우유곽 버리는 법"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"itemName\":\"우유팩\""
+    ]
+  },
+  {
+    "id": "classify_alias_battery_colloquial",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "밧데리 어떻게 버려?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"건전지\""
+    ]
+  },
+  {
+    "id": "steps_alias_pet_short_standalone",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "페트 어디에 버려?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"itemName\":\"페트병\""
+    ]
+  },
+  {
     "id": "standard_region_required_glass_food_container",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -4355,10 +4534,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"glass_food_container\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4373,10 +4553,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"earthen_pot\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4391,10 +4572,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wine_glass\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4409,10 +4591,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"instant_rice_container\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4427,10 +4610,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pot_glass_lid\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4445,10 +4629,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"broom\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4463,10 +4648,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"floor_mop\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4481,10 +4667,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"ironing_board\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4499,10 +4686,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bucket\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4517,10 +4705,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"towel\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4535,10 +4724,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bath_mat\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4553,10 +4743,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bathroom_scale\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4571,10 +4762,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electronic_thermometer\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4589,10 +4781,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toothbrush_sterilizer\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4607,10 +4800,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bidet\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4625,10 +4819,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toilet_seat_cover\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4643,10 +4838,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"handbag\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4661,10 +4857,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wrist_watch\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4679,10 +4876,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"travel_carrier\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4697,10 +4895,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"necktie\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4715,10 +4914,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"scarf\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4733,10 +4933,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"badminton_racket\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4751,10 +4952,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"swim_tube\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4769,10 +4971,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"stroller\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4787,10 +4990,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"car_seat\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4805,10 +5009,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"kids_kickboard\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4823,10 +5028,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"inline_skates\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4841,10 +5047,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wired_earphones\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4859,10 +5066,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wireless_earphones\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4877,10 +5085,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"headphones\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4895,10 +5104,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"remote_control\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4913,10 +5123,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"laptop\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4931,10 +5142,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"tablet\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4949,10 +5161,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"smartwatch\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4967,10 +5180,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"game_console\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -4985,10 +5199,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"speaker\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5003,10 +5218,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"calculator\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5021,10 +5237,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"camera\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5039,10 +5256,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"monitor\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5057,10 +5275,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"printer\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5075,10 +5294,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electric_heater\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5093,10 +5313,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electric_blanket\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5111,10 +5332,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"water_heating_mat\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5129,10 +5351,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"humidifier\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5147,10 +5370,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"dehumidifier\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5165,10 +5389,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electric_iron\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5183,10 +5408,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"vacuum_cleaner\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5201,10 +5427,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"rice_cooker\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5219,10 +5446,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"microwave\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5237,10 +5465,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"electric_kettle\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5255,10 +5484,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toaster\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5273,10 +5503,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"blender\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5291,10 +5522,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"coffee_machine\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5309,10 +5541,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"air_purifier\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5327,10 +5560,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"curtain\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5345,10 +5579,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"blind\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5363,10 +5598,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"carpet\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5381,10 +5617,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wall_clock\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5399,10 +5636,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"alarm_clock\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5417,10 +5655,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"floor_lamp\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5435,10 +5674,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"whiteboard\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5453,10 +5693,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"sofa\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5471,10 +5712,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"desk\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5489,10 +5731,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bookshelf\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5507,10 +5750,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"drawer_chest\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5525,10 +5769,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"wardrobe\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5543,10 +5788,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"dining_table\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5561,10 +5807,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"bed_frame\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5579,10 +5826,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cat_tower\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5597,10 +5845,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cat_scratcher\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5615,10 +5864,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"fish_tank\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5633,10 +5883,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"tent\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5651,10 +5902,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"picnic_mat\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5669,10 +5921,11 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cooler_box\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
   },
   {
@@ -5687,10 +5940,54 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"christmas_tree\"",
-      "\"status\":\"standard_import\""
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
     ],
-    "expectedRegionalPolicy": {
-      "level": "필수"
+    "expectedRegionNotes": {
+      "present": true
     }
+  },
+  {
+    "id": "steps_fallback_toilet_brush",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기솔 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "재질, 오염 여부, 크기, 지역 정보"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "steps_fallback_leather_belt",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가죽 벨트 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "재질로 추정한 일반 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "classify_fallback_pet_food_bag",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "사료 포대 버리기"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
   }
 ]

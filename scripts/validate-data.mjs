@@ -6,6 +6,7 @@ const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.m
 const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.meta.url);
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
+const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -14,6 +15,7 @@ const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8
 const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
+const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
@@ -39,8 +41,6 @@ const mcpToolNames = new Set([
   "make_cleanup_plan",
   "get_region_disposal_info",
 ]);
-const expectedRegionalPolicyLevels = new Set(["필수", "참고", "낮음"]);
-const expectedRegionalPolicyShapes = new Set(["minimal", "itemGuideOnly"]);
 const regionCheckLevelToExpectedPolicyLevel = {
   required: "필수",
   advisory: "참고",
@@ -199,6 +199,10 @@ if (!Array.isArray(mcpAnswerCases)) {
 
 if (!Array.isArray(questionBacklog)) {
   throw new Error("src/data/question-backlog.json must contain an array");
+}
+
+if (!Array.isArray(materialGuidelines) || materialGuidelines.length === 0) {
+  throw new Error("src/data/material-guidelines.json must contain a non-empty array");
 }
 
 const reviewCounts = countBy(items, (item) => item?.review?.status);
@@ -537,39 +541,24 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     }
   }
 
-  if (testCase.expectedRegionalPolicy !== undefined) {
-    if (
-      !testCase.expectedRegionalPolicy ||
-      typeof testCase.expectedRegionalPolicy !== "object" ||
-      Array.isArray(testCase.expectedRegionalPolicy)
-    ) {
-      errors.push(`${prefix}.expectedRegionalPolicy must be an object when present`);
+  if (testCase.expectedRegionNotes !== undefined) {
+    const expectation = testCase.expectedRegionNotes;
+    if (!expectation || typeof expectation !== "object" || Array.isArray(expectation)) {
+      errors.push(`${prefix}.expectedRegionNotes must be an object when present`);
     } else {
-      const { level, shape, guidance } = testCase.expectedRegionalPolicy;
-      if (level !== undefined && !expectedRegionalPolicyLevels.has(level)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.level must be one of ${Array.from(expectedRegionalPolicyLevels).join(", ")}`);
+      if (typeof expectation.present !== "boolean") {
+        errors.push(`${prefix}.expectedRegionNotes.present must be a boolean`);
       }
-      if (shape !== undefined && !expectedRegionalPolicyShapes.has(shape)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape must be one of ${Array.from(expectedRegionalPolicyShapes).join(", ")}`);
+      if (expectation.includes !== undefined) {
+        if (!Array.isArray(expectation.includes) || expectation.includes.some((value) => !isNonEmptyString(value))) {
+          errors.push(`${prefix}.expectedRegionNotes.includes must be an array of non-empty strings when present`);
+        }
+        if (expectation.present === false) {
+          errors.push(`${prefix}.expectedRegionNotes.includes cannot be combined with present=false`);
+        }
       }
-      if (guidance !== undefined && !isNonEmptyString(guidance)) {
-        errors.push(`${prefix}.expectedRegionalPolicy.guidance must be a non-empty string when present`);
-      }
-      if (level === undefined && shape === undefined && guidance === undefined) {
-        errors.push(`${prefix}.expectedRegionalPolicy must include level, shape, or guidance`);
-      }
-      if (shape !== undefined && level === undefined) {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape must be paired with level`);
-      }
-      if (shape === "itemGuideOnly" && level !== "참고") {
-        errors.push(`${prefix}.expectedRegionalPolicy.shape=itemGuideOnly is only valid for advisory regional policy cases`);
-      }
-      if (
-        testCase.tool === "get_disposal_steps" &&
-        level === "참고" &&
-        !(testCase.expectedTextExcludes ?? []).some((entry) => entry.includes("공식 출처"))
-      ) {
-        errors.push(`${prefix}.expectedTextExcludes must exclude 공식 출처 for advisory get_disposal_steps cases`);
+      if (testCase.tool !== "get_disposal_steps") {
+        errors.push(`${prefix}.expectedRegionNotes is only valid for get_disposal_steps cases`);
       }
     }
   }
@@ -579,7 +568,7 @@ for (const [index, testCase] of mcpAnswerCases.entries()) {
     "expectedTextExcludes",
     "expectedStructuredIncludes",
     "expectedStructuredExcludes",
-  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionalPolicy !== undefined;
+  ].some((field) => Array.isArray(testCase[field]) && testCase[field].length > 0) || testCase.expectedRegionNotes !== undefined;
   if (!hasExpectation) {
     errors.push(`${prefix} must include at least one expectation`);
   }
@@ -591,17 +580,60 @@ for (const item of items) {
 
   const expectedLevel = regionCheckLevelToExpectedPolicyLevel[regionCheckLevel];
   const expectedItemId = `"id":"${item.id}"`;
+  const expectedLevelAssertion = `"regionCheckLevel":"${expectedLevel}"`;
   const hasAnswerCoverage = mcpAnswerCases.some(
     (testCase) =>
-      testCase.expectedRegionalPolicy?.level === expectedLevel &&
       Array.isArray(testCase.expectedStructuredIncludes) &&
-      testCase.expectedStructuredIncludes.includes(expectedItemId),
+      testCase.expectedStructuredIncludes.includes(expectedItemId) &&
+      testCase.expectedStructuredIncludes.includes(expectedLevelAssertion),
   );
 
   if (!hasAnswerCoverage) {
     errors.push(
-      `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case with expectedRegionalPolicy.level=${expectedLevel}`,
+      `item(${item.id}).regionPolicy.regionCheckLevel must have an MCP answer case asserting ${expectedLevelAssertion}`,
     );
+  }
+}
+
+const materialGuidelineIds = new Set();
+for (const [index, guideline] of materialGuidelines.entries()) {
+  const prefix = `materialGuideline[${index}]${guideline?.id ? `(${guideline.id})` : ""}`;
+
+  if (!isNonEmptyString(guideline.id)) {
+    errors.push(`${prefix}.id must be a non-empty string`);
+  } else {
+    if (!/^[a-z0-9_]+$/.test(guideline.id)) errors.push(`${prefix}.id must use lowercase snake_case`);
+    if (materialGuidelineIds.has(guideline.id)) errors.push(`${prefix}.id is duplicated`);
+    materialGuidelineIds.add(guideline.id);
+  }
+
+  for (const field of ["label", "quickRule", "whenGeneral"]) {
+    if (!isNonEmptyString(guideline[field])) errors.push(`${prefix}.${field} must be a non-empty string`);
+  }
+
+  if (!Array.isArray(guideline.steps) || guideline.steps.length < 2 || guideline.steps.length > 3) {
+    errors.push(`${prefix}.steps must contain 2 to 3 entries`);
+  } else {
+    for (const [stepIndex, step] of guideline.steps.entries()) {
+      if (!isNonEmptyString(step)) errors.push(`${prefix}.steps[${stepIndex}] must be a non-empty string`);
+    }
+  }
+
+  if (!Array.isArray(guideline.cautions) || guideline.cautions.length < 1 || guideline.cautions.length > 2) {
+    errors.push(`${prefix}.cautions must contain 1 to 2 entries`);
+  } else {
+    for (const [cautionIndex, caution] of guideline.cautions.entries()) {
+      if (!isNonEmptyString(caution)) errors.push(`${prefix}.cautions[${cautionIndex}] must be a non-empty string`);
+    }
+  }
+
+  if (!guideline.source || typeof guideline.source !== "object") {
+    errors.push(`${prefix}.source is required`);
+  } else {
+    if (!isNonEmptyString(guideline.source.title)) errors.push(`${prefix}.source.title must be a non-empty string`);
+    if (guideline.source.url !== undefined && !/^https?:\/\//.test(guideline.source.url)) {
+      errors.push(`${prefix}.source.url must start with http:// or https://`);
+    }
   }
 }
 

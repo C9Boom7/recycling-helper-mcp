@@ -22,6 +22,9 @@
 
 | Date | Decision | Follow-up |
 | --- | --- | --- |
+| 2026-08-14 | `노트북/랩탑`은 `small_electronics` 흡수가 아니라 별도 품목으로 둔다. | Phase 2에서 `laptop` 품목(소형가전 전용수거함 기준)과 평가/answer 케이스로 반영 완료. 기존 "랩탑" not_found smoke는 정상 매칭 기대로 갱신했다. |
+| 2026-08-14 | `정수기 필터`를 신규 품목으로 추가한다. | Phase 2에서 연수필터 종량제 기준을 근거로 `water_purifier_filter` 추가 완료. 백로그 auto_b6aece0913을 `covered`로 닫았다. |
+| 2026-08-14 | `햇반/즉석밥 용기`는 별칭 흡수가 아니라 별도 품목으로 둔다. | Phase 2에서 품목사전 근거(niIdx=98)로 `instant_rice_container` 추가 완료. OTHER 재질이라 지역 확인 필요로 표시했다. |
 | 2026-07-02 | 폐의약품 포장재는 약 자체와 다르므로 `빈 약통`, `알약 포장재`를 별도 품목으로 모델링한다. | Source Gap 트랙에서 공식 근거 기반 데이터 승격 후 Answer Quality 트랙에서 smoke/backlog 동기화 |
 | 2026-07-02 | `공유기`, `휴대용 선풍기`는 개별 품목보다 `small_electronics` 계열 별칭/조건으로 흡수한다. | Source Gap 트랙에서 기존 소형가전 품목 별칭과 근거 보강 후 Answer Quality 트랙에서 회귀 케이스 동기화 |
 | 2026-07-02 | 서초/송파 대형폐기물 수수료는 전체 표가 아니라 Top 품목 일부부터 구조화하고 이후 범위를 넓힌다. | Region Data 트랙에서 Top 품목만 우선 수집 |

@@ -942,12 +942,6 @@
     "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
   },
   {
-    "query": "멜라민 스펀지는 어떻게 버려?",
-    "expectedItemId": "melamine_sponge",
-    "expectedDisposalType": "general",
-    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
-  },
-  {
     "query": "지퍼백은 어떻게 버려?",
     "expectedItemId": "zipper_bag",
     "expectedDisposalType": "recycle",

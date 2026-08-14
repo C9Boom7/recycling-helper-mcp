@@ -275,7 +275,9 @@
       "종이팩",
       "팩우유",
       "주스팩",
-      "음료팩"
+      "음료팩",
+      "우유곽",
+      "우유갑"
     ],
     "category": "paper_pack",
     "disposalType": "recycle",
@@ -428,7 +430,8 @@
       "생수병",
       "투명 페트병",
       "PET병",
-      "음료수병"
+      "음료수병",
+      "페트"
     ],
     "category": "plastic",
     "disposalType": "recycle",
@@ -2744,7 +2747,8 @@
       "폐건전지",
       "AA 건전지",
       "AAA 건전지",
-      "리튬 건전지"
+      "리튬 건전지",
+      "밧데리"
     ],
     "category": "hazardous",
     "disposalType": "special_collection",
@@ -7146,7 +7150,10 @@
       "스폰지 수세미",
       "아크릴 수세미",
       "부직포 수세미",
-      "철수세미"
+      "철수세미",
+      "멜라민 스펀지",
+      "매직 스펀지",
+      "매직블럭"
     ],
     "category": "contaminated_mixed_household",
     "disposalType": "general",
@@ -11503,54 +11510,6 @@
       "lastReviewedAt": "2026-08-14",
       "notes": [
         "Phase 2 표준 티어 벌크 확장으로 추가."
-      ]
-    }
-  },
-  {
-    "id": "melamine_sponge",
-    "name": "멜라민 스펀지",
-    "aliases": [
-      "매직블럭",
-      "매직 스펀지",
-      "매직블록",
-      "멜라민 폼 스펀지"
-    ],
-    "category": "thermoset_resin",
-    "disposalType": "general",
-    "conditions": [],
-    "summary": "멜라민 스펀지는 재활용이 안 되는 수지 발포 제품이라 종량제봉투로 배출합니다.",
-    "steps": [
-      "물기를 짜서 부피를 줄입니다.",
-      "종량제봉투에 담아 배출합니다."
-    ],
-    "cautions": [
-      "쓰다 남은 조각도 모두 일반쓰레기이며, 플라스틱 수거함에 넣지 않습니다."
-    ],
-    "confidence": "medium",
-    "needsRegionCheck": false,
-    "regionPolicy": {
-      "scope": "national_default",
-      "needsRegionCheck": false
-    },
-    "sourceRefs": [
-      "생활폐기물 분리배출 누리집 품목사전 - 수세미(일반폐기물) 및 멜라민 그릇(일반폐기물) 준용"
-    ],
-    "sources": [
-      {
-        "title": "생활폐기물 분리배출 누리집 품목사전 - 수세미",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionaryView.do?niIdx=485",
-        "sourceType": "official_guidance",
-        "checkedAt": "2026-08-14",
-        "basis": "스펀지 검색 시 전용 항목은 없고, 유사 품목인 수세미가 일반폐기물(종량제)로 안내됨. 멜라민 재질 역시 품목사전에서 일반폐기물(멜라민 그릇)로 분류되어 동일하게 판단."
-      }
-    ],
-    "review": {
-      "status": "standard_import",
-      "reviewer": "phase-2-coverage",
-      "lastReviewedAt": "2026-08-14",
-      "notes": [
-        "Phase 2 표준 티어 벌크 확장으로 추가.",
-        "전용 사전 항목이 없어 유사 품목(수세미·멜라민 그릇) 기준으로 medium 처리."
       ]
     }
   },

@@ -34,7 +34,7 @@
 - `query_contains_name` (88~99점): 질의 안에 품목명 전체가 포함
 - `short_alias_standalone` (78점~): 2글자 이하 별칭이 독립된 단어로 등장
 - `generic_fragment` (82점~): 품목명이 짧은 질의어를 단순 포함 — 동점 후보가 있으면 확정하지 않음
-- `fuzzy_overlap` (~30점): 글자 유사도 기반 fallback
+- `fuzzy_jamo` (40~70점): 한글 자모 분해 후 레벤슈타인 유사도로 오타 허용 ("패트병"→"페트병"). 유사도 0.85 이상 단일 후보만 확정하고, 그 미만은 후보로만 제시
 
 `resolveWasteItem()`은 이 점수를 `match` / `ambiguous` / `not_found` 세 가지 결과로 정리합니다. "컵", "통", "병"처럼 여러 품목에 동시에 해당하는 포괄어는 `ambiguous`로 처리해 임의로 하나를 확정하지 않고, 후보 목록과 함께 재질·용도를 되묻습니다.
 
@@ -109,9 +109,9 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 정확도 개선은 품목 데이터와 대표 질문 평가셋을 함께 관리합니다.
 
-- 품목 데이터: `src/data/waste-items.json` (273개)
-- 대표 질문 평가셋: `src/data/evaluation-cases.json` (273개)
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (271개)
+- 품목 데이터: `src/data/waste-items.json` (272개)
+- 대표 질문 평가셋: `src/data/evaluation-cases.json` (272개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (289개)
 - 지역 정책 데이터: `src/data/region-policies.json` (5개 지역)
 - 지역 평가셋: `src/data/region-evaluation-cases.json` (35개)
 - 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (강남·서초·송파·마포 4개 지역)
@@ -126,7 +126,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 지역 정책 비교: [docs/region-policy-comparison.md](docs/region-policy-comparison.md)
 - 로컬 MCP 검증 흐름: [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)
 
-품목 리뷰 상태: `verified` 39 / `region_review_needed` 84 / `needs_source` 7 / `standard_import` 143. 질문 백로그: `covered` 110 / `wont_fix` 1 / `todo` 0.
+품목 리뷰 상태: `verified` 39 / `region_review_needed` 84 / `needs_source` 7 / `standard_import` 142. 질문 백로그: `covered` 110 / `wont_fix` 1 / `todo` 0.
 
 검증:
 

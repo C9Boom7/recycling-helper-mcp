@@ -67,24 +67,29 @@
 
 가이드: "result의 크기는 최소한으로", "API 응답을 그대로 쓰지 말 것". 현재 `get_disposal_steps`는 품목 객체 전체를, `classify_waste_item`은 sources 배열 전체를 structuredContent에 싣는다.
 
-툴별 허용 필드 (이 외 필드 제거):
+툴별 허용 필드 (이 외 필드 제거, smoke가 키 화이트리스트를 강제):
 
 - `classify_waste_item`: `found, matchedItem, matchedBy, disposalGroup, disposalType, summary, confidence, regionCheckLevel, regionGuidance, primarySource{title,url}`
-- `get_disposal_steps`: `found, itemName, disposalGroup, summary, steps, cautions, regionCheckLevel, regionNotes(지역 안내 줄 배열, 있을 때만), sources(최대 2개 {title,url})`
+- `get_disposal_steps`: `found, id, itemName, matchedBy, disposalGroup, summary, steps, cautions, review{status}, region(입력 시), regionCheckLevel, regionNotes(지역 안내 줄 배열, 있을 때만), sources(최대 2개 {title,url})`
 - `check_confusing_item`: matches 배열 항목당 `itemName, summary, confidence, regionCheckLevel` + 첫 caution 1개
-- `make_cleanup_plan`: items 항목당 `input, found, group, itemName?, summary, regionCheckLevel?` — `groups` 중복 맵 제거 (text에 이미 그룹핑이 있음)
-- `get_region_disposal_info`: `region, matchedRegion, item, defaultSummary, checkList, officialSources(최대 3개)` — `regionalPolicy` 전체 객체 제거
+- `make_cleanup_plan`: items 항목당 `input, found, group, itemName?, summary, regionCheckLevel?, candidates?` — `groups` 중복 맵 제거 (text에 이미 그룹핑이 있음)
+- `get_region_disposal_info`: `region, matchedRegion, item, ambiguousCandidates?, defaultSummary, checkList, officialSources(최대 3개 {title,url}, 미매칭 지역도 동일 형태)` — `regionalPolicy` 전체 객체 제거
 - ambiguous/not_found 응답: 현행 유지 (이미 작음). `candidateDetails`의 `score`는 제거.
 
-text 출력(마크다운)은 현행 유지 — 이미 정제된 형식이고 가이드 권장에 부합한다.
-수용 기준: `pnpm smoke:mcp` 통과 (mcp-answer-cases의 structured 기대값은 이 스펙에 맞춰 갱신), 대표 응답의 JSON 크기가 기존 대비 절반 이하.
+원안 대비 조정 (코드리뷰 반영):
+- `get_disposal_steps`의 `id`/`matchedBy`/`review.status`/`region`은 유지한다. 회귀 스위트 170여 케이스가 매칭 정체성을 이 필드로 고정하고, 호출 로그(R6)의 `matchedId`와 조인하는 축이기 때문이다. 무게가 컸던 것은 `regionalPolicy` 블롭이며, 이는 `regionNotes` 줄 배열로 대체됐다 (text 경로와 동일한 게이팅: 품목별 지역 가이드가 있거나 지역 확인이 필수일 때만 포함).
+- `score`는 모든 툴의 structuredContent에서 제거하고 호출 로그로만 남긴다.
+
+text 출력(마크다운)은 현행 유지 — 이미 정제된 형식이고 가이드 권장에 부합한다. 단 `make_cleanup_plan`의 품목별 근거 줄은 제목만 사용한다 (basis/URL 포함 금지 — 목록형 출력 팽창 방지).
+수용 기준: `pnpm smoke:mcp` 통과 + smoke의 툴별 structuredContent 키 화이트리스트 단언 통과, 지역 조합 대표 응답의 structured 크기가 기존 대비 절반 이하.
 
 ### R6. 툴 호출 로깅
 
 QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다 (k8s/PlayMCP 로그로 수집됨).
 
-- 필드: `ts, tool, input(itemName/region/items), status(match|ambiguous|not_found|ok), matchedId, score, ms`
-- 구현: 툴 핸들러를 감싸는 `withCallLog(name, handler)` 헬퍼 하나로.
+- 필드: `ts, tool, input(itemName/region/items), status(match|partial|ambiguous|not_found|ok|error), matchedId, matchedRegion, score, matched/total(cleanup plan), ms`
+- `matchedId`는 항상 품목 데이터 id로 통일한다 (표시 이름·지역명 금지 — 툴 간 로그 조인용). 매칭된 지역은 `matchedRegion`에 별도 기록.
+- 구현: 툴 핸들러를 감싸는 `withCallLog(name, handler)` 헬퍼 하나로. 핸들러가 `_log` 메타데이터로 식별자를 넘기고 withCallLog가 클라이언트 응답에서 제거한다.
 - 개인정보 유의: 입력은 품목명/지역명뿐이므로 문제없으나, 그 이상을 로깅하지 않는다.
 
 ## 검증 및 완료 기준 (DoD)
@@ -107,6 +112,7 @@ QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 �
 - [x] R2 CORS origins — preview-chatgpt.kakao.com, tools.kakao.com 추가, smoke origin 루프 확장
 - [x] R3 descriptions + SERVER_INSTRUCTIONS — PRD 초안 그대로 적용
 - [x] R4 단일 소스 툴 정의 — `TOOL_DEFS`에서 SSE/JSON-only 양쪽 생성 (zod-to-json-schema, SDK와 동일 옵션), smoke에 두 경로 byte-identical 검증 추가. SDK가 execution taskSupport "forbidden"을 기본 부여하므로 COMPAT에도 미러링
-- [x] R5 structuredContent 다이어트 — get_disposal_steps 전체 품목 덤프 제거(대표 응답 512B, 기존 대비 1/4 이하). 기존 196 케이스 중 케이스 수정 0건 (cleanup plan의 품목별 regionGuidance는 이전 세션의 의도된 회귀 케이스라 필드 유지로 대응)
-- [x] R6 호출 로깅 — withCallLog, stdout JSONL {ts, tool, input, status, matchedId, score, ms}
+- [x] R5 structuredContent 다이어트 — 1차: get_disposal_steps 전체 품목 덤프 제거. 2차(코드리뷰 반영): `regionalPolicy` 블롭을 `regionNotes` 줄 배열로 대체하고 스펙 필수 필드 `steps`/`cautions` 추가, smoke에 툴별 키 화이트리스트 강제 추가. 지역 조합 대표 응답 structured 2,964B→953B(steps), 3,200B→630B(region info). 케이스 196건 기대값을 새 계약으로 이행 (매칭 정체성 단언은 `id`/`matchedBy`로 유지)
+- [x] R6 호출 로깅 — withCallLog + 핸들러 `_log` 메타. stdout JSONL {ts, tool, input, status, matchedId(항상 품목 id), matchedRegion, score, matched/total, ms}
+- [x] 코드리뷰 후속 — JSON-only 경로 tools/call 지원(406 해소), host 검증 /mcp 한정(/health 프로브 403 해소), SDK `toJsonSchemaCompat` 재사용(zod-to-json-schema 직접 의존 제거), 툴 정의·핸들러 단일 배열 통합, smoke의 무동작 fetch Host 헤더 제거
 - [x] DoD — pnpm local:test 통과 (196 answer cases), curl로 임의 host 403/와일드카드 200 확인, 로컬 main 머지
