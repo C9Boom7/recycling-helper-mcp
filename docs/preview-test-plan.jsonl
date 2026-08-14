@@ -1,3 +1,4 @@
+{"_note":"실행 규칙: 한 번에 한 발화씩 보낸다. 여러 개를 한 메시지에 붙이면 ChatGPT가 종합 답변으로 처리해 툴 호출이 줄어든다(J1~J4에서 확인). 카테고리가 바뀌면 새 대화 시작으로 초기화한다. 위젯이 나오는 get_disposal_steps 확정 매칭만 호출을 확정할 수 있고, 나머지 텍스트 응답은 답변에 데이터 고유 표현이 있는지로 간접 판정한다."}
 {"id":"D1","category":"직접","utterance":"기름 묻은 피자박스 어떻게 버려?","expectTool":"get_disposal_steps","expectWidget":true,"note":"오염 분리 배출 안내"}
 {"id":"D2","category":"직접","utterance":"깨진 유리컵 버리는 법 알려줘","expectTool":"get_disposal_steps","expectWidget":true,"note":"부상 경고 caution이 앞에 와야 함"}
 {"id":"D3","category":"직접","utterance":"폐건전지 어디다 버려?","expectTool":"get_disposal_steps","expectWidget":true,"note":"전용 수거함 안내"}
