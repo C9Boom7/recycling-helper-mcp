@@ -233,25 +233,66 @@ function parseAmount(token) {
   return null;
 }
 
-/** 표 머리글 바로 아래 열 이름 줄. 지자체마다 어휘가 다르다. */
+/**
+ * 열 이름 줄의 어휘. 지자체마다 다르다 — `종류`(금천·강동), `유형`(영등포),
+ * `1차분류`~`4차분류`(도봉)는 R1 초안에 없어 그 지역 열 인식이 통째로 죽었다.
+ * `별`은 붙기도 떼기도 해서(`유형`/`유형별`, `품목`/`품목별`) 선택으로 둔다.
+ */
 const COLUMN_WORDS =
-  /^(분\s*류|대분류|소분류|종\s*별|유형\s*별|품\s*목|품\s*명|품목\s*별|규\s*격|가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비|비\s*고|변경\s*사항|연\s*번|순\s*번|번\s*호)$/;
+  /^(분\s*류|[0-9]\s*차\s*분\s*류|대분류|소분류|종\s*별|종\s*류|유\s*형(\s*별)?|품\s*목(\s*별)?|품\s*명|규\s*격|가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비|비\s*고|변경\s*사항|연\s*번|순\s*번|번\s*호)$/;
 /** 금액 칸 뒤에 더 붙는 열. 있으면 "금액이 행의 마지막"이라는 전제가 깨진다. */
 const TRAILING_COLUMN = /^(비\s*고|변경\s*사항)$/;
 const FEE_COLUMN = /^(가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비)$/;
 /** 행 번호 열. 선언돼 있으면 행 머리의 일련번호를 금액과 구분해야 한다. */
 const SEQUENCE_COLUMN = /^(연번|순번|번호)$/;
 
+/** 단위 표기. 머리글과 열 이름 줄 사이에도, 열 이름 줄 안에도 낀다. */
+const UNIT_NOTE = /^\(\s*(단위\s*[:：][^)]*|원)\s*\)$/;
+/** 머리글 아래 따로 한 줄로 붙는 조문 참조. `(제29조제1항제2호 관련)` */
+const ARTICLE_REF = /^\(.*관련\s*\)$/;
+/** 머리글에서 열 이름 줄까지 훑을 최대 줄 수. 실측 최대는 광진구 3줄이다. */
+const MAX_HEADER_GAP = 6;
+
+/** 머리글과 열 이름 줄 사이에 끼는 줄인가. */
+function isHeaderNoise(line) {
+  if (UNIT_NOTE.test(line) || ARTICLE_REF.test(line)) return true;
+  // 표제를 한 번 더 적어놓은 줄. 광진구는 그대로 반복하고, 강동구는
+  // `1. 대형폐기물 수집·운반수수료 (단위 : 원)`처럼 번호와 단위를 달고 나온다.
+  return TABLE_SUBJECT.test(line) && TABLE_FEE_WORD.test(line);
+}
+
 /**
  * 표 머리글 다음에 오는 열 이름 줄을 읽는다. 열 구성이 지자체마다 달라
  * 파서를 고를 근거가 되고, 금액 뒤에 열이 더 있으면 단순 규칙을 쓸 수 없다.
+ *
+ * 머리글과 열 이름 줄이 맞붙어 있는 곳은 오히려 드물다(10곳 중 도봉구뿐).
+ * 조문 참조·단위 표기·표제 재기술이 사이에 끼고 몇 줄이 끼는지도 제각각이라,
+ * 맞붙어 있다고 보고 읽던 R1 초안은 10곳 중 7곳에서 빈 배열을 냈다. 그러면
+ * parseFeeRows의 안전장치 둘(declaresTrailing·hasSequence)이 통째로 죽는다.
  */
 function readColumns(lines, startIndex) {
-  const columns = [];
+  // 잡음만 건너뛴다. 잡음도 열 이름도 아닌 줄을 만나면 포기하고 원래 자리를
+  // 돌려준다 — 계속 훑어 내려가면 열 이름 줄이 없는 표에서 데이터 셀을 열로
+  // 주워 담아, 열 인식 실패보다 나쁜 가짜 열 구성을 만든다.
   let i = startIndex + 1;
-  for (; i < lines.length && columns.length < 10; i += 1) {
-    if (!COLUMN_WORDS.test(lines[i])) break;
-    columns.push(lines[i].replace(/\s+/g, ""));
+  for (; i < lines.length && i - startIndex <= MAX_HEADER_GAP; i += 1) {
+    if (COLUMN_WORDS.test(lines[i])) break;
+    if (!isHeaderNoise(lines[i])) return { columns: [], nextIndex: startIndex + 1 };
+  }
+  if (i >= lines.length || !COLUMN_WORDS.test(lines[i])) return { columns: [], nextIndex: startIndex + 1 };
+
+  const columns = [];
+  // 좌우 2단 조판은 같은 열 구성이 두 번 나온다(금천·강동 8열). 상한은 그 위.
+  for (; i < lines.length && columns.length < 12; i += 1) {
+    if (COLUMN_WORDS.test(lines[i])) {
+      columns.push(lines[i].replace(/\s+/g, ""));
+      continue;
+    }
+    // 단위 표기가 열 이름 줄 한가운데 끼기도 한다 — 은평구는 `부과금액`과
+    // `비고` 사이에, 도봉구는 `수수료` 다음에 온다. 여기서 멈추면 뒤에 오는
+    // 열을 통째로 놓쳐, 하필 꼬리 열 감지가 봐야 할 `비고`가 사라진다.
+    if (UNIT_NOTE.test(lines[i])) continue;
+    break;
   }
   return { columns, nextIndex: i };
 }
@@ -283,11 +324,12 @@ function parseFeeRows(lines, startIndex) {
   for (let i = nextIndex; i < lines.length; i += 1) {
     const token = lines[i];
 
-    // 연번 열이 있는 표(현재 열 인식이 되는 곳 중에는 종로구)에서는 행 머리의
-    // 일련번호가 금액 자리로 끼어든다. parseAmount는 콤마 없는 맨숫자도 500
-    // 이상이면 금액으로 보므로, 500행을 넘는 표에서는 501·502…가 금액으로
-    // 소비돼 가짜 행이 생기고 그 뒤 행의 품명·규격이 한 칸씩 밀린다.
-    // 지금 대상 10곳은 연번이 500을 넘지 않아 드러나지 않았을 뿐이다.
+    // 연번 열이 있는 표(종로·강북·은평·영등포)에서는 행 머리의 일련번호가
+    // 금액 자리로 끼어든다. parseAmount는 콤마 없는 맨숫자도 500 이상이면
+    // 금액으로 보므로, 500행을 넘는 표에서는 501·502…가 금액으로 소비돼
+    // 가짜 행이 생기고 그 뒤 행의 품명·규격이 한 칸씩 밀린다. 이 넷은 연번이
+    // 324를 넘지 않아 아직 드러나지 않았을 뿐이다(가장 큰 도봉구 713행은
+    // 연번 열이 없어 해당 없다).
     //
     // 순번 카운터로 맞춰보는 방법은 병합 셀 하나에 어긋나면 복구되지 않는다.
     // 위치를 쓴다 — 연번은 행의 첫 칸이라 직전 금액에서 pending을 비운 직후에만
