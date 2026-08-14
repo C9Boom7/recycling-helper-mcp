@@ -1630,5 +1630,281 @@
     "expectedItemId": "airtight_container",
     "expectedDisposalType": "recycle",
     "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "냉장고 어떻게 버려?",
+    "expectedItemId": "refrigerator",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. 무상방문수거가 1순위 안내인지 확인합니다."
+  },
+  {
+    "query": "세탁기 버리는 법 알려줘",
+    "expectedItemId": "washing_machine",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장."
+  },
+  {
+    "query": "에어컨 버리려면 어떻게 해?",
+    "expectedItemId": "air_conditioner",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. R1 이전에는 리모컨으로 오매칭되던 질의입니다."
+  },
+  {
+    "query": "텔레비전 버리는 방법",
+    "expectedItemId": "television",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. TV 별칭도 같은 품목으로 확정되어야 합니다."
+  },
+  {
+    "query": "데스크탑 컴퓨터 어떻게 버려?",
+    "expectedItemId": "desktop_computer",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. 포괄어 '컴퓨터'는 노트북·모니터와 답이 갈려 되묻는 것이 정답이라, 특정된 표현으로 케이스를 잡는다."
+  },
+  {
+    "query": "신발장 어떻게 버려?",
+    "expectedItemId": "shoe_rack",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "장식장 어떻게 버려?",
+    "expectedItemId": "display_cabinet",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "문갑 어떻게 버려?",
+    "expectedItemId": "low_chest",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "찬장 어떻게 버려?",
+    "expectedItemId": "cupboard",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "탁자 어떻게 버려?",
+    "expectedItemId": "side_table",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "병풍 어떻게 버려?",
+    "expectedItemId": "folding_screen",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "파티션 어떻게 버려?",
+    "expectedItemId": "partition",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "캐비닛 어떻게 버려?",
+    "expectedItemId": "filing_cabinet",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "싱크대 어떻게 버려?",
+    "expectedItemId": "sink_unit",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "욕조 어떻게 버려?",
+    "expectedItemId": "bathtub",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "변기 어떻게 버려?",
+    "expectedItemId": "toilet_bowl",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "세면대 어떻게 버려?",
+    "expectedItemId": "washbasin",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "문짝 어떻게 버려?",
+    "expectedItemId": "door_panel",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "물탱크 어떻게 버려?",
+    "expectedItemId": "water_tank",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 2)의 대표 질의입니다."
+  },
+  {
+    "query": "정수기 어떻게 버려?",
+    "expectedItemId": "water_purifier",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "운동기구 어떻게 버려?",
+    "expectedItemId": "exercise_machine",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "안마의자 어떻게 버려?",
+    "expectedItemId": "massage_chair",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "선풍기 어떻게 버려?",
+    "expectedItemId": "electric_fan",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "오디오 어떻게 버려?",
+    "expectedItemId": "audio_system",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "식기세척기 어떻게 버려?",
+    "expectedItemId": "dishwasher",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "식기건조기 어떻게 버려?",
+    "expectedItemId": "dish_dryer",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "탈수기 어떻게 버려?",
+    "expectedItemId": "spin_dryer",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "재봉틀 어떻게 버려?",
+    "expectedItemId": "sewing_machine",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "조명기구 어떻게 버려?",
+    "expectedItemId": "lighting_fixture",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "가스오븐레인지 어떻게 버려?",
+    "expectedItemId": "gas_oven_range",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "피아노 어떻게 버려?",
+    "expectedItemId": "piano",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "금고 어떻게 버려?",
+    "expectedItemId": "safe_box",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "타이어 어떻게 버려?",
+    "expectedItemId": "tire",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "자전거 어떻게 버려?",
+    "expectedItemId": "bicycle",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "보일러 어떻게 버려?",
+    "expectedItemId": "boiler",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "돌침대 어떻게 버려?",
+    "expectedItemId": "stone_bed",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "오락기 어떻게 버려?",
+    "expectedItemId": "arcade_machine",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "자동판매기 어떻게 버려?",
+    "expectedItemId": "vending_machine",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "항아리 어떻게 버려?",
+    "expectedItemId": "large_jar",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "쌀통 어떻게 버려?",
+    "expectedItemId": "rice_container",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "고무통 어떻게 버려?",
+    "expectedItemId": "rubber_tub",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "마네킹 어떻게 버려?",
+    "expectedItemId": "mannequin",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "휠체어 어떻게 버려?",
+    "expectedItemId": "wheelchair",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "보행기 어떻게 버려?",
+    "expectedItemId": "baby_walker",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "쓰레기통 어떻게 버려?",
+    "expectedItemId": "large_trash_bin",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
+  },
+  {
+    "query": "난로 어떻게 버려?",
+    "expectedItemId": "space_heater",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7. 일회용 손난로로 오매칭되던 질의를 이 품목이 받는다."
   }
 ]

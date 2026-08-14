@@ -423,6 +423,8 @@ const metroRegionIds = new Set(regionalPolicies.filter((region) => region?.cover
 // 031-729-3120 같은 정상 직통번호를 오탐하므로 쓰지 않는다.
 const representativeComplaintPhone = /^\d{2,3}-120$/;
 const regionPhoneFormat = /^(\d{2,4}-\d{3,4}-\d{4}|\d{4}-\d{4})$/;
+// `scripts/import-bulky-fees.ts`의 MAX_FEE_ROWS와 같은 값이어야 한다.
+const MAX_FEE_ROWS_PER_ITEM = 12;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 const httpsUrl = /^https:\/\//;
 
@@ -568,7 +570,7 @@ for (const [index, region] of regionalPolicies.entries()) {
 }
 
 // 지역 별칭 충돌은 문자열 포함 여부가 아니라 실제 매칭 결과로 잡는다
-// (`evaluate-data.mjs`의 alias self-resolution 검사). 포함 규칙은 정상 구성인
+// (`test-region-matching.ts`의 alias self-resolution 검사). 포함 규칙은 정상 구성인
 // 동명 자치구의 대칭 별칭까지 error로 막아버려서 쓰지 못한다 — "중구"를 서울과
 // 부산 양쪽에 다는 건 되묻기를 만드는 올바른 구성이지 충돌이 아니다.
 
@@ -603,6 +605,18 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
   if (!Array.isArray(schedule.fees) || schedule.fees.length === 0) {
     errors.push(`${prefix}.fees must contain at least one fee`);
   } else {
+    // (regionId, itemId)당 행 상한. 근거는 출처가 아니라 응답 크기다 —
+    // `formatBulkyWasteFeeLines`가 해당 품목 행을 전부 나열한다. 임포터에도 같은
+    // 상한이 있지만 손으로 넣은 행은 그쪽을 거치지 않아 여기서도 막는다.
+    const feeRowsByItemId = countBy(schedule.fees, (fee) => fee.itemId);
+    for (const [itemId, count] of Object.entries(feeRowsByItemId)) {
+      if (count > MAX_FEE_ROWS_PER_ITEM) {
+        errors.push(`${prefix}.fees has ${count} rows for item ${itemId}; the cap is ${MAX_FEE_ROWS_PER_ITEM}`);
+      }
+    }
+  }
+
+  if (Array.isArray(schedule.fees) && schedule.fees.length > 0) {
     for (const [feeIndex, fee] of schedule.fees.entries()) {
       const feePrefix = `${prefix}.fees[${feeIndex}]`;
       if (!isNonEmptyString(fee.itemId)) errors.push(`${feePrefix}.itemId must be a non-empty string`);

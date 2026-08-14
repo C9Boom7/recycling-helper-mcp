@@ -1,7 +1,7 @@
 // Runs every question-backlog query through the real resolveWasteItem (from
 // dist, so `pnpm build` first) and prints the status distribution. Used for the
-// Phase 1 not_found before/after measurement — do not use evaluate-data.mjs's
-// simplified matcher for this.
+// Phase 1 not_found before/after measurement — measure against the shipped
+// resolver, never a second copy of the matching rules.
 import { readFileSync } from "node:fs";
 import { resolveWasteItem } from "../dist/data.js";
 
