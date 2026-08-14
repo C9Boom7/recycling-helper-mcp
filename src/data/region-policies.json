@@ -2,7 +2,15 @@
   {
     "id": "gangnam_gu",
     "name": "서울 강남구",
-    "aliases": ["강남구", "서울시 강남구", "서울특별시 강남구", "gangnam", "gangnam-gu"],
+    "aliases": [
+      "강남구",
+      "서울시 강남구",
+      "서울특별시 강남구",
+      "gangnam",
+      "gangnam-gu"
+    ],
+    "coverageTier": "full",
+    "metroId": "seoul",
     "checkedAt": "2026-07-02",
     "summary": "강남구는 일반 생활쓰레기와 재활용품의 기본 배출시간을 20:00~익일 05:00로 안내합니다. 단독주택, 빌라, 소규모 상가의 재활용품은 목요일에 비닐·투명페트병만, 월·화·수·금·일요일에 그 외 재활용품을 배출합니다.",
     "generalWaste": {
@@ -114,7 +122,9 @@
     },
     "itemGuides": [
       {
-        "itemIds": ["pet_bottle"],
+        "itemIds": [
+          "pet_bottle"
+        ],
         "summary": "강남구 단독주택·빌라·소규모 상가 기준으로 투명페트병은 목요일에 비닐과 함께 별도 배출합니다.",
         "steps": [
           "내용물을 비우고 라벨을 제거합니다.",
@@ -123,7 +133,9 @@
         ]
       },
       {
-        "itemIds": ["snack_bag"],
+        "itemIds": [
+          "snack_bag"
+        ],
         "summary": "강남구 단독주택·빌라·소규모 상가 기준으로 비닐류는 목요일에 투명페트병과 함께 별도 배출합니다.",
         "steps": [
           "내용물과 이물질을 제거합니다.",
@@ -133,7 +145,13 @@
         ]
       },
       {
-        "itemIds": ["milk_carton", "aseptic_pack", "paper_cup", "styrofoam", "paper_core"],
+        "itemIds": [
+          "milk_carton",
+          "aseptic_pack",
+          "paper_cup",
+          "styrofoam",
+          "paper_core"
+        ],
         "summary": "강남구 단독주택·빌라·소규모 상가 기준으로 비닐·투명페트병 외 재활용품은 월·화·수·금·일요일에 배출합니다.",
         "steps": [
           "내용물을 비우고 이물질을 제거합니다.",
@@ -142,7 +160,10 @@
         ]
       },
       {
-        "itemIds": ["frying_pan", "cooking_pot"],
+        "itemIds": [
+          "frying_pan",
+          "cooking_pot"
+        ],
         "summary": "강남구 단독주택·빌라·소규모 상가 기준으로 고철류는 비닐·투명페트병 외 기타 재활용품 배출일에 맞춰 배출합니다.",
         "steps": [
           "음식물과 기름때를 제거합니다.",
@@ -151,7 +172,9 @@
         ]
       },
       {
-        "itemIds": ["toothpaste_tube"],
+        "itemIds": [
+          "toothpaste_tube"
+        ],
         "summary": "강남구에서 치약 튜브는 내용물 제거와 분리배출 표시를 확인한 뒤, 플라스틱류 또는 종량제봉투로 나눠 배출합니다.",
         "steps": [
           "내용물을 최대한 비우고 헹군 뒤 분리배출 표시를 확인합니다.",
@@ -160,7 +183,9 @@
         ]
       },
       {
-        "itemIds": ["chopsticks"],
+        "itemIds": [
+          "chopsticks"
+        ],
         "summary": "강남구에서 나무젓가락과 복합재질 젓가락은 종량제봉투, 금속 단일재질 젓가락은 고철류 재활용품 기준을 확인합니다.",
         "steps": [
           "나무젓가락은 음식물쓰레기와 섞지 않고 일반 종량제봉투로 배출합니다.",
@@ -169,7 +194,9 @@
         ]
       },
       {
-        "itemIds": ["straw"],
+        "itemIds": [
+          "straw"
+        ],
         "summary": "강남구에서 빨대는 재질과 오염 여부를 먼저 확인하고, 플라스틱·고철류 또는 종량제봉투로 나눠 배출합니다.",
         "steps": [
           "플라스틱 빨대는 이물질을 제거한 뒤 기타 재활용품 배출일에 맞춰 배출합니다.",
@@ -178,7 +205,9 @@
         ]
       },
       {
-        "itemIds": ["plastic_cup"],
+        "itemIds": [
+          "plastic_cup"
+        ],
         "summary": "강남구에서 카페 일회용 플라스틱 컵은 무색페트병과 섞지 말고, 비닐·투명페트병 외 기타 재활용품 배출일을 확인합니다.",
         "steps": [
           "남은 음료와 얼음, 빨대, 뚜껑, 컵홀더를 분리합니다.",
@@ -188,7 +217,9 @@
         ]
       },
       {
-        "itemIds": ["plastic_storage_box"],
+        "itemIds": [
+          "plastic_storage_box"
+        ],
         "summary": "강남구에서 리빙박스·플라스틱 수납함은 작은 단일재질이면 플라스틱류, 큰 수납장·서랍장 형태이면 대형생활폐기물 신청 기준을 확인합니다.",
         "steps": [
           "내용물을 비우고 테이프, 스티커, 금속 레일, 바퀴 등 분리 가능한 부속품을 제거합니다.",
@@ -198,7 +229,9 @@
         ]
       },
       {
-        "itemIds": ["cup_holder"],
+        "itemIds": [
+          "cup_holder"
+        ],
         "summary": "강남구에서 컵홀더는 코팅되지 않은 종이면 종이류, 코팅·오염이 있으면 종량제봉투 기준을 확인합니다.",
         "steps": [
           "컵에서 컵홀더를 분리하고 젖음·음료 오염 여부를 확인합니다.",
@@ -208,7 +241,9 @@
         ]
       },
       {
-        "itemIds": ["plastic_wrap"],
+        "itemIds": [
+          "plastic_wrap"
+        ],
         "summary": "강남구에서 깨끗한 PE 비닐랩은 비닐류 목요일 배출 기준을 확인하고, 오염 랩이나 PVC 포장랩은 종량제봉투로 배출합니다.",
         "steps": [
           "음식물·기름·소스 오염 여부를 먼저 확인합니다.",
@@ -217,7 +252,9 @@
         ]
       },
       {
-        "itemIds": ["plant_soil"],
+        "itemIds": [
+          "plant_soil"
+        ],
         "summary": "강남구에서 화분 흙은 음식물쓰레기가 아니라 불연성 폐기물 봉투 또는 특수규격마대 기준을 확인해 배출합니다.",
         "steps": [
           "흙, 식물 줄기·잎, 뿌리, 화분 용기를 분리합니다.",
@@ -226,7 +263,9 @@
         ]
       },
       {
-        "itemIds": ["wilted_flower"],
+        "itemIds": [
+          "wilted_flower"
+        ],
         "summary": "강남구에서 시든 꽃과 화초는 음식물쓰레기가 아니라 일반 종량제봉투 대상이며, 흙·화분·포장재를 먼저 분리합니다.",
         "steps": [
           "꽃다발의 비닐, 리본, 철사, 플라스틱 장식은 먼저 분리합니다.",
@@ -236,7 +275,9 @@
         ]
       },
       {
-        "itemIds": ["candle"],
+        "itemIds": [
+          "candle"
+        ],
         "summary": "강남구에서 향초는 남은 왁스와 심지를 종량제봉투로 배출하고, 용기는 왁스 제거 후 재질별 배출 기준을 확인합니다.",
         "steps": [
           "왁스와 심지, 금속 받침을 가능한 분리합니다.",
@@ -246,7 +287,9 @@
         ]
       },
       {
-        "itemIds": ["contact_lens"],
+        "itemIds": [
+          "contact_lens"
+        ],
         "summary": "강남구에서 콘택트렌즈 자체는 종량제봉투로, 깨끗한 렌즈케이스는 플라스틱류 배출 가능 여부를 확인합니다.",
         "steps": [
           "사용한 렌즈는 하수구나 변기에 버리지 않고 종량제봉투로 배출합니다.",
@@ -256,7 +299,9 @@
         ]
       },
       {
-        "itemIds": ["cd_dvd"],
+        "itemIds": [
+          "cd_dvd"
+        ],
         "summary": "강남구에서 CD/DVD 디스크는 종량제봉투로 배출하고, 깨끗한 플라스틱 케이스는 플라스틱류 배출 기준을 확인합니다.",
         "steps": [
           "디스크와 케이스를 분리합니다.",
@@ -266,7 +311,9 @@
         ]
       },
       {
-        "itemIds": ["clothes_hanger"],
+        "itemIds": [
+          "clothes_hanger"
+        ],
         "summary": "강남구에서 옷걸이는 세탁소 철제 옷걸이, 플라스틱 옷걸이, 나무·복합재질 옷걸이를 재질별로 나눠 확인합니다.",
         "steps": [
           "세탁소 철제 옷걸이는 세탁소 반납 가능 여부를 먼저 확인합니다.",
@@ -276,7 +323,9 @@
         ]
       },
       {
-        "itemIds": ["disposable_cutlery"],
+        "itemIds": [
+          "disposable_cutlery"
+        ],
         "summary": "강남구에서 일회용 숟가락·포크는 오염 제거 가능 여부와 플라스틱/PLA 재질을 먼저 확인합니다.",
         "steps": [
           "음식물, 소스, 기름 오염을 제거할 수 있는지 확인합니다.",
@@ -286,7 +335,9 @@
         ]
       },
       {
-        "itemIds": ["coffee_capsule"],
+        "itemIds": [
+          "coffee_capsule"
+        ],
         "summary": "강남구에서 커피 캡슐은 제조사 회수 프로그램을 우선 확인하고, 직접 배출 시 내용물 제거와 재질 분리가 가능한지 확인합니다.",
         "steps": [
           "브랜드 회수백, 매장 회수 등 제조사 회수 프로그램 이용 가능 여부를 먼저 확인합니다.",
@@ -295,7 +346,9 @@
         ]
       },
       {
-        "itemIds": ["flower_pot"],
+        "itemIds": [
+          "flower_pot"
+        ],
         "summary": "강남구에서 화분은 흙을 분리한 뒤 플라스틱, 불연성 폐기물, 대형생활폐기물 중 재질과 크기에 맞는 기준을 확인합니다.",
         "steps": [
           "화분 흙과 식물, 받침을 먼저 분리합니다.",
@@ -305,7 +358,9 @@
         ]
       },
       {
-        "itemIds": ["cosmetic_container"],
+        "itemIds": [
+          "cosmetic_container"
+        ],
         "summary": "강남구에서 화장품 용기는 내용물과 펌프·뚜껑을 분리한 뒤 플라스틱류 또는 유리병류 배출일을 확인합니다.",
         "steps": [
           "남은 화장품을 비우고 헹굴 수 있는 용기는 이물질을 제거합니다.",
@@ -315,7 +370,9 @@
         ]
       },
       {
-        "itemIds": ["nail_polish"],
+        "itemIds": [
+          "nail_polish"
+        ],
         "summary": "강남구에서 매니큐어 병은 내용물 제거 가능 여부를 먼저 보고, 빈 용기는 재질별 배출일을 확인하며 내용물 제거가 어려우면 종량제봉투로 배출합니다.",
         "steps": [
           "내용물이 남았거나 굳었으면 유리병류로 바로 넣지 않습니다.",
@@ -324,7 +381,9 @@
         ]
       },
       {
-        "itemIds": ["perfume_bottle"],
+        "itemIds": [
+          "perfume_bottle"
+        ],
         "summary": "강남구에서 향수병은 소량 남은 내용물을 휴지 등에 흡수시켜 종량제봉투로 처리하고, 빈 유리병은 유리병류 배출일을 확인합니다.",
         "steps": [
           "향수 내용물이 남아 있으면 휴지 등에 흡수시켜 일반 종량제봉투로 배출합니다.",
@@ -333,7 +392,9 @@
         ]
       },
       {
-        "itemIds": ["mercury_thermometer"],
+        "itemIds": [
+          "mercury_thermometer"
+        ],
         "summary": "강남구에서 수은 체온계는 생활계유해폐기물 전용수거함 또는 지정 수거처 확인이 필요한 고위험 품목으로 안내합니다.",
         "steps": [
           "수은 체온계는 분해·해체하지 않고 골판지 상자나 완충재로 파손되지 않게 포장합니다.",
@@ -342,7 +403,9 @@
         ]
       },
       {
-        "itemIds": ["pesticide_container"],
+        "itemIds": [
+          "pesticide_container"
+        ],
         "summary": "강남구에서 내용물이 남은 살충제 통은 폐농약 또는 생활계유해폐기물 전용수거함 운영 여부를 확인하고, 유출되지 않게 밀봉합니다.",
         "steps": [
           "남은 살충제나 폐농약은 용기째 완전히 밀봉합니다.",
@@ -351,7 +414,9 @@
         ]
       },
       {
-        "itemIds": ["fire_extinguisher"],
+        "itemIds": [
+          "fire_extinguisher"
+        ],
         "summary": "강남구에서 소화기는 대형생활폐기물 신청 기준을 확인해 배출하며, 캔류나 고철류로 임의 배출하지 않습니다.",
         "steps": [
           "소화기를 분해하거나 구멍 내지 않습니다.",
@@ -360,7 +425,9 @@
         ]
       },
       {
-        "itemIds": ["lighter"],
+        "itemIds": [
+          "lighter"
+        ],
         "summary": "강남구에서 일회용 라이터는 남은 가스를 통풍이 잘되는 장소에서 완전히 제거한 뒤 종량제봉투로 배출합니다.",
         "steps": [
           "가스가 남아 있으면 화기 없는 통풍이 잘되는 장소에서 가스를 완전히 제거합니다.",
@@ -369,7 +436,9 @@
         ]
       },
       {
-        "itemIds": ["power_bank"],
+        "itemIds": [
+          "power_bank"
+        ],
         "summary": "강남구에서 정상 보조배터리는 폐건전지 수거함 기준을 확인하고, 부풀거나 손상된 보조배터리는 안전 배출 가능 여부를 먼저 문의합니다.",
         "steps": [
           "정상 보조배터리는 단자를 테이프로 감싼 뒤 폐건전지 수거함 위치를 확인합니다.",
@@ -378,7 +447,11 @@
         ]
       },
       {
-        "itemIds": ["battery", "fluorescent_lamp", "led_lamp"],
+        "itemIds": [
+          "battery",
+          "fluorescent_lamp",
+          "led_lamp"
+        ],
         "summary": "강남구에서는 폐형광등·폐건전지를 일반주택은 주민센터 및 주택가 수거함, 아파트는 단지 내 수거함에 배출하도록 안내합니다.",
         "steps": [
           "일반쓰레기나 재활용품에 섞지 않습니다.",
@@ -388,7 +461,9 @@
         ]
       },
       {
-        "itemIds": ["medicine"],
+        "itemIds": [
+          "medicine"
+        ],
         "summary": "강남구 자원순환 종합포털에서 폐의약품 수거함 위치를 확인해 배출합니다.",
         "steps": [
           "개인정보가 있는 포장지는 제거합니다.",
@@ -397,7 +472,9 @@
         ]
       },
       {
-        "itemIds": ["used_cooking_oil"],
+        "itemIds": [
+          "used_cooking_oil"
+        ],
         "summary": "폐식용유는 강남구 자원순환 종합포털의 폐식용유 수거함 위치정보를 확인합니다.",
         "steps": [
           "가능하면 전용 수거함 위치를 확인합니다.",
@@ -406,7 +483,9 @@
         ]
       },
       {
-        "itemIds": ["moldy_bread"],
+        "itemIds": [
+          "moldy_bread"
+        ],
         "summary": "강남구에서 곰팡이 핀 빵처럼 상한 음식은 포장재와 이물질을 제거한 뒤 음식물쓰레기 전용 배출 방식으로 처리합니다.",
         "steps": [
           "비닐 포장, 빵끈, 스티커, 방습제 등 음식물이 아닌 재질을 제거합니다.",
@@ -415,7 +494,12 @@
         ]
       },
       {
-        "itemIds": ["fruit_seed", "fish_bone", "tea_bag", "onion_peel"],
+        "itemIds": [
+          "fruit_seed",
+          "fish_bone",
+          "tea_bag",
+          "onion_peel"
+        ],
         "summary": "강남구 공식 첨부 안내는 핵과류 씨(복숭아 씨 등), 생선뼈, 티백, 양파껍질을 음식물쓰레기가 아닌 일반쓰레기 종량제봉투 대상으로 안내합니다.",
         "steps": [
           "음식물쓰레기 전용봉투나 RFID에 넣지 않습니다.",
@@ -424,7 +508,16 @@
         ]
       },
       {
-        "itemIds": ["chicken_bone", "shellfish_shell", "egg_shell", "fruit_seed", "onion_peel", "nut_shell", "corn_cob_husk", "herbal_medicine_dregs"],
+        "itemIds": [
+          "chicken_bone",
+          "shellfish_shell",
+          "egg_shell",
+          "fruit_seed",
+          "onion_peel",
+          "nut_shell",
+          "corn_cob_husk",
+          "herbal_medicine_dregs"
+        ],
         "summary": "강남구는 동물뼈, 조개껍데기, 달걀껍데기, 밤·호두껍질, 파 뿌리, 단단한 껍질류 등을 음식물쓰레기가 아닌 일반 종량제 봉투 대상으로 안내합니다.",
         "steps": [
           "음식물쓰레기와 섞지 않습니다.",
@@ -433,7 +526,9 @@
         ]
       },
       {
-        "itemIds": ["broken_glass"],
+        "itemIds": [
+          "broken_glass"
+        ],
         "summary": "강남구는 깨진유리 등을 PP봉투(태워서는 안 되는 쓰레기용 봉투)에 담아 배출하도록 안내합니다.",
         "steps": [
           "신문지나 두꺼운 종이로 감싸 날카로운 부분이 드러나지 않게 합니다.",
@@ -442,7 +537,9 @@
         ]
       },
       {
-        "itemIds": ["yoga_mat"],
+        "itemIds": [
+          "yoga_mat"
+        ],
         "summary": "강남구에서 요가매트·고무매트는 종량제봉투에 담기면 일반쓰레기, 담기 어려운 큰 매트는 대형생활폐기물 신청 기준을 확인합니다.",
         "steps": [
           "PVC나 합성고무 매트는 비닐류 재활용품으로 배출하지 않습니다.",
@@ -452,7 +549,12 @@
         ]
       },
       {
-        "itemIds": ["chair", "mattress", "blanket", "mirror"],
+        "itemIds": [
+          "chair",
+          "mattress",
+          "blanket",
+          "mirror"
+        ],
         "summary": "강남구 대형생활폐기물은 배출 3일 전까지 사전 신청하고, 접수증 또는 접수번호를 부착해 지정 장소에 배출합니다.",
         "steps": [
           "강남구 자원순환 종합포털에서 품목과 수수료를 확인합니다.",
@@ -461,7 +563,9 @@
         ]
       },
       {
-        "itemIds": ["drying_rack"],
+        "itemIds": [
+          "drying_rack"
+        ],
         "summary": "강남구에서 빨래건조대는 크기가 큰 경우 대형생활폐기물로 신청하고, 안전하게 분리 가능한 금속 부품은 고철류 배출 가능 여부를 확인합니다.",
         "steps": [
           "건조대를 안전하게 접거나 분리할 수 있는지 확인합니다.",
@@ -471,7 +575,9 @@
         ]
       },
       {
-        "itemIds": ["toy"],
+        "itemIds": [
+          "toy"
+        ],
         "summary": "강남구에서 장난감은 전지를 제거한 뒤 작은 복합재질은 종량제봉투, 큰 장난감은 대형생활폐기물, 전지는 폐건전지 수거함 기준을 확인합니다.",
         "steps": [
           "건전지나 충전 배터리를 먼저 제거합니다.",
@@ -481,7 +587,9 @@
         ]
       },
       {
-        "itemIds": ["stuffed_toy"],
+        "itemIds": [
+          "stuffed_toy"
+        ],
         "summary": "강남구에서 인형은 의류수거함에 넣지 않고 일반 종량제봉투로 배출하며, 큰 인형은 대형생활폐기물 신청 기준을 확인합니다.",
         "steps": [
           "건전지나 전자부품이 있으면 먼저 제거합니다.",
@@ -490,7 +598,12 @@
         ]
       },
       {
-        "itemIds": ["small_electronics", "mobile_phone", "electric_toothbrush", "phone_charger_adapter"],
+        "itemIds": [
+          "small_electronics",
+          "mobile_phone",
+          "electric_toothbrush",
+          "phone_charger_adapter"
+        ],
         "summary": "강남구는 소형가전 1~4개는 자원순환 종합포털 신청, 5개 이상 또는 대형가전 포함은 e순환거버넌스 이용을 안내합니다.",
         "steps": [
           "소형가전 수량을 확인합니다.",
@@ -499,7 +612,9 @@
         ]
       },
       {
-        "itemIds": ["cable_wire"],
+        "itemIds": [
+          "cable_wire"
+        ],
         "summary": "강남구는 전선을 PP봉투 대상 예시로 안내하며, 소형전기전자제품 전용 수거함 이용 가능 여부와 함께 확인합니다.",
         "steps": [
           "소형전기전자제품 전용 수거함 이용 가능 여부를 먼저 확인합니다.",
@@ -508,7 +623,9 @@
         ]
       },
       {
-        "itemIds": ["power_strip"],
+        "itemIds": [
+          "power_strip"
+        ],
         "summary": "강남구에서 멀티탭은 소형가전 또는 소형전기전자제품 기준으로 전용수거함과 배출 신청 방식을 확인합니다.",
         "steps": [
           "전선을 자르거나 고철·플라스틱으로 분리하지 않습니다.",
@@ -517,7 +634,10 @@
         ]
       },
       {
-        "itemIds": ["paint_can", "solvent_contaminated_rag"],
+        "itemIds": [
+          "paint_can",
+          "solvent_contaminated_rag"
+        ],
         "summary": "강남구에서 페인트통과 시너·페인트가 묻은 오염 걸레는 내용물 남음 여부와 생활계 유해폐기물 전용 수거함 운영 여부를 확인해야 합니다.",
         "steps": [
           "남은 페인트나 시너·페인트가 묻은 젖은 걸레는 유출되지 않도록 완전히 밀봉하고 화기를 피합니다.",
@@ -526,7 +646,9 @@
         ]
       },
       {
-        "itemIds": ["ice_pack"],
+        "itemIds": [
+          "ice_pack"
+        ],
         "summary": "강남구에서 아이스팩은 물 타입과 젤 타입을 먼저 구분합니다. 2026-07-01 확인한 강남구 자원순환 종합포털 위치정보 메뉴에는 아이스팩 전용 수거함 항목이 없어, 현재는 정확한 수거함 주소를 답하지 않고 운영 여부 확인 안내를 우선합니다.",
         "steps": [
           "물 아이스팩은 내용물을 제거한 뒤 포장용기를 비닐류 기준으로 확인합니다.",
@@ -536,7 +658,9 @@
         ]
       },
       {
-        "itemIds": ["clothing"],
+        "itemIds": [
+          "clothing"
+        ],
         "summary": "재사용 가능한 의류는 강남구 자원순환 종합포털의 의류수거함 위치정보를 확인합니다.",
         "steps": [
           "깨끗하고 마른 상태인지 확인합니다.",
@@ -545,7 +669,9 @@
         ]
       },
       {
-        "itemIds": ["shoes"],
+        "itemIds": [
+          "shoes"
+        ],
         "summary": "재사용 가능한 신발은 의류수거함 위치정보를 확인하고, 버리는 신발은 강남구 안내에 따라 PP봉투 대상일 수 있습니다.",
         "steps": [
           "짝이 맞고 재사용 가능한 상태인지 확인합니다.",
@@ -595,7 +721,16 @@
   {
     "id": "seocho_gu",
     "name": "서울 서초구",
-    "aliases": ["서초구", "서울시 서초구", "서울특별시 서초구", "서울 서초구", "seocho", "seocho-gu"],
+    "aliases": [
+      "서초구",
+      "서울시 서초구",
+      "서울특별시 서초구",
+      "서울 서초구",
+      "seocho",
+      "seocho-gu"
+    ],
+    "coverageTier": "full",
+    "metroId": "seoul",
     "checkedAt": "2026-07-02",
     "summary": "서초구는 일반쓰레기와 재활용품을 동별로 일·화·목 또는 월·수·금 격일 배출합니다. 재활용품 중 폐비닐·투명페트병은 동별 목요일 또는 금요일로 별도 지정되고, 타지 않는 쓰레기(유리조각·도자기 등)는 특수마대 배출을 안내합니다.",
     "generalWaste": {
@@ -712,7 +847,9 @@
     },
     "itemGuides": [
       {
-        "itemIds": ["pet_bottle"],
+        "itemIds": [
+          "pet_bottle"
+        ],
         "summary": "서초구에서 투명페트병은 폐비닐과 함께 동별 목요일 또는 금요일에 별도 배출합니다.",
         "steps": [
           "내용물을 비우고 라벨을 제거한 뒤 압착합니다.",
@@ -721,7 +858,9 @@
         ]
       },
       {
-        "itemIds": ["snack_bag"],
+        "itemIds": [
+          "snack_bag"
+        ],
         "summary": "서초구에서 깨끗한 폐비닐은 투명페트병과 함께 동별 목요일 또는 금요일에 별도 배출합니다.",
         "steps": [
           "내용물과 이물질을 제거합니다.",
@@ -730,7 +869,13 @@
         ]
       },
       {
-        "itemIds": ["milk_carton", "aseptic_pack", "paper_cup", "styrofoam", "paper_core"],
+        "itemIds": [
+          "milk_carton",
+          "aseptic_pack",
+          "paper_cup",
+          "styrofoam",
+          "paper_core"
+        ],
         "summary": "서초구에서 기타 재활용품은 폐비닐·투명페트병 요일과 분리해 동별 일·화요일 또는 월·수요일에 배출합니다.",
         "steps": [
           "내용물을 비우고 이물질을 제거합니다.",
@@ -739,7 +884,11 @@
         ]
       },
       {
-        "itemIds": ["plant_soil", "broken_glass", "flower_pot"],
+        "itemIds": [
+          "plant_soil",
+          "broken_glass",
+          "flower_pot"
+        ],
         "summary": "서초구에서 유리조각, 도자기, 흙처럼 타지 않는 쓰레기는 특수마대 배출 기준을 확인합니다.",
         "steps": [
           "날카로운 파편은 신문지 등으로 감싸 안전하게 포장합니다.",
@@ -748,7 +897,18 @@
         ]
       },
       {
-        "itemIds": ["chicken_bone", "shellfish_shell", "egg_shell", "fruit_seed", "onion_peel", "nut_shell", "corn_cob_husk", "herbal_medicine_dregs", "tea_bag", "fish_bone"],
+        "itemIds": [
+          "chicken_bone",
+          "shellfish_shell",
+          "egg_shell",
+          "fruit_seed",
+          "onion_peel",
+          "nut_shell",
+          "corn_cob_husk",
+          "herbal_medicine_dregs",
+          "tea_bag",
+          "fish_bone"
+        ],
         "summary": "서초구는 뿌리·껍질, 단단한 껍데기, 핵과류 씨, 육류 뼈, 패류·갑각류 껍데기, 생선뼈, 알껍데기, 차류·한약재 찌꺼기 등을 음식물쓰레기가 아닌 일반 종량제봉투 대상으로 안내합니다.",
         "steps": [
           "공식 안내상 일반 종량제봉투 대상인 뼈, 껍데기, 씨, 차류·한약재 찌꺼기 등을 음식물쓰레기에서 분리합니다.",
@@ -757,7 +917,11 @@
         ]
       },
       {
-        "itemIds": ["battery", "fluorescent_lamp", "led_lamp"],
+        "itemIds": [
+          "battery",
+          "fluorescent_lamp",
+          "led_lamp"
+        ],
         "summary": "서초구에서 폐건전지와 폐형광등은 공동주택·주택가·동주민센터 수거함 기준을 확인합니다.",
         "steps": [
           "깨지지 않은 폐형광등과 폐건전지는 전용 수거함에 배출합니다.",
@@ -766,7 +930,9 @@
         ]
       },
       {
-        "itemIds": ["medicine"],
+        "itemIds": [
+          "medicine"
+        ],
         "summary": "서초구 폐의약품은 동주민센터·구청 전용수거함 또는 서울시 우체통 배출 기준을 확인합니다.",
         "steps": [
           "알약과 연고 등은 종류별 포장 기준을 확인합니다.",
@@ -775,7 +941,9 @@
         ]
       },
       {
-        "itemIds": ["used_cooking_oil"],
+        "itemIds": [
+          "used_cooking_oil"
+        ],
         "summary": "서초구 폐식용유는 아파트 수거함 또는 동 주민센터 상시 배출 기준을 확인합니다.",
         "steps": [
           "튀김 잔재물 등 이물질을 거릅니다.",
@@ -784,7 +952,12 @@
         ]
       },
       {
-        "itemIds": ["small_electronics", "mobile_phone", "electric_toothbrush", "phone_charger_adapter"],
+        "itemIds": [
+          "small_electronics",
+          "mobile_phone",
+          "electric_toothbrush",
+          "phone_charger_adapter"
+        ],
         "summary": "서초구 소형가전은 아파트 수집용 거치대 또는 일반주택 재활용 배출일 유선 연락 기준을 확인합니다.",
         "steps": [
           "소형가전 무상수거 대상 품목인지 확인합니다.",
@@ -793,7 +966,10 @@
         ]
       },
       {
-        "itemIds": ["clothing", "shoes"],
+        "itemIds": [
+          "clothing",
+          "shoes"
+        ],
         "summary": "서초구 재사용 가능한 의류와 신발은 옷체통 기준을 확인하고, 걸레·수건은 종량제봉투로 배출합니다.",
         "steps": [
           "오염되지 않았고 재사용 가능한 상태인지 확인합니다.",
@@ -871,7 +1047,16 @@
   {
     "id": "songpa_gu",
     "name": "서울 송파구",
-    "aliases": ["송파구", "서울시 송파구", "서울특별시 송파구", "서울 송파구", "songpa", "songpa-gu"],
+    "aliases": [
+      "송파구",
+      "서울시 송파구",
+      "서울특별시 송파구",
+      "서울 송파구",
+      "songpa",
+      "songpa-gu"
+    ],
+    "coverageTier": "full",
+    "metroId": "seoul",
     "checkedAt": "2026-07-02",
     "summary": "송파구는 일반주택의 일반·음식물·재활용품 배출요일을 동별 표로 운영합니다. 폐비닐·폐페트병과 기타 재활용품이 동별로 나뉘며, 불에 타지 않는 쓰레기는 특수규격봉투(마대) 구매 후 배출장소에 배출하고 동별 지정 청소대행업체에 신고하도록 안내합니다.",
     "generalWaste": {
@@ -985,7 +1170,9 @@
     },
     "itemGuides": [
       {
-        "itemIds": ["pet_bottle"],
+        "itemIds": [
+          "pet_bottle"
+        ],
         "summary": "송파구 투명페트병은 주 1회 18:00~22:00에 동별 목요일 또는 금요일로 나뉘며, 아파트는 자체 배출일을 따릅니다.",
         "steps": [
           "내용물을 비우고 라벨을 제거합니다.",
@@ -994,7 +1181,9 @@
         ]
       },
       {
-        "itemIds": ["snack_bag"],
+        "itemIds": [
+          "snack_bag"
+        ],
         "summary": "송파구 폐비닐·폐페트병은 동별 지정요일을 확인해 기타 재활용품과 구분해 배출합니다.",
         "steps": [
           "내용물과 오염을 제거합니다.",
@@ -1003,7 +1192,13 @@
         ]
       },
       {
-        "itemIds": ["milk_carton", "aseptic_pack", "paper_cup", "styrofoam", "paper_core"],
+        "itemIds": [
+          "milk_carton",
+          "aseptic_pack",
+          "paper_cup",
+          "styrofoam",
+          "paper_core"
+        ],
         "summary": "송파구 기타 재활용품은 동별 일반주택 배출요일 표를 확인하고, 종이팩은 일반폐지와 분리합니다.",
         "steps": [
           "내용물을 비우고 물로 헹군 뒤 말립니다.",
@@ -1012,7 +1207,11 @@
         ]
       },
       {
-        "itemIds": ["plant_soil", "broken_glass", "flower_pot"],
+        "itemIds": [
+          "plant_soil",
+          "broken_glass",
+          "flower_pot"
+        ],
         "summary": "송파구에서 깨진유리, 도자기류, 타일, 석고 등 불에 타지 않는 쓰레기는 특수규격봉투(마대) 기준을 확인합니다.",
         "steps": [
           "파편은 다치지 않도록 감싸 안전하게 포장합니다.",
@@ -1021,7 +1220,17 @@
         ]
       },
       {
-        "itemIds": ["chicken_bone", "shellfish_shell", "egg_shell", "fruit_seed", "onion_peel", "nut_shell", "herbal_medicine_dregs", "tea_bag", "fish_bone"],
+        "itemIds": [
+          "chicken_bone",
+          "shellfish_shell",
+          "egg_shell",
+          "fruit_seed",
+          "onion_peel",
+          "nut_shell",
+          "herbal_medicine_dregs",
+          "tea_bag",
+          "fish_bone"
+        ],
         "summary": "송파구는 딱딱한 껍데기, 핵과류 씨, 육류 뼈다귀, 패류·갑각류 껍데기, 1회용 티백, 한약재 찌꺼기, 마늘·양파껍질, 생선뼈, 계란 껍데기 등을 음식물쓰레기가 아닌 일반 생활쓰레기로 안내합니다.",
         "steps": [
           "뼈, 껍데기, 딱딱한 껍질과 씨앗, 티백·한약재 찌꺼기를 음식물쓰레기에서 분리합니다.",
@@ -1030,7 +1239,11 @@
         ]
       },
       {
-        "itemIds": ["battery", "fluorescent_lamp", "led_lamp"],
+        "itemIds": [
+          "battery",
+          "fluorescent_lamp",
+          "led_lamp"
+        ],
         "summary": "송파구 폐형광등·폐건전지 등 생활계 유해폐기물은 아파트 또는 동주민센터 수거함 기준을 확인합니다.",
         "steps": [
           "깨지지 않게 분리 보관합니다.",
@@ -1039,7 +1252,9 @@
         ]
       },
       {
-        "itemIds": ["medicine"],
+        "itemIds": [
+          "medicine"
+        ],
         "summary": "송파구 폐의약품은 구청·주민센터·국민건강보험공단 민원실 수거함 또는 서울시 우체통 배출 기준을 확인합니다.",
         "steps": [
           "약을 하수구나 변기에 버리지 않습니다.",
@@ -1048,7 +1263,9 @@
         ]
       },
       {
-        "itemIds": ["used_cooking_oil"],
+        "itemIds": [
+          "used_cooking_oil"
+        ],
         "summary": "송파구 식물성 폐식용유는 동주민센터 또는 공동주택 수거장소·전용수거함 배출 기준을 확인합니다.",
         "steps": [
           "이물질이 섞이지 않게 모읍니다.",
@@ -1057,7 +1274,12 @@
         ]
       },
       {
-        "itemIds": ["small_electronics", "mobile_phone", "electric_toothbrush", "phone_charger_adapter"],
+        "itemIds": [
+          "small_electronics",
+          "mobile_phone",
+          "electric_toothbrush",
+          "phone_charger_adapter"
+        ],
         "summary": "송파구 폐소형가전은 처리수수료 무료 대상이며 거주지 관할 청소대행업체 신고 후 배출합니다.",
         "steps": [
           "폐소형가전 대상품목인지 확인합니다.",
@@ -1066,7 +1288,10 @@
         ]
       },
       {
-        "itemIds": ["clothing", "shoes"],
+        "itemIds": [
+          "clothing",
+          "shoes"
+        ],
         "summary": "송파구 단독·다가구·다세대·연립·상가의 재사용 가능한 의류와 신발은 의류수거함에 상시 배출할 수 있습니다.",
         "steps": [
           "오물 등이 묻지 않은 상태인지 확인합니다.",
@@ -1126,10 +1351,10 @@
         "basis": "의류수거함 상시 배출, 수거대상·수거불가 품목, 의류수거함 위치 목록"
       },
       {
-        "title": "송파구청 폐기물배출안내",
-        "url": "https://www.songpa.go.kr/www/contents.do?key=2117",
+        "title": "스마트클린 송파 대형폐기물 이용 안내",
+        "url": "https://smartclean.songpa.go.kr/online/bulky/guide",
         "sourceType": "local_guidance",
-        "checkedAt": "2026-07-02",
+        "checkedAt": "2026-08-14",
         "basis": "대형폐기물 전화·인터넷·모바일 신고, 배출증 부착, 익일 이후 수거와 1~2일 수거 안내"
       }
     ]
@@ -1137,7 +1362,16 @@
   {
     "id": "mapo_gu",
     "name": "서울 마포구",
-    "aliases": ["마포구", "서울 마포구", "서울시 마포구", "서울특별시 마포구", "mapo", "mapo-gu"],
+    "aliases": [
+      "마포구",
+      "서울 마포구",
+      "서울시 마포구",
+      "서울특별시 마포구",
+      "mapo",
+      "mapo-gu"
+    ],
+    "coverageTier": "full",
+    "metroId": "seoul",
     "checkedAt": "2026-07-03",
     "summary": "마포구는 일반생활쓰레기와 음식물쓰레기를 일·월·화·수·목요일에 배출하고, 재활용품은 투명페트병·비닐류를 수요일, 그 외 품목을 일·월·화·목요일에 배출하도록 안내합니다.",
     "generalWaste": {
@@ -1246,7 +1480,9 @@
     },
     "itemGuides": [
       {
-        "itemIds": ["pet_bottle"],
+        "itemIds": [
+          "pet_bottle"
+        ],
         "summary": "마포구에서 투명페트병은 비닐류와 함께 수요일에 별도 배출합니다.",
         "steps": [
           "내용물을 비우고 라벨을 제거한 뒤 압착합니다.",
@@ -1255,7 +1491,9 @@
         ]
       },
       {
-        "itemIds": ["snack_bag"],
+        "itemIds": [
+          "snack_bag"
+        ],
         "summary": "마포구에서 비닐류는 투명페트병과 함께 수요일에 별도 배출합니다.",
         "steps": [
           "내용물과 이물질을 제거합니다.",
@@ -1264,7 +1502,13 @@
         ]
       },
       {
-        "itemIds": ["milk_carton", "aseptic_pack", "paper_cup", "styrofoam", "paper_core"],
+        "itemIds": [
+          "milk_carton",
+          "aseptic_pack",
+          "paper_cup",
+          "styrofoam",
+          "paper_core"
+        ],
         "summary": "마포구에서 비닐·투명페트병 외 기타 재활용품은 일·월·화·목요일에 배출합니다.",
         "steps": [
           "내용물을 비우고 이물질을 제거합니다.",
@@ -1273,7 +1517,10 @@
         ]
       },
       {
-        "itemIds": ["plant_soil", "broken_glass"],
+        "itemIds": [
+          "plant_soil",
+          "broken_glass"
+        ],
         "summary": "마포구에서 흙, 깨진 유리, 벽돌 등은 특수규격봉투(PP포대)와 수거업체 신고 기준을 확인합니다.",
         "steps": [
           "날카로운 조각은 다치지 않도록 감싸 안전하게 포장합니다.",
@@ -1282,7 +1529,16 @@
         ]
       },
       {
-        "itemIds": ["chicken_bone", "shellfish_shell", "fruit_seed", "onion_peel", "nut_shell", "corn_cob_husk", "herbal_medicine_dregs", "tea_bag"],
+        "itemIds": [
+          "chicken_bone",
+          "shellfish_shell",
+          "fruit_seed",
+          "onion_peel",
+          "nut_shell",
+          "corn_cob_husk",
+          "herbal_medicine_dregs",
+          "tea_bag"
+        ],
         "summary": "마포구는 양파·마늘·옥수수 껍질과 옥수수대, 딱딱한 껍데기, 핵과류 씨, 육류 뼈다귀, 패류 껍데기, 차류·한약재 찌꺼기 등을 음식물쓰레기 전용봉투에 넣지 않는 품목으로 안내합니다.",
         "steps": [
           "껍질, 씨, 뼈다귀, 패류 껍데기, 차류·한약재 찌꺼기를 음식물쓰레기에서 분리합니다.",
@@ -1291,7 +1547,10 @@
         ]
       },
       {
-        "itemIds": ["battery", "fluorescent_lamp"],
+        "itemIds": [
+          "battery",
+          "fluorescent_lamp"
+        ],
         "summary": "마포구 폐형광등·폐건전지는 공식 수거함 배치 현황에서 주소와 상세 위치를 확인해 전용 수거함에 배출합니다.",
         "steps": [
           "깨지거나 누액이 생기지 않도록 분리 보관합니다.",
@@ -1300,7 +1559,12 @@
         ]
       },
       {
-        "itemIds": ["small_electronics", "mobile_phone", "electric_toothbrush", "phone_charger_adapter"],
+        "itemIds": [
+          "small_electronics",
+          "mobile_phone",
+          "electric_toothbrush",
+          "phone_charger_adapter"
+        ],
         "summary": "마포구 1차 확인 범위에서는 소형폐가전 전용 배출방식이 명확하지 않아, 무료 방문수거 대상 여부와 대형폐기물 신고 기준을 먼저 확인합니다.",
         "steps": [
           "가전제품이 e순환거버넌스 무료 방문수거 대상인지 확인합니다.",
@@ -1309,7 +1573,18 @@
         ]
       },
       {
-        "itemIds": ["chair", "mattress", "blanket", "mirror", "plastic_storage_box", "yoga_mat", "drying_rack", "flower_pot", "toy", "stuffed_toy"],
+        "itemIds": [
+          "chair",
+          "mattress",
+          "blanket",
+          "mirror",
+          "plastic_storage_box",
+          "yoga_mat",
+          "drying_rack",
+          "flower_pot",
+          "toy",
+          "stuffed_toy"
+        ],
         "summary": "마포구에서 종량제봉투에 담기 어려운 대형생활폐기물은 동주민센터 방문 또는 구청 홈페이지 신고 후 신고필증을 부착해 배출합니다.",
         "steps": [
           "재사용 가능 여부를 먼저 확인하고, 재활용이 불가능하면 대형폐기물로 신고합니다.",
@@ -1318,7 +1593,10 @@
         ]
       },
       {
-        "itemIds": ["clothing", "shoes"],
+        "itemIds": [
+          "clothing",
+          "shoes"
+        ],
         "summary": "마포구 재사용 가능한 의류와 신발은 공식 의류수거함 배치 현황에서 가까운 수거함 위치를 확인합니다.",
         "steps": [
           "젖거나 오염된 상태가 아닌지 확인합니다.",
@@ -1383,6 +1661,8 @@
       "seongnam-si",
       "pangyo"
     ],
+    "coverageTier": "full",
+    "metroId": "gyeonggi",
     "checkedAt": "2026-07-05",
     "summary": "성남시는 생활폐기물을 수거 전날 일몰 후부터 다음날 오전 5시까지 배출하도록 안내하고, 재활용품은 품목별로 비우고 헹군 뒤 분리배출하며, 음식물류는 이물질과 대표 제외 품목을 제거해 전용봉투 또는 수거용기에 배출하도록 안내합니다. 판교는 동 단위 별도 정책이 아니라 성남시 기본 정책 alias로만 처리합니다.",
     "generalWaste": {
@@ -1495,7 +1775,9 @@
     },
     "itemGuides": [
       {
-        "itemIds": ["pet_bottle"],
+        "itemIds": [
+          "pet_bottle"
+        ],
         "summary": "성남시는 투명페트병을 비우고 라벨을 제거한 뒤 투명페트병 전용수거함에 별도 분리배출하도록 안내합니다.",
         "steps": [
           "내용물을 깨끗이 비우고 부착 상표(라벨)를 제거합니다.",
@@ -1504,7 +1786,9 @@
         ]
       },
       {
-        "itemIds": ["snack_bag"],
+        "itemIds": [
+          "snack_bag"
+        ],
         "summary": "성남시 비닐류는 내용물을 깨끗이 비우고 재질 구분 없이 펼쳐 모아 배출합니다.",
         "steps": [
           "내용물과 이물질을 제거합니다.",
@@ -1513,7 +1797,13 @@
         ]
       },
       {
-        "itemIds": ["milk_carton", "aseptic_pack", "paper_cup", "styrofoam", "paper_core"],
+        "itemIds": [
+          "milk_carton",
+          "aseptic_pack",
+          "paper_cup",
+          "styrofoam",
+          "paper_core"
+        ],
         "summary": "성남시 기타 재활용품은 비우고, 헹구고, 분리한 뒤 품목별로 묶거나 투명봉투에 담아 배출합니다.",
         "steps": [
           "내용물을 비우고 물로 헹굽니다.",
@@ -1522,7 +1812,10 @@
         ]
       },
       {
-        "itemIds": ["broken_glass", "flower_pot"],
+        "itemIds": [
+          "broken_glass",
+          "flower_pot"
+        ],
         "summary": "성남시에서 깨진 유리, 깨진 형광등, 도자기류, 화분 등 불연성 폐기물은 불연성마대에 넣어 배출합니다.",
         "steps": [
           "날카로운 조각은 다치지 않도록 감싸 안전하게 포장합니다.",
@@ -1531,7 +1824,15 @@
         ]
       },
       {
-        "itemIds": ["chicken_bone", "shellfish_shell", "egg_shell", "fruit_seed", "onion_peel", "nut_shell", "fish_bone"],
+        "itemIds": [
+          "chicken_bone",
+          "shellfish_shell",
+          "egg_shell",
+          "fruit_seed",
+          "onion_peel",
+          "nut_shell",
+          "fish_bone"
+        ],
         "summary": "성남시는 양파·마늘·옥수수껍질, 알껍질류, 핵과류 씨앗, 육류 및 생선 등의 뼈, 단단한 껍데기 등을 음식물쓰레기에서 제거하도록 안내합니다.",
         "steps": [
           "음식물류에서 껍질, 씨앗, 뼈, 패각류 등 단단하거나 재활용을 어렵게 하는 물질을 분리합니다.",
@@ -1540,7 +1841,10 @@
         ]
       },
       {
-        "itemIds": ["battery", "fluorescent_lamp"],
+        "itemIds": [
+          "battery",
+          "fluorescent_lamp"
+        ],
         "summary": "성남시 폐건전지와 폐형광등은 동 행정복지센터, 학교, 공동주택 등에 비치된 전용 수거함에 배출합니다.",
         "steps": [
           "폐건전지는 전지를 제품에서 분리합니다.",
@@ -1549,7 +1853,12 @@
         ]
       },
       {
-        "itemIds": ["small_electronics", "mobile_phone", "electric_toothbrush", "phone_charger_adapter"],
+        "itemIds": [
+          "small_electronics",
+          "mobile_phone",
+          "electric_toothbrush",
+          "phone_charger_adapter"
+        ],
         "summary": "성남시에서 대형가전과 소형가전 5품목 이상은 폐가전제품 무상방문수거서비스 대상 여부를 먼저 확인합니다.",
         "steps": [
           "소형가전이 5개 이상이거나 대형가전과 함께 배출하는지 확인합니다.",
@@ -1558,7 +1867,18 @@
         ]
       },
       {
-        "itemIds": ["chair", "mattress", "blanket", "mirror", "plastic_storage_box", "yoga_mat", "drying_rack", "flower_pot", "toy", "stuffed_toy"],
+        "itemIds": [
+          "chair",
+          "mattress",
+          "blanket",
+          "mirror",
+          "plastic_storage_box",
+          "yoga_mat",
+          "drying_rack",
+          "flower_pot",
+          "toy",
+          "stuffed_toy"
+        ],
         "summary": "성남시에서 종량제봉투에 담기 어려운 대형폐기물은 전화 또는 인터넷, 모바일 신고 후 접수번호나 납부필증을 부착해 배출합니다.",
         "steps": [
           "전화 또는 인터넷, 모바일을 통해 배출신고를 합니다.",
@@ -1567,7 +1887,10 @@
         ]
       },
       {
-        "itemIds": ["clothing", "shoes"],
+        "itemIds": [
+          "clothing",
+          "shoes"
+        ],
         "summary": "성남시 생활폐기물 안내는 의류 등을 젖지 않도록 투명비닐에 담아 배출하도록 안내합니다.",
         "steps": [
           "젖거나 오염된 상태가 아닌지 확인합니다.",
@@ -1611,6 +1934,1034 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-07-05",
         "basis": "대형폐기물 정의, 전화·인터넷·모바일 신고, 접수번호·납부필증 부착, 판교동 포함 분당구 수거업체 관할, 대형폐가전 무상 방문수거 안내"
+      }
+    ]
+  },
+  {
+    "id": "jongno_gu",
+    "name": "서울 종로구",
+    "aliases": [
+      "종로구",
+      "서울 종로구",
+      "서울시 종로구",
+      "서울특별시 종로구",
+      "jongno-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "종로구는 대형생활폐기물을 구청 인터넷 신청으로 접수하고 수수료를 결제한 뒤 접수번호를 붙여 배출하도록 안내합니다. 폐의약품은 관내 19개소 수거함, 폐건전지는 공동주택과 동주민센터 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "조제약과 가루약은 포장지를 개봉하지 않고 밀봉된 상태 그대로, 알약은 약상자만 제거해 밀봉 상태로, 물약은 뚜껑을 닫아 새지 않게 폐의약품 수거함에 배출합니다.",
+          "밀봉하면 가까운 우체통에도 넣을 수 있으나 액상 폐의약품은 제외합니다. 수거함은 종로구청 본관과 각 동주민센터, 종로구 보건소 등 관내 19개소에 있습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "공동주택은 단지 내 폐형광등·폐건전지 수거함에, 단독주택은 동주민센터 등 관내 수거함에 배출합니다.",
+          "배터리를 뺄 수 있는 제품은 배터리만 분리해 배출하고 일체형은 제품 그대로 배출하며, 종량제봉투에 넣어서는 안 됩니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.jongno.go.kr/waste/mo/web/order/insertAgreeForm.do",
+      "feeUrl": "https://www.jongno.go.kr/waste/mo/web/expense/selectExpenseList.do",
+      "phone": "02-2148-2376",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "종로구 대형생활폐기물 배출 신청 안내",
+        "url": "https://www.jongno.go.kr/waste/mo/web/info/info.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "인터넷 신청 경로와 수수료 안내 링크, 폐기물 관련문의 02-2148-2376 확인"
+      },
+      {
+        "title": "종로구 대형생활폐기물 배출 수수료 안내",
+        "url": "https://www.jongno.go.kr/waste/mo/web/expense/selectExpenseList.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "품목별 수수료 조회 페이지"
+      }
+    ]
+  },
+  {
+    "id": "yongsan_gu",
+    "name": "서울 용산구",
+    "aliases": [
+      "용산구",
+      "서울 용산구",
+      "서울시 용산구",
+      "서울특별시 용산구",
+      "yongsan-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "용산구는 대형생활폐기물을 구청 포털에서 신청하고 품목별 수수료를 같은 곳에서 조회하도록 안내합니다. 폐의약품 수거함은 관내 70개소, 우체통은 41개소를 함께 운영합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가루약과 조제 알약은 포장 및 밀봉 상태 그대로, 물약은 마개를 잠그고 용기 그대로, 캡슐 알약과 연고는 겉포장 종이만 제거한 뒤 배출합니다.",
+          "구청·보건소·동주민센터·복지관·공동주택 수거함 70개소와 관내 우체통 41개소를 이용하며, 우체통에 넣을 때는 봉투에 '폐의약품'을 표시해 밀봉합니다. 물약은 우체통에 넣을 수 없습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "건전지와 충전용 전지는 동주민센터·아파트·주택가 골목에 설치된 전용 수거함에 배출합니다.",
+          "충전용 보조배터리나 리튬계 2차 전지가 들어간 완구류도 같은 수거함에 배출해야 하고, 종량제봉투에 넣으면 화재 위험이 있습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.yongsan.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200674",
+      "feeUrl": "https://www.yongsan.go.kr/portal/lifeWaste/wasteStndr/list.do?menuNo=200673",
+      "phone": "02-2199-7294",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "용산구 대형생활폐기물 신청 안내",
+        "url": "https://www.yongsan.go.kr/portal/main/contents.do?menuNo=200672",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "신청 경로와 수수료 링크, 청소행정과 02-2199-7294 확인"
+      },
+      {
+        "title": "용산구 폐의약품 분리배출 안내",
+        "url": "https://www.yongsan.go.kr/portal/main/contents.do?menuNo=201150",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐의약품 배출방법과 수거함·우체통 위치"
+      }
+    ]
+  },
+  {
+    "id": "gwangjin_gu",
+    "name": "서울 광진구",
+    "aliases": [
+      "광진구",
+      "서울 광진구",
+      "서울시 광진구",
+      "서울특별시 광진구",
+      "gwangjin-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "광진구는 대형폐기물 인터넷 신청을 스마트클린 광진에서 받고 품목별 수수료도 같은 곳에서 조회하게 합니다. 폐의약품은 전용 수거함에 배출하되 소량의 알약은 '폐의약품'을 적어 우체통에 넣을 수 있습니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "알약·조제약·캡슐약·물약은 폐의약품 전용 수거함에 배출합니다.",
+          "A4 용지 크기를 넘지 않는 소량의 알약·조제약·캡슐약은 전용 봉투나 일반 봉투에 '폐의약품'이라고 적어 우체통에 넣어도 됩니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 녹슬지 않게 물기를 제거하고 원상태로 분리수거함에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.smartclean-gwangjin.kr/online/bulky/request",
+      "feeUrl": "https://www.smartclean-gwangjin.kr/online/bulky/item",
+      "phone": "02-450-1375",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "광진구 대형폐기물 배출신청",
+        "url": "https://www.gwangjin.go.kr/portal/main/contents.do?menuNo=200835",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "인터넷 신청 사이트 안내와 청소과 일반문의 450-1375 확인"
+      },
+      {
+        "title": "광진구 폐형광등·폐건전지 분리배출방법",
+        "url": "https://www.gwangjin.go.kr/portal/main/contents.do?menuNo=200846",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 배출방법"
+      }
+    ]
+  },
+  {
+    "id": "gangbuk_gu",
+    "name": "서울 강북구",
+    "aliases": [
+      "강북구",
+      "서울 강북구",
+      "서울시 강북구",
+      "서울특별시 강북구",
+      "gangbuk-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "강북구는 대형생활폐기물을 구청 포털에서 인터넷으로 신청하게 하고 품목별 부과기준을 게시판으로 안내합니다. 폐의약품은 전용 수거함, 폐건전지는 동주민센터와 공동주택 거점 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 전용수거함에 배출합니다. 가루약과 조제 알약은 포장 및 밀봉 상태 그대로, 캡슐은 포장된 채로, 물약·시럽·연고는 용기 마개를 닫아 배출합니다.",
+          "우체통에 넣을 때는 봉투에 '폐의약품'을 적어 밀봉하며, 물약은 우체통에 넣을 수 없습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 제품에서 분리한 뒤 동주민센터와 공동주택 배출장소 같은 주요 거점의 전용수거함에 배출합니다. 휴대폰 배터리는 휴대폰과 함께 배출합니다.",
+          "폐형광등은 깨지지 않게 전용수거함에 넣고, 이미 깨진 것은 신문지로 감싸 종량제봉투에 담습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.gangbuk.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200292",
+      "feeUrl": "https://www.gangbuk.go.kr/portal/bbs/B0000088/list.do?menuNo=200291",
+      "phone": "02-901-6787",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "강북구 대형생활폐기물 인터넷신청",
+        "url": "https://www.gangbuk.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200292",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "인터넷 신청 경로와 청소행정과 02-901-6787 확인"
+      },
+      {
+        "title": "강북구 폐형광등·폐건전지 배출안내",
+        "url": "https://www.gangbuk.go.kr/portal/main/contents.do?menuNo=200847",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 배출방법과 거점 수거함"
+      }
+    ]
+  },
+  {
+    "id": "dobong_gu",
+    "name": "서울 도봉구",
+    "aliases": [
+      "도봉구",
+      "서울 도봉구",
+      "서울시 도봉구",
+      "서울특별시 도봉구",
+      "dobong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "도봉구는 대형폐기물 신청과 수수료 조회를 스마트클린 도봉에서 처리하고 배출 상담 번호를 따로 둡니다. 폐의약품은 약국과 관공서 수거함 또는 우체통, 폐건전지는 전용 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 관내 약국이나 도봉구청·동주민센터·복지관·일부 공동주택에 놓인 수거함에 배출하거나 관내 우체통에 넣습니다.",
+          "우체통에는 물약을 넣을 수 없고, 가루약과 알약을 일반 봉투에 담아 '폐의약품'이라고 적은 뒤 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 폐형광등·폐건전지 수거함이 설치된 곳에 배출합니다. 수거함은 각 동주민센터와 공동주택, 경로당 등에 있습니다.",
+          "정확한 위치는 스마트서울맵에서 '폐건전지 폐형광등 분리수거함'으로 검색해 확인합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.dobong.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.dobong.go.kr/online/bulky/item",
+      "phone": "02-2091-3266",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "스마트클린 도봉 이용 방법",
+        "url": "https://smartclean.dobong.go.kr/online/bulky/guide",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "배출 절차와 대형폐기물 배출문의 02-2091-3266 확인"
+      },
+      {
+        "title": "도봉구 폐형광등·폐건전지 배출안내",
+        "url": "https://www.dobong.go.kr/subsite/waste/Contents.asp?code=10007368",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 수거함 위치와 배출방법"
+      }
+    ]
+  },
+  {
+    "id": "nowon_gu",
+    "name": "서울 노원구",
+    "aliases": [
+      "노원구",
+      "서울 노원구",
+      "서울시 노원구",
+      "서울특별시 노원구",
+      "nowon-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "노원구는 대형폐기물 신청과 수수료 조회를 스마트클린 노원에서 받습니다. 폐의약품은 동주민센터·보건소·약국 수거함으로 모으고, 폐건전지는 아파트 세대 수와 주택 유형에 따라 배출처가 갈립니다. 배출 요일과 시간은 동·주택 유형별로 달라 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가정에 보관 중인 폐의약품은 동주민센터와 보건소, 약국 등에 비치된 폐의약품 수거함에 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 건물 유형에 따라 지정된 분리수거함에 배출합니다.",
+          "아파트는 500가구 이상이면 관리사무소, 500가구 미만이면 관할 동주민센터나 자체 분리수거함을 이용하고, 단독주택은 관할 동주민센터에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.nowon.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.nowon.kr/online/bulky/item",
+      "phone": "02-2116-3808",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "노원구 생활폐기물 배출안내",
+        "url": "https://www.nowon.kr/www/minwon/minwon4/minwon4_03/minwon4_03_02.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐의약품 배출 안내와 자원순환과 직통 02-2116-3808 확인"
+      },
+      {
+        "title": "노원구 폐형광등·폐건전지 배출안내",
+        "url": "https://www.nowon.kr/www/minwon/minwon4/minwon4_03/minwon4_03_07.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 분리수거함 설치장소"
+      }
+    ]
+  },
+  {
+    "id": "eunpyeong_gu",
+    "name": "서울 은평구",
+    "aliases": [
+      "은평구",
+      "서울 은평구",
+      "서울시 은평구",
+      "서울특별시 은평구",
+      "eunpyeong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "은평구는 대형생활폐기물 신청과 수수료 조회를 스마트클린 은평에서 받습니다. 폐의약품은 전용 수거함이나 우체통에 배출하고, 폐배터리와 폐형광등은 화재 예방을 위해 동별 전용 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 은평구 관내 전용수거함이나 우체통에 배출합니다.",
+          "수거함 위치는 스마트서울맵의 '폐의약품 전용수거함 위치' 탭에서 확인할 수 있습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐배터리를 재활용품에 섞어 배출하면 화재의 원인이 되므로, 폐배터리와 폐형광등은 각 동별 전용수거함에 배출합니다.",
+          "폐형광등은 포장지를 제거하고 깨지지 않은 상태로 넣습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.ep.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.ep.go.kr/online/bulky/item",
+      "phone": "02-351-7587",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "은평구 대형생활폐기물 신청",
+        "url": "https://www.ep.go.kr/www/contents.do?key=349",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "공식 신청 사이트 안내와 자원순환과 자원재활용팀 02-351-7587 확인"
+      },
+      {
+        "title": "은평구 폐배터리·폐형광등 배출안내",
+        "url": "https://www.ep.go.kr/www/contents.do?key=1241",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 전용수거함 배출방법"
+      }
+    ]
+  },
+  {
+    "id": "gangseo_gu",
+    "name": "서울 강서구",
+    "aliases": [
+      "강서구",
+      "서울 강서구",
+      "서울시 강서구",
+      "서울특별시 강서구",
+      "gangseo-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "강서구는 대형폐기물 배출신청과 수집·운반 수수료를 구청 누리집에서 함께 안내합니다. 폐의약품은 주민센터·보건소·우체통으로, 전지류는 제품에서 분리해 거점 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가루약과 조제 알약은 포장 및 밀봉 상태 그대로, 캡슐 알약은 포장된 그대로, 물약·시럽·연고는 용기 마개를 닫아 배출합니다.",
+          "배출장소는 가까운 주민센터와 보건소, 구청, 국민건강보험공단 지사 민원실, 서울시 소재 우체통입니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "전지류는 제품에서 분리해 배출합니다.",
+          "전자제품 대리점과 시계점 같은 역회수 경로나 주요 거점에 비치된 수거함, 지정된 전지류 수거일·장소에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.gangseo.seoul.kr/gs010206",
+      "feeUrl": "https://www.gangseo.seoul.kr/gs010205",
+      "phone": "02-2600-4064",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "강서구 대형폐기물 배출신고 안내",
+        "url": "https://www.gangseo.seoul.kr/gs010203",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "자원순환과 문의 02-2600-4064 확인"
+      },
+      {
+        "title": "강서구 폐의약품 배출방법",
+        "url": "https://www.gangseo.seoul.kr/env/env010501",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐의약품 배출장소와 방법"
+      }
+    ]
+  },
+  {
+    "id": "geumcheon_gu",
+    "name": "서울 금천구",
+    "aliases": [
+      "금천구",
+      "서울 금천구",
+      "서울시 금천구",
+      "서울특별시 금천구",
+      "geumcheon-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "금천구는 대형폐기물 신청과 수수료 조회를 스마트클린 금천에서 받습니다. 폐의약품은 동주민센터·보건소·공동주택 수거함이나 우체통으로, 폐형광등과 폐건전지는 전용 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가루약과 조제 알약은 포장 및 밀봉 상태 그대로, 캡슐은 포장된 그대로, 물약·시럽·연고는 용기 마개를 닫아 배출합니다.",
+          "배출장소는 가까운 동주민센터와 보건소, 공동주택의 폐의약품 수거함이며, 물약을 뺀 나머지는 '폐의약품'을 표시해 서울시 소재 우체통에 넣을 수도 있습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등과 폐건전지는 전용 수거함으로 배출합니다.",
+          "수거함 위치는 구청 누리집의 폐형광등 수거함 위치 안내에서 확인합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.geumcheon.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.geumcheon.go.kr/online/bulky/item",
+      "phone": "02-2627-1476",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "금천구 대형폐기물배출안내",
+        "url": "https://www.geumcheon.go.kr/portal/contents.do?key=549",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "신청 경로와 청소행정과 02-2627-1476 확인"
+      },
+      {
+        "title": "금천구 폐의약품 배출 방법",
+        "url": "https://www.geumcheon.go.kr/portal/contents.do?key=4409",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐의약품 배출방법과 배출장소"
+      }
+    ]
+  },
+  {
+    "id": "yeongdeungpo_gu",
+    "name": "서울 영등포구",
+    "aliases": [
+      "영등포구",
+      "서울 영등포구",
+      "서울시 영등포구",
+      "서울특별시 영등포구",
+      "yeongdeungpo-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "영등포구는 대형폐기물 신청과 수수료 조회를 스마트클린 영등포에서 받습니다. 폐의약품은 관내 50개소 전용 수거함으로 모으고, 폐건전지는 부풀어 오른 경우 수거함 대신 동주민센터에 전달하도록 안내합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가정에서 나온 폐의약품은 종량제봉투가 아니라 전용 수거함으로 배출합니다.",
+          "관내 50개소에 폐의약품 전용 수거함이 설치돼 운영되고 있습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지와 보조배터리는 종류에 상관없이 물기를 제거하고 가까운 전용 분리수거함에 배출합니다.",
+          "크기가 커서 수거함에 들어가지 않거나 배터리가 부풀어 오른 경우에는 화재 위험이 있으므로 가까운 동주민센터에 전달합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.ydp.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.ydp.go.kr/online/bulky/item",
+      "phone": "02-2670-3486",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "스마트클린 영등포 이용 방법",
+        "url": "https://smartclean.ydp.go.kr/online/bulky/guide",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "배출 절차와 청소과 자원재활용팀 02-2670-3486 확인"
+      },
+      {
+        "title": "영등포구 폐전지 배출안내",
+        "url": "https://www.ydp.go.kr/www/contents.do?key=6155",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 배출요령과 부푼 배터리 처리"
+      }
+    ]
+  },
+  {
+    "id": "dongjak_gu",
+    "name": "서울 동작구",
+    "aliases": [
+      "동작구",
+      "서울 동작구",
+      "서울시 동작구",
+      "서울특별시 동작구",
+      "dongjak-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "동작구는 대형폐기물 신청과 수수료 조회를 스마트클린 동작에서 받습니다. 폐의약품은 전용 수거함이나 관내 우체통으로 배출하고, 폐형광등과 폐건전지 분리수거함은 관내 425개소를 운영합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 구청·주민센터·복지관·공동주택에 설치된 전용수거함이나 관내 우체통에 배출합니다.",
+          "우체통에 넣을 때는 회수봉투나 일반봉투에 '폐의약품'을 표시해 밀봉하며 물약은 제외합니다. 수거함 위치는 스마트서울맵에서 확인합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등과 폐건전지는 포장지를 제거한 뒤 깨지지 않은 상태로 분리수거함에 배출합니다.",
+          "관내 분리수거함은 425개소가 설치돼 있습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.dongjak.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.dongjak.go.kr/online/bulky/item",
+      "phone": "02-820-1326",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "동작구 대형폐기물 종류 및 처리방법",
+        "url": "https://www.dongjak.go.kr/portal/main/contents.do?menuNo=200734",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "처리방법과 청소행정과 청소행정팀 02-820-1326 확인"
+      },
+      {
+        "title": "동작구 폐형광등·폐건전지 분리수거",
+        "url": "https://www.dongjak.go.kr/portal/main/contents.do?menuNo=200594",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 배출방법과 수거함 개소"
+      }
+    ]
+  },
+  {
+    "id": "gwanak_gu",
+    "name": "서울 관악구",
+    "aliases": [
+      "관악구",
+      "서울 관악구",
+      "서울시 관악구",
+      "서울특별시 관악구",
+      "gwanak-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "관악구는 대형폐기물을 스마트클린 관악에서 인터넷으로 신청하거나 수거 대행 콜센터로 접수합니다. 폐의약품은 동주민센터 수거함 21개소와 관내 우체통 29개소로, 폐건전지는 주택 유형별 수거함으로 모읍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가루약과 조제 알약은 포장 및 밀봉 상태 그대로, 캡슐은 포장된 그대로, 물약·시럽·연고는 용기 마개를 닫아 배출합니다.",
+          "배출장소는 각 동주민센터 폐의약품 수거함 21개소와 관내 우체통 29개소이며, 우체통에 넣을 때는 일반봉투에 '폐의약품'을 표시합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "아파트는 단지 안에 설치된 폐형광등·폐건전지 수거함에, 일반주택은 동주민센터와 길거리에 설치된 수거함에 배출합니다.",
+          "대형건물과 대규모사업장의 폐건전지는 e-순환거버넌스를 통해 처리합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.gwanak.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.gwanak.go.kr/online/bulky/item",
+      "phone": "02-882-5677",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "관악구 대형폐기물 배출방법",
+        "url": "https://www.gwanak.go.kr/site/gwanak/09/10903020400002023110105.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "인터넷·전화 배출신청 절차와 콜센터 02-882-5677 확인"
+      },
+      {
+        "title": "관악구 생활계 유해폐기물 배출안내",
+        "url": "https://www.gwanak.go.kr/site/gwanak/09/10903060000002023030704.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐의약품과 폐형광등·폐건전지 배출방법"
+      }
+    ]
+  },
+  {
+    "id": "gangdong_gu",
+    "name": "서울 강동구",
+    "aliases": [
+      "강동구",
+      "서울 강동구",
+      "서울시 강동구",
+      "서울특별시 강동구",
+      "gangdong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-14",
+    "summary": "강동구는 대형폐기물 신청과 수집·운반 수수료를 구청 누리집에서 함께 처리합니다. 폐의약품은 동주민센터·보건소 수거함이나 우체통으로 배출하고, 부풀어 오른 리튬전지는 수거함에 넣지 말고 담당자에게 직접 전달하도록 안내합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 각 동주민센터와 보건소, 천호보건지소의 수거함이나 우체통에 배출합니다. 가루약과 조제 알약은 포장지를 개봉하지 말고 그대로 배출합니다.",
+          "우체통에 넣을 때는 전용 봉투나 '폐의약품'을 표기한 일반 종이봉투에 담으며, 물약과 시럽은 우체통이 아니라 주민센터·보건소 수거함에 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 녹슬지 않게 물기를 제거하고 원상태로 분리수거함에 배출합니다.",
+          "리튬이차전지가 부풀어 오른 경우에는 화재·폭발 위험이 있으므로 전용수거함에 바로 넣지 말고 비닐랩으로 감아 구청 담당부서나 동주민센터 담당자에게 직접 전달합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.gangdong.go.kr/web/newportal/largeWaste/apply/step1",
+      "feeUrl": "https://www.gangdong.go.kr/web/newportal/largeWaste/code/list",
+      "phone": "02-3425-5870",
+      "contactCheckedAt": "2026-08-14"
+    },
+    "sources": [
+      {
+        "title": "강동구 대형폐기물 처리신청",
+        "url": "https://www.gangdong.go.kr/web/newportal/largeWaste/apply/step1",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "인터넷 신청 경로와 청소행정과 도시청결팀 02-3425-5870 확인"
+      },
+      {
+        "title": "강동구 폐형광등·폐건전지 배출안내",
+        "url": "https://www.gangdong.go.kr/web/newportal/contents/gdp_005_004_010_004_003",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "폐건전지 배출방법과 부푼 리튬전지 처리"
+      }
+    ]
+  },
+  {
+    "id": "seoul",
+    "name": "서울특별시",
+    "aliases": [
+      "서울",
+      "서울시",
+      "서울특별시",
+      "seoul"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "서울시는 재활용품을 비우고 헹궈 재질별로 나눠 배출하는 기본 원칙과 품목별 배출요령을 시 차원에서 통일해 안내합니다. 다만 시 안내문 자체가 재활용품 수거는 자치구 조례와 실제 수거 여건에 따라 달라지니 거주지 자치구 청소과에 확인하라고 밝히고 있습니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 25개 자치구가 따로 정하므로 거주 자치구 확인이 필요합니다.",
+    "sources": [
+      {
+        "title": "재활용품 분리배출 길라잡이 - 서울특별시 환경",
+        "url": "https://news.seoul.go.kr/env/archives/558699",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "품목별 분리배출요령과 '자치구 조례·수거 여건에 따라 다르므로 자치구 청소과 확인' 안내"
+      }
+    ]
+  },
+  {
+    "id": "busan",
+    "name": "부산광역시",
+    "aliases": [
+      "부산",
+      "부산시",
+      "부산광역시",
+      "busan"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "부산시는 재활용품 분리배출과 음식물쓰레기 배출방법, 1회용품 사용규제를 시 단위로 안내합니다. 시 누리집의 폐기물 안내 안에 '구·군별 배출시간·장소' 항목이 따로 있다는 점이 배출 시점과 장소가 지역마다 갈린다는 사실을 그대로 보여줍니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 16개 구·군이 각각 정하므로 거주 구·군 확인이 필요합니다.",
+    "sources": [
+      {
+        "title": "재활용품 분리배출 - 부산광역시",
+        "url": "https://www.busan.go.kr/depart/ahwastepolicy09",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "시 단위 재활용품 분리배출 안내와 하위 '구·군별 배출시간·장소' 메뉴 확인"
+      }
+    ]
+  },
+  {
+    "id": "daegu",
+    "name": "대구광역시",
+    "aliases": [
+      "대구",
+      "대구시",
+      "대구광역시",
+      "daegu"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "대구시 자원순환과가 분리수거 품목과 배출요령, 투명페트병 분리배출, 음식물류폐기물 감량, 종량제봉투 이용안내를 환경 누리집에 모아 두었습니다. 음식물쓰레기는 물기와 이물질을 빼고 내놓는 것이 기본입니다. 봉투 가격과 배출 요일, 수수료, 대형폐기물 신청 경로는 구·군마다 달라 거주지 구·군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "분리수거 품목 및 배출요령 - 대구광역시 환경",
+        "url": "https://www.daegu.go.kr/env/index.do?menu_id=00001319",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "자원순환과가 안내하는 시 단위 분리수거 품목·배출요령"
+      }
+    ]
+  },
+  {
+    "id": "incheon",
+    "name": "인천광역시",
+    "aliases": [
+      "인천",
+      "인천시",
+      "인천광역시",
+      "incheon"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "인천시는 폐기물 발생을 줄이고 재사용·재생 이용을 늘리는 자원순환 정책 방향을 밝히면서, 시민이 참여하는 분리배출 확대를 핵심으로 내세웁니다. 폐가전 전용수거함 위치 같은 지점 단위 정보는 분리배출 누리집의 지도로 안내합니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 10개 군·구가 각각 운영하므로 거주 군·구에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "자원순환 - 인천광역시 분야별 환경",
+        "url": "https://www.incheon.go.kr/env/ENV010202",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "시 자원순환 정책 방향과 담당 자원순환과 확인"
+      }
+    ]
+  },
+  {
+    "id": "gwangju",
+    "name": "광주광역시",
+    "aliases": [
+      "광주",
+      "광주시",
+      "광주광역시",
+      "gwangju"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "광주시 환경 누리집은 종이류·유리병·금속캔·페트병·비닐류·전지류·형광등 등 품목을 나눠 배출요령을 안내하고, 내용물을 비우고 헹궈 이물질을 없앤 뒤 내놓는 것을 공통 원칙으로 제시합니다. 2026년 8월 기준 누리집 기관명이 '전남광주통합특별시(구)광주광역시'로 표기돼 전남과의 행정 통합이 반영돼 있습니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 5개 자치구 소관이라 거주 자치구 확인이 필요합니다.",
+    "sources": [
+      {
+        "title": "재활용 자원 - 광주광역시 환경",
+        "url": "https://www.gwangju.go.kr/envi/contentsView.do?pageId=envi246",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "품목별 분리배출요령 본문과 통합 기관명 표기 확인"
+      }
+    ]
+  },
+  {
+    "id": "daejeon",
+    "name": "대전광역시",
+    "aliases": [
+      "대전",
+      "대전시",
+      "대전광역시",
+      "daejeon"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "대전시 자원순환과가 종이류·유리병·금속캔·플라스틱·의류·전지류·형광등·폐가전의 품목별 배출요령을 정리해 안내합니다. 유리병은 색상별 용기나 전용봉투에, 무색 페트병은 투명·반투명 봉투에 담아 다른 플라스틱과 섞이지 않게 내놓도록 기준이 구체적입니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 5개 자치구가 정하므로 거주 자치구에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "재활용품목 및 분리배출요령 - 대전광역시청",
+        "url": "https://www.daejeon.go.kr/drh/DrhContentsHtmlView.do?menuSeq=1976",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "품목별 분리배출요령 본문과 담당 자원순환과 확인"
+      }
+    ]
+  },
+  {
+    "id": "ulsan",
+    "name": "울산광역시",
+    "aliases": [
+      "울산",
+      "울산시",
+      "울산광역시",
+      "ulsan"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "울산시 자원순환 안내는 가정 생활폐기물을 '구청장·군수가 정하는 종량제 규격봉투'에 담아 지정된 시간과 장소에 내놓도록 규정합니다. 재활용 가능 폐기물도 구·군이나 아파트 자치회가 정한 장소와 용기에 맞춰 배출해야 합니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 처음부터 구·군 소관이라 거주지 구·군 확인이 필요합니다.",
+    "sources": [
+      {
+        "title": "폐기물 배출방법 - 울산광역시 자원순환",
+        "url": "https://ulsan.go.kr/u/envi/contents.ulsan?mId=001005002001000000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "'구청장·군수가 정하는 종량제 규격봉투' 규정과 구·군별 안내 링크 확인"
+      }
+    ]
+  },
+  {
+    "id": "sejong",
+    "name": "세종특별자치시",
+    "aliases": [
+      "세종",
+      "세종시",
+      "세종특별자치시",
+      "sejong"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "세종시는 모든 쓰레기를 해가 진 뒤 내 집·내 점포 앞에 내놓는 것을 기본 규칙으로 삼고, 읍·면지역과 동지역의 배출 방식을 나눠 안내합니다. 읍·면은 종량제봉투를 지정장소에 두는 반면 동지역은 자동크린넷 투입구에 넣습니다. 수거 요일과 시간은 동별로 다르고 대형폐기물은 읍·면·동에서 납부필증을 사거나 시 배출신고를 거쳐야 하므로, 실제 배출은 거주 읍·면·동 기준으로 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "우리집의 폐기물 분류 - 세종특별자치시 생활폐기물 분리배출",
+        "url": "https://www.sejong.go.kr/recycle/sub03_01_01.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "읍·면지역과 동지역 배출 방식 차이, 야간 배출 원칙 확인"
+      }
+    ]
+  },
+  {
+    "id": "gyeonggi",
+    "name": "경기도",
+    "aliases": [
+      "경기",
+      "경기도",
+      "gyeonggi"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "경기도는 수도권 생활폐기물 직매립 금지에 맞춰 분리배출 인프라 확충과 다회용기 생활화, 수거보상제 확대, 처리시설 현대화를 축으로 생활폐기물 감량을 추진합니다. 도 누리집이 도 차원의 안내를 제공하지만 거점배출시설 설치처럼 실행은 시군 단위로 진행됩니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 31개 시군이 각각 정하므로 거주 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "폐기물 관리 - 경기도청 생활환경",
+        "url": "https://www.gg.go.kr/bbs/board.do?bsIdx=678&menuId=1966",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "도 누리집 환경>생활환경>폐기물 관리 안내 확인"
+      }
+    ]
+  },
+  {
+    "id": "gangwon",
+    "name": "강원특별자치도",
+    "aliases": [
+      "강원",
+      "강원도",
+      "강원특별자치도",
+      "gangwon"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "강원특별자치도는 폐기물 발생량을 먼저 줄이고 나온 폐기물은 최대한 자원화하는 자원순환형 관리체계 구축을 도 정책 방향으로 밝히고 있습니다. 종량제와 EPR, 음식물류 폐기물 직매립 금지 같은 제도 흐름을 도 차원에서 정리해 안내합니다. 도 페이지에는 시군별 배출 정보가 없어 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 18개 시군에서 직접 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "폐기물 발생 및 처리 - 강원특별자치도 자원순환",
+        "url": "https://state.gwd.go.kr/portal/partinfo/environment/recycling/waste",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "도 자원순환형 폐기물 관리체계 정책 방향 확인, 시군별 안내 없음"
+      }
+    ]
+  },
+  {
+    "id": "chungnam",
+    "name": "충청남도",
+    "aliases": [
+      "충남",
+      "충청남도",
+      "chungnam"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "충청남도 자원순환과가 도 전체 폐기물 발생량과 처리 현황을 정리해 공개하고, 폐기물 처리업체 정보는 순환자원정보센터로 연결합니다. 도 페이지에는 시군별 배출 자료가 없습니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 15개 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "폐기물 발생 및 처리현황 - 충청남도 누리집",
+        "url": "https://www.chungnam.go.kr/cnportal/main/contents.do?menuNo=500670",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "도 단위 폐기물 발생·처리 통계와 담당 자원순환과 확인"
+      }
+    ]
+  },
+  {
+    "id": "gyeongbuk",
+    "name": "경상북도",
+    "aliases": [
+      "경북",
+      "경상북도",
+      "gyeongbuk"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "경상북도 환경 누리집은 생활쓰레기의 관리와 처리가 시장·군수의 고유사무임을 명시하고, 각 시군이 자체 또는 민간 위탁으로 수거·처리한다고 안내합니다. 도 차원에서는 음식물쓰레기 감량과 처리시설 확충, 지역맞춤형 종량제 같은 감량 전략을 제시합니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 22개 시군에서 직접 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "폐기물감량 - 경상북도 환경정책",
+        "url": "https://www.gb.go.kr/Main/env/page.do?mnu_uid=15198&LARGE_CODE=1050&MEDIUM_CODE=10&SMALL_CODE=10&SMALL_CODE2=40&mnu_order=2",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "'생활쓰레기의 관리 및 처리는 시장·군수의 고유사무' 문구와 도 감량 전략 확인"
+      }
+    ]
+  },
+  {
+    "id": "jeju",
+    "name": "제주특별자치도",
+    "aliases": [
+      "제주",
+      "제주도",
+      "제주특별자치도",
+      "jeju"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "제주도는 재활용품 요일별 배출제를 도 전역에 시행해 배출시간을 15시부터 다음날 4시까지로 정하고, 음식물쓰레기는 24시간 배출할 수 있게 합니다. 월·수·금은 플라스틱류와 종이류·불연성, 화·토는 플라스틱류와 종이류·비닐류로 요일이 갈리고 병류와 스티로폼, 캔·고철류는 매일 낼 수 있습니다. 대형폐기물 신고는 제주시와 서귀포시로 나뉘어 있어 세부 배출 장소와 수수료, 신청 경로는 거주 행정시와 읍·면·동에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "재활용품 요일별 배출제 - 제주특별자치도 환경",
+        "url": "https://www.jeju.go.kr/nature/environment/reform.htm",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "요일별 배출 품목표와 배출시간, 행정시별 대형폐기물 링크 분리 확인"
+      }
+    ]
+  },
+  {
+    "id": "chungbuk",
+    "name": "충청북도",
+    "aliases": [
+      "충북",
+      "충청북도",
+      "chungbuk"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "충청북도 환경정책과는 순환경제 전환 차원에서 종이팩을 씻고 펼쳐 말린 뒤 배출하도록 안내하고, 도 단위로는 생활폐기물·음식물류 처리시설 운영현황 같은 통계를 공개합니다. 도 누리집에는 품목별 배출요령을 모아 둔 시민용 페이지가 따로 없습니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 11개 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "충북도 종이팩 분리배출 캠페인 - 충청북도",
+        "url": "https://www.chungbuk.go.kr/www/selectBbsNttView.do?key=429&bbsNo=65&nttNo=300098",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "환경정책과 명의의 종이팩 분리배출 요령과 자원순환 정책 취지 확인"
+      }
+    ]
+  },
+  {
+    "id": "jeonbuk",
+    "name": "전북특별자치도",
+    "aliases": [
+      "전북",
+      "전북특별자치도",
+      "jeonbuk"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "전북특별자치도는 투명페트병 별도 분리배출 의무화를 도 단위로 안내하며, 무색 투명한 생수·음료 페트병은 내용물을 비우고 라벨을 뗀 뒤 눌러 뚜껑을 닫아 다른 플라스틱과 따로 내놓도록 합니다. 도는 환경청·시군과 함께 이행 실태를 점검합니다. 도 누리집 분야별 정보에 환경 항목이 없어 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 14개 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "전북자치도 투명페트병 분리배출 수거실태 합동점검 - 전북특별자치도",
+        "url": "https://www.jeonbuk.go.kr/newsroom/board/view.jeonbuk?boardId=BBS_0000090&menuCd=DOM_000001101000000000&dataSid=555193",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "도 단위 투명페트병 분리배출 요령과 제도 시행 경과, 시군 합동점검 확인"
+      }
+    ]
+  },
+  {
+    "id": "jeonnam",
+    "name": "전라남도",
+    "aliases": [
+      "전남",
+      "전라남도",
+      "jeonnam"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "전라남도는 환경계획의 자원순환 부문 목표를 폐기물의 안정적 처리와 지속가능한 자원순환사회 실현으로 잡고, 계획을 세울 때 관할 기초자치단체장의 의견을 수렴합니다. 도민 실천 안내는 가정 쓰레기 분리배출의 온실가스 감축 효과 같은 생활 지침 수준입니다. 2026년 8월 기준 누리집 기관명이 '전남광주통합특별시(구)전라남도청'으로 표기돼 광주와의 행정 통합이 반영돼 있습니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 22개 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "환경계획 - 전라남도 환경정책",
+        "url": "https://www.jeonnam.go.kr/contentsView.do?menuId=jeonnam0506120200",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "자원순환 부문 목표와 기초자치단체장 의견 수렴 절차, 통합 기관명 표기 확인"
+      }
+    ]
+  },
+  {
+    "id": "gyeongnam",
+    "name": "경상남도",
+    "aliases": [
+      "경남",
+      "경상남도",
+      "gyeongnam"
+    ],
+    "coverageTier": "metro",
+    "checkedAt": "2026-08-14",
+    "summary": "경상남도 환경정책과는 음식물쓰레기 줄이기 실천수칙을 가정·음식점·단체급식소로 나눠 안내하고, 음식물쓰레기는 따로 버리되 물기와 이물질을 없애 위생적으로 관리하도록 합니다. 도 차원에서는 1회용 플라스틱 감축과 재활용률 향상을 추진하고, 시·군에는 폐기물 관리조례 정비를 맡깁니다. 품목별 배출요령과 배출일정은 도 누리집에 없어 18개 시군에서 확인해야 합니다.",
+    "sources": [
+      {
+        "title": "생활환경 - 경상남도 녹색경남",
+        "url": "https://www.gyeongnam.go.kr/index.gyeong?menuCd=DOM_000000146005004000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-14",
+        "basis": "음식물쓰레기 배출 원칙과 실천수칙, 담당 환경정책과 확인"
       }
     ]
   }

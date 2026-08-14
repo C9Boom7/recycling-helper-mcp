@@ -2,14 +2,8 @@ import { readFileSync } from "node:fs";
 
 const itemsPath = new URL("../src/data/waste-items.json", import.meta.url);
 const casesPath = new URL("../src/data/evaluation-cases.json", import.meta.url);
-const regionPoliciesPath = new URL("../src/data/region-policies.json", import.meta.url);
-const regionCasesPath = new URL("../src/data/region-evaluation-cases.json", import.meta.url);
-const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.meta.url);
 const wasteItems = JSON.parse(readFileSync(itemsPath, "utf8"));
 const evaluationCases = JSON.parse(readFileSync(casesPath, "utf8"));
-const regionalPolicies = JSON.parse(readFileSync(regionPoliciesPath, "utf8"));
-const regionEvaluationCases = JSON.parse(readFileSync(regionCasesPath, "utf8"));
-const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
 
 function normalizeText(value) {
   return value
@@ -60,31 +54,6 @@ function findBestWasteItem(query) {
     .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"))[0];
 }
 
-function findRegionalPolicy(region) {
-  const normalizedRegion = normalizeText(region);
-  if (!normalizedRegion) return undefined;
-
-  for (const policy of regionalPolicies) {
-    const names = [policy.name, ...policy.aliases];
-    for (const name of names) {
-      const normalizedName = normalizeText(name);
-      if (normalizedRegion === normalizedName || normalizedRegion.includes(normalizedName) || normalizedName.includes(normalizedRegion)) {
-        return { region: policy, matchedBy: name };
-      }
-    }
-  }
-
-  return undefined;
-}
-
-function findRegionItemGuide(region, item) {
-  return region.itemGuides.find((guide) => guide.itemIds.includes(item.id));
-}
-
-function findBulkyWasteFees(region, item) {
-  return bulkyWasteFeeSchedules.find((schedule) => schedule.regionId === region.id)?.fees.filter((fee) => fee.itemId === item.id) ?? [];
-}
-
 const failures = [];
 const itemIds = new Set(wasteItems.map((item) => item.id));
 const caseCountsByItemId = new Map();
@@ -129,49 +98,12 @@ for (const testCase of evaluationCases) {
   }
 }
 
-for (const testCase of regionEvaluationCases) {
-  const regionMatch = findRegionalPolicy(testCase.region);
-  if (!regionMatch) {
-    failures.push(`region "${testCase.region}" did not match any policy; expected ${testCase.expectedRegionId}`);
-    continue;
-  }
-
-  if (regionMatch.region.id !== testCase.expectedRegionId) {
-    failures.push(`region "${testCase.region}" matched ${regionMatch.region.id}; expected ${testCase.expectedRegionId}`);
-  }
-
-  const itemMatch = findBestWasteItem(testCase.query);
-  if (!itemMatch) {
-    failures.push(`"${testCase.query}" did not match any item for region case; expected ${testCase.expectedItemId}`);
-    continue;
-  }
-
-  if (itemMatch.item.id !== testCase.expectedItemId) {
-    failures.push(`"${testCase.query}" matched ${itemMatch.item.id} for region case; expected ${testCase.expectedItemId}`);
-  }
-
-  const guide = findRegionItemGuide(regionMatch.region, itemMatch.item);
-  const guideText = guide ? [guide.summary, ...guide.steps].join(" ") : "";
-  if (!guideText.includes(testCase.expectedGuideContains)) {
-    failures.push(
-      `"${testCase.region}" + "${testCase.query}" regional guide did not include "${testCase.expectedGuideContains}"`,
-    );
-  }
-
-  if (testCase.expectedFeeKrw !== undefined) {
-    const fees = findBulkyWasteFees(regionMatch.region, itemMatch.item);
-    if (!fees.some((fee) => fee.feeKrw === testCase.expectedFeeKrw)) {
-      failures.push(
-        `"${testCase.region}" + "${testCase.query}" bulky waste fees did not include ${testCase.expectedFeeKrw}`,
-      );
-    }
-  }
-}
-
 if (failures.length > 0) {
   console.error(`Data evaluation failed (${failures.length}):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log(`Data evaluation passed: ${evaluationCases.length} item cases, ${regionEvaluationCases.length} region cases`);
+// 지역 케이스는 `test-region-matching.ts`로 옮겼다 — 거기서는 리졸버를 복제하지 않고
+// `src/data.ts`에서 그대로 불러 쓴다.
+console.log(`Data evaluation passed: ${evaluationCases.length} item cases`);

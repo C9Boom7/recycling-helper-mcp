@@ -74,19 +74,41 @@ export type BulkyWasteFeeSchedule = {
   fees: BulkyWasteFee[];
 };
 
+/**
+ * `full`은 배출 요일까지 확인한 기존 5개 지역, `standard`는 대형폐기물 신청
+ * 경로와 수거함 안내만 담은 얕은 티어, `metro`는 자치구가 등록되지 않았을 때
+ * 착지시키는 광역시도 레이어다. 대형폐기물 접수는 기초자치단체 소관이라
+ * `metro`에는 `bulkyWaste`를 두지 않는다(validate가 강제).
+ */
+export type RegionCoverageTier = "full" | "standard" | "metro";
+
+export type RegionBulkyWaste = {
+  definition?: string;
+  place?: string[];
+  collection?: string[];
+  phone?: string;
+  applicationUrl?: string;
+  feeUrl?: string;
+  /** URL과 번호는 확인 시점이 달라서 지역 `checkedAt`과 따로 기록한다. */
+  contactCheckedAt?: string;
+};
+
 export type RegionalPolicyData = {
   id: string;
   name: string;
   aliases: string[];
+  coverageTier: RegionCoverageTier;
+  /** 자치구·시가 속한 광역시도의 region id. `metro` 항목에는 없다. */
+  metroId?: string;
   checkedAt: string;
   summary: string;
-  generalWaste: {
+  generalWaste?: {
     time: string;
     place: string;
     method: string;
     notes: string[];
   };
-  recycling: {
+  recycling?: {
     appliesTo: string;
     time: string;
     place: string;
@@ -95,35 +117,39 @@ export type RegionalPolicyData = {
     method: string[];
     notes: string[];
   };
-  foodWaste: {
+  foodWaste?: {
     method: string[];
     generalWasteExceptions: string[];
     exceptionMethod: string;
   };
-  specialCollections: {
-    batteryAndFluorescentLamp: { method: string[] };
-    medicine: { method: string[] };
-    usedCookingOil: { method: string[] };
-    clothing: { method: string[] };
+  specialCollections?: {
+    batteryAndFluorescentLamp?: { method: string[] };
+    medicine?: { method: string[] };
+    usedCookingOil?: { method: string[] };
+    clothing?: { method: string[] };
   };
-  bulkyWaste: {
-    definition: string;
-    place: string[];
-    collection: string[];
-    phone: string;
-  };
-  smallElectronics: {
+  bulkyWaste?: RegionBulkyWaste;
+  smallElectronics?: {
     method: string[];
     examples: string[];
   };
-  itemGuides: RegionItemGuide[];
+  itemGuides?: RegionItemGuide[];
   sources: RegionCollectionSource[];
 };
+
+/** 자치구·시 레벨과 광역시도 레벨. 매칭은 작은 단위부터 확정한다. */
+export type RegionMatchLevel = "district" | "metro";
 
 export type MatchedRegionPolicy = {
   region: RegionalPolicyData;
   matchedBy: string;
+  level: RegionMatchLevel;
 };
+
+export type RegionResolution =
+  | { status: "match"; match: MatchedRegionPolicy }
+  | { status: "ambiguous"; candidates: MatchedRegionPolicy[] }
+  | { status: "not_found" };
 
 export type WasteMatch = {
   item: WasteItem;
@@ -687,62 +713,172 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   return { status: "match", match: best };
 }
 
-/** 시·도 단위 입력. 지역 정책은 시·군·구 단위라 이 이름만으로는 확정하지 않는다. */
-const PROVINCE_QUERIES = new Set(
-  [
-    "서울", "서울시", "서울특별시",
-    "부산", "부산시", "부산광역시",
-    "대구", "대구시", "대구광역시",
-    "인천", "인천시", "인천광역시",
-    "광주", "광주시", "광주광역시",
-    "대전", "대전시", "대전광역시",
-    "울산", "울산시", "울산광역시",
-    "세종", "세종시", "세종특별자치시",
-    "경기", "경기도",
-    "강원", "강원도", "강원특별자치도",
-    "충북", "충청북도", "충남", "충청남도",
-    "전북", "전라북도", "전북특별자치도", "전남", "전라남도",
-    "경북", "경상북도", "경남", "경상남도",
-    "제주", "제주도", "제주특별자치도",
-  ].map(normalizeText),
-);
+export function regionMatchLevel(region: RegionalPolicyData): RegionMatchLevel {
+  return region.coverageTier === "metro" ? "metro" : "district";
+}
 
-export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undefined {
-  if (!region) return undefined;
+/**
+ * 3(완전 일치) > 2(질의가 지역명으로 시작) > 1(지역명이 질의로 시작).
+ *
+ * 양쪽 모두 **앞부분 기준**인 게 핵심이다. 한국어 주소는 큰 단위부터 적으므로
+ * 실제 지역 참조는 항상 어느 한쪽의 앞에서 겹친다. 아무 위치나 허용하면 형태소
+ * 경계를 넘어 걸린다 — "남구"가 "서울강남구"에 걸려 조용히 강남구로 확정되고,
+ * "부산 해운대구"는 "해운대구" 속의 "대구" 때문에 대구광역시까지 후보로 끌어온다.
+ * 앞부분으로 고정하면 "강남"은 "강남구"를, "부산 해운대구"는 부산만 찾고,
+ * "남구"는 아무것도 못 찾아 전국 폴백으로 내려간다. 틀린 답보다 모르는 답이 낫다.
+ */
+const REGION_MIN_FRAGMENT_QUERY_LENGTH = 2;
 
-  const normalizedRegion = normalizeText(region);
-  if (!normalizedRegion) return undefined;
+type RegionMatchStrength = 3 | 2 | 1;
 
-  // Pass 1 — the query names the region at least as specifically as we do
-  // ("서울 강남구", "강남구 역삼동"). The first hit is the answer.
-  const broaderHits: MatchedRegionPolicy[] = [];
-  for (const policy of regionalPolicies) {
-    const names = [policy.name, ...policy.aliases];
-    for (const name of names) {
-      const normalizedName = normalizeText(name);
-      if (normalizedRegion === normalizedName || normalizedRegion.includes(normalizedName)) {
-        return { region: policy, matchedBy: name };
-      }
-      if (normalizedName.includes(normalizedRegion)) {
-        broaderHits.push({ region: policy, matchedBy: name });
-      }
+function regionMatchStrength(normalizedQuery: string, normalizedName: string): RegionMatchStrength | 0 {
+  if (!normalizedName) return 0;
+  if (normalizedQuery === normalizedName) return 3;
+  if (normalizedQuery.startsWith(normalizedName)) return 2;
+  if (normalizedName.startsWith(normalizedQuery) && normalizedQuery.length >= REGION_MIN_FRAGMENT_QUERY_LENGTH) return 1;
+  return 0;
+}
+
+/** 한 레벨에서 주어진 강도로 매칭되는 지역들. 같은 지역이 여러 별칭으로 걸리면 하나로 접는다. */
+function regionCandidatesAt(
+  policies: RegionalPolicyData[],
+  normalizedQuery: string,
+  level: RegionMatchLevel,
+  strength: RegionMatchStrength,
+): MatchedRegionPolicy[] {
+  const byRegionId = new Map<string, MatchedRegionPolicy>();
+
+  for (const policy of policies) {
+    if (regionMatchLevel(policy) !== level) continue;
+    if (byRegionId.has(policy.id)) continue;
+
+    for (const name of [policy.name, ...policy.aliases]) {
+      if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
+      byRegionId.set(policy.id, { region: policy, matchedBy: name, level });
+      break;
     }
   }
 
-  // Pass 2 — the query is broader than any region we cover. Answering with
-  // whichever policy sat first in the file presented 강남구 rules as if they were
-  // 서울 rules; with 4 서울 구 registered that is a coin flip the user never agreed to.
-  //
-  // A 시·도 name never resolves, even when we happen to cover exactly one region
-  // inside it — "경기" would otherwise return 성남시 rules to someone in 수원.
-  // Anything else resolves only when it lands on a single region, so a bare
-  // "강남구" or "마포" still works.
-  if (PROVINCE_QUERIES.has(normalizedRegion)) return undefined;
+  return Array.from(byRegionId.values()).sort((a, b) => a.region.name.localeCompare(b.region.name, "ko"));
+}
 
-  const distinct = new Set(broaderHits.map((hit) => hit.region.name));
-  if (distinct.size === 1) return broaderHits[0];
+/**
+ * 명확하게 확정되는 가장 작은 단위가 이긴다. 강도가 높은 단계부터 내려가되
+ * 같은 강도 안에서는 자치구를 광역시도보다 먼저 본다. 이 순서가 핵심 케이스를
+ * 가른다 — "부산 중구"는 자치구 완전 일치로 확정, "부산"은 자치구가 여럿이라
+ * 미확정이지만 광역 완전 일치가 더 앞 단계라 되묻지 않고 광역으로 착지,
+ * "중구"는 어느 단계에서도 유일하지 않아 되묻는다.
+ */
+/**
+ * 완전 일치는 레벨을 가리지 않고 먼저 본다 — 질의가 통째로 광역명이면("경기")
+ * 그건 광역 참조지 자치구 이름의 조각이 아니다. 그 다음은 자치구의 약한 단계까지
+ * 모두 본 뒤에야 광역으로 내려간다. 이래야 "서울 강남"이 광역 서울이 아니라
+ * 강남구로 착지한다 — 명확하게 확정되는 가장 작은 단위가 이긴다.
+ */
+const REGION_DISTRICT_ORDER: ReadonlyArray<readonly [RegionMatchLevel, RegionMatchStrength]> = [
+  ["district", 3],
+  ["metro", 3],
+  ["district", 2],
+  ["district", 1],
+];
 
-  return undefined;
+const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, RegionMatchStrength]> = [
+  ["metro", 2],
+  ["metro", 1],
+];
+
+/**
+ * 질의 앞에 붙은 광역명과 그것을 뗀 나머지. 가장 긴 광역 표기를 떼야
+ * "경기도 분당구"에서 `경기`가 아니라 `경기도`가 떨어진다.
+ *
+ * 질의가 통째로 광역명이면 떼지 않는다 — 그건 광역 참조다.
+ */
+function splitLeadingMetro(
+  policies: RegionalPolicyData[],
+  normalizedQuery: string,
+): { metro: RegionalPolicyData; rest: string } | undefined {
+  let best: { metro: RegionalPolicyData; rest: string } | undefined;
+
+  for (const policy of policies) {
+    if (regionMatchLevel(policy) !== "metro") continue;
+
+    for (const name of [policy.name, ...policy.aliases]) {
+      const normalizedName = normalizeText(name);
+      if (!normalizedName || normalizedQuery === normalizedName) continue;
+      if (!normalizedQuery.startsWith(normalizedName)) continue;
+
+      const rest = normalizedQuery.slice(normalizedName.length);
+      if (!rest) continue;
+      if (!best || rest.length < best.rest.length) best = { metro: policy, rest };
+    }
+  }
+
+  return best;
+}
+
+export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?: string): RegionResolution {
+  if (!region) return { status: "not_found" };
+
+  const normalizedQuery = normalizeText(region);
+  if (!normalizedQuery) return { status: "not_found" };
+
+  let ambiguous: MatchedRegionPolicy[] | undefined;
+
+  const consider = (candidates: MatchedRegionPolicy[]): MatchedRegionPolicy | undefined => {
+    if (candidates.length === 1) return candidates[0];
+    // 되묻기는 더 앞선 단계가 전부 비었을 때만 쓴다. 약한 단계에서 후보가
+    // 여럿이어도, 아직 안 본 단계에서 유일 확정이 나오면 그쪽이 이긴다.
+    if (candidates.length > 1 && !ambiguous) ambiguous = candidates.slice(0, MAX_AMBIGUOUS_CANDIDATES);
+    return undefined;
+  };
+
+  for (const [level, strength] of REGION_DISTRICT_ORDER) {
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    if (match) return { status: "match", match };
+  }
+
+  // 광역으로 내려앉기 전에, 앞의 광역명을 떼고 그 광역 소속 자치구만 다시 본다.
+  // 광역 표기가 별칭과 다른 형태로 붙으면("경기 성남시" vs 별칭 "경기도 성남시")
+  // 양방향 접두 어느 쪽도 맞지 않아 자치구를 통째로 놓치고, 배출 요일까지 있는
+  // full 티어 데이터가 광역 안내로 덮인다. 서울은 자치구마다 "서울 X구"·"서울시 X구"
+  // 별칭을 전부 달아둬서 가려져 있을 뿐이라, 지역이 늘 때마다 같은 구멍이 난다.
+  const split = splitLeadingMetro(policies, normalizedQuery);
+  if (split) {
+    const withinMetro = policies.filter((policy) => policy.metroId === split.metro.id);
+    for (const [level, strength] of REGION_DISTRICT_ORDER) {
+      if (level !== "district") continue;
+      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength));
+      if (match) return { status: "match", match };
+    }
+  }
+
+  for (const [level, strength] of REGION_METRO_FALLBACK_ORDER) {
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    if (match) return { status: "match", match };
+  }
+
+  return ambiguous ? { status: "ambiguous", candidates: ambiguous } : { status: "not_found" };
+}
+
+export function resolveRegionalPolicy(region?: string): RegionResolution {
+  return resolveRegionalPolicyIn(regionalPolicies, region);
+}
+
+/**
+ * 확정된 지역만 돌려준다. 되묻어야 하는 입력은 지역 없음으로 취급해, 호출부가
+ * 조용히 틀린 지역 기준을 답변에 싣지 않게 한다. 되묻는 응답이 필요한 곳은
+ * `resolveRegionalPolicy`를 직접 쓴다.
+ */
+export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undefined {
+  const resolved = resolveRegionalPolicy(region);
+  return resolved.status === "match" ? resolved.match : undefined;
+}
+
+/** 광역 안내로 착지했을 때 "어느 구인지" 좁히도록 되짚어줄 등록된 자치구들. */
+export function findRegisteredDistricts(metro: RegionalPolicyData): RegionalPolicyData[] {
+  return regionalPolicies
+    .filter((policy) => policy.metroId === metro.id)
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
 }
 
 export function confidenceLabel(confidence: Confidence): string {
@@ -866,7 +1002,27 @@ export function formatRegionSourceList(region: RegionalPolicyData): string[] {
 }
 
 export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem): RegionItemGuide | undefined {
-  return region.itemGuides.find((guide) => guide.itemIds.includes(item.id));
+  return region.itemGuides?.find((guide) => guide.itemIds.includes(item.id));
+}
+
+/**
+ * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
+ * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
+ * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.
+ */
+export function formatRegionBulkyContactLines(region: RegionalPolicyData): string[] {
+  if (region.coverageTier === "metro") {
+    return [`- ${region.name} 대형폐기물 접수는 시·군·구 소관이라, 거주 중인 시·군·구를 확인해야 신청 경로와 수수료가 정해집니다.`];
+  }
+
+  const { bulkyWaste } = region;
+  if (!bulkyWaste) return [];
+
+  return [
+    bulkyWaste.phone ? `- 문의/신청 안내 전화: ${bulkyWaste.phone}` : undefined,
+    bulkyWaste.applicationUrl ? `- 인터넷 신청: ${bulkyWaste.applicationUrl}` : undefined,
+    bulkyWaste.feeUrl ? `- 수수료 조회: ${bulkyWaste.feeUrl}` : undefined,
+  ].filter((line): line is string => line !== undefined);
 }
 
 export function findBulkyWasteFeeSchedule(region: RegionalPolicyData): BulkyWasteFeeSchedule | undefined {
@@ -910,13 +1066,21 @@ export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegi
     // 대형폐기물이 보조 배출로면 사전 신청은 그 갈래에서만 필요하다. 무조건
     // 신청 절차만 안내하면 종량제봉투가 기본인 품목(빗자루·돗자리 등)에
     // 틀린 절차를 지시하게 된다.
-    return [
-      isBulkySecondaryRoute(item)
+    //
+    // "배출 3일 전"은 자치구에서 확인한 기한이다. 광역으로 착지했을 때 지역명만
+    // 갈아끼워 그대로 쓰면 확인한 적 없는 기한을 광역 전체 기준으로 단정하게 된다
+    // — 바로 아래 "접수는 시·군·구 소관" 안내와도 한 블록 안에서 어긋난다.
+    // 광역에서는 기한을 빼고 신청이 필요하다는 사실만 남긴다.
+    const isMetro = region.coverageTier === "metro";
+    const bulkyLine = isMetro
+      ? isBulkySecondaryRoute(item)
+        ? "- 대형폐기물에 해당할 때만 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다."
+        : "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
+      : isBulkySecondaryRoute(item)
         ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
-        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`,
-      `- 문의/신청 안내 전화: ${region.bulkyWaste.phone}`,
-      ...bulkyWasteFeeLines,
-    ];
+        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`;
+
+    return [bulkyLine, ...formatRegionBulkyContactLines(region), ...bulkyWasteFeeLines];
   }
 
   if (item.disposalType.includes("special_collection")) {

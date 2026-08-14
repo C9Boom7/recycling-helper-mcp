@@ -4,6 +4,7 @@ const dataPath = new URL("../src/data/waste-items.json", import.meta.url);
 const regionPolicyPath = new URL("../src/data/region-policies.json", import.meta.url);
 const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.meta.url);
 const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.meta.url);
+const regionEvaluationCasesPath = new URL("../src/data/region-evaluation-cases.json", import.meta.url);
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
@@ -14,6 +15,7 @@ const items = JSON.parse(readFileSync(dataPath, "utf8"));
 const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8"));
 const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
 const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
+const regionEvaluationCases = JSON.parse(readFileSync(regionEvaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
@@ -254,6 +256,15 @@ expectDocumentCount(
   reviewCounts.standard_import ?? 0,
 );
 expectAllDocumentCounts("docs/session-coordination.md MCP answer cases", sessionCoordination, /MCP answer cases (\d+)개/g, mcpAnswerCases.length);
+// 지역 카운트는 그동안 어느 정규식에도 안 걸려서 문서가 조용히 어긋났다.
+// 지역이 늘 때마다 문서 갱신을 강제하도록 여기서 대조한다.
+expectDocumentCount("docs/session-coordination.md region policies", sessionCoordination, /지역 정책 데이터 (\d+)개/, regionalPolicies.length);
+expectDocumentCount(
+  "docs/session-coordination.md region evaluation cases",
+  sessionCoordination,
+  /지역 평가 케이스 (\d+)개/,
+  regionEvaluationCases.length,
+);
 expectSessionSourceSnapshot({
   wasteItems: items.length,
   evaluationCases: evaluationCases.length,
@@ -406,14 +417,33 @@ for (const [index, item] of items.entries()) {
   }
 }
 
+const regionCoverageTiers = new Set(["full", "standard", "metro"]);
+const metroRegionIds = new Set(regionalPolicies.filter((region) => region?.coverageTier === "metro").map((region) => region.id));
+// 대표 민원번호는 "지역번호+120" 형태다. "120으로 끝나면 error" 같은 느슨한 규칙은
+// 031-729-3120 같은 정상 직통번호를 오탐하므로 쓰지 않는다.
+const representativeComplaintPhone = /^\d{2,3}-120$/;
+const regionPhoneFormat = /^(\d{2,4}-\d{3,4}-\d{4}|\d{4}-\d{4})$/;
+const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+const httpsUrl = /^https:\/\//;
+
+function collectionMethodIsFilled(collection) {
+  return Array.isArray(collection?.method) && collection.method.some((method) => isNonEmptyString(method));
+}
+
 const regionIds = new Set();
 for (const [index, region] of regionalPolicies.entries()) {
   const prefix = `region[${index}]${region?.id ? `(${region.id})` : ""}`;
+  const tier = region.coverageTier;
+  const isMetro = tier === "metro";
+
   if (!isNonEmptyString(region.id)) errors.push(`${prefix}.id must be a non-empty string`);
   if (!isNonEmptyString(region.name)) errors.push(`${prefix}.name must be a non-empty string`);
   if (!Array.isArray(region.aliases) || region.aliases.length === 0) errors.push(`${prefix}.aliases must not be empty`);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(region.checkedAt ?? "")) errors.push(`${prefix}.checkedAt must be YYYY-MM-DD`);
+  if (!isoDate.test(region.checkedAt ?? "")) errors.push(`${prefix}.checkedAt must be YYYY-MM-DD`);
   if (!isNonEmptyString(region.summary)) errors.push(`${prefix}.summary must be a non-empty string`);
+  if (!regionCoverageTiers.has(tier)) {
+    errors.push(`${prefix}.coverageTier must be one of ${Array.from(regionCoverageTiers).join(", ")}`);
+  }
 
   if (isNonEmptyString(region.id)) {
     if (!/^[a-z0-9_]+$/.test(region.id)) errors.push(`${prefix}.id must use lowercase snake_case`);
@@ -421,37 +451,89 @@ for (const [index, region] of regionalPolicies.entries()) {
     regionIds.add(region.id);
   }
 
-  if (!region.generalWaste || !isNonEmptyString(region.generalWaste.time) || !isNonEmptyString(region.generalWaste.place)) {
-    errors.push(`${prefix}.generalWaste must include time and place`);
-  }
-  if (!region.recycling || !isNonEmptyString(region.recycling.vinylAndPetDay) || !isNonEmptyString(region.recycling.otherDays)) {
-    errors.push(`${prefix}.recycling must include vinylAndPetDay and otherDays`);
-  }
-  if (!region.foodWaste || !Array.isArray(region.foodWaste.generalWasteExceptions)) {
-    errors.push(`${prefix}.foodWaste.generalWasteExceptions must be an array`);
-  }
-  if (
-    !region.bulkyWaste ||
-    !isNonEmptyString(region.bulkyWaste.definition) ||
-    !Array.isArray(region.bulkyWaste.place) ||
-    !Array.isArray(region.bulkyWaste.collection) ||
-    !isNonEmptyString(region.bulkyWaste.phone)
-  ) {
-    errors.push(`${prefix}.bulkyWaste must include definition, place, collection, and phone`);
-  }
-  if (!Array.isArray(region.itemGuides)) {
-    errors.push(`${prefix}.itemGuides must be an array`);
+  // 광역시도 레이어는 전화번호도 신고 경로도 갖지 않는다. 대형폐기물 접수는
+  // 기초자치단체 소관이라 광역 단위에 대응하는 직통번호가 없고, 억지로 시청
+  // 대표번호를 채우면 R4-1 기준이 조용히 무너진다.
+  if (isMetro) {
+    if (region.metroId !== undefined) errors.push(`${prefix}.metroId must not be set on a metro region`);
+    if (region.bulkyWaste !== undefined) {
+      errors.push(`${prefix}.bulkyWaste must not be set on a metro region; bulky waste intake belongs to the district level`);
+    }
   } else {
-    for (const [guideIndex, guide] of region.itemGuides.entries()) {
-      const guidePrefix = `${prefix}.itemGuides[${guideIndex}]`;
-      if (!Array.isArray(guide.itemIds) || guide.itemIds.length === 0) errors.push(`${guidePrefix}.itemIds must not be empty`);
-      if (!isNonEmptyString(guide.summary)) errors.push(`${guidePrefix}.summary must be a non-empty string`);
-      if (!Array.isArray(guide.steps) || guide.steps.length === 0) errors.push(`${guidePrefix}.steps must not be empty`);
-      for (const itemId of guide.itemIds ?? []) {
-        if (!ids.has(itemId)) warnings.push(`${guidePrefix}.itemIds includes unknown item id ${itemId}`);
+    if (!isNonEmptyString(region.metroId)) errors.push(`${prefix}.metroId is required for district-level regions`);
+    else if (!metroRegionIds.has(region.metroId)) errors.push(`${prefix}.metroId references unknown metro region ${region.metroId}`);
+  }
+
+  if (tier === "full") {
+    if (!region.generalWaste || !isNonEmptyString(region.generalWaste.time) || !isNonEmptyString(region.generalWaste.place)) {
+      errors.push(`${prefix}.generalWaste must include time and place`);
+    }
+    if (!region.recycling || !isNonEmptyString(region.recycling.vinylAndPetDay) || !isNonEmptyString(region.recycling.otherDays)) {
+      errors.push(`${prefix}.recycling must include vinylAndPetDay and otherDays`);
+    }
+    if (!region.foodWaste || !Array.isArray(region.foodWaste.generalWasteExceptions)) {
+      errors.push(`${prefix}.foodWaste.generalWasteExceptions must be an array`);
+    }
+    if (
+      !region.bulkyWaste ||
+      !isNonEmptyString(region.bulkyWaste.definition) ||
+      !Array.isArray(region.bulkyWaste.place) ||
+      !Array.isArray(region.bulkyWaste.collection) ||
+      !isNonEmptyString(region.bulkyWaste.phone)
+    ) {
+      errors.push(`${prefix}.bulkyWaste must include definition, place, collection, and phone`);
+    }
+    if (!Array.isArray(region.itemGuides)) errors.push(`${prefix}.itemGuides must be an array`);
+  }
+
+  // R4 완결 조건 5종. "반쯤 채운 지역을 넣지 않는다"를 사람 의지가 아니라
+  // 파이프라인으로 보장하는 지점이라 전부 error다.
+  if (tier === "standard") {
+    if (Array.isArray(region.aliases) && region.aliases.length < 2) {
+      errors.push(`${prefix}.aliases must include at least 2 entries for standard tier`);
+    }
+    const bulkyWaste = region.bulkyWaste;
+    if (!bulkyWaste) {
+      errors.push(`${prefix}.bulkyWaste is required for standard tier`);
+    } else {
+      if (!httpsUrl.test(bulkyWaste.applicationUrl ?? "")) errors.push(`${prefix}.bulkyWaste.applicationUrl must be an https URL`);
+      if (!httpsUrl.test(bulkyWaste.feeUrl ?? "")) errors.push(`${prefix}.bulkyWaste.feeUrl must be an https URL`);
+      if (!isNonEmptyString(bulkyWaste.phone)) errors.push(`${prefix}.bulkyWaste.phone is required for standard tier`);
+      if (!isoDate.test(bulkyWaste.contactCheckedAt ?? "")) errors.push(`${prefix}.bulkyWaste.contactCheckedAt must be YYYY-MM-DD`);
+    }
+    if (!collectionMethodIsFilled(region.specialCollections?.medicine)) {
+      errors.push(`${prefix}.specialCollections.medicine.method is required for standard tier`);
+    }
+    if (!collectionMethodIsFilled(region.specialCollections?.batteryAndFluorescentLamp)) {
+      errors.push(`${prefix}.specialCollections.batteryAndFluorescentLamp.method is required for standard tier`);
+    }
+  }
+
+  if (region.bulkyWaste?.phone !== undefined) {
+    const phone = region.bulkyWaste.phone;
+    if (representativeComplaintPhone.test(phone)) {
+      errors.push(`${prefix}.bulkyWaste.phone "${phone}" is a representative complaint line; use the desk's direct number`);
+    } else if (!regionPhoneFormat.test(phone)) {
+      errors.push(`${prefix}.bulkyWaste.phone "${phone}" must look like 02-1234-5678 or 1522-3833`);
+    }
+  }
+
+  if (region.itemGuides !== undefined) {
+    if (!Array.isArray(region.itemGuides)) {
+      errors.push(`${prefix}.itemGuides must be an array when present`);
+    } else {
+      for (const [guideIndex, guide] of region.itemGuides.entries()) {
+        const guidePrefix = `${prefix}.itemGuides[${guideIndex}]`;
+        if (!Array.isArray(guide.itemIds) || guide.itemIds.length === 0) errors.push(`${guidePrefix}.itemIds must not be empty`);
+        if (!isNonEmptyString(guide.summary)) errors.push(`${guidePrefix}.summary must be a non-empty string`);
+        if (!Array.isArray(guide.steps) || guide.steps.length === 0) errors.push(`${guidePrefix}.steps must not be empty`);
+        for (const itemId of guide.itemIds ?? []) {
+          if (!ids.has(itemId)) warnings.push(`${guidePrefix}.itemIds includes unknown item id ${itemId}`);
+        }
       }
     }
   }
+
   if (!Array.isArray(region.sources) || region.sources.length === 0) {
     errors.push(`${prefix}.sources must contain at least one source`);
   } else {
@@ -459,12 +541,21 @@ for (const [index, region] of regionalPolicies.entries()) {
       const sourcePrefix = `${prefix}.sources[${sourceIndex}]`;
       if (!isNonEmptyString(source.title)) errors.push(`${sourcePrefix}.title must be a non-empty string`);
       if (!sourceTypes.has(source.sourceType)) errors.push(`${sourcePrefix}.sourceType must be one of ${Array.from(sourceTypes).join(", ")}`);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(source.checkedAt ?? "")) errors.push(`${sourcePrefix}.checkedAt must be YYYY-MM-DD`);
+      if (!isoDate.test(source.checkedAt ?? "")) errors.push(`${sourcePrefix}.checkedAt must be YYYY-MM-DD`);
       if (source.url !== undefined && !/^https?:\/\//.test(source.url)) errors.push(`${sourcePrefix}.url must start with http:// or https://`);
       if (!isNonEmptyString(source.basis)) warnings.push(`${sourcePrefix}.basis should explain what the source supports`);
     }
+    // 얕은 티어는 출처 URL이 유일한 검증 수단이라 제목만 있는 출처를 허용하지 않는다.
+    if ((tier === "standard" || isMetro) && !region.sources.some((source) => httpsUrl.test(source.url ?? ""))) {
+      errors.push(`${prefix}.sources must include at least one https URL for ${tier} tier`);
+    }
   }
 }
+
+// 지역 별칭 충돌은 문자열 포함 여부가 아니라 실제 매칭 결과로 잡는다
+// (`evaluate-data.mjs`의 alias self-resolution 검사). 포함 규칙은 정상 구성인
+// 동명 자치구의 대칭 별칭까지 error로 막아버려서 쓰지 못한다 — "중구"를 서울과
+// 부산 양쪽에 다는 건 되묻기를 만드는 올바른 구성이지 충돌이 아니다.
 
 for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
   const prefix = `bulkyWasteFeeSchedule[${index}]${schedule?.regionId ? `(${schedule.regionId})` : ""}`;
