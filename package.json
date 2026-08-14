@@ -10,6 +10,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "check:links": "node scripts/check-region-links.mjs",
     "measure:region": "tsx scripts/measure-region-resolution.ts",
+    "measure:bulky": "pnpm build && node scripts/measure-bulky-items.mjs",
     "eval:data": "node scripts/evaluate-data.mjs",
     "backlog:questions": "node scripts/report-question-backlog.mjs",
     "backlog:resolution": "pnpm build && node scripts/report-backlog-resolution.mjs",

@@ -32,6 +32,9 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 5개로 나�
 | 3 | [phase-3-widget.md](phase-3-widget.md) | get_disposal_steps 확정 매칭 위젯 + copy_text | Phase 0 머지 후 — 1·2와 병렬 가능 |
 | 4a | [phase-4-release.md](phase-4-release.md) §4a | 본선 서버 배포 + Preview 연결·툴콜 확인 | Phase 0 배포 직후 — **즉시 착수** |
 | 4b | [phase-4-release.md](phase-4-release.md) | 발화 테스트 매트릭스, description 튜닝, 회귀, 마감 | Phase 1~3 배포 이후 |
+| 5 | [phase-5-region-expansion.md](phase-5-region-expansion.md) | 지역 커버리지 확장 (표준·광역 티어), 동명 자치구 매칭 교정 | Phase 4a 이후 |
+| 6 | [phase-6-bulky-fee-etl.md](phase-6-bulky-fee-etl.md) | 자치법규 조례 ETL로 대형폐기물 수수료 채우기 (서울 13곳 + 성남) | Phase 5 이후 |
+| 7 | [phase-7-bulky-item-fee-expansion.md](phase-7-bulky-item-fee-expansion.md) | 복합명사 오매칭 교정, 대형폐기물 품목 확장, 표준데이터 수수료 임포트(용산·노원·강서·관악) | Phase 5 이후 — Phase 6과 지역 배타 분담 |
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
 단, 둘 다 `evaluation-cases.json`/`mcp-answer-cases.json`을 만지므로 케이스 추가는 append-only로 하고 id 충돌만 피한다.
@@ -84,5 +87,10 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 3 | 완료 (PR #5 머지됨) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. Preview 렌더링(R6) 확인은 4a로 이관 |
 | 4a | 서버 검증 완료, Preview 대기 | claude/prd4-analysis-review-56f5e3 | `c205fdf` 배포분 1·2단계 통과(health 272, 툴 5개, 위젯 JSON, 평균 59ms). 3·4단계는 Chrome 확장 연결 후 |
 | 4b | 미착수 | - | 4a 완주 이후 |
+| 5 | 완료 (PR #10·#11 머지됨) | claude/phase5-* | 지역 5 → 35곳(서울 17구 + 광역 17). 대형폐기물 수수료 금액은 범위 밖이었음 |
+| 6 | PRD·구현 진행 중 (PR #13) | claude/phase6-* | 조례 ETL. 종로 + 표준데이터 미수록 9곳 담당 |
+| 7 | PRD 작성됨 | claude/region-expansion-analysis | 오매칭 교정 + 품목 확장 + 표준데이터 수수료 4곳 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
+
+Phase 6·7은 같은 `src/data/bulky-waste-fees.json`을 채우므로 **지역으로 배타 분담**한다. 상세는 [phase-7 문서의 "트랙 분담"](phase-7-bulky-item-fee-expansion.md#트랙-분담-phase-6과-배타) 참조.
