@@ -168,17 +168,23 @@ export function findMaterialGuideline(id: string): MaterialGuideline | undefined
 // item-classification `category` field on waste items, even where strings
 // overlap. Concrete material words come before disposal-channel words so a
 // query like "약과 포장지 폐의약품 수거함?" leads with the packaging material.
+//
+// Keywords are matched as bare substrings, so a word that also appears inside
+// unrelated compounds stays out of the table: "글라스" would infer glass-bottle
+// recycling for 선글라스, and "껍질" would infer food waste for 조개껍질. Both are
+// general trash, and a wrong material principle reads more authoritative than
+// the generic material menu the fallback shows instead.
 const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
   { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
   { category: "paper_cardboard", pattern: /종이|박스|상자|골판지|신문|서류|공책/u },
   { category: "can_metal", pattern: /캔|깡통|고철|금속|알루미늄|스텐|스테인리스|양은/u },
-  { category: "glass_bottle", pattern: /유리|글라스/u },
+  { category: "glass_bottle", pattern: /유리/u },
   { category: "plastic_container", pattern: /플라스틱|페트|트레이|아크릴/u },
   { category: "textile", pattern: /옷|의류|섬유|이불|담요|커튼|수건|헝겊/u },
   { category: "electronics_battery", pattern: /배터리|건전지|전지|충전|전동|전자|전기|가전|노트북|랩탑|케이블|충전기/u },
   { category: "hazardous_pressurized", pattern: /의약품|알약|물약|연고|시럽|형광등|가스|스프레이|부탄|에어로졸|살충|농약|페인트|소화기/u },
-  { category: "food_waste", pattern: /음식물|먹다\s*남|껍질|과일|채소/u },
+  { category: "food_waste", pattern: /음식물|먹다\s*남|과일|채소/u },
   { category: "bulky", pattern: /대형|가구|침대|소파|장롱|매트리스/u },
   { category: "general_trash", pattern: /실리콘|고무|라텍스|가죽|멜라민|스펀지|스폰지|복합\s*재질/u },
 ];
@@ -205,10 +211,13 @@ export function normalizeText(value: string): string {
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
+const MIN_MATCH_SCORE = 35;
 const MAX_AMBIGUOUS_CANDIDATES = 7;
 // fuzzy_jamo must stay below generic_fragment (82): it is a typo guess, never
 // stronger evidence than an actual substring hit.
 const FUZZY_JAMO_STRONG_SCORE = 70;
+const FUZZY_JAMO_WEAK_MIN_SCORE = 40;
+const FUZZY_JAMO_WEAK_MAX_SCORE = 55;
 const FUZZY_JAMO_STRONG_SIMILARITY = 0.85;
 const FUZZY_JAMO_MIN_SIMILARITY = 0.7;
 const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
@@ -279,38 +288,95 @@ function levenshteinDistance(a: string, b: string): number {
   return previous[b.length];
 }
 
-function jamoSimilarity(a: string, b: string): number {
-  if (!a || !b) return 0;
-  const jamoA = decomposeHangulJamo(a);
-  const jamoB = decomposeHangulJamo(b);
-  const maxLength = Math.max(jamoA.length, jamoB.length);
-  if (maxLength === 0) return 0;
+type IndexedName = {
+  name: string;
+  normalized: string;
+  jamo: string;
+  isShortAlias: boolean;
+};
 
-  return 1 - levenshteinDistance(jamoA, jamoB) / maxLength;
+type IndexedItem = {
+  item: WasteItem;
+  names: IndexedName[];
+};
+
+// Names and aliases are static data, so their normalization and jamo
+// decomposition happen once here rather than once per name per query.
+const indexedItems: IndexedItem[] = wasteItems.map((item) => ({
+  item,
+  names: [item.name, ...item.aliases].map((name) => {
+    const normalized = normalizeText(name);
+    return {
+      name,
+      normalized,
+      jamo: decomposeHangulJamo(normalized),
+      isShortAlias: normalized.length <= SHORT_ALIAS_MAX_LENGTH,
+    };
+  }),
+}));
+
+type ScoredQuery = {
+  raw: string;
+  normalized: string;
+  tokens: string[];
+};
+
+type FuzzyQuery = {
+  normalized: string;
+  jamoVariants: string[];
+  isBareItemName: boolean;
+};
+
+function buildFuzzyQuery({ normalized, tokens }: ScoredQuery): FuzzyQuery {
+  const variants = new Set<string>([normalized]);
+  for (const token of tokens) {
+    if (token.length <= 1) continue;
+    variants.add(token);
+    variants.add(stripShortAliasParticle(token));
+  }
+
+  return {
+    normalized,
+    jamoVariants: Array.from(variants, (variant) => decomposeHangulJamo(variant)).filter(Boolean),
+    // The weak band only fires on a bare item name. In a longer query a generic
+    // compound token sits ~0.7 from unrelated items ("약과 포장지"↔"약 포장재"), and
+    // the not_found material fallback answers those better than a coin-flip
+    // suggestion would.
+    isBareItemName: tokens.length <= 1,
+  };
 }
 
-function fuzzyJamoScore(normalizedQuery: string, queryTokens: string[], normalizedName: string): number {
-  let bestSimilarity = jamoSimilarity(normalizedQuery, normalizedName);
-  for (const token of queryTokens) {
-    if (token.length <= 1) continue;
-    bestSimilarity = Math.max(
-      bestSimilarity,
-      jamoSimilarity(token, normalizedName),
-      jamoSimilarity(stripShortAliasParticle(token), normalizedName),
-    );
+// A typo guess must agree with the candidate on the word's first jamo, the same
+// prefix constraint fuzzy search engines use. Similarity alone lets phonetic
+// neighbours collide across unrelated words ("테이프"↔"베이프", "포장지"↔"화장지",
+// "조개껍질"↔"호두껍질"); the recall lost on first-consonant typos is answered by
+// the not_found material fallback, while a wrong suggestion is not.
+function jamoTypoSimilarity(queryJamo: string, nameJamo: string): number {
+  if (!queryJamo || !nameJamo) return 0;
+  if (queryJamo[0] !== nameJamo[0]) return 0;
+
+  const maxLength = Math.max(queryJamo.length, nameJamo.length);
+  const minLength = Math.min(queryJamo.length, nameJamo.length);
+  // The edit distance is at least the length gap, so this ratio caps the
+  // reachable similarity — a cheap way to skip the Levenshtein matrix for the
+  // sentence-vs-short-name pairs that make up most of the scan.
+  if (minLength / maxLength < FUZZY_JAMO_MIN_SIMILARITY) return 0;
+
+  return 1 - levenshteinDistance(queryJamo, nameJamo) / maxLength;
+}
+
+function fuzzyJamoScore(query: FuzzyQuery, name: IndexedName): number {
+  let bestSimilarity = 0;
+  for (const queryJamo of query.jamoVariants) {
+    bestSimilarity = Math.max(bestSimilarity, jamoTypoSimilarity(queryJamo, name.jamo));
   }
 
   if (bestSimilarity >= FUZZY_JAMO_STRONG_SIMILARITY) return FUZZY_JAMO_STRONG_SCORE;
+  if (!query.isBareItemName || bestSimilarity < FUZZY_JAMO_MIN_SIMILARITY) return 0;
 
-  // The weak band only fires on bare item-name queries (≤2 tokens). In full
-  // sentences, generic compound tokens sit ~0.7 from unrelated items
-  // ("포장지"↔"화장지"), and the not_found material fallback answers those
-  // queries better than a coin-flip suggestion would.
-  if (queryTokens.length <= 2 && bestSimilarity >= FUZZY_JAMO_MIN_SIMILARITY) {
-    return Math.min(55, 40 + Math.round(((bestSimilarity - FUZZY_JAMO_MIN_SIMILARITY) / 0.15) * 15));
-  }
-
-  return 0;
+  const similaritySpan = FUZZY_JAMO_STRONG_SIMILARITY - FUZZY_JAMO_MIN_SIMILARITY;
+  const scoreSpan = FUZZY_JAMO_WEAK_MAX_SCORE - FUZZY_JAMO_WEAK_MIN_SCORE;
+  return FUZZY_JAMO_WEAK_MIN_SCORE + Math.round(((bestSimilarity - FUZZY_JAMO_MIN_SIMILARITY) / similaritySpan) * scoreSpan);
 }
 
 function isLikelyDisposalTargetMention(query: string, normalizedQuery: string, normalizedName: string): boolean {
@@ -382,18 +448,14 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  */
 type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_jamo" | "target_mention";
 
-function scoreItem(query: string, item: WasteItem): WasteMatch {
-  const normalizedQuery = normalizeText(query);
-  const queryTokens = normalizedTokens(query);
-  const names = [item.name, ...item.aliases];
-  const semanticBonus = scoreQuerySemanticSignals(query, item);
+function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
+  const { raw, normalized: normalizedQuery, tokens: queryTokens } = query;
+  const semanticBonus = scoreQuerySemanticSignals(raw, indexed.item);
   let bestScore = 0;
-  let matchedBy = item.name;
+  let matchedBy = indexed.item.name;
   let matchKind: MatchKind = "none";
 
-  for (const name of names) {
-    const normalizedName = normalizeText(name);
-    const isShortAlias = normalizedName.length <= SHORT_ALIAS_MAX_LENGTH;
+  for (const { name, normalized: normalizedName, isShortAlias } of indexed.names) {
     let score = 0;
     let kind: MatchKind = "none";
 
@@ -401,7 +463,7 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
       score = 100;
       kind = "exact";
     } else if (normalizedQuery.includes(normalizedName)) {
-      if (isLikelyDisposalTargetMention(query, normalizedQuery, normalizedName)) {
+      if (isLikelyDisposalTargetMention(raw, normalizedQuery, normalizedName)) {
         score = 20;
         kind = "target_mention";
       } else if (isShortAlias) {
@@ -416,14 +478,6 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
     } else if (normalizedName.includes(normalizedQuery)) {
       score = 82;
       kind = "generic_fragment";
-    } else {
-      if (!isShortAlias) {
-        const fuzzyScore = fuzzyJamoScore(normalizedQuery, queryTokens, normalizedName);
-        if (fuzzyScore > 0) {
-          score = fuzzyScore;
-          kind = "fuzzy_jamo";
-        }
-      }
     }
 
     if (score > bestScore) {
@@ -433,13 +487,40 @@ function scoreItem(query: string, item: WasteItem): WasteMatch {
     }
   }
 
-  // fuzzy_jamo never receives the semantic bonus: 70 + 18 would overtake
-  // generic_fragment (82) and break the typo-guess-stays-weakest invariant.
   const adjustedScore =
-    bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE && matchKind !== "fuzzy_jamo"
-      ? Math.min(99, bestScore + semanticBonus)
-      : bestScore;
-  return { item, score: adjustedScore, matchedBy, matchKind };
+    bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE ? Math.min(99, bestScore + semanticBonus) : bestScore;
+  return { item: indexed.item, score: adjustedScore, matchedBy, matchKind };
+}
+
+// Typo guesses never take the semantic bonus: 70 + 18 would overtake
+// generic_fragment (82) and break the typo-stays-weakest invariant.
+function scoreItemTypos(query: FuzzyQuery, indexed: IndexedItem): WasteMatch {
+  let bestScore = 0;
+  let matchedBy = indexed.item.name;
+
+  for (const name of indexed.names) {
+    // A name that shares a substring with the query is not a typo of it: that
+    // containment is scored by scoreItemNames, including the cases it
+    // deliberately holds down (a "폐의약품 수거함" mention is not a query about
+    // 폐의약품), and a typo guess must not route around those guards.
+    if (name.isShortAlias || query.normalized.includes(name.normalized) || name.normalized.includes(query.normalized)) {
+      continue;
+    }
+
+    const score = fuzzyJamoScore(query, name);
+    if (score > bestScore) {
+      bestScore = score;
+      matchedBy = name.name;
+    }
+  }
+
+  return { item: indexed.item, score: bestScore, matchedBy, matchKind: bestScore > 0 ? "fuzzy_jamo" : "none" };
+}
+
+function rankMatches(matches: WasteMatch[]): WasteMatch[] {
+  return matches
+    .filter((match) => match.score >= MIN_MATCH_SCORE)
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"));
 }
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
@@ -448,17 +529,19 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
     return [];
   }
 
-  const matches = wasteItems
-    .map((item) => scoreItem(query, item))
-    .filter((match) => match.score >= 35)
-    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"));
+  const scoredQuery: ScoredQuery = { raw: query, normalized: normalizedQuery, tokens: normalizedTokens(query) };
+  const named = rankMatches(indexedItems.map((indexed) => scoreItemNames(scoredQuery, indexed)));
+  if (named.length > 0) {
+    return named.slice(0, limit);
+  }
 
-  // Typo guesses only matter when nothing confident matched. With an exact or
-  // contains hit present, fuzzy_jamo entries are near-miss noise that would
-  // pollute list-shaped outputs (e.g. check_confusing_item's top 3).
-  const hasConfidentMatch = matches.some((match) => match.score >= HIGH_CONFIDENCE_SCORE);
-  const visible = hasConfidentMatch ? matches.filter((match) => match.matchKind !== "fuzzy_jamo") : matches;
-  return visible.slice(0, limit);
+  // Typo matching is a fallback tier, not a competing signal. Running it only
+  // when no name or alias hit exists keeps near-miss guesses out of every
+  // list-shaped output (e.g. check_confusing_item's top 3) at any score band,
+  // and a well-spelled query never pays for the jamo Levenshtein scan.
+  const fuzzyQuery = buildFuzzyQuery(scoredQuery);
+  const typos = rankMatches(indexedItems.map((indexed) => scoreItemTypos(fuzzyQuery, indexed)));
+  return typos.slice(0, limit);
 }
 
 export function findBestWasteItem(query: string): WasteMatch | undefined {
@@ -530,15 +613,15 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
 
   // Typo guesses confirm only when exactly one candidate clears the strong
   // similarity bar; anything weaker is surfaced as an "is this what you
-  // meant?" candidate list, even when there is just one candidate.
+  // meant?" candidate list, even when there is just one candidate. The typo
+  // tier never mixes with name matches, so every match here is a guess.
   if (best.matchKind === "fuzzy_jamo") {
-    const fuzzyMatches = [best, ...rest].filter((match) => match.matchKind === "fuzzy_jamo");
-    const strongMatches = fuzzyMatches.filter((match) => match.score >= FUZZY_JAMO_STRONG_SCORE);
-    if (strongMatches.length === 1 && best.score >= FUZZY_JAMO_STRONG_SCORE) {
-      return { status: "match", match: best };
+    const strongMatches = matches.filter((match) => match.score >= FUZZY_JAMO_STRONG_SCORE);
+    if (strongMatches.length === 1) {
+      return { status: "match", match: strongMatches[0] };
     }
 
-    return { status: "ambiguous", candidates: fuzzyMatches.slice(0, MAX_AMBIGUOUS_CANDIDATES) };
+    return { status: "ambiguous", candidates: matches.slice(0, MAX_AMBIGUOUS_CANDIDATES) };
   }
 
   if (best.matchKind === "generic_fragment" && best.score < HIGH_CONFIDENCE_SCORE) {
