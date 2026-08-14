@@ -1076,7 +1076,21 @@ export function findBulkyWasteFeeSchedule(region: RegionalPolicyData): BulkyWast
   return bulkyWasteFeeSchedules.find((schedule) => schedule.regionId === region.id);
 }
 
+/**
+ * 수수료를 보여도 되는 품목인지. 지자체 고시에는 대형폐기물 요금이 실려 있어도,
+ * 우리 안내가 "무료로 재활용/전용수거함/종량제봉투"인 품목이면 그 금액은 답이 아니다.
+ *
+ * 고시명 매칭은 넓게 걸리므로(`상자`→택배상자, `신발`→신발) 이 판단을 데이터 쪽에만
+ * 맡기면 "깨끗한 상태로 스티로폼류에 배출합니다" 바로 아래에 "수수료 1,000원"이 붙는다.
+ * 배출 그룹 라벨에 대형폐기물이 들어가는지로 거른다 — disposalType 문자열을 부분
+ * 일치로 보면 새 값이 조용히 새므로 `disposal-groups.json`의 명시 매핑을 그대로 쓴다.
+ */
+function itemHasBulkyRoute(item: WasteItem): boolean {
+  return disposalGroupLabel(item.disposalType).includes("대형폐기물");
+}
+
 export function findBulkyWasteFees(region: RegionalPolicyData, item: WasteItem): BulkyWasteFee[] {
+  if (!itemHasBulkyRoute(item)) return [];
   return findBulkyWasteFeeSchedule(region)?.fees.filter((fee) => fee.itemId === item.id) ?? [];
 }
 
@@ -1088,7 +1102,7 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
   const schedule = findBulkyWasteFeeSchedule(region);
   if (!schedule) return [];
 
-  const fees = schedule.fees.filter((fee) => fee.itemId === item.id);
+  const fees = findBulkyWasteFees(region, item);
   if (fees.length === 0) return [];
 
   return [

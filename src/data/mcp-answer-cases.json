@@ -7630,7 +7630,9 @@
     },
     "expectedTextIncludes": [
       "서울 용산구",
-      "수수료"
+      "수수료",
+      "책상 서랍이 없는 경우: 3,000원",
+      "책상 양수(양쪽서랍): 7,000원"
     ],
     "expectedStructuredIncludes": [
       "\"regionCheckLevel\":\"필수\""
@@ -7645,7 +7647,8 @@
     },
     "expectedTextIncludes": [
       "서울 노원구",
-      "수수료"
+      "수수료",
+      "(침대)매트리스(라텍스/메모리폼) 퀸(두께15㎝미만): 5,000원"
     ],
     "expectedStructuredIncludes": [
       "\"regionCheckLevel\":\"필수\""
@@ -7660,7 +7663,9 @@
     },
     "expectedTextIncludes": [
       "서울 강서구",
-      "수수료"
+      "수수료",
+      "소파 1인용: 3,000원",
+      "소파 4인용: 9,000원"
     ],
     "expectedStructuredIncludes": [
       "\"regionCheckLevel\":\"필수\""
@@ -7675,10 +7680,84 @@
     },
     "expectedTextIncludes": [
       "서울 관악구",
-      "수수료"
+      "수수료",
+      "책상 상판 면적 120센티미터x60센티미터 기준: 2,000원"
     ],
     "expectedStructuredIncludes": [
       "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7_fee_not_shown_for_styrofoam",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스티로폼",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "## 스티로폼"
+    ],
+    "expectedTextExcludes": [
+      "대형생활폐기물 수수료 후보"
+    ]
+  },
+  {
+    "id": "phase7_fee_not_shown_for_umbrella",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "우산",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "## 우산"
+    ],
+    "expectedTextExcludes": [
+      "대형생활폐기물 수수료 후보"
+    ]
+  },
+  {
+    "id": "phase7_fee_not_shown_for_shoes",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "신발",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "## 신발"
+    ],
+    "expectedTextExcludes": [
+      "대형생활폐기물 수수료 후보"
+    ]
+  },
+  {
+    "id": "phase7_fee_yongsan_gu_mattress_not_bed_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "침대(매트리스, 라텍스, 토퍼) 퀸 사이즈: 8,000원"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"mattress\""
+    ]
+  },
+  {
+    "id": "phase7_fee_gwanak_gu_mattress_not_bed_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 관악구"
+    },
+    "expectedTextIncludes": [
+      "침대 2인용 매트리스: 8,000원"
+    ],
+    "expectedTextExcludes": [
+      "침대 1인용 침대 틀"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"mattress\""
     ]
   }
 ]

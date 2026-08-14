@@ -779,13 +779,6 @@
       {
         "itemId": "bed_frame",
         "category": "가구류",
-        "itemName": "침대(매트리스, 라텍스, 토퍼)",
-        "spec": "싱글, 슈퍼싱글 사이즈",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "가구류",
         "itemName": "침대(틀)",
         "spec": "더블 사이즈(서랍 별도)",
         "feeKrw": 7000
@@ -814,15 +807,8 @@
       {
         "itemId": "bed_frame",
         "category": "가구류",
-        "itemName": "침대(매트리스, 라텍스, 토퍼)",
-        "spec": "킹 사이즈",
-        "feeKrw": 9000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "가구류",
-        "itemName": "침대(매트리스, 라텍스, 토퍼)",
-        "spec": "라지킹 사이즈",
+        "itemName": "침대(틀)",
+        "spec": "라지킹 사이즈(서랍 별도)",
         "feeKrw": 10000
       },
       {
@@ -831,6 +817,13 @@
         "itemName": "침대",
         "spec": "싱글, 슈퍼싱글 (매트포함) (서랍별도)",
         "feeKrw": 10000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "가구류",
+        "itemName": "접이식 침대 (라꾸라꾸)",
+        "spec": "2인용",
+        "feeKrw": 12000
       },
       {
         "itemId": "bed_frame",
@@ -908,6 +901,48 @@
         "itemName": "카펫(카페트)",
         "spec": "긴 면 기준 100cm 당",
         "feeKrw": 2000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "유아용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "싱글, 슈퍼싱글 사이즈",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "더블 사이즈",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "퀸 사이즈",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "킹 사이즈",
+        "feeKrw": 9000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대(매트리스, 라텍스, 토퍼)",
+        "spec": "라지킹 사이즈",
+        "feeKrw": 10000
       },
       {
         "itemId": "bathroom_scale",
@@ -1785,20 +1820,6 @@
         "feeKrw": 7000
       },
       {
-        "itemId": "display_cabinet",
-        "category": "가구류",
-        "itemName": "욕실 수납장(진열장)",
-        "spec": "긴쪽 1m 미만",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "display_cabinet",
-        "category": "가구류",
-        "itemName": "욕실 수납장(진열장)",
-        "spec": "긴쪽 1m 이상",
-        "feeKrw": 4000
-      },
-      {
         "itemId": "clothes_hanger",
         "category": "가구류",
         "itemName": "옷걸이(스텐드형, 벽걸이)",
@@ -2269,20 +2290,6 @@
         "category": "기타",
         "itemName": "도마",
         "spec": "업소용",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "airtight_container",
-        "category": "기타",
-        "itemName": "김치통",
-        "spec": "10ℓ미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "airtight_container",
-        "category": "기타",
-        "itemName": "김치통",
-        "spec": "20ℓ미만",
         "feeKrw": 2000
       },
       {
@@ -3033,27 +3040,6 @@
         "itemName": "물탱크(FRP)",
         "spec": "1톤 이상",
         "feeKrw": 6000
-      },
-      {
-        "itemId": "delivery_box",
-        "category": "생활용품류",
-        "itemName": "상자",
-        "spec": "긴 면이50㎝미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "delivery_box",
-        "category": "생활용품류",
-        "itemName": "상자",
-        "spec": "긴 면이100㎝미만",
-        "feeKrw": 1500
-      },
-      {
-        "itemId": "delivery_box",
-        "category": "생활용품류",
-        "itemName": "상자",
-        "spec": "긴 면이100㎝이상",
-        "feeKrw": 2000
       },
       {
         "itemId": "travel_carrier",
@@ -4803,13 +4789,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "골프채 가방",
-        "spec": "모든 규격",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "ironing_board",
         "category": "생활용품류",
         "itemName": "다리미판",
@@ -5535,13 +5514,6 @@
         "feeKrw": 1000
       },
       {
-        "itemId": "drying_rack",
-        "category": "생활용품류",
-        "itemName": "식기건조대",
-        "spec": "제한사항 없음",
-        "feeKrw": 1000
-      },
-      {
         "itemId": "blind",
         "category": "생활용품류",
         "itemName": "블라인드",
@@ -5803,9 +5775,9 @@
       {
         "itemId": "bed_frame",
         "category": "가구류",
-        "itemName": "침대",
-        "spec": "1인용 매트리스",
-        "feeKrw": 5000
+        "itemName": "접이식 침대",
+        "spec": "1인용",
+        "feeKrw": 7000
       },
       {
         "itemId": "bed_frame",
@@ -5813,13 +5785,6 @@
         "itemName": "침대",
         "spec": "2인용 침대 틀",
         "feeKrw": 7000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "가구류",
-        "itemName": "침대",
-        "spec": "2인용 매트리스",
-        "feeKrw": 8000
       },
       {
         "itemId": "bed_frame",
@@ -5859,9 +5824,23 @@
       {
         "itemId": "mattress",
         "category": "가구류",
+        "itemName": "침대",
+        "spec": "1인용 매트리스",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
         "itemName": "라텍스 매트리스",
         "spec": "2인용",
         "feeKrw": 7000
+      },
+      {
+        "itemId": "mattress",
+        "category": "가구류",
+        "itemName": "침대",
+        "spec": "2인용 매트리스",
+        "feeKrw": 8000
       },
       {
         "itemId": "chair",

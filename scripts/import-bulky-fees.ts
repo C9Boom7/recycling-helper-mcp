@@ -30,7 +30,8 @@ const RAW_PATH = process.argv[2] ?? "logs/bulky-fee-standard-data.json";
 const FEES_PATH = "src/data/bulky-waste-fees.json";
 const REGIONS_PATH = "src/data/region-policies.json";
 
-// (regionId, itemId)당 fee 행 상한. Phase 6이 validate에 거는 값과 같아야 한다.
+// (regionId, itemId)당 fee 행 상한. `validate-data.mjs`의 MAX_FEE_ROWS_PER_ITEM과
+// 같은 값이어야 한다 — 손으로 넣은 행은 이 스크립트를 거치지 않으므로 검사는 거기에 있다.
 const MAX_FEE_ROWS = 12;
 
 const TARGETS: Array<[string, string, string]> = [
@@ -60,11 +61,43 @@ type Verdict =
  * - 복수 품목 표기: "스키, 보드"는 조각마다 다른 품목이라 하나로 붙일 수 없다.
  *   실제로 정규화 후 "키보드"에 걸려 소형가전이 됐다.
  * - 옵션 요금 행: "*유리별도", "추가금"은 품목이 아니라 부가 요금이다.
+ * - 핵심어 충돌: 핵심어가 같아도 다른 물건인 고시명은 규칙으로 못 가른다. 아래 목록으로 뺀다.
  */
+
+/**
+ * 핵심어 일치만으로는 걸러지지 않는 오귀속. "식기건조대"는 "건조대"가 빨래건조대의
+ * 별칭이라 붙고, "상자"·"김치통"·"골프채 가방"도 더 넓은 품목의 핵심어에 얹힌다.
+ * 규칙을 더 조이면 정상 매칭(밥상→식탁 등)을 깨뜨리므로 명시적으로 뺀다.
+ */
+const HEAD_COLLISION_NAMES = new Set(["식기건조대", "욕실 수납장", "상자", "김치통", "골프채 가방"]);
+
+/**
+ * 고시명이 상위어로 뭉뚱그려져 있을 때 실제 품목을 가르는 표.
+ *
+ * 용산구는 매트리스 가격을 "침대(매트리스, 라텍스, 토퍼)"로, 관악구는 고시명 "침대" +
+ * 규격 "1인용 매트리스"로 적는다. 괄호를 떼면 둘 다 "침대"만 남아 침대 프레임에 붙었고,
+ * 그래서 용산구는 매트리스 수수료가 아예 안 나오고 관악구는 라텍스 값만 나왔다.
+ *
+ * 괄호·규격에서 다른 품목이 잡히면 무조건 그쪽으로 보내는 일반 규칙도 만들어 봤지만
+ * 새 오귀속이 그만큼 생긴다 — "커튼(블라인드)"가 블라인드로, "전기장판 (전기담요,
+ * 온수매트)"가 온수매트로, "(침대)매트리스(일반)"이 되레 침대 프레임으로 갔다.
+ * 근거를 확인한 쌍만 여기 적는다.
+ */
+const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string }> = [
+  // "매트포함"은 세트 가격이라 침대 프레임에 그대로 둔다.
+  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress" },
+];
+
+function overrideItemId(rawName: string, spec: string, baseItemId: string): string | undefined {
+  const text = `${rawName} ${spec}`;
+  return SPLIT_HINTS.find((rule) => rule.from === baseItemId && rule.hint.test(text))?.to;
+}
+
 function classifyName(rawName: string): Verdict {
   const base = rawName.replace(/[(（][^)）]*[)）]/g, " ").trim();
   if (/[,/·]/.test(base)) return { ok: false, reason: "multi_item_name" };
   if (/별도|추가금|추가 요금/.test(rawName)) return { ok: false, reason: "surcharge_row" };
+  if (HEAD_COLLISION_NAMES.has(base)) return { ok: false, reason: "head_collision" };
 
   const resolved = resolveWasteItem(base);
   if (resolved.status !== "match") return { ok: false, reason: resolved.status };
@@ -103,26 +136,30 @@ for (const [gu, regionId, regionName] of TARGETS) {
   // 지자체 제출 기준일. 수집일이 아니라 이 값을 써야 신선도가 정직하게 드러난다.
   const checkedAt = [...new Set(regionRows.map(r => r.CRTR_YMD))].sort().pop()!;
 
-  const grouped = new Map<string, StandardRow[]>();
+  const grouped = new Map<string, Array<{ row: StandardRow; spec: string }>>();
   const skipped = new Map<string, number>();
+  const rerouted: string[] = [];
   for (const row of regionRows) {
     const verdict = classifyName(row.LAR_WAS_NM);
     if (!verdict.ok) {
       skipped.set(verdict.reason, (skipped.get(verdict.reason) ?? 0) + 1);
       continue;
     }
-    const list = grouped.get(verdict.itemId) ?? [];
-    list.push(row);
-    grouped.set(verdict.itemId, list);
+    const rawSpec = row.LAR_WAS_SPCFCT;
+    const spec = rawSpec && rawSpec !== "null" && String(rawSpec).trim() ? String(rawSpec).trim() : row.LAR_WAS_NM;
+    const override = overrideItemId(row.LAR_WAS_NM, spec, verdict.itemId);
+    if (override) rerouted.push(`${row.LAR_WAS_NM}/${spec}: ${verdict.itemId}→${override}`);
+    const itemId = override ?? verdict.itemId;
+    const list = grouped.get(itemId) ?? [];
+    list.push({ row, spec });
+    grouped.set(itemId, list);
   }
 
   const fees: BulkyWasteFee[] = [];
   const trimmed: string[] = [];
   for (const [itemId, group] of grouped) {
     const unique = new Map<string, BulkyWasteFee>();
-    for (const row of group) {
-      const rawSpec = row.LAR_WAS_SPCFCT;
-      const spec = rawSpec && rawSpec !== "null" && String(rawSpec).trim() ? String(rawSpec).trim() : row.LAR_WAS_NM;
+    for (const { row, spec } of group) {
       // 고시명까지 키에 넣는다. 매트리스 일반/모션/라텍스는 spec이 "퀸"으로 같아도
       // 다른 제품이고 금액이 다르다 — spec만으로 합치면 한 규격에 금액이 둘 붙는다.
       const key = `${row.LAR_WAS_NM}|${spec}|${row.FEE}`;
@@ -161,6 +198,7 @@ for (const [gu, regionId, regionName] of TARGETS) {
 
   console.log(`${gu}: 원본 ${regionRows.length}행 → 품목 ${grouped.size}개 / fee ${fees.length}행`);
   console.log(`  제외: ${JSON.stringify(Object.fromEntries(skipped))}`);
+  if (rerouted.length) console.log(`  품목 재지정: ${rerouted.join(" / ")}`);
   if (trimmed.length) console.log(`  상한 적용: ${trimmed.join(", ")}`);
 }
 
