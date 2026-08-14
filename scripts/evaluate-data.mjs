@@ -60,25 +60,67 @@ function findBestWasteItem(query) {
     .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, "ko"))[0];
 }
 
-function findRegionalPolicy(region) {
-  const normalizedRegion = normalizeText(region);
-  if (!normalizedRegion) return undefined;
+// src/data.ts의 resolveRegionalPolicy와 같은 규칙을 쓴다 — 명확하게 확정되는
+// 가장 작은 단위가 이긴다. 한쪽만 고치면 평가가 런타임과 다른 답을 통과시킨다.
+const REGION_MIN_FRAGMENT_QUERY_LENGTH = 2;
+
+function regionMatchLevel(region) {
+  return region.coverageTier === "metro" ? "metro" : "district";
+}
+
+function regionMatchStrength(normalizedQuery, normalizedName) {
+  if (!normalizedName) return 0;
+  if (normalizedQuery === normalizedName) return 3;
+  if (normalizedQuery.startsWith(normalizedName)) return 2;
+  if (normalizedName.startsWith(normalizedQuery) && normalizedQuery.length >= REGION_MIN_FRAGMENT_QUERY_LENGTH) return 1;
+  return 0;
+}
+
+function regionCandidatesAt(normalizedQuery, level, strength) {
+  const byRegionId = new Map();
 
   for (const policy of regionalPolicies) {
-    const names = [policy.name, ...policy.aliases];
-    for (const name of names) {
-      const normalizedName = normalizeText(name);
-      if (normalizedRegion === normalizedName || normalizedRegion.includes(normalizedName) || normalizedName.includes(normalizedRegion)) {
-        return { region: policy, matchedBy: name };
-      }
+    if (regionMatchLevel(policy) !== level || byRegionId.has(policy.id)) continue;
+    for (const name of [policy.name, ...policy.aliases]) {
+      if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
+      byRegionId.set(policy.id, { region: policy, matchedBy: name, level });
+      break;
     }
   }
 
-  return undefined;
+  return Array.from(byRegionId.values()).sort((a, b) => a.region.name.localeCompare(b.region.name, "ko"));
+}
+
+const REGION_RESOLUTION_ORDER = [
+  ["district", 3],
+  ["metro", 3],
+  ["district", 2],
+  ["district", 1],
+  ["metro", 2],
+  ["metro", 1],
+];
+
+function resolveRegionalPolicy(region) {
+  const normalizedQuery = normalizeText(region ?? "");
+  if (!normalizedQuery) return { status: "not_found" };
+
+  let ambiguous;
+  for (const [level, strength] of REGION_RESOLUTION_ORDER) {
+    const candidates = regionCandidatesAt(normalizedQuery, level, strength);
+    if (candidates.length === 1) return { status: "match", match: candidates[0] };
+    if (candidates.length > 1 && !ambiguous) ambiguous = candidates;
+  }
+
+  return ambiguous ? { status: "ambiguous", candidates: ambiguous } : { status: "not_found" };
+}
+
+function findRegionalPolicy(region) {
+  const resolved = resolveRegionalPolicy(region);
+  return resolved.status === "match" ? resolved.match : undefined;
 }
 
 function findRegionItemGuide(region, item) {
-  return region.itemGuides.find((guide) => guide.itemIds.includes(item.id));
+  return region.itemGuides?.find((guide) => guide.itemIds.includes(item.id));
 }
 
 function findBulkyWasteFees(region, item) {
@@ -129,16 +171,65 @@ for (const testCase of evaluationCases) {
   }
 }
 
+// R2의 회귀 방어선. 지역의 이름·별칭을 그대로 입력했을 때 그 지역으로
+// 확정되거나 최소한 되묻기 후보에는 들어가야 한다. 어느 쪽도 아니면 그 별칭은
+// 다른 지역에 뺏긴 것이고, 사용자에게는 조용히 틀린 지역 안내가 나간다.
+for (const region of regionalPolicies) {
+  for (const alias of [region.name, ...region.aliases]) {
+    const resolution = resolveRegionalPolicy(alias);
+    if (resolution.status === "match" && resolution.match.region.id === region.id) continue;
+    if (resolution.status === "ambiguous" && resolution.candidates.some((candidate) => candidate.region.id === region.id)) continue;
+
+    const actual =
+      resolution.status === "match"
+        ? `${resolution.match.region.id}`
+        : resolution.status === "ambiguous"
+        ? `ambiguous(${resolution.candidates.map((candidate) => candidate.region.id).join(", ")})`
+        : "not_found";
+    failures.push(`region ${region.id} alias "${alias}" resolves to ${actual}`);
+  }
+}
+
 for (const testCase of regionEvaluationCases) {
-  const regionMatch = findRegionalPolicy(testCase.region);
-  if (!regionMatch) {
+  const resolution = resolveRegionalPolicy(testCase.region);
+
+  // 동명 자치구는 확정하지 않고 되묻는 게 정답이다. 이 케이스는 "어떤 지역으로
+  // 매칭됐는가"가 아니라 "확정을 거부했는가"를 본다.
+  if (testCase.expectedStatus === "ambiguous") {
+    if (resolution.status !== "ambiguous") {
+      failures.push(`region "${testCase.region}" resolved as ${resolution.status}; expected an ambiguous re-ask`);
+      continue;
+    }
+
+    const candidateIds = resolution.candidates.map((candidate) => candidate.region.id);
+    for (const expectedId of testCase.expectedCandidateIds ?? []) {
+      if (!candidateIds.includes(expectedId)) {
+        failures.push(`region "${testCase.region}" ambiguity candidates ${candidateIds.join(", ")} did not include ${expectedId}`);
+      }
+    }
+    continue;
+  }
+
+  if (resolution.status !== "match") {
     failures.push(`region "${testCase.region}" did not match any policy; expected ${testCase.expectedRegionId}`);
     continue;
   }
 
+  const regionMatch = resolution.match;
   if (regionMatch.region.id !== testCase.expectedRegionId) {
     failures.push(`region "${testCase.region}" matched ${regionMatch.region.id}; expected ${testCase.expectedRegionId}`);
   }
+
+  if (testCase.expectedLevel !== undefined && regionMatch.level !== testCase.expectedLevel) {
+    failures.push(`region "${testCase.region}" resolved at the ${regionMatch.level} level; expected ${testCase.expectedLevel}`);
+  }
+
+  // 표준 티어는 필드가 얕아 케이스도 얕게 간다 — 신청 경로가 실제로 노출되는지만 본다.
+  if (testCase.expectedBulkyApplication && !regionMatch.region.bulkyWaste?.applicationUrl) {
+    failures.push(`region "${testCase.region}" (${regionMatch.region.id}) has no bulkyWaste.applicationUrl to surface`);
+  }
+
+  if (testCase.query === undefined) continue;
 
   const itemMatch = findBestWasteItem(testCase.query);
   if (!itemMatch) {

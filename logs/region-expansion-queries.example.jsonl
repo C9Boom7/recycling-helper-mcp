@@ -1,0 +1,60 @@
+{"query":"서울 종로구","expectedRegionId":"jongno_gu","expectedLevel":"district"}
+{"query":"용산구","expectedRegionId":"yongsan_gu","expectedLevel":"district"}
+{"query":"광진구","expectedRegionId":"gwangjin_gu","expectedLevel":"district"}
+{"query":"강북구","expectedRegionId":"gangbuk_gu","expectedLevel":"district"}
+{"query":"도봉구","expectedRegionId":"dobong_gu","expectedLevel":"district"}
+{"query":"노원구","expectedRegionId":"nowon_gu","expectedLevel":"district"}
+{"query":"은평구","expectedRegionId":"eunpyeong_gu","expectedLevel":"district"}
+{"query":"강서구","expectedRegionId":"gangseo_gu","expectedLevel":"district"}
+{"query":"금천구","expectedRegionId":"geumcheon_gu","expectedLevel":"district"}
+{"query":"영등포구","expectedRegionId":"yeongdeungpo_gu","expectedLevel":"district"}
+{"query":"동작구","expectedRegionId":"dongjak_gu","expectedLevel":"district"}
+{"query":"관악구","expectedRegionId":"gwanak_gu","expectedLevel":"district"}
+{"query":"강동구","expectedRegionId":"gangdong_gu","expectedLevel":"district"}
+{"query":"강남구","expectedRegionId":"gangnam_gu","expectedLevel":"district"}
+{"query":"서초구","expectedRegionId":"seocho_gu","expectedLevel":"district"}
+{"query":"송파구","expectedRegionId":"songpa_gu","expectedLevel":"district"}
+{"query":"마포구","expectedRegionId":"mapo_gu","expectedLevel":"district"}
+{"query":"성남시","expectedRegionId":"seongnam_si","expectedLevel":"district"}
+{"query":"판교","expectedRegionId":"seongnam_si","expectedLevel":"district"}
+{"query":"서울 강남","expectedRegionId":"gangnam_gu","expectedLevel":"district"}
+{"query":"서울 중구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"성동구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"동대문구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"중랑구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"성북구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"서대문구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"양천구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"구로구","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"서울","expectedRegionId":"seoul","expectedLevel":"metro"}
+{"query":"부산","expectedRegionId":"busan","expectedLevel":"metro"}
+{"query":"대구","expectedRegionId":"daegu","expectedLevel":"metro"}
+{"query":"인천","expectedRegionId":"incheon","expectedLevel":"metro"}
+{"query":"광주","expectedRegionId":"gwangju","expectedLevel":"metro"}
+{"query":"대전","expectedRegionId":"daejeon","expectedLevel":"metro"}
+{"query":"울산","expectedRegionId":"ulsan","expectedLevel":"metro"}
+{"query":"세종","expectedRegionId":"sejong","expectedLevel":"metro"}
+{"query":"경기","expectedRegionId":"gyeonggi","expectedLevel":"metro"}
+{"query":"강원","expectedRegionId":"gangwon","expectedLevel":"metro"}
+{"query":"충북","expectedRegionId":"chungbuk","expectedLevel":"metro"}
+{"query":"충남","expectedRegionId":"chungnam","expectedLevel":"metro"}
+{"query":"전북","expectedRegionId":"jeonbuk","expectedLevel":"metro"}
+{"query":"전남","expectedRegionId":"jeonnam","expectedLevel":"metro"}
+{"query":"경북","expectedRegionId":"gyeongbuk","expectedLevel":"metro"}
+{"query":"경남","expectedRegionId":"gyeongnam","expectedLevel":"metro"}
+{"query":"제주","expectedRegionId":"jeju","expectedLevel":"metro"}
+{"query":"부산 해운대구","expectedRegionId":"busan","expectedLevel":"metro"}
+{"query":"부산 기장군","expectedRegionId":"busan","expectedLevel":"metro"}
+{"query":"대구 수성구","expectedRegionId":"daegu","expectedLevel":"metro"}
+{"query":"인천 남동구","expectedRegionId":"incheon","expectedLevel":"metro"}
+{"query":"대전 유성구","expectedRegionId":"daejeon","expectedLevel":"metro"}
+{"query":"울산 남구","expectedRegionId":"ulsan","expectedLevel":"metro"}
+{"query":"경기 수원시","expectedRegionId":"gyeonggi","expectedLevel":"metro"}
+{"query":"경기 고양시","expectedRegionId":"gyeonggi","expectedLevel":"metro"}
+{"query":"경기도 하남시","expectedRegionId":"gyeonggi","expectedLevel":"metro"}
+{"query":"강원 춘천시","expectedRegionId":"gangwon","expectedLevel":"metro"}
+{"query":"충남 천안시","expectedRegionId":"chungnam","expectedLevel":"metro"}
+{"query":"전북 전주시","expectedRegionId":"jeonbuk","expectedLevel":"metro"}
+{"query":"경북 포항시","expectedRegionId":"gyeongbuk","expectedLevel":"metro"}
+{"query":"경남 창원시","expectedRegionId":"gyeongnam","expectedLevel":"metro"}
+{"query":"제주시","expectedRegionId":"jeju","expectedLevel":"metro"}

@@ -8,6 +8,8 @@
     "build": "tsc && mkdir -p dist/data && cp src/data/*.json dist/data/",
     "start": "node dist/server.js",
     "validate:data": "node scripts/validate-data.mjs",
+    "check:links": "node scripts/check-region-links.mjs",
+    "measure:region": "node scripts/measure-region-resolution.mjs",
     "eval:data": "node scripts/evaluate-data.mjs",
     "backlog:questions": "node scripts/report-question-backlog.mjs",
     "backlog:resolution": "pnpm build && node scripts/report-backlog-resolution.mjs",
@@ -15,7 +17,7 @@
     "backlog:auto": "node scripts/auto-backlog-queries.mjs",
     "backlog:auto:quality": "node scripts/auto-backlog-queries.mjs --input logs/quality-seed-queries.example.jsonl --region \"서울 강남구\"",
     "log:query": "node scripts/log-query.mjs",
-    "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && node scripts/evaluate-data.mjs",
+    "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && node scripts/evaluate-data.mjs && tsx scripts/test-region-matching.ts",
     "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
     "local:test": "pnpm check && pnpm smoke:mcp"
   },

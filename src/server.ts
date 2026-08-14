@@ -9,7 +9,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 // even across zod major versions.
 import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-schema-compat.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import type { MatchedRegionPolicy, MaterialGuideline, WasteItem, WasteMatch } from "./data.js";
+import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteItem, WasteMatch } from "./data.js";
 import {
   confidenceLabel,
   disposalGroupLabel,
@@ -17,8 +17,10 @@ import {
   findMaterialGuideline,
   findRegionalPolicy,
   findRegionItemGuide,
+  findRegisteredDistricts,
   findWasteItems,
   formatItemGuide,
+  formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceList,
   inferMaterialCategories,
@@ -27,6 +29,7 @@ import {
   itemRegionCheckLabel,
   itemRegionGuidance,
   publicReviewMetadata,
+  resolveRegionalPolicy,
   resolveWasteItem,
   wasteItems,
 } from "./data.js";
@@ -108,6 +111,8 @@ const READ_ONLY_ANNOTATIONS = {
 type ToolLogMeta = {
   matchedId?: string;
   matchedRegion?: string;
+  /** 지역 해상도 — R7 측정이 자치구 확정/광역 폴백/전국 폴백을 이 필드로 센다. */
+  regionStatus?: string;
   score?: number;
   status?: string;
   matched?: number;
@@ -429,11 +434,19 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
 }
 
 function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
+  const { generalWaste, recycling } = region.region;
+
+  // 배출 요일·시간은 full 티어에만 있다. 얕은 티어에서 이 자리를 비우면 확인할
+  // 항목이 통째로 사라지므로, 확정된 값 대신 "직접 확인할 항목"으로 돌려준다.
+  const scheduleChecks = [
+    generalWaste ? `일반쓰레기: ${generalWaste.time}, ${generalWaste.place}` : undefined,
+    recycling ? `재활용품: ${recycling.time}, ${recycling.place}` : undefined,
+    recycling?.vinylAndPetDay,
+    recycling?.otherDays,
+  ].filter((check): check is string => Boolean(check));
+
   return [
-    `일반쓰레기: ${region.region.generalWaste.time}, ${region.region.generalWaste.place}`,
-    `재활용품: ${region.region.recycling.time}, ${region.region.recycling.place}`,
-    region.region.recycling.vinylAndPetDay,
-    region.region.recycling.otherDays,
+    ...(scheduleChecks.length > 0 ? scheduleChecks : ["일반쓰레기·재활용품 배출 요일과 시간 (같은 지역 안에서도 동·주택 유형별로 다를 수 있음)"]),
     "불연성 폐기물 봉투, 특수마대, PP봉투 등 지역 지정 봉투 기준",
     "음식물류폐기물 전용봉투, RFID, 제외 품목",
     "대형생활폐기물 사전 신청과 수수료",
@@ -713,12 +726,64 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   );
 }
 
+/**
+ * 미등록 지역에서도 다음 행동이 남아야 한다. "지역번호+120" 대표 민원번호는
+ * 연결해도 담당 부서까지 한참 돌아가 안내로서 값이 없으므로 넣지 않는다 —
+ * 번호를 준다면 지역 데이터에서 확인한 직통번호여야 하고, 없으면 빼는 쪽이 낫다.
+ */
+const NATIONAL_FALLBACK_LINKS = [
+  {
+    title: "생활폐기물 분리배출 누리집 지역별 안내",
+    url: "https://www.분리배출.kr/front/region/region.do",
+    basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
+  },
+  {
+    title: "정부24 민원 신청",
+    url: "https://plus.gov.kr/minwon/",
+    basis: "'대형폐기물'로 검색하면 거주 지자체의 대형폐기물 배출 신청 민원으로 연결됩니다.",
+  },
+];
+
+/** 광역 안내로 착지했을 때 좁혀줄 자치구는 몇 곳만 보인다 — 응답 줄 수 예산을 지킨다. */
+const MAX_LISTED_DISTRICTS = 6;
+
+function metroNarrowingLine(metro: MatchedRegionPolicy): string {
+  const districts = findRegisteredDistricts(metro.region);
+  if (districts.length === 0) {
+    return `${metro.region.name} 광역 기준 안내입니다. 대형폐기물 신청 경로와 수수료는 시·군·구 소관이라, 거주 중인 시·군·구를 알려주시면 더 정확히 안내할 수 있습니다.`;
+  }
+
+  const listed = districts.slice(0, MAX_LISTED_DISTRICTS).map((district) => district.name);
+  const rest = districts.length - listed.length;
+  return `${metro.region.name} 광역 기준 안내입니다. 시·군·구를 알려주시면 그 기준으로 좁혀드립니다. (상세 안내 보유: ${listed.join(", ")}${rest > 0 ? ` 외 ${rest}곳` : ""})`;
+}
+
+/** 얕은 티어를 full 티어처럼 보이게 하지 않는다 — 확정되지 않은 범위를 밝힌다. */
+function regionCoverageNote(regionMatch: MatchedRegionPolicy): string | undefined {
+  if (regionMatch.level === "metro") return metroNarrowingLine(regionMatch);
+  if (regionMatch.region.coverageTier === "standard") {
+    return `${regionMatch.region.name} 기준으로 대형폐기물 신청 경로와 수거함 안내까지 확인했습니다. 배출 요일과 시간은 같은 지역 안에서도 동·주택 유형별로 갈려 확정 안내에 넣지 않았습니다.`;
+  }
+  return undefined;
+}
+
+function regionSpecialCollectionLines(region: RegionalPolicyData): string[] {
+  const { medicine, batteryAndFluorescentLamp } = region.specialCollections ?? {};
+  return [
+    ...(medicine?.method?.[0] ? [`- 폐의약품: ${medicine.method[0]}`] : []),
+    ...(batteryAndFluorescentLamp?.method?.[0] ? [`- 폐건전지·폐형광등: ${batteryAndFluorescentLamp.method[0]}`] : []),
+  ];
+}
+
 async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
   const resolved = itemName ? resolveWasteItem(itemName) : undefined;
   const match = resolved?.status === "match" ? resolved.match : undefined;
   const ambiguousCandidates =
     resolved?.status === "ambiguous" ? resolved.candidates.map(ambiguousCandidateLabel) : undefined;
-  const regionMatch = findRegionalPolicy(region);
+
+  const regionResolution = resolveRegionalPolicy(region);
+  const regionMatch = regionResolution.status === "match" ? regionResolution.match : undefined;
+  const regionCandidates = regionResolution.status === "ambiguous" ? regionResolution.candidates.map((candidate) => candidate.region.name) : undefined;
   const checkList = itemRegionCheckList(regionMatch, match?.item);
 
   const itemLine = match
@@ -729,19 +794,38 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
     : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";
 
+  // 지역을 확정하지 못해도 첫 줄에 입력한 지역명을 그대로 되비추고,
+  // "확인하지 못했다"가 아니라 "이 경로로 확인하면 된다"로 끝낸다.
+  const regionLine = regionCandidates
+    ? `입력한 지역 "${region}"은(는) 여러 지역에 해당할 수 있어 하나로 확정하지 못했습니다. 후보: ${regionCandidates.join(", ")} — 어느 지역인지 알려주시면 그 기준으로 안내하겠습니다.`
+    : regionMatch
+    ? `지역 요약: ${regionMatch.region.summary}`
+    : `"${region}"은(는) 아직 상세 지역 데이터가 없습니다. 아래 공식 경로에서 거주 지자체 기준을 바로 확인할 수 있습니다.`;
+
+  const bulkyLines = regionMatch ? formatRegionBulkyContactLines(regionMatch.region) : [];
+  const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region) : [];
+  const hasSchedule = Boolean(regionMatch?.region.generalWaste && regionMatch.region.recycling);
+
   const lines = [
     `${regionMatch?.region.name ?? region} 지역 확인 안내`,
     "",
     itemLine,
     match ? `기본 판단: ${match.item.summary}` : undefined,
     match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
-    regionMatch ? `지역 요약: ${regionMatch.region.summary}` : undefined,
-    "",
-    regionMatch ? `${regionMatch.region.name} 기본 배출 기준` : undefined,
-    regionMatch ? `- 일반쓰레기: ${regionMatch.region.generalWaste.time}, ${regionMatch.region.generalWaste.place}` : undefined,
-    regionMatch ? `- 재활용품: ${regionMatch.region.recycling.time}, ${regionMatch.region.recycling.place}` : undefined,
-    regionMatch ? `- ${regionMatch.region.recycling.vinylAndPetDay}` : undefined,
-    regionMatch ? `- ${regionMatch.region.recycling.otherDays}` : undefined,
+    regionLine,
+    regionMatch ? regionCoverageNote(regionMatch) : undefined,
+    hasSchedule ? "" : undefined,
+    hasSchedule ? `${regionMatch?.region.name} 기본 배출 기준` : undefined,
+    hasSchedule ? `- 일반쓰레기: ${regionMatch?.region.generalWaste?.time}, ${regionMatch?.region.generalWaste?.place}` : undefined,
+    hasSchedule ? `- 재활용품: ${regionMatch?.region.recycling?.time}, ${regionMatch?.region.recycling?.place}` : undefined,
+    hasSchedule ? `- ${regionMatch?.region.recycling?.vinylAndPetDay}` : undefined,
+    hasSchedule ? `- ${regionMatch?.region.recycling?.otherDays}` : undefined,
+    bulkyLines.length > 0 ? "" : undefined,
+    bulkyLines.length > 0 ? `${regionMatch?.region.name} 대형폐기물` : undefined,
+    ...bulkyLines,
+    specialLines.length > 0 ? "" : undefined,
+    specialLines.length > 0 ? `${regionMatch?.region.name} 수거함 안내` : undefined,
+    ...specialLines,
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
     match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
@@ -755,11 +839,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     "공식 확인처",
     ...(regionMatch
       ? formatRegionSourceList(regionMatch.region)
-      : [
-          "- 생활폐기물 분리배출 누리집: https://www.분리배출.kr/front/region/region.do",
-          "- 거주 지자체 청소/자원순환/환경 부서 안내 페이지",
-          "- 대형폐기물은 지자체 대형폐기물 신고 페이지",
-        ]),
+      : NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)),
   ].filter(Boolean);
 
   return textResult(
@@ -767,21 +847,22 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     {
       region,
       matchedRegion: regionMatch?.region.name,
+      regionStatus: regionMatch ? regionMatch.level : regionCandidates ? "ambiguous" : "unknown",
+      regionCandidates,
+      coverageTier: regionMatch?.region.coverageTier,
       item: match?.item.name,
       ambiguousCandidates,
       defaultSummary: match?.item.summary,
       checkList,
       officialSources: regionMatch
         ? regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url }))
-        : [
-            { title: "생활폐기물 분리배출 누리집", url: "https://www.분리배출.kr/front/region/region.do" },
-            { title: "거주 지자체 청소/자원순환/환경 부서 안내 페이지" },
-          ],
+        : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
     },
     {
       matchedId: match?.item.id,
       score: match?.score,
       matchedRegion: regionMatch?.region.name,
+      regionStatus: regionMatch ? regionMatch.level : regionCandidates ? "ambiguous" : "unknown",
     },
   );
 }

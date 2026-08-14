@@ -6,13 +6,31 @@
 
 ## Covered Regions
 
-| Region | Runtime ID | Status |
-| --- | --- | --- |
-| 서울 강남구 | `gangnam_gu` | 기존 기준 지역 |
-| 서울 서초구 | `seocho_gu` | 2026-07-02 추가 |
-| 서울 송파구 | `songpa_gu` | 2026-07-02 추가 |
-| 서울 마포구 | `mapo_gu` | 2026-07-03 추가 |
-| 경기도 성남시 | `seongnam_si` | 2026-07-05 추가, 판교는 alias만 |
+2026-08-14 Phase 5에서 티어를 나눴다. 아래 비교표는 배출 요일까지 확인한 `full` 티어 5곳만 다룬다. `standard` 13곳과 `metro` 17곳은 담는 항목이 달라 같은 표로 비교하지 않는다.
+
+| Region | Runtime ID | Tier | Status |
+| --- | --- | --- | --- |
+| 서울 강남구 | `gangnam_gu` | full | 기존 기준 지역 |
+| 서울 서초구 | `seocho_gu` | full | 2026-07-02 추가 |
+| 서울 송파구 | `songpa_gu` | full | 2026-07-02 추가 |
+| 서울 마포구 | `mapo_gu` | full | 2026-07-03 추가 |
+| 경기도 성남시 | `seongnam_si` | full | 2026-07-05 추가, 판교는 alias만 |
+
+### Standard tier (2026-08-14 추가)
+
+대형폐기물 인터넷 신청·수수료 조회 URL, 담당 직통번호, 폐의약품·폐건전지 수거함 안내까지 전부 확인된 서울 자치구 13곳이다. 배출 요일·시간은 담지 않는다.
+
+`jongno_gu`, `yongsan_gu`, `gwangjin_gu`, `gangbuk_gu`, `dobong_gu`, `nowon_gu`, `eunpyeong_gu`, `gangseo_gu`, `geumcheon_gu`, `yeongdeungpo_gu`, `dongjak_gu`, `gwanak_gu`, `gangdong_gu`
+
+서울 나머지 8개 구(중구·성동구·동대문구·중랑구·성북구·서대문구·양천구·구로구)는 완결 조건을 못 채워 넣지 않았다. 사유는 [data-decision-backlog.md](data-decision-backlog.md)에 있다.
+
+### Metro tier (2026-08-14 추가)
+
+자치구 데이터가 없을 때 착지하는 광역시도 17곳이다. 대형폐기물 접수가 기초자치단체 소관이라 전화번호와 신청 URL을 두지 않고, 응답에서 시·군·구 확인이 더 필요하다는 사실을 밝힌다.
+
+`seoul`, `busan`, `daegu`, `incheon`, `gwangju`, `daejeon`, `ulsan`, `sejong`, `gyeonggi`, `gangwon`, `chungbuk`, `chungnam`, `jeonbuk`, `jeonnam`, `gyeongbuk`, `gyeongnam`, `jeju`
+
+조사 중 확인된 사항으로, 광주광역시와 전라남도 누리집 기관명이 각각 `전남광주통합특별시(구)광주광역시`, `전남광주통합특별시(구)전라남도청`으로 바뀌어 있다. 사용자가 부르는 이름은 그대로라 `name`은 기존 명칭을 유지하고, 통합 사실은 각 지역 `summary`에 적었다.
 
 ## Comparison
 

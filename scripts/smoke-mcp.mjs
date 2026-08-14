@@ -81,6 +81,11 @@ const STRUCTURED_KEY_WHITELIST = {
   get_region_disposal_info: [
     "region",
     "matchedRegion",
+    // 지역 해상도(자치구 확정/광역 폴백/되묻기/미등록)와 티어. 호스트가 얕은
+    // 티어 안내를 확정 안내처럼 다루지 않도록 짧은 스칼라로만 싣는다.
+    "regionStatus",
+    "regionCandidates",
+    "coverageTier",
     "item",
     "ambiguousCandidates",
     "defaultSummary",

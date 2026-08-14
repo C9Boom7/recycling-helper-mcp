@@ -64,6 +64,16 @@
 - 오염/파손/대형/유해/복합재질 같은 예외 조건이 `conditions`, `steps`, `cautions`에 반영되어 있다.
 - 지역 차이가 있으면 `needsRegionCheck: true`와 `regionPolicy.checkItems`가 채워져 있다.
 
+## Region Coverage Tier
+
+품목의 `review.status`와 별개로, `region-policies.json`의 지역은 `coverageTier`로 담는 범위를 나눈다. 지역을 늘리려면 한 지역의 밀도를 낮춰야 하는데, 낮춘 범위를 스키마에 드러내지 않으면 얕은 데이터가 확정 안내처럼 보이기 때문이다.
+
+- `full`: 배출 요일·시간, 음식물 예외, 특수수거, 대형폐기물 절차까지. 기존 5곳.
+- `standard`: 대형폐기물 인터넷 신청 URL, 수수료 조회 URL, 담당 직통번호, `contactCheckedAt`, 폐의약품·폐건전지 수거함 안내, 출처 URL. **여섯 항목이 전부 있어야 추가한다.** 하나라도 못 채우면 넣지 않고 백로그에 남긴다. 배출 요일·시간은 같은 구 안에서도 동·주택 유형별로 갈려 담지 않는다.
+- `metro`: 광역시도 폴백. `bulkyWaste` 자체를 두지 않는다 — 대형폐기물 접수가 기초자치단체 소관이라 광역에 대응하는 직통번호가 없고, 시청 대표번호로 메우면 번호 품질 기준이 무너진다. validate가 `metro`에 `bulkyWaste`가 있으면 error를 낸다.
+
+전화번호는 티어와 무관하게 담당 직통번호만 쓴다. 지역번호+120 대표 민원번호는 validate가 막고, 지자체 대표번호(교환)는 쓰지 않는다. 번호를 확인하지 못하면 그 지자체를 추가하지 않는다.
+
 ## Source Priority
 
 출처 우선순위:
