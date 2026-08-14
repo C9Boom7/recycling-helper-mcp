@@ -82,7 +82,7 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 1 | 완료 (main 반영) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹. 코드리뷰 후속 수정은 PR #6으로 머지 |
 | 2 | 완료 (PR #4 머지됨) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272 |
 | 3 | 완료 (PR #5 머지됨) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. Preview 렌더링(R6) 확인은 4a로 이관 |
-| 4a | 대기 (재배포 클릭 필요) | claude/prd4-analysis-review-56f5e3 | Phase 0~3 전부 main 반영됨 — 사용자 재배포 후 즉시 착수 |
+| 4a | 서버 검증 완료, Preview 대기 | claude/prd4-analysis-review-56f5e3 | `c205fdf` 배포분 1·2단계 통과(health 272, 툴 5개, 위젯 JSON, 평균 59ms). 3·4단계는 Chrome 확장 연결 후 |
 | 4b | 미착수 | - | 4a 완주 이후 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.

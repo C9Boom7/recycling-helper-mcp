@@ -157,7 +157,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_disposal_steps",
     title: "Get Disposal Steps",
     description:
-      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. This is the primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Accepts vague or partial item names; if ambiguous, the result lists candidates so you can ask the user which one they mean.",
+      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. This is the primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Use it even when the user also mentions where they live — pass that as region and the result carries the local rules and bulky-waste fee — e.g. '강남구 사는데 침대 어떻게 버려?'. Accepts vague or partial item names; if ambiguous, the result lists candidates so you can ask the user which one they mean.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -205,7 +205,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): collection days, bulky-waste application links and fees, and official local sources. Use when the user names where they live or asks region-specific questions — e.g. '강남구 재활용 무슨 요일에 버려?', '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 폐건전지 어디 버려?'. Optional itemName narrows the checklist to that item.",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): collection days, bulky-waste application links and fees, and official local sources. Use when the region itself is the question — e.g. '강남구 재활용 무슨 요일에 버려?', '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead. Optional itemName narrows the checklist to that item.",
     inputShape: {
       region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
