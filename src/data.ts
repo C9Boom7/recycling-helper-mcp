@@ -280,6 +280,11 @@ const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
 const MIN_MATCH_SCORE = 35;
 const MAX_AMBIGUOUS_CANDIDATES = 7;
+// A query that only hits the modifier half of a compound name is not evidence
+// of identity (see scoreItemNames). Kept below MIN_MATCH_SCORE so it drops out
+// entirely rather than surfacing as a candidate: answering "에어컨" with a
+// remote control is worse than falling back to the material guidance.
+const MODIFIER_FRAGMENT_SCORE = 30;
 // fuzzy_jamo must stay below generic_fragment (82): it is a typo guess, never
 // stronger evidence than an actual substring hit.
 const FUZZY_JAMO_STRONG_SCORE = 70;
@@ -513,7 +518,7 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  * an exact, prefix, or standalone-token match, so only this one needs a tie check
  * in resolveWasteItem before it's safe to answer with confidence.
  */
-type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "fuzzy_jamo" | "target_mention";
+type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "modifier_fragment" | "fuzzy_jamo" | "target_mention";
 
 function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   const { raw, normalized: normalizedQuery, tokens: queryTokens } = query;
@@ -543,8 +548,18 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
         kind = "query_contains_name";
       }
     } else if (normalizedName.includes(normalizedQuery)) {
-      score = 82;
-      kind = "generic_fragment";
+      // Korean is head-final: the trailing morpheme of a compound noun carries
+      // the identity. "의자" inside "낡은 의자" is the head, so they are the same
+      // object. "에어컨" inside "에어컨 리모컨" is a modifier — a different object
+      // that merely names the query in passing, and answering with it is worse
+      // than not answering. Only a head-position hit counts as identity.
+      if (normalizedName.endsWith(normalizedQuery)) {
+        score = 82;
+        kind = "generic_fragment";
+      } else {
+        score = MODIFIER_FRAGMENT_SCORE;
+        kind = "modifier_fragment";
+      }
     }
 
     if (score > bestScore) {
@@ -554,8 +569,13 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
     }
   }
 
+  // The semantic bonus must not lift a modifier hit back over MIN_MATCH_SCORE —
+  // material keywords in the query say nothing about which half of a compound
+  // name was hit.
   const adjustedScore =
-    bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE ? Math.min(99, bestScore + semanticBonus) : bestScore;
+    matchKind !== "modifier_fragment" && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
+      ? Math.min(99, bestScore + semanticBonus)
+      : bestScore;
   return { item: indexed.item, score: adjustedScore, matchedBy, matchKind };
 }
 
