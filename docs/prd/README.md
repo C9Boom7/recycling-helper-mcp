@@ -80,7 +80,7 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | --- | --- | --- | --- |
 | 0 | 완료 (origin/main 푸시됨) | claude/kakaotalk-mcp-analysis-4dfb43 | 코드리뷰 지적 10건 수정 포함(32757f5). 재배포는 사용자 클릭 대기 |
 | 1 | 완료 (origin/main 푸시됨) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹, smoke 211케이스. 재배포는 사용자 클릭 대기 |
-| 2 | 완료 (브랜치 통합, PR 대기) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272. main 통합 후 local:test 통과 |
+| 2 | 완료 (PR #4, 머지 대기) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272. 최신 main 통합 후 local:test 통과 |
 | 3 | 미착수 | - | 1·2와 병렬 착수 가능 |
 | 4a | 미착수 | - | Phase 0 배포 후 즉시 — 최우선 |
 | 4b | 미착수 | - | 1~3 배포 이후 |
