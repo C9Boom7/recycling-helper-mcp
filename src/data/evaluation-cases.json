@@ -1630,5 +1630,35 @@
     "expectedItemId": "airtight_container",
     "expectedDisposalType": "recycle",
     "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "냉장고 어떻게 버려?",
+    "expectedItemId": "refrigerator",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. 무상방문수거가 1순위 안내인지 확인합니다."
+  },
+  {
+    "query": "세탁기 버리는 법 알려줘",
+    "expectedItemId": "washing_machine",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장."
+  },
+  {
+    "query": "에어컨 버리려면 어떻게 해?",
+    "expectedItemId": "air_conditioner",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. R1 이전에는 리모컨으로 오매칭되던 질의입니다."
+  },
+  {
+    "query": "텔레비전 버리는 방법",
+    "expectedItemId": "television",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. TV 별칭도 같은 품목으로 확정되어야 합니다."
+  },
+  {
+    "query": "컴퓨터 어떻게 버리나요",
+    "expectedItemId": "desktop_computer",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 대형가전 확장. R1 이후 노트북으로 오매칭되던 것을 이 품목이 받습니다."
   }
 ]
