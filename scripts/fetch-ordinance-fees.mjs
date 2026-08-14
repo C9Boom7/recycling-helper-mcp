@@ -35,6 +35,9 @@ const OUTPUT_DIR = "data/ordinance-raw";
 /** 데모 계정을 두드리는 속도를 낮춘다. R0 실측 건당 2.2초와 같은 수준이다. */
 const REQUEST_DELAY_MS = 400;
 
+/** 검색 페이지 상한(페이지당 100건). 데모 계정을 무한정 두드리지 않으려는 안전판. */
+const MAX_SEARCH_PAGES = 20;
+
 /**
  * Phase 6 대상 10곳. 용산·노원·강서·관악은 공공데이터포털 표준데이터
  * 트랙이 맡으므로 여기 없다(PRD "트랙 분담").
@@ -105,18 +108,40 @@ function asArray(value) {
   return Array.isArray(value) ? value : [value];
 }
 
-/** 1단계 — 기관명이 정확히 일치하고 이름에 `폐기물`이 든 자치법규를 전부 모은다. */
+/**
+ * 1단계 — 기관명이 정확히 일치하고 이름에 `폐기물`이 든 자치법규를 전부 모은다.
+ *
+ * 검색은 기관 한정이 아니라 전국 자치법규를 훑으므로 100건을 쉽게 넘긴다.
+ * 한 페이지만 받고 말면 대상 조례가 101번째 뒤로 밀렸을 때 조용히 누락되고,
+ * 결과는 "조례가 없다"와 구별되지 않는다. `totalCnt`를 보고 끝까지 넘긴다.
+ */
 async function searchLaws(기관명) {
   const query = encodeURIComponent(`${기관명.split(" ").pop()} 폐기물`);
-  const url = `${SEARCH_URL}?OC=${OC}&target=ordin&type=JSON&search=1&display=100&query=${query}`;
-  const body = await fetchWithRetry(url);
-  let parsed;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    throw new Error(`검색 응답이 JSON이 아니다 (${기관명}) — 데모 계정이 막혔을 수 있다`);
+  const laws = [];
+  let totalCount = 0;
+  let page = 1;
+
+  for (; page <= MAX_SEARCH_PAGES; page += 1) {
+    if (page > 1) await sleep(REQUEST_DELAY_MS);
+    const url = `${SEARCH_URL}?OC=${OC}&target=ordin&type=JSON&search=1&display=100&page=${page}&query=${query}`;
+    const body = await fetchWithRetry(url);
+    let parsed;
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      throw new Error(`검색 응답이 JSON이 아니다 (${기관명}) — 데모 계정이 막혔을 수 있다`);
+    }
+    const search = parsed.OrdinSearch ?? {};
+    if (page === 1) totalCount = Number(search.totalCnt ?? 0);
+    const pageLaws = asArray(search.law);
+    laws.push(...pageLaws);
+    if (pageLaws.length === 0 || laws.length >= totalCount) break;
   }
-  const laws = asArray(parsed.OrdinSearch?.law);
+
+  // 상한에 걸려 끊겼으면 알린다. 조용히 자르면 누락이 "조례 없음"으로 보인다.
+  if (laws.length < totalCount) {
+    console.error(`    ! ${기관명} 검색이 ${laws.length}/${totalCount}건에서 끊겼다 (상한 ${MAX_SEARCH_PAGES}페이지)`);
+  }
 
   return laws
     .filter((law) => law.지자체기관명 === 기관명)
@@ -158,7 +183,9 @@ async function attachmentText(attachment) {
   const data = await fetchWithRetry(attachment.url, { asBuffer: true });
   if (data.length === 0) throw new Error("빈 첨부");
 
-  if (data.subarray(0, 4).equals(Buffer.from("PK", "latin1"))) {
+  // zip 로컬 파일 헤더 시그니처. 리터럴에 raw 제어문자를 박으면 편집기·리뷰
+  // 화면에서 안 보여 2바이트 "PK"로 오독되므로 hex로 적는다.
+  if (data.subarray(0, 4).equals(Buffer.from("504b0304", "hex"))) {
     throw new Error("hwpx(zip) 첨부는 아직 지원하지 않는다");
   }
   if (data.subarray(0, 8).equals(Buffer.from("d0cf11e0a1b11ae1", "hex"))) {
@@ -212,6 +239,8 @@ const COLUMN_WORDS =
 /** 금액 칸 뒤에 더 붙는 열. 있으면 "금액이 행의 마지막"이라는 전제가 깨진다. */
 const TRAILING_COLUMN = /^(비\s*고|변경\s*사항)$/;
 const FEE_COLUMN = /^(가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비)$/;
+/** 행 번호 열. 선언돼 있으면 행 머리의 일련번호를 금액과 구분해야 한다. */
+const SEQUENCE_COLUMN = /^(연번|순번|번호)$/;
 
 /**
  * 표 머리글 다음에 오는 열 이름 줄을 읽는다. 열 구성이 지자체마다 달라
@@ -240,43 +269,34 @@ function readColumns(lines, startIndex) {
  */
 function parseFeeRows(lines, startIndex) {
   const { columns, nextIndex } = readColumns(lines, startIndex);
-
-  // 금액 뒤에 `비고`·`변경사항` 열이 더 있으면 금액 다음 토큰이 다음 행의
-  // 품명이 아니라 같은 행의 꼬리다. 이 형태를 단순 규칙으로 밀면 품명과
-  // 규격이 한 칸씩 밀린 그럴듯한 오답이 나온다 — 내지 않는 편이 낫다.
-  //
-  // 다만 열 이름만 보고 막으면 안 된다. 성남시처럼 `비고`를 선언해놓고 실제로는
-  // 전부 비워둔 표가 있고, 그건 단순 규칙으로 정확히 읽힌다. 그래서 헤더 선언과
-  // 데이터 증거를 모두 요구한다 — 금액 바로 뒤 토큰이 특정 값으로 반복되면
-  // (동작구 `품목추가` 29회) 꼬리 열이 실제로 채워져 있다는 뜻이다.
   const feeIndex = columns.findIndex((column) => FEE_COLUMN.test(column));
-  const declaresTrailing = feeIndex >= 0 && columns.slice(feeIndex + 1).some((column) => TRAILING_COLUMN.test(column));
-  if (declaresTrailing) {
-    const counts = new Map();
-    let samples = 0;
-    for (let i = nextIndex; i < lines.length - 1; i += 1) {
-      if (parseAmount(lines[i]) === null || parseAmount(lines[i + 1]) !== null) continue;
-      const next = lines[i + 1];
-      counts.set(next, (counts.get(next) ?? 0) + 1);
-      samples += 1;
-    }
-    const [topToken, topCount] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
-    if (samples > 0 && topCount >= 5 && topCount / samples >= 0.05) {
-      const trailingNames = columns.slice(feeIndex + 1).join("·");
-      return {
-        rows: [],
-        columns,
-        unsupportedForm: `금액 뒤 ${trailingNames} 열이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
-      };
-    }
-  }
+  const hasSequence = columns.some((column) => SEQUENCE_COLUMN.test(column));
 
   const rows = [];
   let pending = [];
   let currentItem = null;
+  // 금액 바로 뒤 토큰의 분포. 꼬리 열 판정에 쓰며, 표를 실제로 훑는 이 루프
+  // 안에서 모아야 표 바깥(부칙·묶음 파일의 다른 별표) 토큰이 섞이지 않는다.
+  const trailingCounts = new Map();
+  let trailingSamples = 0;
 
   for (let i = nextIndex; i < lines.length; i += 1) {
     const token = lines[i];
+
+    // 연번 열이 있는 표(현재 열 인식이 되는 곳 중에는 종로구)에서는 행 머리의
+    // 일련번호가 금액 자리로 끼어든다. parseAmount는 콤마 없는 맨숫자도 500
+    // 이상이면 금액으로 보므로, 500행을 넘는 표에서는 501·502…가 금액으로
+    // 소비돼 가짜 행이 생기고 그 뒤 행의 품명·규격이 한 칸씩 밀린다.
+    // 지금 대상 10곳은 연번이 500을 넘지 않아 드러나지 않았을 뿐이다.
+    //
+    // 순번 카운터로 맞춰보는 방법은 병합 셀 하나에 어긋나면 복구되지 않는다.
+    // 위치를 쓴다 — 연번은 행의 첫 칸이라 직전 금액에서 pending을 비운 직후에만
+    // 온다. 반대로 금액은 행의 마지막이라 그 자리에 올 수 없다.
+    if (hasSequence && pending.length === 0 && /^\d{1,4}$/.test(token)) {
+      pending.push(token); // rawGroup에는 남긴다. 아래 labels 필터가 후보에서 뺀다.
+      continue;
+    }
+
     const amount = parseAmount(token);
     if (amount === null) {
       pending.push(token);
@@ -285,7 +305,15 @@ function parseFeeRows(lines, startIndex) {
       continue;
     }
 
-    // 연번 열이 있는 표(영등포구)에서는 행 번호가 품명 자리로 밀려든다.
+    const follower = lines[i + 1];
+    // 연번은 행마다 값이 달라 분포가 퍼지므로 표본에서 뺀다. 남겨두면
+    // 표본만 부풀려 꼬리 열 판정의 비율을 희석한다.
+    const followerIsSequence = hasSequence && follower !== undefined && /^\d{1,4}$/.test(follower);
+    if (follower !== undefined && !followerIsSequence && parseAmount(follower) === null) {
+      trailingCounts.set(follower, (trailingCounts.get(follower) ?? 0) + 1);
+      trailingSamples += 1;
+    }
+
     // 품명이 맨숫자인 경우는 없으므로 후보에서 뺀다.
     const labels = pending.filter((token) => !/^\d{1,4}$/.test(token));
 
@@ -303,6 +331,27 @@ function parseFeeRows(lines, startIndex) {
       currentItem = itemName;
     }
     pending = [];
+  }
+
+  // 금액 뒤에 `비고`·`변경사항` 열이 더 있으면 금액 다음 토큰이 다음 행의
+  // 품명이 아니라 같은 행의 꼬리다. 이 형태를 단순 규칙으로 밀면 품명과
+  // 규격이 한 칸씩 밀린 그럴듯한 오답이 나온다 — 내지 않는 편이 낫다.
+  //
+  // 다만 열 이름만 보고 막으면 안 된다. 성남시처럼 `비고`를 선언해놓고 실제로는
+  // 전부 비워둔 표가 있고, 그건 단순 규칙으로 정확히 읽힌다. 그래서 헤더 선언과
+  // 데이터 증거를 모두 요구한다 — 금액 바로 뒤 토큰이 특정 값으로 반복되면
+  // (동작구 `품목추가` 29회) 꼬리 열이 실제로 채워져 있다는 뜻이다.
+  const declaresTrailing = feeIndex >= 0 && columns.slice(feeIndex + 1).some((column) => TRAILING_COLUMN.test(column));
+  if (declaresTrailing) {
+    const [topToken, topCount] = [...trailingCounts.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+    if (trailingSamples > 0 && topCount >= 5 && topCount / trailingSamples >= 0.05) {
+      const trailingNames = columns.slice(feeIndex + 1).join("·");
+      return {
+        rows: [],
+        columns,
+        unsupportedForm: `금액 뒤 ${trailingNames} 열이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
+      };
+    }
   }
 
   return { rows, columns, unsupportedForm: null };
@@ -375,10 +424,17 @@ async function collectRegion(target) {
         result.law = law;
         result.attachment = { ...attachment, header: lines[start], columns };
         result.rawText = text;
-        result.errors.push(`[${law.name}] ${attachment.title}: 열 구성 미지원 — ${unsupportedForm}`);
+        result.errors.push(`[${law.name}] ${attachment.title || "(제목 없음)"}: 열 구성 미지원 — ${unsupportedForm}`);
         return result;
       }
-      if (rows.length === 0) continue;
+      if (rows.length === 0) {
+        // 머리글은 찾았는데 행이 0개다. 사유 없이 넘기면 최종 메시지가
+        // "수수료표를 찾지 못했다"뿐이라 머리글조차 없던 경우와 구별되지 않는다.
+        result.errors.push(
+          `[${law.name}] ${attachment.title || "(제목 없음)"}: 표 머리글은 찾았으나 행을 하나도 뽑지 못했다 (머리글: "${lines[start]}")`,
+        );
+        continue;
+      }
 
       result.law = law;
       result.attachment = { ...attachment, header: lines[start], columns };
@@ -394,13 +450,19 @@ async function collectRegion(target) {
 
 async function main() {
   const requested = process.argv.slice(2);
-  const targets = requested.length > 0 ? TARGETS.filter((t) => requested.includes(t.regionId)) : TARGETS;
 
-  if (targets.length === 0) {
-    console.error(`대상이 없다. 사용 가능한 regionId: ${TARGETS.map((t) => t.regionId).join(", ")}`);
+  // 모르는 regionId를 조용히 버리면 안 된다. 유효한 것과 섞여 들어오면
+  // 오타 하나로 그 지역이 빠진 채 "완료 — 1/1"이 찍혀 성공으로 보인다.
+  const known = new Set(TARGETS.map((t) => t.regionId));
+  const unknown = requested.filter((regionId) => !known.has(regionId));
+  if (unknown.length > 0) {
+    console.error(`모르는 regionId: ${unknown.join(", ")}`);
+    console.error(`사용 가능한 regionId: ${TARGETS.map((t) => t.regionId).join(", ")}`);
     process.exitCode = 1;
     return;
   }
+
+  const targets = requested.length > 0 ? TARGETS.filter((t) => requested.includes(t.regionId)) : TARGETS;
 
   mkdirSync(OUTPUT_DIR, { recursive: true });
   let failed = 0;

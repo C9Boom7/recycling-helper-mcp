@@ -185,9 +185,18 @@ function decodeParaText(data) {
   for (let i = 0; i + 2 <= data.length; i += 2) {
     const code = data.readUInt16LE(i);
     if (code >= 32) {
-      // 짝 없는 서로게이트가 제어 레코드에 섞여 들어온다. 그대로 두면
-      // 문자열로 만드는 순간 터진다(R0에서 강북구가 여기서 죽었다).
-      if (code >= 0xd800 && code <= 0xdfff) continue;
+      // 짝 없는 서로게이트가 제어 레코드에 섞여 들어온다(R0에서 강북구가
+      // 여기서 깨졌다). 다만 본문은 UTF-16LE라 CJK 확장 한자는 정상적인
+      // 서로게이트 쌍으로 저장되므로, 짝이 맞으면 살리고 없을 때만 버린다.
+      if (code >= 0xd800 && code <= 0xdbff) {
+        const low = i + 4 <= data.length ? data.readUInt16LE(i + 2) : -1;
+        if (low >= 0xdc00 && low <= 0xdfff) {
+          out += String.fromCharCode(code, low);
+          i += 2; // 루프의 +2와 합쳐 쌍 전체를 넘긴다.
+        }
+        continue;
+      }
+      if (code >= 0xdc00 && code <= 0xdfff) continue; // 짝 없는 하위 서로게이트
       out += String.fromCharCode(code);
       continue;
     }
