@@ -6,7 +6,7 @@ Kakao Tools Preview에서 실사용 시나리오를 돌려 **툴 호출률과 �
 
 ## 전제
 
-- Phase 0~3이 로컬 main에 머지되어 있고, 사용자 "푸시하라" + 재배포로 본선 서버에 반영된 상태.
+- Phase 0~3이 PR 머지로 main에 반영되어 있고, 사용자 재배포 클릭으로 본선 서버에 올라간 상태.
 - Preview 테스트는 Claude가 Chrome 확장으로 대행한다. 필요 조건: Chrome에 카카오 계정(PlayMCP 가입 계정) 및 ChatGPT 계정(Plus/Pro 권장, Business/Enterprise 불가) 로그인 유지.
 - Preview 사용 시 참고 (가이드 §4): 도구함에는 테스트할 MCP만 담는다. 실제 툴 이름에는 MCP 식별자 prefix가 붙는다. 위젯 확인 후에는 "새 대화 시작"으로 초기화한다. 툴 호출은 비결정적이므로 시나리오당 필요 시 2회까지 반복한다.
 

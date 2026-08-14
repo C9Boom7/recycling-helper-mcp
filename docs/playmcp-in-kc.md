@@ -68,3 +68,34 @@ MCP 식별자: recyclingHelper
 MCP Endpoint: PlayMCP in KC에서 발급받은 Endpoint URL
 ```
 
+## 배포 서버 (실제 발급된 엔드포인트)
+
+서버가 두 대 있고 용도가 다릅니다. **본선 작업은 본선 서버만 재배포합니다.**
+
+| 용도 | 엔드포인트 | 비고 |
+| --- | --- | --- |
+| **본선** (Kakao Tools) | `https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp` | 현재 작업 대상. main 브랜치 Git 소스 빌드 |
+| 예선 (PlayMCP AI채팅) | `https://recycle-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp` (서버 ID `1498`) | **절대 건드리지 않습니다.** 예선 제출 상태 보존 |
+
+서버 코드의 host allowlist는 `*.playmcp-endpoint.kakaocloud.io` suffix 와일드카드라, 서버를 새로 만들어 호스트명이 바뀌어도 코드 수정 없이 동작합니다.
+
+### 재배포 후 확인
+
+main에 머지하고 사용자가 PlayMCP in KC에서 "재배포"를 누른 뒤, 아래로 반영 여부를 확인합니다.
+
+```bash
+curl -sS https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/health
+```
+
+`items` 수가 방금 배포한 커밋의 품목 수와 같아야 합니다. 다르면 이전 빌드가 떠 있는 것입니다.
+
+툴 호출까지 확인하려면 (Kakao 인프라가 쓰는 JSON-only 경로):
+
+```bash
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"기름 묻은 피자박스"}}}' https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp
+```
+
+#### 확인 이력
+
+- 2026-08-14, `a696026`(Phase 0 + Phase 1) 배포분 검증 통과: health 200(items 130), initialize, tools/list 5개(SSE·JSON-only 동일), JSON-only `tools/call`, not_found 재질 폴백, ambiguous 후보 제시, CORS 4개 origin(`playmcp.kakaocloud.io`, `playmcp.kakao.com`, `preview-chatgpt.kakao.com`, `tools.kakao.com`), 응답속도 평균 24ms·p99 30ms(네트워크 왕복 포함, 가이드 기준 p99 3,000ms).
+
