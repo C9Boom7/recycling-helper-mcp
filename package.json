@@ -10,7 +10,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "eval:data": "node scripts/evaluate-data.mjs",
     "backlog:questions": "node scripts/report-question-backlog.mjs",
-    "backlog:resolution": "node scripts/report-backlog-resolution.mjs",
+    "backlog:resolution": "pnpm build && node scripts/report-backlog-resolution.mjs",
     "backlog:auto": "node scripts/auto-backlog-queries.mjs",
     "backlog:auto:quality": "node scripts/auto-backlog-queries.mjs --input logs/quality-seed-queries.example.jsonl --region \"서울 강남구\"",
     "log:query": "node scripts/log-query.mjs",

@@ -550,6 +550,11 @@ const materialGuidelineIds = new Set();
 for (const [index, guideline] of materialGuidelines.entries()) {
   const prefix = `materialGuideline[${index}]${guideline?.id ? `(${guideline.id})` : ""}`;
 
+  if (!guideline || typeof guideline !== "object" || Array.isArray(guideline)) {
+    errors.push(`${prefix} must be an object`);
+    continue;
+  }
+
   if (!isNonEmptyString(guideline.id)) {
     errors.push(`${prefix}.id must be a non-empty string`);
   } else {

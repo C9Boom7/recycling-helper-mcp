@@ -10,18 +10,24 @@ const backlog = JSON.parse(readFileSync(backlogPath, "utf8"));
 
 let match = 0;
 let ambiguous = 0;
+let skipped = 0;
 const notFoundQueries = [];
 
 for (const entry of backlog) {
   const query = entry.query ?? "";
-  if (!query) continue;
+  if (!query) {
+    skipped += 1;
+    continue;
+  }
   const resolved = resolveWasteItem(query);
   if (resolved.status === "match") match += 1;
   else if (resolved.status === "ambiguous") ambiguous += 1;
   else notFoundQueries.push(query);
 }
 
-console.log(`Backlog resolution: total ${backlog.length}, match ${match}, ambiguous ${ambiguous}, not_found ${notFoundQueries.length}`);
+console.log(
+  `Backlog resolution: total ${backlog.length}, match ${match}, ambiguous ${ambiguous}, not_found ${notFoundQueries.length}, skipped ${skipped} (no query)`,
+);
 for (const query of notFoundQueries) {
   console.log(`- not_found: ${query}`);
 }

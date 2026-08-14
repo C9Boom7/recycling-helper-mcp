@@ -279,57 +279,55 @@ const FALLBACK_ASK_FOR = ["재질", "오염 여부", "크기", "지역"];
 // Material menu shown when the query gives no material hint. Kept to 5 one-line
 // rules to respect the Phase 0 response-size budget.
 const FALLBACK_MENU_MATERIAL_IDS = ["plastic_container", "vinyl_film", "paper_cardboard", "can_metal", "general_trash"];
+const FALLBACK_STEP_LIMIT = 2;
 
+function isMaterialGuideline(guideline: MaterialGuideline | undefined): guideline is MaterialGuideline {
+  return guideline !== undefined;
+}
+
+// not_found means findWasteItems already came back empty for this query, so the
+// answer is the material fallback: inferred principles when the query names a
+// material, otherwise the one-line menu.
 function unknownItemResult(itemName: string): CallToolResult {
-  const candidates = findWasteItems(itemName, 3).map((match) => match.item.name);
-  const candidateText = candidates.length > 0 ? `\n\n비슷한 후보: ${candidates.join(", ")}` : "";
-  const inferred = inferMaterialCategories(itemName)
-    .map((id) => findMaterialGuideline(id))
-    .filter((guideline): guideline is MaterialGuideline => guideline !== undefined);
+  const inferred = inferMaterialCategories(itemName).map(findMaterialGuideline).filter(isMaterialGuideline);
+  const isInferred = inferred.length > 0;
+  const guidelines = isInferred
+    ? inferred
+    : FALLBACK_MENU_MATERIAL_IDS.map(findMaterialGuideline).filter(isMaterialGuideline);
 
   const lines = [
     `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`,
-    "품목의 재질, 오염 여부, 크기, 지역 정보를 함께 알려주면 더 정확히 판단할 수 있습니다.",
+    `품목의 ${FALLBACK_ASK_FOR.join(", ")} 정보를 함께 알려주면 더 정확히 판단할 수 있습니다.`,
+    "",
+    isInferred ? "재질로 추정한 일반 원칙:" : "주요 재질별 한 줄 원칙:",
   ];
 
-  if (inferred.length > 0) {
-    lines.push("", "재질로 추정한 일반 원칙:");
-    for (const guideline of inferred) {
-      lines.push(`- ${guideline.label}: ${guideline.quickRule}`);
-      for (const step of guideline.steps.slice(0, 2)) {
-        lines.push(`  - ${step}`);
-      }
-      lines.push(`  - 재활용이 어려운 경우: ${guideline.whenGeneral}`);
+  for (const guideline of guidelines) {
+    lines.push(`- ${guideline.label}: ${guideline.quickRule}`);
+    if (!isInferred) continue;
+    for (const step of guideline.steps.slice(0, FALLBACK_STEP_LIMIT)) {
+      lines.push(`  - ${step}`);
     }
-  } else {
-    lines.push("", "주요 재질별 한 줄 원칙:");
-    for (const id of FALLBACK_MENU_MATERIAL_IDS) {
-      const guideline = findMaterialGuideline(id);
-      if (guideline) lines.push(`- ${guideline.label}: ${guideline.quickRule}`);
-    }
+    lines.push(`  - 재활용이 어려운 경우: ${guideline.whenGeneral}`);
   }
 
-  const materials =
-    inferred.length > 0
-      ? inferred.map((guideline) => ({
-          id: guideline.id,
-          label: guideline.label,
-          quickRule: guideline.quickRule,
-          steps: guideline.steps.slice(0, 2),
-          whenGeneral: guideline.whenGeneral,
-          source: guideline.source,
-        }))
-      : FALLBACK_MENU_MATERIAL_IDS.map((id) => findMaterialGuideline(id))
-          .filter((guideline): guideline is MaterialGuideline => guideline !== undefined)
-          .map((guideline) => ({ id: guideline.id, label: guideline.label, quickRule: guideline.quickRule }));
-
-  return textResult(lines.join("\n") + candidateText, {
+  return textResult(lines.join("\n"), {
     found: false,
     itemName,
-    candidates,
     fallback: {
-      inferred: inferred.length > 0,
-      materials,
+      inferred: isInferred,
+      materials: guidelines.map((guideline) => ({
+        id: guideline.id,
+        label: guideline.label,
+        quickRule: guideline.quickRule,
+        ...(isInferred
+          ? {
+              steps: guideline.steps.slice(0, FALLBACK_STEP_LIMIT),
+              whenGeneral: guideline.whenGeneral,
+              source: guideline.source,
+            }
+          : {}),
+      })),
       askFor: FALLBACK_ASK_FOR,
     },
   });
@@ -351,12 +349,25 @@ function ambiguousCandidateDetails(match: WasteMatch): ToolResult {
   };
 }
 
+// A one-candidate resolution is a typo guess, not a list of matches — Phase 1
+// typo matching made that the common shape, so every site that renders
+// candidates has to ask instead of claiming several items matched.
+function didYouMeanQuestion(candidateLabel: string): string {
+  return `혹시 "${candidateLabel}"을(를) 찾으시나요?`;
+}
+
+function ambiguousCandidateSummary(candidateLabels: string[]): string {
+  return candidateLabels.length === 1
+    ? `${didYouMeanQuestion(candidateLabels[0])} 맞다면 그 품목명으로 다시 물어봐 주세요.`
+    : `여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다. (후보: ${candidateLabels.join(", ")})`;
+}
+
 function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallToolResult {
   const candidateLabels = candidates.map(ambiguousCandidateLabel);
   const text =
     candidateLabels.length === 1
       ? [
-          `입력한 품목 "${itemName}"을(를) 정확히 찾지 못했습니다. 혹시 "${candidateLabels[0]}"을(를) 찾으시나요?`,
+          `입력한 품목 "${itemName}"을(를) 정확히 찾지 못했습니다. ${didYouMeanQuestion(candidateLabels[0])}`,
           "맞다면 그 품목명으로 다시 물어봐 주세요. 아니라면 재질, 용도, 크기를 알려주시면 다시 판단하겠습니다.",
         ].join("\n")
       : [
@@ -500,8 +511,18 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
 }
 
 async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<LoggedToolResult> {
-  const matches = findWasteItems(itemName, 3);
+  let matches = findWasteItems(itemName, 3);
   if (matches.length === 0) return unknownItemResult(itemName);
+
+  // Typo guesses have to clear the same confirmation gate as the other tools.
+  // Listed as "헷갈림 체크" entries they would read as conclusions about items the
+  // user never named, so an unconfirmed guess asks back instead.
+  if (matches[0].matchKind === "fuzzy_jamo") {
+    const resolved = resolveWasteItem(itemName);
+    if (resolved.status === "not_found") return unknownItemResult(itemName);
+    if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
+    matches = [resolved.match];
+  }
 
   const lines = [
     `헷갈림 체크: "${itemName}"`,
@@ -551,7 +572,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
         input: rawName,
         found: false as const,
         group: "확인 필요",
-        summary: `여러 품목에 해당할 수 있어 확인이 필요합니다 (후보: ${candidateLabels.join(", ")}).`,
+        summary: ambiguousCandidateSummary(candidateLabels),
         candidates: candidateLabels,
       };
     }
@@ -645,7 +666,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const itemLine = match
     ? `품목: ${match.item.name}`
     : ambiguousCandidates
-    ? `품목: "${itemName}"은(는) 여러 품목에 해당할 수 있어 하나로 확정하지 못했습니다. (후보: ${ambiguousCandidates.join(", ")})`
+    ? `품목: "${itemName}" — ${ambiguousCandidateSummary(ambiguousCandidates)}`
     : itemName
     ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
     : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";

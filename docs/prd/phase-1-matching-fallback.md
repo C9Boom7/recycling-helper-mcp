@@ -47,8 +47,10 @@
 - **`fuzzy_jamo`에는 `semanticBonus`를 가산하지 않는다.** 현행 `scoreItem`은 88점 미만 매칭에 최대 18점을 가산하므로, 그대로 두면 70점짜리 fuzzy_jamo가 88점까지 올라 위 불변식이 깨진다.
 - 짧은 이름(정규화 2자 이하)에는 적용하지 않는다 (오폭 방지).
 - 토큰 단위 비교도 지원: 질의 토큰 중 하나가 품목명과 자모 유사하면 매칭 (예: "패트병 라벨 떼야 해?" → "페트병").
-- **확신 매칭(88점 이상)이 하나라도 있으면 fuzzy_jamo 후보는 결과 목록에서 제외한다.** 이미 정확히 매칭된 질의에 자모 근사 후보를 섞으면 `check_confusing_item` 같은 목록형 출력이 잡음으로 오염된다 (예: "비닐봉지" exact 매칭 옆에 "코팅지" 0.7 근사가 끼는 문제).
-- **약한 밴드(0.7~0.85)는 단어형 질의(토큰 2개 이하)에서만 발동한다.** 문장형 질의에서는 일반 명사 토큰이 무관 품목과 0.7 언저리로 걸리는 잡음이 생기고("포장지"↔"화장지" 0.71), 그런 질의는 not_found 폴백(R1)이 더 유용한 답을 준다. 강한 밴드(≥0.85)는 문장에서도 발동한다.
+- **오타 매칭은 이름 매칭과 경쟁하지 않는 폴백 티어다.** `findWasteItems`는 이름·별칭 매칭을 먼저 돌리고, 35점 이상 매칭이 하나도 없을 때만 자모 패스를 실행한다. 점수 밴드로 걸러내는 방식(초기 구현: 88점 이상이 있을 때만 제외)은 78점 `short_alias_standalone`이나 82점 `generic_fragment`가 최고점인 질의에서 오타 후보가 목록형 출력에 그대로 남는 구멍이 있었다. 티어를 분리하면 어떤 점수대에서도 오염이 없고, 철자가 맞는 질의는 자모 레벤슈타인 비용을 아예 내지 않는다.
+- **질의에 포함된 이름은 오타 후보가 될 수 없다.** 이름이 질의의 부분 문자열이면(또는 그 반대면) 그건 이름 매칭이 이미 채점한 신호이고, 일부러 낮게 억제한 경우도 포함된다("폐의약품 수거함에 넣어?"는 폐의약품을 묻는 질의가 아니라 20점 `target_mention`). 오타 티어가 그 억제를 우회하면 안 된다.
+- **오타 후보는 단어 첫 자모가 일치해야 한다** (퍼지 검색의 prefix 제약과 같은 장치). 유사도만 보면 발음이 닮은 무관한 단어끼리 붙는다("테이프"↔별칭 "베이프" 0.83, "포장지"↔별칭 "화장지" 0.71, "조개껍질"↔"호두껍질"). 첫 자음 오타는 놓치지만 그 질의는 not_found 재질 폴백(R1)이 답하고, 틀린 확정 답변은 폴백이 없다.
+- **약한 밴드(0.7~0.85)는 토큰 1개짜리 단어형 질의에서만 발동한다.** 토큰 2개까지 허용하면 "약과 포장지"가 "약 포장재"(0.75)에 걸려 R1이 정확히 추정하는 비닐 재질 원칙 대신 엉뚱한 확인 질문이 나간다. 강한 밴드(≥0.85)는 문장에서도 발동한다.
 - `resolveWasteItem`에 fuzzy_jamo 분기를 신설한다(확정 스펙): best가 `fuzzy_jamo`이고 유사도 ≥ 0.85 단일 후보면 match 확정, 그 미만이면 후보가 1개여도 `ambiguous`(candidates)로 돌려 "이것을 찾으신 게 맞나요?" 성격을 드러낸다. 현재 `resolveWasteItem`은 후보 2개 이상일 때만 ambiguous를 반환하므로(`candidates.length > 1`), fuzzy_jamo 분기에서는 이 조건을 완화해야 한다. 40~55점도 `findWasteItems`의 35점 필터를 통과하므로 이 분기가 없으면 낮은 유사도 오타가 단독 최고점일 때 그대로 match로 확정되는 회귀가 생긴다.
 
 수용 기준(신규 평가 케이스로 고정): `패트병→페트병`, `스치로폼→스티로폼`, `형광능→형광등`, `건전기→건전지` 급의 오타 4개 이상이 올바른 품목으로 이어진다. 기존 evaluation-cases 130 + region 35 + mcp-answer-cases 전체 무회귀.
@@ -71,7 +73,7 @@ R2·R3은 매칭을 공격적으로 만들므로, 반대 방향 회귀를 함께
 
 ## 파일별 작업 지점
 
-- [src/data.ts](../../src/data.ts): `scoreItem`(fuzzy 교체), `resolveWasteItem`(fuzzy_jamo 분기 — 단독 후보 ambiguous 허용), `inferMaterialCategories` 신설, material-guidelines 로드.
+- [src/data.ts](../../src/data.ts): `scoreItemNames`/`scoreItemTypos`(이름 티어와 오타 티어 분리), `resolveWasteItem`(fuzzy_jamo 분기 — 단독 후보 ambiguous 허용), `inferMaterialCategories` 신설, material-guidelines 로드. 이름·별칭의 정규화와 자모 분해는 로드 시점에 `indexedItems`로 미리 계산한다.
 - [src/server.ts](../../src/server.ts): `unknownItemResult` 확장 (Phase 0의 structuredContent 스펙 준수).
 - `src/data/material-guidelines.json` 신설, `src/data/waste-items.json` 별칭 보강.
 - `scripts/validate-data.mjs`: material-guidelines 스키마 검증 추가.
@@ -88,7 +90,7 @@ R2·R3은 매칭을 공격적으로 만들므로, 반대 방향 회귀를 함께
 ## 완료 체크리스트
 
 - [x] R1 폴백 (데이터 + 추정 + 응답) — material-guidelines.json 12종, `inferMaterialCategories`, `unknownItemResult` 확장, validate-data 스키마 검증. 폴백 smoke 5건
-- [x] R2 자모 매칭 — `fuzzy_jamo`(강 0.85→70점 / 약 0.7~0.85→40~55점, semanticBonus 미가산, 약한 밴드는 토큰 2개 이하 질의만), `resolveWasteItem` 단독 후보 확인 질문 분기. 오타 smoke 4건 + 약한 밴드 1건
+- [x] R2 자모 매칭 — `fuzzy_jamo`(강 0.85→70점 / 약 0.7~0.85→40~55점, semanticBonus 미가산, 이름 매칭이 없을 때만 도는 폴백 티어, 첫 자모 일치 필수, 약한 밴드는 토큰 1개 질의만), `resolveWasteItem` 단독 후보 확인 질문 분기. 오타 smoke 4건 + 약한 밴드 1건 + 리뷰 후속 6건
 - [x] R3 별칭 보강 — 수세미(멜라민 스펀지·매직 스펀지·매직블럭), 우유팩(우유곽·우유갑), 건전지(밧데리), 페트병(페트). 그룹당 smoke 1건. 랩탑·정수기 필터·햇반 용기는 신규 품목 판단이라 data-decision-backlog에 기록하고 Phase 2로 이관
 - [x] R4 과매칭 방어 — 기존 "컵/통/병/용기" ambiguous smoke 무회귀 유지, "약봉투"(빈 약통·폐의약품 미매칭) / "약병"(exact 유지) smoke 추가
 - [x] not_found 감소 측정 기록 (아래)
@@ -106,3 +108,15 @@ R2·R3은 매칭을 공격적으로 만들므로, 반대 방향 회귀를 함께
 - 잔여 3건: "약과 포장지"(폐의약품 오매칭 방지를 위한 의도적 비매칭 — 이제 비닐·유해 재질 폴백 제공), "랩탑", "정수기 필터"(신규 품목 후보 — Phase 2 이관, 각각 폐가전 추정 폴백·재질 메뉴 폴백 제공).
 - 폴백 응답 크기 실측: 재질 1개 추정 약 1.4KB, 2개 추정 약 2.4KB (text+structuredContent 합계) — 대표 확정 매칭 응답(약 2.0~2.2KB)과 같은 자릿수.
 - 회귀: `pnpm local:test` 통과 — evaluation 130 + region 35 + MCP answer 211(기존 196 + 신규 15) 전체.
+
+## 코드 리뷰 후속 수정 (2026-08-14)
+
+머지 후 코드 리뷰에서 약한 밴드가 오타가 아닌 발음 충돌까지 후보로 올리는 문제가 드러나 정밀도 쪽으로 조정했다. 백로그 지표는 그대로(match 108 / ambiguous 0 / not_found 3)이고, MCP answer 케이스는 217건(신규 6건)이다.
+
+- 오타 티어 분리: `findWasteItems`는 이름 매칭이 하나도 없을 때만 자모 패스를 돌린다. 78·82점 매칭이 최고점일 때 오타 후보가 목록형 출력에 남던 구멍을 막고, 철자가 맞는 질의는 자모 비용을 내지 않는다(실측 0.10ms/query, 오타 폴백 질의 0.19ms/query).
+- 첫 자모 일치 필수 + 약한 밴드는 토큰 1개 질의 한정: "테이프"→"베이프", "포장지"→"화장지", "약과 포장지"→"약 포장재" 오추천이 사라지고 해당 질의는 R1 재질 폴백으로 간다.
+- `check_confusing_item`도 오타 추측에 확인 게이트를 적용한다. 이전에는 `findWasteItems`를 직접 써서 40~55점 추측을 `found:true` 확정 답변으로 냈다.
+- 재질 추정 키워드에서 "글라스"·"껍질"을 뺐다. 부분 문자열 매칭이라 선글라스·조개껍질에 엉뚱한 재질 원칙이 붙었다.
+- 단독 후보 ambiguous 문구를 `ambiguousCandidateSummary`로 통일했다. cleanup plan과 region 안내가 후보 1개를 두고 "여러 품목에 해당할 수 있어"라고 답하던 문제.
+- `unknownItemResult`에서 항상 비어 있던 후보 재조회를 없애고(not_found 자체가 매칭 0건 조건), 텍스트와 structuredContent를 한 목록에서 만든다. smoke는 `fallback` 내부 키와 재질별 steps 2개 상한까지 검증한다.
+- `backlog:resolution`에 `pnpm build`를 붙였다. 빌드 없이 돌면 이전 dist 기준 수치가 측정값으로 찍힌다.

@@ -4521,5 +4521,127 @@
       "\"found\":true",
       "\"itemName\":\"페트병\""
     ]
+  },
+  {
+    "id": "confusing_typo_jamo_strong_confirms_single_item",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "패트병"
+    },
+    "expectedTextIncludes": [
+      "헷갈림 체크",
+      "1. 페트병"
+    ],
+    "expectedTextExcludes": [
+      "2. "
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"itemName\":\"페트병\""
+    ]
+  },
+  {
+    "id": "confusing_weak_jamo_asks_back_instead_of_concluding",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "약봉투"
+    },
+    "expectedTextIncludes": [
+      "혹시",
+      "찾으시나요"
+    ],
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "결론"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"ambiguous\":true"
+    ],
+    "expectedStructuredExcludes": [
+      "\"matches\""
+    ]
+  },
+  {
+    "id": "classify_typo_guard_phonetic_alias_collision_tape",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "테이프"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "베이프",
+      "전자담배",
+      "혹시"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false"
+    ]
+  },
+  {
+    "id": "classify_typo_guard_packaging_prefers_material_fallback",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "포장지"
+    },
+    "expectedTextIncludes": [
+      "재질로 추정한 일반 원칙",
+      "비닐·필름류"
+    ],
+    "expectedTextExcludes": [
+      "물티슈",
+      "화장지",
+      "혹시"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":true",
+      "\"id\":\"vinyl_film\""
+    ]
+  },
+  {
+    "id": "classify_fallback_sunglasses_no_glass_inference",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "선글라스"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "유리병류",
+      "빈용기보증금"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"glass_bottle\""
+    ]
+  },
+  {
+    "id": "cleanup_weak_jamo_single_candidate_asks_back",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": [
+        "약봉투"
+      ]
+    },
+    "expectedTextIncludes": [
+      "혹시",
+      "찾으시나요"
+    ],
+    "expectedTextExcludes": [
+      "여러 품목에 해당할 수 있어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"group\":\"확인 필요\""
+    ]
   }
 ]

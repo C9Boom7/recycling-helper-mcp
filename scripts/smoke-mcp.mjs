@@ -44,7 +44,9 @@ const REQUIRED_TOOL_ANNOTATION_FIELDS = [
 // the smoke suite instead of silently regrowing the payload.
 // Phase 1 R1 extends the not_found contract with a material-principles
 // fallback block: { inferred, materials[], askFor[] }.
-const NOT_FOUND_KEYS = ["found", "itemName", "candidates", "fallback"];
+const NOT_FOUND_KEYS = ["found", "itemName", "fallback"];
+const NOT_FOUND_FALLBACK_KEYS = ["inferred", "materials", "askFor"];
+const NOT_FOUND_FALLBACK_MATERIAL_KEYS = ["id", "label", "quickRule", "steps", "whenGeneral", "source"];
 const AMBIGUOUS_KEYS = ["found", "ambiguous", "itemName", "candidates", "candidateDetails"];
 const STRUCTURED_KEY_WHITELIST = {
   classify_waste_item: [
@@ -456,6 +458,26 @@ function assertStructuredKeys(result, testCase) {
   assert(allowed, `${testCase.id} has no structured key whitelist for tool ${testCase.tool}`);
   for (const key of keys) {
     assert(allowed.includes(key), `${testCase.id} structuredContent has non-whitelisted key "${key}"`);
+  }
+
+  // The nested pass below skips found:false responses, so the fallback block —
+  // the one not_found payload that carries nested objects — is checked here.
+  if (structured.found === false && isPlainObject(structured.fallback)) {
+    for (const key of Object.keys(structured.fallback)) {
+      assert(NOT_FOUND_FALLBACK_KEYS.includes(key), `${testCase.id} fallback has non-whitelisted key "${key}"`);
+    }
+    for (const material of structured.fallback.materials ?? []) {
+      for (const key of Object.keys(material)) {
+        assert(
+          NOT_FOUND_FALLBACK_MATERIAL_KEYS.includes(key),
+          `${testCase.id} fallback.materials[] has non-whitelisted key "${key}"`,
+        );
+      }
+      assert(
+        (material.steps ?? []).length <= 2,
+        `${testCase.id} fallback.materials[] must keep at most 2 steps per material`,
+      );
+    }
   }
 
   const nested = NESTED_KEY_WHITELIST[testCase.tool];
