@@ -685,21 +685,60 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   return { status: "match", match: best };
 }
 
+/** 시·도 단위 입력. 지역 정책은 시·군·구 단위라 이 이름만으로는 확정하지 않는다. */
+const PROVINCE_QUERIES = new Set(
+  [
+    "서울", "서울시", "서울특별시",
+    "부산", "부산시", "부산광역시",
+    "대구", "대구시", "대구광역시",
+    "인천", "인천시", "인천광역시",
+    "광주", "광주시", "광주광역시",
+    "대전", "대전시", "대전광역시",
+    "울산", "울산시", "울산광역시",
+    "세종", "세종시", "세종특별자치시",
+    "경기", "경기도",
+    "강원", "강원도", "강원특별자치도",
+    "충북", "충청북도", "충남", "충청남도",
+    "전북", "전라북도", "전북특별자치도", "전남", "전라남도",
+    "경북", "경상북도", "경남", "경상남도",
+    "제주", "제주도", "제주특별자치도",
+  ].map(normalizeText),
+);
+
 export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undefined {
   if (!region) return undefined;
 
   const normalizedRegion = normalizeText(region);
   if (!normalizedRegion) return undefined;
 
+  // Pass 1 — the query names the region at least as specifically as we do
+  // ("서울 강남구", "강남구 역삼동"). The first hit is the answer.
+  const broaderHits: MatchedRegionPolicy[] = [];
   for (const policy of regionalPolicies) {
     const names = [policy.name, ...policy.aliases];
     for (const name of names) {
       const normalizedName = normalizeText(name);
-      if (normalizedRegion === normalizedName || normalizedRegion.includes(normalizedName) || normalizedName.includes(normalizedRegion)) {
+      if (normalizedRegion === normalizedName || normalizedRegion.includes(normalizedName)) {
         return { region: policy, matchedBy: name };
+      }
+      if (normalizedName.includes(normalizedRegion)) {
+        broaderHits.push({ region: policy, matchedBy: name });
       }
     }
   }
+
+  // Pass 2 — the query is broader than any region we cover. Answering with
+  // whichever policy sat first in the file presented 강남구 rules as if they were
+  // 서울 rules; with 4 서울 구 registered that is a coin flip the user never agreed to.
+  //
+  // A 시·도 name never resolves, even when we happen to cover exactly one region
+  // inside it — "경기" would otherwise return 성남시 rules to someone in 수원.
+  // Anything else resolves only when it lands on a single region, so a bare
+  // "강남구" or "마포" still works.
+  if (PROVINCE_QUERIES.has(normalizedRegion)) return undefined;
+
+  const distinct = new Set(broaderHits.map((hit) => hit.region.name));
+  if (distinct.size === 1) return broaderHits[0];
 
   return undefined;
 }
