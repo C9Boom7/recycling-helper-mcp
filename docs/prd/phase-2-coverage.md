@@ -106,3 +106,17 @@ Phase 1 몫, 2.7% → 0.9%가 Phase 2 몫이다. 빈출 발화 50개는 Phase 1 
 - 과매칭 방어로 제거한 별칭: `크리스마스트리`의 "트리"(프린터 카트리지 질의를 가로챔), `멜라민 그릇`의 "멜라민 컵"(포괄어 "컵" 후보 목록에서 기존 머그컵을 밀어냄), `스마트워치`의 "전자시계", `전기포트`의 "티포트".
 - 기존 데이터에서 발견해 정리한 별칭 충돌 1건: "커피 티백"이 `tea_bag`과 `drip_bag_coffee_filter` 양쪽에 있어 배출법이 맞는 후자만 남겼다.
 - 백로그 todo 1건(`정수기 필터`)이 `water_purifier_filter` 품목으로 커버되어 `covered`로 전환했다.
+
+## 코드리뷰 반영 (2026-08-14)
+
+품목이 늘면서 `disposalType` 어휘도 함께 늘었는데, `disposalGroupLabel`이 부분 문자열로
+그룹을 추론하고 있어 신규 값들이 조용히 어긋났다. 라벨을 데이터로 분리하고 validate로
+전수 대응을 강제했다.
+
+- **배출 그룹 매핑을 [src/data/disposal-groups.json](../../src/data/disposal-groups.json)으로 분리.** 부분 문자열 추론을 없앴다. 이전에는 `small_electronics_collection`(27개)·`food_waste`(3개)가 어느 분기에도 걸리지 않아 노트북·프린터·상한 우유 같은 품목이 `배출 그룹: 확인 필요`로 나왔다. 그 라벨은 `make_cleanup_plan`에서 not_found·모호 항목에 쓰는 값이라, 매칭에 성공한 품목이 실패한 것처럼 보였다.
+- **복합 배출로는 "주 배출로/보조 배출로" 순서로 표기.** `bulky`를 먼저 보던 탓에 종량제봉투가 기본인 `general_or_bulky_by_size`(18개) 등이 통째로 `대형폐기물`로 나왔다. 빗자루는 이제 `일반쓰레기/대형폐기물`, 체중계는 `소형가전/대형폐기물`, 전자레인지는 `무상방문수거/대형폐기물`이다.
+- **`nonburnable_special_bag`(5개)은 `불연성 폐기물`로 분리.** `includes("special")`에 걸려 `특수/유해폐기물`로 나오던 것을 바로잡았다. 불연성 마대 대상 품목을 유해폐기물 수거처로 안내하던 문제다.
+- **`formatRegionItemGuide`의 대형폐기물 분기를 조건부로 변경.** 대형폐기물이 보조 배출로일 때는 "대형폐기물에 해당할 때만 사전 신청" 문구를 쓴다. 이전에는 빗자루·돗자리처럼 종량제봉투가 기본인 품목에도 "배출 3일 전까지 사전 신청" 절차만 안내했다.
+- **체중계의 `disposalType`을 `recycle_or_bulky_by_type` → `small_electronics_collection_or_bulky`로 교정.** 결론 문장이 소형가전 수거함을 가리키는데 타입만 `recycle`이라 "세부 판단" 노출도 어긋나 있었다.
+- **회귀 케이스 6건 추가(answer case 290 → 296)** — 고친 그룹별로 `disposalGroup`을 단언하고, 기존 `standard_region_required_broom`에는 조건부 지역 문구 단언을 보강했다. 라벨을 되돌리면 smoke가 깨지는 것을 확인했다.
+- **`scripts/`도 타입 체크 대상에 포함** — `tsconfig.scripts.json`을 추가하고 `pnpm check`에 물렸다. `measure-coverage.ts`가 `include: ["src/**/*"]` 밖이라 `tsc --noEmit`이 한 번도 보지 않던 상태였다.

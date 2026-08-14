@@ -7,6 +7,7 @@ const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
+const disposalGroupsPath = new URL("../src/data/disposal-groups.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -16,6 +17,7 @@ const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
+const disposalGroups = JSON.parse(readFileSync(disposalGroupsPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
@@ -203,6 +205,33 @@ if (!Array.isArray(questionBacklog)) {
 
 if (!Array.isArray(materialGuidelines) || materialGuidelines.length === 0) {
   throw new Error("src/data/material-guidelines.json must contain a non-empty array");
+}
+
+if (!disposalGroups || typeof disposalGroups !== "object" || Array.isArray(disposalGroups)) {
+  throw new Error("src/data/disposal-groups.json must contain an object map");
+}
+
+// disposalType -> 배출 그룹 라벨은 전수 대응이어야 한다. 빠지면 런타임이
+// "확인 필요"로 답하는데, 그건 not_found/모호 항목의 라벨이라 매칭에 성공한
+// 품목이 실패한 것처럼 보인다.
+const usedDisposalTypes = new Set();
+for (const [index, item] of items.entries()) {
+  if (!isNonEmptyString(item.disposalType)) continue;
+  usedDisposalTypes.add(item.disposalType);
+  if (!isNonEmptyString(disposalGroups[item.disposalType])) {
+    errors.push(`${at(index, item.id, "disposalType")} "${item.disposalType}" has no label in src/data/disposal-groups.json`);
+  }
+}
+
+for (const [disposalType, label] of Object.entries(disposalGroups)) {
+  if (!isNonEmptyString(label)) {
+    errors.push(`disposalGroups["${disposalType}"] must be a non-empty string`);
+  } else if (label === "확인 필요") {
+    errors.push(`disposalGroups["${disposalType}"] must not be "확인 필요" — that label is reserved for unmatched items`);
+  }
+  if (!usedDisposalTypes.has(disposalType)) {
+    warnings.push(`disposalGroups["${disposalType}"] is not used by any waste item`);
+  }
 }
 
 const reviewCounts = countBy(items, (item) => item?.review?.status);

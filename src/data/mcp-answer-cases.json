@@ -4625,12 +4625,17 @@
       "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "빗자루"
+      "빗자루",
+      "대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청"
+    ],
+    "expectedTextExcludes": [
+      "서울 강남구 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다."
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"broom\"",
       "\"regionCheckLevel\":\"필수\"",
-      "\"regionNotes\""
+      "\"regionNotes\"",
+      "\"disposalGroup\":\"일반쓰레기/대형폐기물\""
     ],
     "expectedRegionNotes": {
       "present": true
@@ -6013,6 +6018,103 @@
       "\"found\":false",
       "\"inferred\":true",
       "\"id\":\"glass_bottle\""
+    ]
+  },
+  {
+    "id": "classify_group_small_electronics_laptop",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "노트북 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 소형가전"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 확인 필요"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"소형가전\"",
+      "\"disposalType\":\"small_electronics_collection\""
+    ]
+  },
+  {
+    "id": "classify_group_food_waste_spoiled_milk",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "상한 우유 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 음식물쓰레기"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 확인 필요"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"음식물쓰레기\""
+    ]
+  },
+  {
+    "id": "classify_group_nonburnable_wine_glass",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "와인잔 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 불연성 폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 특수/유해폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"불연성 폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_secondary_bulky_broom",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "빗자루 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 일반쓰레기/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"일반쓰레기/대형폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_secondary_bulky_bathroom_scale",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "체중계 버리려면 어떻게 해?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 소형가전/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"소형가전/대형폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_free_visit_microwave",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "전자레인지 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 무상방문수거/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"무상방문수거/대형폐기물\""
     ]
   }
 ]

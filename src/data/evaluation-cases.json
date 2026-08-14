@@ -1046,7 +1046,7 @@
   {
     "query": "체중계는 어떻게 버려?",
     "expectedItemId": "bathroom_scale",
-    "expectedDisposalType": "recycle_or_bulky_by_type",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
     "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
   },
   {

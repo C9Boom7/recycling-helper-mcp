@@ -12387,7 +12387,7 @@
       "스마트 체중계"
     ],
     "category": "small_appliance",
-    "disposalType": "recycle_or_bulky_by_type",
+    "disposalType": "small_electronics_collection_or_bulky",
     "conditions": [
       "digital",
       "mechanical"
