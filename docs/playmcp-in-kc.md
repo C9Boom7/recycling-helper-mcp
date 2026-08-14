@@ -98,4 +98,13 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d '{
 #### 확인 이력
 
 - 2026-08-14, `a696026`(Phase 0 + Phase 1) 배포분 검증 통과: health 200(items 130), initialize, tools/list 5개(SSE·JSON-only 동일), JSON-only `tools/call`, not_found 재질 폴백, ambiguous 후보 제시, CORS 4개 origin(`playmcp.kakaocloud.io`, `playmcp.kakao.com`, `preview-chatgpt.kakao.com`, `tools.kakao.com`), 응답속도 평균 24ms·p99 30ms(네트워크 왕복 포함, 가이드 기준 p99 3,000ms).
+- 2026-08-14, `c205fdf`(Phase 0~3 전체) 배포분 서버 검증 통과 — Phase 4a의 1·2단계:
+  - health 200, `items: 272` (Phase 2 확장분 반영 확인).
+  - tools/list 5개. description 269~482자로 전부 1,024자 이내, annotations 5개 필드 모두 지정됨.
+  - 툴 5개 실호출 정상: `get_disposal_steps`(확정/오타/ambiguous), `classify_waste_item`, `check_confusing_item`, `make_cleanup_plan`, `get_region_disposal_info`.
+  - 위젯 경로 확인: 확정 매칭 응답의 `content[0].text`가 `{widget, copy_text, name}` JSON 문자열이고 `status` 키가 없다(가이드 별첨 형식). ambiguous는 텍스트 유지 — Phase 3 R1 분기대로 동작.
+  - Phase 1 자모 매칭 반영: "패트병" → 페트병 카드.
+  - CORS 4개 origin 허용, 미등록 origin은 헤더 없음. JSON-only accept 경로 200.
+  - 응답속도 20회 표본 평균 59ms·p50 59ms·p95 84ms (네트워크 왕복 포함).
+  - **미완**: Kakao Tools Preview 렌더링·툴 호출 확인(4a의 3·4단계). Chrome 확장 미연결로 대기 중.
 
