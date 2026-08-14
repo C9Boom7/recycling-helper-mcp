@@ -68,7 +68,7 @@ Phase 3은 `src/server.ts`의 `get_disposal_steps` 핸들러를 만지므로 Pha
 | --- | --- | --- | --- |
 | 0 | 완료 (main 머지) | claude/kakaotalk-mcp-analysis-4dfb43 | push 대기 |
 | 1 | 미착수 | - | Phase 0 머지됨 — 착수 가능 |
-| 2 | 미착수 | - | Phase 0 머지됨 — 착수 가능, Phase 1과 병렬 가능 |
+| 2 | 완료 (main 머지) | claude/prd2-analysis-review-862248 | 품목 130 → 273, push 대기 |
 | 3 | 미착수 | - | Phase 1 머지 후 권장 |
 | 4 | 미착수 | - | |
 

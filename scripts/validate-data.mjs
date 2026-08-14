@@ -19,7 +19,7 @@ const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
 const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
-const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed"]);
+const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed", "standard_import"]);
 const regionScopes = new Set(["national_default", "region_specific", "local_collection_point", "bulky_waste"]);
 const regionCheckLevels = new Set(["required", "advisory"]);
 const questionBacklogTypes = new Set([
@@ -50,6 +50,14 @@ const errors = [];
 const warnings = [];
 const ids = new Set();
 const names = new Set();
+const normalizedKeyOwners = new Map();
+
+function normalizeMatchText(value) {
+  return value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "")
+    .trim();
+}
 
 function stableJsonStringify(value) {
   if (Array.isArray(value)) {
@@ -206,6 +214,12 @@ expectDocumentCount(
   reviewCounts.region_review_needed ?? 0,
 );
 expectDocumentCount("docs/source-coverage.md needs_source items", sourceCoverage, /- `needs_source`: (\d+)/, reviewCounts.needs_source ?? 0);
+expectDocumentCount(
+  "docs/source-coverage.md standard_import items",
+  sourceCoverage,
+  /- `standard_import`: (\d+)/,
+  reviewCounts.standard_import ?? 0,
+);
 expectAllDocumentCounts("docs/session-coordination.md MCP answer cases", sessionCoordination, /MCP answer cases (\d+)개/g, mcpAnswerCases.length);
 expectSessionSourceSnapshot({
   wasteItems: items.length,
@@ -248,6 +262,23 @@ for (const [index, item] of items.entries()) {
       warnings.push(`${at(index, item.id, "name")} is duplicated`);
     }
     names.add(item.name);
+  }
+
+  const normalizedKeys = new Set();
+  if (isNonEmptyString(item.name)) normalizedKeys.add(normalizeMatchText(item.name));
+  if (Array.isArray(item.aliases)) {
+    for (const alias of item.aliases) {
+      if (isNonEmptyString(alias)) normalizedKeys.add(normalizeMatchText(alias));
+    }
+  }
+  for (const key of normalizedKeys) {
+    if (!key) continue;
+    const owner = normalizedKeyOwners.get(key);
+    if (owner !== undefined && owner !== item.id) {
+      errors.push(`${at(index, item.id, "name/aliases")} normalized key "${key}" collides with item ${owner}`);
+    } else {
+      normalizedKeyOwners.set(key, item.id);
+    }
   }
 
   if (!confidenceValues.has(item.confidence)) {
@@ -320,6 +351,24 @@ for (const [index, item] of items.entries()) {
     }
     if (item.review.lastReviewedAt !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(item.review.lastReviewedAt)) {
       errors.push(`${at(index, item.id, "review.lastReviewedAt")} must be YYYY-MM-DD when present`);
+    }
+    if (item.review.status === "standard_import") {
+      if (!Array.isArray(item.aliases) || item.aliases.length < 2) {
+        errors.push(`${at(index, item.id, "aliases")} standard_import items must have at least 2 aliases`);
+      }
+      if (!Array.isArray(item.steps) || item.steps.length < 1 || item.steps.length > 3) {
+        errors.push(`${at(index, item.id, "steps")} standard_import items must have 1 to 3 steps`);
+      }
+      if (!Array.isArray(item.cautions) || item.cautions.length < 1) {
+        errors.push(`${at(index, item.id, "cautions")} standard_import items must have at least 1 caution`);
+      }
+      if (Array.isArray(item.sources)) {
+        for (const [sourceIndex, source] of item.sources.entries()) {
+          if (!isNonEmptyString(source.url)) {
+            errors.push(`${at(index, item.id, `sources[${sourceIndex}].url`)} is required for standard_import items`);
+          }
+        }
+      }
     }
   }
 }

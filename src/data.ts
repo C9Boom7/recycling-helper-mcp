@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 export type Confidence = "high" | "medium" | "low";
 export type SourceType = "official_guidance" | "local_guidance" | "law" | "safety_guidance" | "manual_review";
-export type ReviewStatus = "draft" | "needs_source" | "verified" | "region_review_needed";
+export type ReviewStatus = "draft" | "needs_source" | "verified" | "region_review_needed" | "standard_import";
 
 export type WasteSource = {
   title: string;
