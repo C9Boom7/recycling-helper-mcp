@@ -209,6 +209,43 @@ export function normalizeText(value: string): string {
     .trim();
 }
 
+/**
+ * Bare disposal-category words are not items. They used to match whichever item
+ * happened to carry a sentence-style alias containing the category — "대형폐기물"
+ * hit `"인덕션 유리 상판 깨진 건 대형폐기물이야"` and returned a broken-cooktop card,
+ * "음식물" hit `"곰팡이 핀 빵은 음식물쓰레기야"`. A confident card about an item the
+ * user never named is worse than the not_found fallback, which asks what the item is.
+ *
+ * The 19 sentence aliases stay — they legitimately match full utterances by their
+ * item-name part. Only the query side is gated, and only when the whole query is
+ * the category term (so "대형폐기물 신고" or "음식물 쓰레기통" still search normally).
+ */
+const DISPOSAL_CATEGORY_QUERIES = new Set(
+  [
+    "대형폐기물",
+    "생활폐기물",
+    "음식물",
+    "음식물쓰레기",
+    "일반쓰레기",
+    "종량제",
+    "종량제봉투",
+    "재활용",
+    "재활용품",
+    "분리수거",
+    "분리배출",
+    "불연성",
+    "불연성폐기물",
+    "특수폐기물",
+    "유해폐기물",
+    "폐기물",
+    "쓰레기",
+  ].map(normalizeText),
+);
+
+function isDisposalCategoryQuery(query: string): boolean {
+  return DISPOSAL_CATEGORY_QUERIES.has(normalizeText(query));
+}
+
 const SHORT_ALIAS_MAX_LENGTH = 2;
 const HIGH_CONFIDENCE_SCORE = 88;
 const MIN_MATCH_SCORE = 35;
@@ -604,6 +641,10 @@ export type WasteQueryResolution =
  * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
  */
 export function resolveWasteItem(query: string): WasteQueryResolution {
+  if (isDisposalCategoryQuery(query)) {
+    return { status: "not_found" };
+  }
+
   const matches = findWasteItems(query, wasteItems.length);
   if (matches.length === 0) {
     return { status: "not_found" };
