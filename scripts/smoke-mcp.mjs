@@ -712,6 +712,26 @@ function assertPlainTextResponse(result, context) {
   assert(!resultText(result).trimStart().startsWith("{"), `${context} should stay plain text, not a widget payload`);
 }
 
+// PRD phase-3 R2: one unsupported node type drops the whole card to text
+// fallback, and that only shows up in Preview — a push + redeploy away.
+const ALLOWED_WIDGET_NODE_TYPES = new Set(["Card", "Title", "Text", "Caption", "Divider"]);
+
+function assertWidgetNode(node, context) {
+  assert(isPlainObject(node), `${context} is not a widget node`);
+  assert(ALLOWED_WIDGET_NODE_TYPES.has(node.type), `${context} uses unsupported node type ${JSON.stringify(node.type)}`);
+  assert(!("status" in node), `${context} must not define status — Kakao fills it`);
+
+  if (node.type === "Divider") return;
+
+  if (node.type === "Card") {
+    assert(Array.isArray(node.children) && node.children.length > 0, `${context} has no children`);
+    node.children.forEach((child, index) => assertWidgetNode(child, `${context} > child[${index}]`));
+    return;
+  }
+
+  assert(typeof node.value === "string" && node.value.trim().length > 0, `${context} has an empty value`);
+}
+
 /**
  * PRD phase-3 R2-1 branch table, exercised on the builder directly. The
  * "region matched but no item-specific guide" branch needs an input the server
@@ -723,7 +743,8 @@ async function runWidgetBuilderCases() {
 
   const nationwide = items.find((item) => item.id === "pizza_box_oily");
   const regional = items.find((item) => item.id === "chair");
-  assert(nationwide && regional, "widget builder cases are missing their fixtures");
+  const advisory = items.find((item) => item.id === "pet_bottle");
+  assert(nationwide && regional && advisory, "widget builder cases are missing their fixtures");
 
   const card = (input) => JSON.stringify(buildDisposalWidget({ sourceTitle: "테스트 출처", ...input }).widget);
 
@@ -731,11 +752,29 @@ async function runWidgetBuilderCases() {
   assert(!nationwideCard.includes("거주 지역 기준 확인 필요"), "nationally uniform item should carry no region line");
   assert(!nationwideCard.includes("기준으로 배출 요일"), "nationally uniform item should carry no region line");
 
+  // R2-1: only a *required* region check earns the ask. Advisory-level items —
+  // 42 of the 130 — read as complete without one, and formatItemGuide adds no
+  // region section for them either.
+  const advisoryCard = card({ item: advisory });
+  assert(!advisoryCard.includes("거주 지역 기준 확인 필요"), "advisory-level item should not demand a region");
+  assert(card({ item: advisory, regionName: "서울 강남구" }).includes("서울 강남구 기준으로 배출 요일"), "advisory item with a matched region should name it");
+
   const withNotes = card({ item: regional, regionName: "서울 강남구", regionNotes: ["- 강남구 기준 안내", "- 두 번째 줄", "- 세 번째 줄"] });
   assert(withNotes.includes("서울 강남구 기준"), "region card is missing the region caption");
   assert(withNotes.includes("강남구 기준 안내"), "region card is missing the region guidance line");
   assert(!withNotes.includes("- 강남구 기준 안내"), "region guidance keeps its list bullet");
   assert(!withNotes.includes("세 번째 줄"), "region guidance should be capped at two lines");
+
+  // The fee sits outside the two-line note budget — the boilerplate that
+  // formatRegionItemGuide emits first must never be able to crowd it out.
+  const withFee = card({
+    item: regional,
+    regionName: "서울 강남구",
+    regionNotes: ["- 사전 신청 안내", "- 접수증 부착 안내", "- 세 번째 줄"],
+    regionFeeLine: "수수료 2,000원~5,000원 (규격 4종)",
+  });
+  assert(withFee.includes("수수료 2,000원~5,000원"), "fee line must survive the region note cap");
+  assert(!withFee.includes("세 번째 줄"), "fee line must not widen the region note cap");
 
   const withoutNotes = card({ item: regional, regionName: "서울 강남구" });
   assert(withoutNotes.includes("서울 강남구 기준으로 배출 요일"), "matched region without guidance should still name the region");
@@ -743,11 +782,74 @@ async function runWidgetBuilderCases() {
   const withoutRegion = card({ item: regional });
   assert(withoutRegion.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
 
+  // R2: safety wording outranks authoring order, or the cap can drop the one
+  // caution that keeps a 수거 작업자 from getting cut.
+  const sharp = items.find((item) => item.id === "chopsticks");
+  assert(sharp, "widget builder cases are missing their 주의 fixture");
+  assert(card({ item: sharp }).includes("다치지 않게"), "safety caution should outrank informational ones");
+
   const payload = buildDisposalWidget({ item: regional, sourceTitle: "테스트 출처" });
   assert(!("status" in payload), "widget payload must not define status — Kakao fills it");
   assert(!("status" in payload.widget), "widget node must not define status — Kakao fills it");
   assert(typeof payload.copy_text === "string" && payload.copy_text.split("\n").length <= 6, "copy_text must stay within 6 lines");
   assert(typeof payload.name === "string" && payload.name.length > 0, "widget payload is missing name");
+
+  // R3: a truncated copy_text has to say so. Shared to 카톡 it is all the
+  // recipient sees, and silently ending at step 5 of 7 reads as complete.
+  const longSteps = items.find((item) => item.steps.length > 5);
+  assert(longSteps, "widget builder cases are missing their long-steps fixture");
+  const longCopy = buildDisposalWidget({ item: longSteps, sourceTitle: "테스트 출처" }).copy_text.split("\n");
+  assert(longCopy.length <= 6, "truncated copy_text must stay within 6 lines");
+  assert(longCopy.at(-1).startsWith("(남은 "), "truncated copy_text must say how many steps it left out");
+  assert(!buildDisposalWidget({ item: nationwide, sourceTitle: "테스트 출처" }).copy_text.includes("(남은 "), "untruncated copy_text must not claim it left steps out");
+}
+
+/**
+ * Every item through the widget path once. The 183 get_disposal_steps answer
+ * cases are pinned to WIDGET_ENABLED=false, so on their own they would only
+ * cover a shape production never serves (R1 leaves widgets on by default) —
+ * this keeps the whole catalogue on the real path. Structure only, no wording:
+ * the answer cases already own what the text says.
+ */
+async function sweepWidgetCatalogue(baseUrl, startRequestId) {
+  const { wasteItems, itemNeedsCriticalRegionCheck } = await import("../dist/data.js");
+  let requestId = startRequestId;
+  let validated = 0;
+  const skipped = [];
+
+  for (const item of wasteItems) {
+    // Region-critical items get a region so the R2-1 branch that carries fees
+    // and guidance is exercised too, not just the "ask for a region" fallback.
+    const args = itemNeedsCriticalRegionCheck(item)
+      ? { itemName: item.name, region: "서울 강남구" }
+      : { itemName: item.name };
+    const result = await callTool(baseUrl, "get_disposal_steps", args, requestId);
+    requestId += 1;
+
+    // A display name can still resolve as ambiguous; that path stays text by design.
+    if (result.structuredContent !== undefined) {
+      skipped.push(item.id);
+      continue;
+    }
+
+    const context = `catalogue sweep (${item.id})`;
+    const payload = parseWidgetPayload(result, context);
+    assert(payload.widget?.type === "Card", `${context} root should be a Card, got ${payload.widget?.type}`);
+    assertWidgetNode(payload.widget, `${context} widget`);
+    assert(!("status" in payload), `${context} payload must not define status`);
+    assert(payload.name === "disposal_steps", `${context} has the wrong widget name: ${payload.name}`);
+
+    const copyLines = payload.copy_text.split("\n");
+    assert(copyLines.length >= 3 && copyLines.length <= 6, `${context} copy_text is ${copyLines.length} lines, outside the 3~6 budget`);
+    assert(
+      copyLines.every((line) => line.trim().length > 0),
+      `${context} copy_text has a blank line`,
+    );
+    validated += 1;
+  }
+
+  const skipNote = skipped.length > 0 ? ` (skipped as non-match: ${skipped.join(", ")})` : "";
+  console.log(`Widget catalogue sweep: ${validated}/${wasteItems.length} cards validated${skipNote}`);
 }
 
 /**
@@ -811,12 +913,24 @@ async function runWidgetSmoke() {
     const logLines = getOutput()
       .split("\n")
       .filter((line) => line.includes('"tool":"get_disposal_steps"'))
-      .map((line) => JSON.parse(line));
+      // stdout and stderr land in one unframed buffer, so a chunk boundary or an
+      // interleaved stderr write can leave a fragment that still matches the
+      // filter. Skip what does not parse instead of dying on a SyntaxError that
+      // has nothing to do with the behaviour under test.
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
     assert(logLines.length > 0, "no get_disposal_steps call was logged");
     assert(
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
     );
+
+    await sweepWidgetCatalogue(baseUrl, requestId + 1);
 
     console.log(`Widget smoke passed at ${baseUrl} (WIDGET_ENABLED=true)`);
   } finally {

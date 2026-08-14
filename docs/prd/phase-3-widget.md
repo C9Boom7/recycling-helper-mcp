@@ -35,8 +35,8 @@ Card 하나로 구성 (ListView 남용 금지 — 답변은 목록이 아니라 
 2. 배출 그룹 뱃지/캡션: `disposalGroupLabel` (예: "재활용/일반쓰레기")
 3. 결론 텍스트: `item.summary`
 4. 배출 방법: `steps`를 번호 리스트로
-5. 주의: 첫 caution 1~2개
-6. 지역 관련: 아래 R2-1 규칙에 따라 최대 3줄 (지역명 캡션 + 안내 2줄)
+5. 주의: caution 1~2개. **데이터 순서가 아니라 안전 문구 우선**으로 고른다 — 130개 중 52개가 caution 3개 이상이라 상한에서 잘리는데, 순서대로 자르면 "날카롭게 부러진 젓가락은 수거 작업자가 다치지 않게 감싸서 배출하세요" 같은 부상 경고가 정보성 문구에 밀린다. 부상·화재·누출 어휘가 있는 caution을 앞으로 당기고(제거가 아니라 정렬), 나머지는 원래 순서를 지킨다.
+6. 지역 관련: 아래 R2-1 규칙에 따라 최대 4줄 (지역명 캡션 + 수수료 1줄 + 안내 2줄)
 7. 하단 캡션: 대표 근거 출처 title 1개
 
 ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 ChatKit 스펙 문서를 확인해 유효한 타입만 쓴다. 스펙에 없는 타입을 쓰면 폴백된다.
@@ -45,15 +45,18 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 사용자가 `region`을 알려줬는데 카드가 "거주 지역 기준 확인 필요"만 보여주면, 일부러 준 정보에 대한 답이 사라진다. 지역이 있으면 그 지역 기준을 카드에 싣고, 없을 때만 확인 요청 문구를 쓴다.
 
-`handleGetDisposalSteps`가 이미 계산해 둔 `regionMatch`와 `regionNotes`를 위젯 빌더 인자로 넘긴다 (빌더에서 재계산 금지). `regionMatch`는 `itemNeedsRegionCheck(item)`가 참일 때만 채워지므로, 아래 분기는 그 사실에 기댄다.
+`handleGetDisposalSteps`가 이미 계산해 둔 `regionMatch`·`regionNotes`·수수료 요약 1줄을 위젯 빌더 인자로 넘긴다 (빌더에서 재계산 금지).
 
 | 조건 | 카드에 넣을 내용 |
 | --- | --- |
-| `regionCheckLevel`이 "낮음" (= `regionMatch` 없음) | 지역 줄 자체를 넣지 않는다 (전국 공통 기준으로 이미 완결) |
-| `regionNotes` 있음 | `"{지역명} 기준"` 캡션 + `regionNotes` 앞 2줄 (줄머리 `- ` 제거) |
-| `regionMatch`는 있으나 `regionNotes` 없음 | `"{지역명} 기준으로 배출 요일·장소만 확인하면 됩니다"` 한 줄 |
-| `regionMatch` 없음 (지역 미입력이거나 인식 실패) | `"거주 지역 기준 확인 필요"` 한 줄 |
+| `itemNeedsRegionCheck`가 거짓 | 지역 줄 자체를 넣지 않는다 (전국 공통 기준으로 이미 완결) |
+| 지역 매칭 + `regionNotes` 있음 | `"{지역명} 기준"` 캡션 + 수수료 줄(있으면) + `regionNotes` 앞 2줄 (줄머리 `- ` 제거) |
+| 지역 매칭 + `regionNotes` 없음 | `"{지역명} 기준으로 배출 요일·장소만 확인하면 됩니다"` 한 줄 |
+| 지역 없음 + `regionCheckLevel` 필수 | `"거주 지역 기준 확인 필요"` 한 줄 |
+| 지역 없음 + `regionCheckLevel` 참고 | 지역 줄을 넣지 않는다 |
 
+- **지역 미입력 시의 분기는 `itemNeedsRegionCheck`가 아니라 `itemNeedsCriticalRegionCheck`로 가른다.** 전자는 참고 등급까지 참이라 130개 중 42개(페트병·우유팩·빨대·스티로폼 등)에 불필요한 요구가 붙는다. 텍스트 경로(`formatItemGuide`)도 참고 등급에는 지역 섹션을 붙이지 않으므로 두 경로의 기준을 맞춘다.
+- **대형폐기물 수수료는 `regionNotes` 2줄 상한 밖에 따로 1줄로 싣는다.** `formatRegionItemGuide`는 일반 안내를 앞에, 수수료표를 맨 뒤에 놓아서 앞 2줄만 자르면 사용자가 구를 말한 이유인 수수료가 항상 잘린다. 위젯 응답에는 structuredContent도 없어 그 턴에서 복구할 방법이 없다. 규격이 여러 개면 `수수료 2,000원~5,000원 (규격 4종)`처럼 범위로 접는다 — 4종을 다 실으면 카드가 넘치고, 하나를 골라주면 추측이 된다.
 - `regionNotes`는 품목·지역에 따라 3줄을 넘길 수 있다. 카드는 2줄에서 자르고 나머지는 텍스트 대화에 맡긴다 (카드가 길어지면 결론이 묻힌다).
 - 지역명은 `regionMatch.region.name`을 쓴다. 사용자가 입력한 원문(`region` 인자)이 아니라 매칭된 정식 지역명이어야 오인식이 드러난다.
 
@@ -70,6 +73,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 - 지원 문법(굵게/기울임/리스트/인라인코드)만 사용. 링크·헤딩 금지.
 - 3~6줄 이내, 공유받는 사람이 맥락 없이 읽어도 완결되게.
+- **steps를 자를 때는 잘렸다고 말한다.** 공유받은 사람에게는 copy_text가 전부라, 7단계 중 5단계에서 조용히 끝나면 그게 완결된 안내로 읽힌다. 상한을 넘는 품목(130개 중 5개)은 4단계 + `(남은 N단계는 카드에서 확인하세요)`로 6줄 예산 안에서 남은 분량을 밝힌다.
 
 ### R4. 구현 구조
 
@@ -88,6 +92,14 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
   2. ambiguous 발화 → 위젯이 아니라 기존 텍스트 응답 그대로다.
   3. region 인자를 준 확정 매칭 → 카드에 매칭된 지역명이 들어간다 (R2-1 회귀 방지).
 
+### R4-2. 위젯 경로의 폭 회복
+
+`WIDGET_ENABLED=false`를 고정하면 answer case 183개가 **운영에서 쓰지 않는 응답 형태**만 검증하게 된다 (R1의 기본값은 on). 위 3케이스로는 130개 품목 중 2개만 실제 경로를 지난다.
+
+- 위젯을 켠 서버에 전 품목을 한 번씩 통과시키는 sweep을 추가한다. 문구가 아니라 **구조 불변식**만 본다 — Card 루트, children 비어있지 않음, 노드 타입이 Card/Title/Text/Caption/Divider 화이트리스트 안, `status` 키 부재, `name` 일치, `copy_text` 3~6줄에 빈 줄 없음. 문구는 answer case가 이미 담당한다.
+- `regionCheckLevel`이 필수인 품목은 지역을 함께 넘겨, 수수료·지역 안내가 붙는 R2-1 분기까지 지나게 한다.
+- 매칭이 ambiguous로 빠져 위젯이 아닌 품목이 있으면 개수만 세지 말고 **id를 출력한다**. 조용히 건너뛰면 sweep이 전 품목을 덮은 것처럼 읽힌다.
+
 ### R5. 호출 로그의 status 보존
 
 위젯 응답은 structuredContent가 없다. [src/server.ts](../../src/server.ts)의 `callStatus()`는 `found`/`ambiguous`로 상태를 추론하므로, 그대로 두면 확정 매칭인데도 로그에 `"ok"`로 남아 본선 기간 매칭률 집계가 왜곡된다.
@@ -105,7 +117,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 ## 검증 및 완료 기준 (DoD)
 
-1. `pnpm local:test` 통과. 비위젯 경로 무회귀 — smoke 하니스가 `WIDGET_ENABLED=false`를 고정한 상태로 기존 211케이스 전부 통과하고, 여기에 R4-1의 위젯 켠 통합 케이스 3종과 R4의 빌더 구조 케이스가 더해진다.
+1. `pnpm local:test` 통과. 비위젯 경로 무회귀 — smoke 하니스가 `WIDGET_ENABLED=false`를 고정한 상태로 기존 211케이스 전부 통과하고, 여기에 R4-1의 위젯 켠 통합 케이스, R4-2의 전 품목 sweep, R4의 빌더 구조 케이스가 더해진다.
 2. 확정 매칭 호출 1회의 stdout 로그에서 `status`가 `"match"`로 찍히는 것 확인 (R5).
 3. Preview에서 확정 매칭 발화 3종의 위젯 렌더링 스크린샷. 이 중 1종은 지역을 함께 말한 발화로 잡아 카드의 지역 안내(R2-1)를 눈으로 확인한다.
 4. ambiguous/not_found 발화가 여전히 텍스트로 나오는 것 확인.
@@ -119,9 +131,10 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 ## 완료 체크리스트
 
 - [x] R1 분기 + WIDGET_ENABLED — match만 위젯, ambiguous/not_found는 텍스트 유지. `process.env.WIDGET_ENABLED !== "false"`
-- [x] R2 카드 + R2-1 지역 안내 분기 — Card/Title/Text/Caption/Divider만 사용 (Badge는 Preview 통과 후 검토). 지역 4분기 구현
-- [x] R3 copy_text — 제목 1줄 + steps 최대 5개. 최장 품목(비닐류 포장재, 7 steps)도 6줄
+- [x] R2 카드 + R2-1 지역 안내 분기 — Card/Title/Text/Caption/Divider만 사용 (Badge는 Preview 통과 후 검토). 지역 5분기 + 대형폐기물 수수료 전용 줄 + 안전 caution 우선 정렬
+- [x] R3 copy_text — 제목 1줄 + steps 최대 5개, 잘리면 4개 + 남은 단계 안내. 최장 품목(비닐류 포장재, 7 steps)도 6줄
 - [x] R4 widgets.ts + 구조 smoke — `buildDisposalWidget` 순수 함수, structuredContent 미포함
 - [x] R4-1 smoke 하니스 WIDGET_ENABLED 고정 + 위젯 통합 케이스 — 기존 211케이스는 `false` 고정 서버, 위젯은 별도 인스턴스에서 5케이스
+- [x] R4-2 전 품목 sweep — 위젯 켠 서버에 130개 품목 통과, 구조 불변식만 검증
 - [x] R5 호출 로그 status="match" — `_log.status` 명시, smoke가 stdout 로그 라인으로 검증
 - [ ] R6 Preview 렌더링 확인 — push·재배포 이후 가능

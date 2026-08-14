@@ -256,6 +256,30 @@ function buildRegionNotes(item: WasteItem, regionMatch?: MatchedRegionPolicy): s
   return lines.length > 0 ? lines : undefined;
 }
 
+/**
+ * PRD phase-3 R2-1. The card can only carry two region lines, and
+ * formatRegionItemGuide orders its output boilerplate-first, fee-table-last — so
+ * the fee, which is the whole reason someone names their 구, was always the part
+ * that got cut. Condensed to one line here (the builder must not recompute) and
+ * rendered outside the card's two-line region budget.
+ */
+function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy): string | undefined {
+  if (!regionMatch) return undefined;
+
+  const fees = findBulkyWasteFees(regionMatch.region, item);
+  if (fees.length === 0) return undefined;
+
+  const krw = (value: number) => `${value.toLocaleString("ko-KR")}원`;
+  const amounts = fees.map((fee) => fee.feeKrw);
+  const min = Math.min(...amounts);
+  const max = Math.max(...amounts);
+
+  // A single tier can name itself; several tiers become a range, because listing
+  // four specs would blow the card and picking one for the user would be a guess.
+  if (fees.length === 1) return `수수료 ${krw(min)} (${fees[0].spec})`;
+  return `수수료 ${krw(min)}~${krw(max)} (규격 ${fees.length}종)`;
+}
+
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
   return {
     content: [{ type: "text", text }],
@@ -516,6 +540,7 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
         sourceTitle: briefSourceTitle(item),
         regionName: regionMatch?.region.name,
         regionNotes,
+        regionFeeLine: buildRegionFeeLine(item, regionMatch),
       }),
       log,
     );
