@@ -136,7 +136,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/대형폐기물/특수폐기물), confidence, and whether local municipality rules matter. Use for quick yes/no judgment questions like '피자박스 재활용 돼?', '이거 분리수거 되나?', '스티로폼은 어디에 버려?'. For full step-by-step disposal instructions, prefer get_disposal_steps.",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), confidence, and whether local municipality rules matter. Use for quick yes/no judgment questions like '피자박스 재활용 돼?', '이거 분리수거 되나?', '스티로폼은 어디에 버려?'. For full step-by-step disposal instructions, prefer get_disposal_steps.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,

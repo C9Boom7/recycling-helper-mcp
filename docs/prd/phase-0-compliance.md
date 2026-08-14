@@ -99,7 +99,7 @@ QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 �
 3. mcp-answer-cases의 structured 기대값이 R5 스펙으로 갱신됨.
 4. 임의 Host 헤더(`x.playmcp-endpoint.kakaocloud.io`)로 initialize 요청이 성공하는 것을 curl로 확인.
 5. README의 매칭/도구 설명이 변경 내용과 어긋나지 않는지 확인.
-6. 로컬 main 머지. (origin push는 사용자 지시 대기)
+6. 브랜치 푸시 + PR 생성. (머지는 사용자 지시 대기 — 머지가 배포 게이트)
 
 ## 리스크
 

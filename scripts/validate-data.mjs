@@ -7,6 +7,7 @@ const evaluationCasesPath = new URL("../src/data/evaluation-cases.json", import.
 const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.meta.url);
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
+const disposalGroupsPath = new URL("../src/data/disposal-groups.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -16,12 +17,13 @@ const evaluationCases = JSON.parse(readFileSync(evaluationCasesPath, "utf8"));
 const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
+const disposalGroups = JSON.parse(readFileSync(disposalGroupsPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
 const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
-const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed"]);
+const reviewStatuses = new Set(["draft", "needs_source", "verified", "region_review_needed", "standard_import"]);
 const regionScopes = new Set(["national_default", "region_specific", "local_collection_point", "bulky_waste"]);
 const regionCheckLevels = new Set(["required", "advisory"]);
 const questionBacklogTypes = new Set([
@@ -50,6 +52,14 @@ const errors = [];
 const warnings = [];
 const ids = new Set();
 const names = new Set();
+const normalizedKeyOwners = new Map();
+
+function normalizeMatchText(value) {
+  return value
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "")
+    .trim();
+}
 
 function stableJsonStringify(value) {
   if (Array.isArray(value)) {
@@ -197,6 +207,33 @@ if (!Array.isArray(materialGuidelines) || materialGuidelines.length === 0) {
   throw new Error("src/data/material-guidelines.json must contain a non-empty array");
 }
 
+if (!disposalGroups || typeof disposalGroups !== "object" || Array.isArray(disposalGroups)) {
+  throw new Error("src/data/disposal-groups.json must contain an object map");
+}
+
+// disposalType -> 배출 그룹 라벨은 전수 대응이어야 한다. 빠지면 런타임이
+// "확인 필요"로 답하는데, 그건 not_found/모호 항목의 라벨이라 매칭에 성공한
+// 품목이 실패한 것처럼 보인다.
+const usedDisposalTypes = new Set();
+for (const [index, item] of items.entries()) {
+  if (!isNonEmptyString(item.disposalType)) continue;
+  usedDisposalTypes.add(item.disposalType);
+  if (!isNonEmptyString(disposalGroups[item.disposalType])) {
+    errors.push(`${at(index, item.id, "disposalType")} "${item.disposalType}" has no label in src/data/disposal-groups.json`);
+  }
+}
+
+for (const [disposalType, label] of Object.entries(disposalGroups)) {
+  if (!isNonEmptyString(label)) {
+    errors.push(`disposalGroups["${disposalType}"] must be a non-empty string`);
+  } else if (label === "확인 필요") {
+    errors.push(`disposalGroups["${disposalType}"] must not be "확인 필요" — that label is reserved for unmatched items`);
+  }
+  if (!usedDisposalTypes.has(disposalType)) {
+    warnings.push(`disposalGroups["${disposalType}"] is not used by any waste item`);
+  }
+}
+
 const reviewCounts = countBy(items, (item) => item?.review?.status);
 const questionBacklogCounts = countBy(questionBacklog, (question) => question?.status);
 expectDocumentCount("docs/source-coverage.md total waste items", sourceCoverage, /- 총 품목: (\d+)/, items.length);
@@ -210,6 +247,12 @@ expectDocumentCount(
   reviewCounts.region_review_needed ?? 0,
 );
 expectDocumentCount("docs/source-coverage.md needs_source items", sourceCoverage, /- `needs_source`: (\d+)/, reviewCounts.needs_source ?? 0);
+expectDocumentCount(
+  "docs/source-coverage.md standard_import items",
+  sourceCoverage,
+  /- `standard_import`: (\d+)/,
+  reviewCounts.standard_import ?? 0,
+);
 expectAllDocumentCounts("docs/session-coordination.md MCP answer cases", sessionCoordination, /MCP answer cases (\d+)개/g, mcpAnswerCases.length);
 expectSessionSourceSnapshot({
   wasteItems: items.length,
@@ -252,6 +295,23 @@ for (const [index, item] of items.entries()) {
       warnings.push(`${at(index, item.id, "name")} is duplicated`);
     }
     names.add(item.name);
+  }
+
+  const normalizedKeys = new Set();
+  if (isNonEmptyString(item.name)) normalizedKeys.add(normalizeMatchText(item.name));
+  if (Array.isArray(item.aliases)) {
+    for (const alias of item.aliases) {
+      if (isNonEmptyString(alias)) normalizedKeys.add(normalizeMatchText(alias));
+    }
+  }
+  for (const key of normalizedKeys) {
+    if (!key) continue;
+    const owner = normalizedKeyOwners.get(key);
+    if (owner !== undefined && owner !== item.id) {
+      errors.push(`${at(index, item.id, "name/aliases")} normalized key "${key}" collides with item ${owner}`);
+    } else {
+      normalizedKeyOwners.set(key, item.id);
+    }
   }
 
   if (!confidenceValues.has(item.confidence)) {
@@ -324,6 +384,24 @@ for (const [index, item] of items.entries()) {
     }
     if (item.review.lastReviewedAt !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(item.review.lastReviewedAt)) {
       errors.push(`${at(index, item.id, "review.lastReviewedAt")} must be YYYY-MM-DD when present`);
+    }
+    if (item.review.status === "standard_import") {
+      if (!Array.isArray(item.aliases) || item.aliases.length < 2) {
+        errors.push(`${at(index, item.id, "aliases")} standard_import items must have at least 2 aliases`);
+      }
+      if (!Array.isArray(item.steps) || item.steps.length < 1 || item.steps.length > 3) {
+        errors.push(`${at(index, item.id, "steps")} standard_import items must have 1 to 3 steps`);
+      }
+      if (!Array.isArray(item.cautions) || item.cautions.length < 1) {
+        errors.push(`${at(index, item.id, "cautions")} standard_import items must have at least 1 caution`);
+      }
+      if (Array.isArray(item.sources)) {
+        for (const [sourceIndex, source] of item.sources.entries()) {
+          if (!isNonEmptyString(source.url)) {
+            errors.push(`${at(index, item.id, `sources[${sourceIndex}].url`)} is required for standard_import items`);
+          }
+        }
+      }
     }
   }
 }

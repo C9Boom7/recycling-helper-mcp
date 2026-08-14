@@ -3366,20 +3366,18 @@
       "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "재질, 오염 여부, 크기, 지역 정보"
-    ],
-    "expectedTextExcludes": [
-      "## 비닐랩",
-      "## 소형가전"
+      "노트북"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"itemName\":\"랩탑은 소형가전으로 버리면 돼?\""
+      "\"id\":\"laptop\"",
+      "\"found\":true"
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_wrap\"",
       "\"id\":\"small_electronics\""
+    ],
+    "expectedTextExcludes": [
+      "## 비닐랩"
     ]
   },
   {
@@ -4407,14 +4405,14 @@
       "itemName": "실리콘 뒤집개 어떻게 버려?"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "재질로 추정한 일반 원칙",
-      "일반쓰레기"
+      "뒤집개"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"id\":\"general_trash\"",
-      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+      "\"found\":true",
+      "\"id\":\"turner\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"general_trash\""
     ]
   },
   {
@@ -4424,13 +4422,14 @@
       "itemName": "정수기 필터는 어떻게 버려?"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "주요 재질별 한 줄 원칙",
-      "플라스틱 용기류"
+      "정수기 필터"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"inferred\":false"
+      "\"found\":true",
+      "\"id\":\"water_purifier_filter\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"general_trash\""
     ]
   },
   {
@@ -4440,12 +4439,11 @@
       "itemName": "랩탑은 소형가전으로 버리면 돼?"
     },
     "expectedTextIncludes": [
-      "재질로 추정한 일반 원칙",
-      "폐가전·폐전지류"
+      "노트북"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"id\":\"electronics_battery\""
+      "\"found\":true",
+      "\"matchedItem\":\"노트북\""
     ]
   },
   {
@@ -4455,11 +4453,13 @@
       "itemName": "가죽 지갑 버리는 법"
     },
     "expectedTextIncludes": [
-      "재질로 추정한 일반 원칙",
-      "종량제봉투"
+      "지갑"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
+      "\"found\":true",
+      "\"id\":\"wallet\""
+    ],
+    "expectedStructuredExcludes": [
       "\"id\":\"general_trash\""
     ]
   },
@@ -4523,6 +4523,1601 @@
     ]
   },
   {
+    "id": "standard_region_required_glass_food_container",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리 밀폐용기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "유리 밀폐용기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"glass_food_container\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_earthen_pot",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "뚝배기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "뚝배기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"earthen_pot\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wine_glass",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "와인잔",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "와인잔"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wine_glass\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_instant_rice_container",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "즉석밥 용기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "즉석밥 용기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"instant_rice_container\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_pot_glass_lid",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냄비 유리뚜껑",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "냄비 유리뚜껑"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"pot_glass_lid\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_broom",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빗자루",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "빗자루",
+      "대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청"
+    ],
+    "expectedTextExcludes": [
+      "서울 강남구 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다."
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"broom\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\"",
+      "\"disposalGroup\":\"일반쓰레기/대형폐기물\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_floor_mop",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "대걸레",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "대걸레"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"floor_mop\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_ironing_board",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "다리미판",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "다리미판"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"ironing_board\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bucket",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "양동이",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "양동이"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bucket\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_towel",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "수건",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "수건"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"towel\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bath_mat",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕실 발매트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "욕실 발매트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bath_mat\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bathroom_scale",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "체중계",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "체중계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathroom_scale\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_electronic_thermometer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전자 체온계",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전자 체온계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electronic_thermometer\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_toothbrush_sterilizer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "칫솔살균기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "칫솔살균기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toothbrush_sterilizer\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bidet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비데",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "비데"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bidet\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_toilet_seat_cover",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기커버",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "변기커버"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_seat_cover\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_handbag",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가방",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "가방"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"handbag\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wrist_watch",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "손목시계",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "손목시계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wrist_watch\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_travel_carrier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "여행용 캐리어",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "여행용 캐리어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"travel_carrier\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_necktie",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "넥타이",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "넥타이"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"necktie\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_scarf",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스카프",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "스카프"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"scarf\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_badminton_racket",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "배드민턴 라켓",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "배드민턴 라켓"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"badminton_racket\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_swim_tube",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "물놀이 튜브",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "물놀이 튜브"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"swim_tube\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_stroller",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유모차",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "유모차"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stroller\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_car_seat",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카시트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "카시트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"car_seat\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_kids_kickboard",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "킥보드",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "킥보드"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"kids_kickboard\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_inline_skates",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인라인스케이트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "인라인스케이트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"inline_skates\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wired_earphones",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "이어폰",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "이어폰"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wired_earphones\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wireless_earphones",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "무선 이어폰",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "무선 이어폰"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wireless_earphones\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_headphones",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "헤드폰",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "헤드폰"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"headphones\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_remote_control",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "리모컨",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "리모컨"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"remote_control\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_laptop",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "노트북",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "노트북"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"laptop\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_tablet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "태블릿",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "태블릿"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"tablet\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_smartwatch",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스마트워치",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "스마트워치"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"smartwatch\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_game_console",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "게임기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "게임기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"game_console\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_speaker",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스피커",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "스피커"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"speaker\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_calculator",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "계산기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "계산기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"calculator\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_camera",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카메라",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "카메라"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"camera\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_monitor",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "모니터",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "모니터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"monitor\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_printer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "프린터",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "프린터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"printer\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_electric_heater",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전기히터",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전기히터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_heater\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_electric_blanket",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전기장판",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전기장판"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_blanket\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_water_heating_mat",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "온수매트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "온수매트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"water_heating_mat\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_humidifier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가습기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "가습기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"humidifier\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_dehumidifier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "제습기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "제습기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dehumidifier\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_electric_iron",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "다리미",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "다리미"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_iron\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_vacuum_cleaner",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "청소기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "청소기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"vacuum_cleaner\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_rice_cooker",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전기밥솥",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전기밥솥"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"rice_cooker\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_microwave",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전자레인지",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전자레인지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"microwave\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_electric_kettle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전기포트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "전기포트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_kettle\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_toaster",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "토스터",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "토스터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toaster\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_blender",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "믹서기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "믹서기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"blender\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_coffee_machine",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "커피머신",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "커피머신"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"coffee_machine\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_air_purifier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "공기청정기",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "공기청정기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"air_purifier\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_curtain",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "커튼",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "커튼"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"curtain\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_blind",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "블라인드",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "블라인드"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"blind\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_carpet",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "카페트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "카페트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"carpet\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wall_clock",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "벽시계",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "벽시계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wall_clock\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_alarm_clock",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "알람시계",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "알람시계"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"alarm_clock\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_floor_lamp",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스탠드 조명",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "스탠드 조명"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"floor_lamp\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_whiteboard",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화이트보드",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "화이트보드"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"whiteboard\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "소파"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sofa\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_desk",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "책상"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"desk\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bookshelf",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "책장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bookshelf\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_drawer_chest",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서랍장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "서랍장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"drawer_chest\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_wardrobe",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옷장",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "옷장"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"wardrobe\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_dining_table",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "식탁",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "식탁"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dining_table\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_bed_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 프레임",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "침대 프레임"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bed_frame\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_cat_tower",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "캣타워",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "캣타워"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cat_tower\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_cat_scratcher",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "고양이 스크래처",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "고양이 스크래처"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cat_scratcher\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_fish_tank",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "어항",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "어항"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"fish_tank\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_tent",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "텐트",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "텐트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"tent\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_picnic_mat",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "돗자리",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "돗자리"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"picnic_mat\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_cooler_box",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "아이스박스",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "아이스박스"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cooler_box\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "standard_region_required_christmas_tree",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "크리스마스트리",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "크리스마스트리"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"christmas_tree\"",
+      "\"regionCheckLevel\":\"필수\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "steps_fallback_toilet_brush",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기솔 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙",
+      "일반쓰레기(종량제)"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "steps_fallback_leather_belt",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가죽 벨트 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "재질로 추정한 일반 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "classify_fallback_pet_food_bag",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "사료 포대 버리기"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙",
+      "플라스틱 용기류"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"quickRule\""
+    ]
+  },
+  {
+    "id": "steps_fallback_broken_glass_vase",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리 화병 깨진 거 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "재질로 추정한 일반 원칙",
+      "유리병류"
+    ],
+    "expectedTextExcludes": [
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":true",
+      "\"id\":\"glass_bottle\""
+    ]
+  },
+  {
+    "id": "classify_group_small_electronics_laptop",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "노트북 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 소형가전"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 확인 필요"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"소형가전\"",
+      "\"disposalType\":\"small_electronics_collection\""
+    ]
+  },
+  {
+    "id": "classify_group_food_waste_spoiled_milk",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "상한 우유 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 음식물쓰레기"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 확인 필요"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"음식물쓰레기\""
+    ]
+  },
+  {
+    "id": "classify_group_nonburnable_wine_glass",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "와인잔 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 불연성 폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 특수/유해폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"불연성 폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_secondary_bulky_broom",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "빗자루 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 일반쓰레기/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"일반쓰레기/대형폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_secondary_bulky_bathroom_scale",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "체중계 버리려면 어떻게 해?"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 소형가전/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"소형가전/대형폐기물\""
+    ]
+  },
+  {
+    "id": "classify_group_free_visit_microwave",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "전자레인지 버리는 법"
+    },
+    "expectedTextIncludes": [
+      "배출 그룹: 무상방문수거/대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "배출 그룹: 대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"disposalGroup\":\"무상방문수거/대형폐기물\""
+    ]
+  },
+  {
     "id": "confusing_typo_jamo_strong_confirms_single_item",
     "tool": "check_confusing_item",
     "arguments": {
@@ -4563,23 +6158,21 @@
     ]
   },
   {
-    "id": "classify_typo_guard_phonetic_alias_collision_tape",
-    "tool": "classify_waste_item",
+    "id": "confusing_typo_guard_phonetic_alias_collision_tape",
+    "tool": "check_confusing_item",
     "arguments": {
       "itemName": "테이프"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "주요 재질별 한 줄 원칙"
+      "헷갈림 체크",
+      "박스테이프"
     ],
     "expectedTextExcludes": [
       "베이프",
-      "전자담배",
-      "혹시"
+      "전자담배"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"inferred\":false"
+      "\"found\":true"
     ]
   },
   {
@@ -4604,10 +6197,10 @@
     ]
   },
   {
-    "id": "classify_fallback_sunglasses_no_glass_inference",
+    "id": "classify_fallback_glass_substring_no_glass_inference",
     "tool": "classify_waste_item",
     "arguments": {
-      "itemName": "선글라스"
+      "itemName": "글라스데코"
     },
     "expectedTextIncludes": [
       "주요 재질별 한 줄 원칙"
@@ -4622,6 +6215,27 @@
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
+    ]
+  },
+  {
+    "id": "classify_fallback_shell_substring_no_food_waste_inference",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "조개껍질"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "음식물류폐기물",
+      "전용봉투"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"food_waste\""
     ]
   },
   {

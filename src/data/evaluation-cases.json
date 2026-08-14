@@ -778,5 +778,857 @@
     "expectedItemId": "standing_clothes_hanger",
     "expectedDisposalType": "bulky_waste",
     "notes": "스탠드형 행거는 일반 옷걸이와 구분해 대형폐기물 신고 기준을 안내하고 수수료 금액은 단정하지 않아야 합니다."
+  },
+  {
+    "query": "도마는 어떻게 버려?",
+    "expectedItemId": "cutting_board",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "텀블러는 어떻게 버려?",
+    "expectedItemId": "tumbler",
+    "expectedDisposalType": "recycle_by_material_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "유리 밀폐용기는 어떻게 버려?",
+    "expectedItemId": "glass_food_container",
+    "expectedDisposalType": "nonburnable_special_bag",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "주전자는 어떻게 버려?",
+    "expectedItemId": "kettle",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "계란판은 어떻게 버려?",
+    "expectedItemId": "egg_carton",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "쌀포대는 어떻게 버려?",
+    "expectedItemId": "rice_sack",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "믹싱볼은 어떻게 버려?",
+    "expectedItemId": "mixing_bowl",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "채반은 어떻게 버려?",
+    "expectedItemId": "colander",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "국자는 어떻게 버려?",
+    "expectedItemId": "ladle",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "뒤집개는 어떻게 버려?",
+    "expectedItemId": "turner",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "감자칼은 어떻게 버려?",
+    "expectedItemId": "peeler",
+    "expectedDisposalType": "general_or_metal_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "강판은 어떻게 버려?",
+    "expectedItemId": "grater",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "뚝배기는 어떻게 버려?",
+    "expectedItemId": "earthen_pot",
+    "expectedDisposalType": "nonburnable_special_bag",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "보온도시락은 어떻게 버려?",
+    "expectedItemId": "thermal_lunchbox",
+    "expectedDisposalType": "recycle_by_material_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "와인잔은 어떻게 버려?",
+    "expectedItemId": "wine_glass",
+    "expectedDisposalType": "nonburnable_special_bag",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "케첩통은 어떻게 버려?",
+    "expectedItemId": "ketchup_bottle",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "참기름병은 어떻게 버려?",
+    "expectedItemId": "sesame_oil_bottle",
+    "expectedDisposalType": "glass_recycle_after_empty_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "대형 생수통은 어떻게 버려?",
+    "expectedItemId": "large_water_bottle",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "요구르트병은 어떻게 버려?",
+    "expectedItemId": "yogurt_bottle",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "두부 용기는 어떻게 버려?",
+    "expectedItemId": "tofu_container",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "즉석밥 용기는 어떻게 버려?",
+    "expectedItemId": "instant_rice_container",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "아이스크림 통은 어떻게 버려?",
+    "expectedItemId": "ice_cream_tub",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "냄비 유리뚜껑",
+    "expectedItemId": "pot_glass_lid",
+    "expectedDisposalType": "nonburnable_special_bag",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "이쑤시개는 어떻게 버려?",
+    "expectedItemId": "toothpick",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "나무 꼬치는 어떻게 버려?",
+    "expectedItemId": "wooden_skewer",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "정수기 필터는 어떻게 버려?",
+    "expectedItemId": "water_purifier_filter",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "멜라민 그릇은 어떻게 버려?",
+    "expectedItemId": "melamine_bowl",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "지퍼백은 어떻게 버려?",
+    "expectedItemId": "zipper_bag",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "종이 쇼핑백은 어떻게 버려?",
+    "expectedItemId": "paper_shopping_bag",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "은박접시",
+    "expectedItemId": "foil_plate",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "유통기한 지난 밀가루는 어떻게 버려?",
+    "expectedItemId": "expired_flour",
+    "expectedDisposalType": "food_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "상한 우유는 어떻게 버려?",
+    "expectedItemId": "spoiled_milk",
+    "expectedDisposalType": "food_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "커피믹스 봉지",
+    "expectedItemId": "coffee_mix_wrapper",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "락스통은 어떻게 버려?",
+    "expectedItemId": "bleach_container",
+    "expectedDisposalType": "recycle_after_empty",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "테이프클리너는 어떻게 버려?",
+    "expectedItemId": "tape_cleaner",
+    "expectedDisposalType": "general_or_partial_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "빗자루",
+    "expectedItemId": "broom",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "대걸레는 어떻게 버려?",
+    "expectedItemId": "floor_mop",
+    "expectedDisposalType": "general_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "다리미판",
+    "expectedItemId": "ironing_board",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "행주는 어떻게 버려?",
+    "expectedItemId": "dishcloth",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "물걸레 청소포는 어떻게 버려?",
+    "expectedItemId": "mop_wipe_refill",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "양동이는 어떻게 버려?",
+    "expectedItemId": "bucket",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "수건은 어떻게 버려?",
+    "expectedItemId": "towel",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "욕실 발매트는 어떻게 버려?",
+    "expectedItemId": "bath_mat",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "샤워커튼은 어떻게 버려?",
+    "expectedItemId": "shower_curtain",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "체중계는 어떻게 버려?",
+    "expectedItemId": "bathroom_scale",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "욕실화는 어떻게 버려?",
+    "expectedItemId": "bathroom_slippers",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "샤워기 헤드는 어떻게 버려?",
+    "expectedItemId": "shower_head",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "기저귀는 어떻게 버려?",
+    "expectedItemId": "diaper",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "생리대는 어떻게 버려?",
+    "expectedItemId": "sanitary_pad",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "염색약은 어떻게 버려?",
+    "expectedItemId": "hair_dye",
+    "expectedDisposalType": "general_or_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "립스틱은 어떻게 버려?",
+    "expectedItemId": "lipstick",
+    "expectedDisposalType": "general_or_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "마스카라는 어떻게 버려?",
+    "expectedItemId": "mascara",
+    "expectedDisposalType": "general_or_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "머리빗은 어떻게 버려?",
+    "expectedItemId": "hairbrush",
+    "expectedDisposalType": "general_or_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "헤어롤은 어떻게 버려?",
+    "expectedItemId": "hair_roller",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전자 체온계",
+    "expectedItemId": "electronic_thermometer",
+    "expectedDisposalType": "general_or_recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "칫솔살균기",
+    "expectedItemId": "toothbrush_sterilizer",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "비데는 어떻게 버려?",
+    "expectedItemId": "bidet",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "변기커버는 어떻게 버려?",
+    "expectedItemId": "toilet_seat_cover",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "가방은 어떻게 버려?",
+    "expectedItemId": "handbag",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "모자는 어떻게 버려?",
+    "expectedItemId": "hat",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "안경은 어떻게 버려?",
+    "expectedItemId": "glasses",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "선글라스는 어떻게 버려?",
+    "expectedItemId": "sunglasses",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "손목시계는 어떻게 버려?",
+    "expectedItemId": "wrist_watch",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "여행용 캐리어는 어떻게 버려?",
+    "expectedItemId": "travel_carrier",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "장화는 어떻게 버려?",
+    "expectedItemId": "rain_boots",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "지갑은 어떻게 버려?",
+    "expectedItemId": "wallet",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "넥타이는 어떻게 버려?",
+    "expectedItemId": "necktie",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "스카프는 어떻게 버려?",
+    "expectedItemId": "scarf",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "크레파스는 어떻게 버려?",
+    "expectedItemId": "crayon",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "색연필은 어떻게 버려?",
+    "expectedItemId": "colored_pencil",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "물감 튜브는 어떻게 버려?",
+    "expectedItemId": "paint_tube",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "스프링 노트는 어떻게 버려?",
+    "expectedItemId": "spring_notebook",
+    "expectedDisposalType": "paper_recycle_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "클리어파일은 어떻게 버려?",
+    "expectedItemId": "clear_file",
+    "expectedDisposalType": "recycle_by_material_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "박스테이프는 어떻게 버려?",
+    "expectedItemId": "box_tape",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "딱풀은 어떻게 버려?",
+    "expectedItemId": "glue_stick",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "지우개는 어떻게 버려?",
+    "expectedItemId": "eraser",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "필통은 어떻게 버려?",
+    "expectedItemId": "pencil_case",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "퍼즐은 어떻게 버려?",
+    "expectedItemId": "jigsaw_puzzle",
+    "expectedDisposalType": "paper_recycle_or_general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "축구공은 어떻게 버려?",
+    "expectedItemId": "soccer_ball",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "농구공은 어떻게 버려?",
+    "expectedItemId": "basketball",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "배드민턴 라켓은 어떻게 버려?",
+    "expectedItemId": "badminton_racket",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "물놀이 튜브는 어떻게 버려?",
+    "expectedItemId": "swim_tube",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "유모차는 어떻게 버려?",
+    "expectedItemId": "stroller",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "카시트는 어떻게 버려?",
+    "expectedItemId": "car_seat",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "킥보드는 어떻게 버려?",
+    "expectedItemId": "kids_kickboard",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "인라인스케이트는 어떻게 버려?",
+    "expectedItemId": "inline_skates",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "이어폰은 어떻게 버려?",
+    "expectedItemId": "wired_earphones",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "무선 이어폰은 어떻게 버려?",
+    "expectedItemId": "wireless_earphones",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "헤드폰은 어떻게 버려?",
+    "expectedItemId": "headphones",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "리모컨은 어떻게 버려?",
+    "expectedItemId": "remote_control",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "노트북은 어떻게 버려?",
+    "expectedItemId": "laptop",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "태블릿은 어떻게 버려?",
+    "expectedItemId": "tablet",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "스마트워치는 어떻게 버려?",
+    "expectedItemId": "smartwatch",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "게임기는 어떻게 버려?",
+    "expectedItemId": "game_console",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "스피커는 어떻게 버려?",
+    "expectedItemId": "speaker",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "계산기는 어떻게 버려?",
+    "expectedItemId": "calculator",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "카메라는 어떻게 버려?",
+    "expectedItemId": "camera",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "모니터는 어떻게 버려?",
+    "expectedItemId": "monitor",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "프린터는 어떻게 버려?",
+    "expectedItemId": "printer",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전기히터는 어떻게 버려?",
+    "expectedItemId": "electric_heater",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전기장판",
+    "expectedItemId": "electric_blanket",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "온수매트는 어떻게 버려?",
+    "expectedItemId": "water_heating_mat",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "가습기는 어떻게 버려?",
+    "expectedItemId": "humidifier",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "제습기는 어떻게 버려?",
+    "expectedItemId": "dehumidifier",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "다리미는 어떻게 버려?",
+    "expectedItemId": "electric_iron",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "청소기는 어떻게 버려?",
+    "expectedItemId": "vacuum_cleaner",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전기밥솥",
+    "expectedItemId": "rice_cooker",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전자레인지는 어떻게 버려?",
+    "expectedItemId": "microwave",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "전기포트는 어떻게 버려?",
+    "expectedItemId": "electric_kettle",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "토스터는 어떻게 버려?",
+    "expectedItemId": "toaster",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "믹서기는 어떻게 버려?",
+    "expectedItemId": "blender",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "커피머신은 어떻게 버려?",
+    "expectedItemId": "coffee_machine",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "공기청정기는 어떻게 버려?",
+    "expectedItemId": "air_purifier",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "커튼은 어떻게 버려?",
+    "expectedItemId": "curtain",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "블라인드는 어떻게 버려?",
+    "expectedItemId": "blind",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "카페트는 어떻게 버려?",
+    "expectedItemId": "carpet",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "벽시계는 어떻게 버려?",
+    "expectedItemId": "wall_clock",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "알람시계",
+    "expectedItemId": "alarm_clock",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "액자는 어떻게 버려?",
+    "expectedItemId": "picture_frame",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "스탠드 조명은 어떻게 버려?",
+    "expectedItemId": "floor_lamp",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "백열전구는 어떻게 버려?",
+    "expectedItemId": "incandescent_bulb",
+    "expectedDisposalType": "general_or_nonburnable_safe_wrap",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "벽지는 어떻게 버려?",
+    "expectedItemId": "wallpaper",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "시트지는 어떻게 버려?",
+    "expectedItemId": "sheet_film",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "폼보드는 어떻게 버려?",
+    "expectedItemId": "foam_board",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "화이트보드는 어떻게 버려?",
+    "expectedItemId": "whiteboard",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "달력은 어떻게 버려?",
+    "expectedItemId": "calendar",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "소파는 어떻게 버려?",
+    "expectedItemId": "sofa",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "책상은 어떻게 버려?",
+    "expectedItemId": "desk",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "책장은 어떻게 버려?",
+    "expectedItemId": "bookshelf",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "서랍장은 어떻게 버려?",
+    "expectedItemId": "drawer_chest",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "옷장",
+    "expectedItemId": "wardrobe",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "식탁은 어떻게 버려?",
+    "expectedItemId": "dining_table",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "침대 프레임은 어떻게 버려?",
+    "expectedItemId": "bed_frame",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "캣타워는 어떻게 버려?",
+    "expectedItemId": "cat_tower",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "고양이 스크래처는 어떻게 버려?",
+    "expectedItemId": "cat_scratcher",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "어항은 어떻게 버려?",
+    "expectedItemId": "fish_tank",
+    "expectedDisposalType": "nonburnable_or_bulky",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "텐트는 어떻게 버려?",
+    "expectedItemId": "tent",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "돗자리는 어떻게 버려?",
+    "expectedItemId": "picnic_mat",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "아이스박스는 어떻게 버려?",
+    "expectedItemId": "cooler_box",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "크리스마스트리는 어떻게 버려?",
+    "expectedItemId": "christmas_tree",
+    "expectedDisposalType": "general_or_bulky_by_size",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "우비는 어떻게 버려?",
+    "expectedItemId": "rain_coat",
+    "expectedDisposalType": "general",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+  },
+  {
+    "query": "플라스틱 밀폐용기는 어떻게 버려?",
+    "expectedItemId": "airtight_container",
+    "expectedDisposalType": "recycle",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
   }
 ]
