@@ -1,12 +1,16 @@
 # 재활용척척 MCP
 
-재활용척척은 헷갈리는 생활폐기물의 올바른 배출 방법을 안내하는 PlayMCP용 Remote MCP 서버입니다. 카카오톡에서 PlayMCP를 통해 호출되며, 품목 분류부터 지역별 확인 항목까지 하나의 무상태(stateless) MCP 서버로 제공합니다.
+재활용척척은 헷갈리는 생활폐기물의 올바른 배출 방법을 안내하는 Remote MCP 서버입니다. 카카오톡에서 호출되며, 품목 분류부터 지역별 확인 항목까지 하나의 무상태(stateless) MCP 서버로 제공합니다.
 
 ## 아키텍처
 
+본선(Agentic Player 10) 무대는 카카오톡의 **ChatGPT for Kakao — Kakao Tools**입니다. 예선의 PlayMCP AI채팅과 달리 호스트 LLM이 ChatGPT이고, **툴 호출이 보장되지 않습니다.** tool description 품질이 곧 노출률이라 설계가 여기에 맞춰져 있습니다.
+
 ```
-카카오톡 사용자 → PlayMCP (Kakao Cloud) → MCP 서버 (Express, Streamable HTTP, 무상태) → 데이터 레이어 (품목·지역·수수료 JSON)
+카카오톡 사용자 → ChatGPT for Kakao (Kakao Tools) → MCP 서버 (Express, Streamable HTTP, 무상태) → 데이터 레이어 (품목·지역·수수료 JSON)
 ```
+
+호출이 한 번에 그칠 수 있으므로 **한 번의 호출로 항상 유용한 결과를 돌려주는 것**을 원칙으로 잡았습니다. 대분류 → 소분류로 좁혀 가는 멀티스텝 체인은 중간 호출이 누락되면 답이 끊기므로 쓰지 않습니다. 품목을 못 찾아도 재질 기준 안내로, 포괄어면 후보를 제시하는 되묻기로 착지합니다.
 
 - Transport: Streamable HTTP
 - Endpoint: `/mcp`
@@ -37,6 +41,20 @@
 - `fuzzy_jamo` (40~70점): 한글 자모 분해 후 레벤슈타인 유사도로 오타 허용 ("패트병"→"페트병"). 유사도 0.85 이상 단일 후보만 확정하고, 그 미만은 후보로만 제시
 
 `resolveWasteItem()`은 이 점수를 `match` / `ambiguous` / `not_found` 세 가지 결과로 정리합니다. "컵", "통", "병"처럼 여러 품목에 동시에 해당하는 포괄어는 `ambiguous`로 처리해 임의로 하나를 확정하지 않고, 후보 목록과 함께 재질·용도를 되묻습니다.
+
+한국어는 핵심어가 뒤에 오므로 복합명사의 **앞자리에 붙은 이름은 수식어로 봅니다.** "전자레인지 수납장"은 수납장이지 전자레인지가 아닙니다. 다만 수식어로 걸린 후보를 목록에서 통째로 지우지는 않습니다 — 남은 하나가 단독 확정돼 "컴퓨터"가 노트북으로 바뀌는 일이 생기기 때문에, 확정 후보에서만 빼고 "질의가 덜 특정됐다"는 신호로는 남깁니다.
+
+## 응답 형태 — 위젯과 폴백
+
+확정 매칭은 **위젯 카드**로 나갑니다. `content[0].text`에 `{widget, copy_text, name}` JSON을 담는 Kakao Tools 형식이고, 제목·캡션·단계·주의·근거에 더해 지역을 함께 물었으면 `서울 강남구 기준` 블록이 붙습니다. 카드에는 사용자가 그대로 복사할 수 있는 `copy_text`가 따라갑니다.
+
+확정이 아닐 때는 텍스트로 답합니다.
+
+- `ambiguous` — 후보를 제시하고 재질·용도를 되묻습니다. 임의로 하나를 고르지 않습니다.
+- `not_found` — 재질 기준 안내로 착지합니다. "모르겠다"로 끝내지 않는 것이 목적입니다.
+- 카테고리어(`대형폐기물`, `음식물쓰레기` 등)로만 이뤄진 질의도 폴백으로 보냅니다. 문장형 별칭에 걸려 엉뚱한 품목 카드가 뜨는 것을 막기 위해서입니다.
+
+`WIDGET_ENABLED=false`로 두면 확정 매칭도 마크다운 텍스트로 나갑니다. 내용은 같고 렌더링만 다릅니다 — 위젯 렌더링이 문제일 때 되돌리는 스위치입니다([docs/qa-runbook.md](docs/qa-runbook.md) 참고).
 
 ## Run
 
@@ -115,12 +133,12 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 정확도 개선은 품목 데이터와 대표 질문 평가셋을 함께 관리합니다.
 
-- 품목 데이터: `src/data/waste-items.json` (272개)
-- 대표 질문 평가셋: `src/data/evaluation-cases.json` (272개)
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (314개)
+- 품목 데이터: `src/data/waste-items.json` (324개)
+- 대표 질문 평가셋: `src/data/evaluation-cases.json` (324개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (418개)
 - 지역 정책 데이터: `src/data/region-policies.json` (35개 지역 — full 5, standard 13, metro 17)
-- 지역 평가셋: `src/data/region-evaluation-cases.json` (73개)
-- 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (강남·서초·송파·마포 4개 지역)
+- 지역 평가셋: `src/data/region-evaluation-cases.json` (78개)
+- 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (18개 지역 2,025행 — 광역을 뺀 등록 지역 전부)
 - 질문 백로그: `src/data/question-backlog.json`
 - 작업 가이드: [docs/data-quality.md](docs/data-quality.md)
 - 질문 백로그 흐름: [docs/question-backlog.md](docs/question-backlog.md)

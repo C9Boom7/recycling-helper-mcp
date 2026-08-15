@@ -87,8 +87,8 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 1 | 완료 (main 반영) | claude/prd1-analysis-review-3b08e7 | 자모 오타 매칭 + 재질 폴백 + 별칭 4그룹. 코드리뷰 후속 수정은 PR #6으로 머지 |
 | 2 | 완료 (PR #4 머지됨) | claude/prd2-analysis-review-862248 | 표준 티어 142개 추가, 품목 130 → 272 |
 | 3 | 완료 (PR #5 머지됨) | claude/prd3-analysis-review-884092 | 위젯 카드 + copy_text + 지역 안내 분기. Preview 렌더링(R6) 확인은 4a로 이관 |
-| 4a | 서버 검증 완료, Preview 대기 | claude/prd4-analysis-review-56f5e3 | `c205fdf` 배포분 1·2단계 통과(health 272, 툴 5개, 위젯 JSON, 평균 59ms). 3·4단계는 Chrome 확장 연결 후 |
-| 4b | 미착수 | - | 4a 완주 이후 |
+| 4a | 완료 | claude/prd4-analysis-review-56f5e3 | 4단계 전부 통과. Preview 렌더링·툴콜까지 확인했고 측정 환경을 ChatGPT 본체 커넥터로 옮겨 자동 측정이 가능해졌다 |
+| 4b | R1~R3 완료, R4 마감 게이트만 남음 | claude/qa-runbook 외 | 발화 30개 시나리오 완주 — 의도 발화 툴 호출·정답 100%, 비의도 과호출 0(N1은 8/15 Preview 재확인으로 해소). 측정 중 버그 3건(오라우팅·카테고리어 과매칭·광역 임의 확정)을 잡아 배포로 검증. R3 문서 4종 완료 |
 | 5 | 완료 (PR #10·#11 머지됨) | claude/phase5-doc-plan-review-4dcfdb 외 | 지역 5 → 35(full 5, standard 13, metro 17). R4는 최소선 21곳 중 13곳, 8곳은 백로그 |
 | 6 | R0~R4 완료, R5 남음 | claude/phase6-r2-r4 | 조례 10곳 1,176행 적재 — 수수료 보유 지역 8 → 18곳(비광역 전부), 행 849 → 2,025. R2 골든셋 69행 금액 불일치 0건, 파서 결함 둘을 고쳐 행 파싱 10/10. validate 규칙 3종·회귀 3건 추가. 코드 리뷰 후속으로 품목 오귀속 규칙을 조여 42행을 옮기거나 뺐다. R5(링크·시행일자 재확인)는 8/22~23 |
 | 7 | 완료 (PR #22 머지됨) | claude/phase7-r2-batch4 외 | 오매칭 13 → 0, 답변 가능 94/100, 품목 324개. 되묻기 5건 해소 배치까지 마쳐 ambiguous는 포괄어 4건만 남았다 |
