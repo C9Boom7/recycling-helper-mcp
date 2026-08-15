@@ -31,23 +31,35 @@ curl -sS https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/health
   (`node -e "console.log(require('./src/data/waste-items.json').length)"`).
 
 **`items`만으로는 부족하다. 데이터를 안 건드린 배포는 이 숫자가 그대로다.** 매칭 규칙처럼 코드만 바뀐 배포는
-품목 수가 똑같아서 옛 빌드가 떠 있어도 "정상"으로 읽힌다. 실제로 2026-08-15에 조사 처리 개선(PR #27)이 머지된 뒤
-`items`는 양쪽 다 324인 채로 배포만 누락된 적이 있다. 그래서 기능 프로브를 한 번 더 친다.
+품목 수가 똑같아서 옛 빌드가 떠 있어도 "정상"으로 읽힌다. 2026-08-15에 조사 처리 개선(PR #27)을 머지했을 때가 그랬다.
+재배포 대상의 `items`가 배포 전에도 324, 배포 후에도 324여서 이 숫자로는 재배포가 됐는지 알 길이 없었다.
+(같은 날 등록 주소가 130이던 것은 바로 위에 적은 등록 불일치이고, 이 문제와는 별개다.)
+그래서 기능 프로브를 한 번 더 친다. **여기서도 주소를 둘 다 찍는다.**
 
 ```bash
-curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}' \
+PROBE='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}'
+# 재배포 대상
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" \
   https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp
+# 운영 등록이 가리키는 주소
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" \
+  https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp
 ```
 
-`칫솔` 카드가 나오면 조사 처리가 들어간 빌드다. `확실히 찾지 못했습니다`가 나오면 그 이전 빌드다.
+두 주소 모두 `칫솔` 카드가 나와야 조사 처리가 들어간 빌드다. `확실히 찾지 못했습니다`가 나오면 그 이전 빌드다.
+**한쪽만 카드가 나오면 `items`가 같더라도 등록 불일치다** — 위의 등록 불일치 항목으로 돌아간다.
+
+`Not Acceptable: Client must accept both application/json and text/event-stream` 오류가 돌아오는 경우도 있다.
+**이건 Phase 0 이전 빌드라는 뜻이다** — JSON-only `tools/call` 지원이 Phase 0에서 들어갔기 때문이다.
+2026-08-15 기준 운영 등록 주소가 이 상태다. 카드도 폴백도 아닌 오류이므로 위 두 판정에 걸리지 않는데,
+사실 가장 확실한 구버전 신호다. 이때는 응답 내용을 더 볼 것 없이 등록 불일치 항목으로 간다.
 
 **런타임을 고칠 때마다 이 프로브도 갱신한다.** 배포 여부를 가르는 기준은 "그 배포에서만 달라지는 응답"이지
 품목 수가 아니다. 데이터만 바뀐 배포라면 `items`로 충분하다.
 
 "고쳤는데 왜 그대로냐"는 문의는 위 셋 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
 
-품목 수가 맞으면 문제를 재현한다.
+`items`와 기능 프로브가 모두 최신 빌드를 가리키면 그때 문제를 재현한다.
 
 ```bash
 curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
@@ -142,7 +154,9 @@ WIDGET_ENABLED=false
 3. 브랜치를 푸시하고 PR을 연다.
 4. **사용자에게 머지를 요청한다. 머지가 배포 게이트다.**
 5. 머지 후 사용자가 PlayMCP in KC에서 "재배포"를 누른다. Status가 `Active`가 될 때까지 기다린다.
-6. `/health`의 `items`로 반영을 확인한다. 툴 호출까지 재현해 본다.
+6. 반영을 확인한다. `/health`의 `items`는 데이터를 고쳤을 때만 움직이므로, **코드만 고쳤다면 1절의 기능 프로브가 유일한 근거다.**
+   프로브 질의는 **이번 수정에서만 달라지는 응답**으로 갈아 끼우고, 재배포 대상과 운영 등록 주소를 둘 다 친다.
+   그 다음 문의받은 상황을 툴 호출로 재현해 본다.
 
 **재배포 횟수를 아끼려면 수정을 묶어서 내보낸다.** 하루 1~2회가 적당하다.
 
