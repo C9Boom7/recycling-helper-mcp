@@ -955,6 +955,45 @@
     ]
   },
   {
+    "id": "ordinance_fee_jung_gu_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 중구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "3,000원"
+    ]
+  },
+  {
+    "id": "ordinance_fee_seongbuk_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 성북구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "2,000원"
+    ]
+  },
+  {
+    "id": "ordinance_fee_guro_absent_keeps_application_route",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 구로구"
+    },
+    "expectedTextIncludes": [
+      "서울 구로구",
+      "인터넷 신청"
+    ],
+    "expectedTextExcludes": [
+      "수수료 후보"
+    ]
+  },
+  {
     "id": "gangnam_nail_polish_remaining_content",
     "tool": "get_disposal_steps",
     "arguments": {

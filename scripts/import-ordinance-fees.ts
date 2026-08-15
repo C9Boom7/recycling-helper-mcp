@@ -62,6 +62,15 @@ const TARGETS = [
   "yeongdeungpo_gu",
   "dongjak_gu",
   "gangdong_gu",
+  // 2026-08-16 서울 나머지 8개 구가 열리며 추가된 대상.
+  "jung_gu",
+  "seongdong_gu",
+  "dongdaemun_gu",
+  "jungnang_gu",
+  "seongbuk_gu",
+  "seodaemun_gu",
+  "yangcheon_gu",
+  "guro_gu",
 ];
 
 /**
@@ -253,6 +262,7 @@ if (unknown.length > 0) {
 
 const targets = requested.length > 0 ? requested : TARGETS;
 const regions = JSON.parse(readFileSync(REGIONS_PATH, "utf8")) as RegionalPolicyData[];
+const misalignedRegions: string[] = [];
 const existing = JSON.parse(readFileSync(FEES_PATH, "utf8")) as BulkyWasteFeeSchedule[];
 
 const built: BulkyWasteFeeSchedule[] = [];
@@ -285,6 +295,23 @@ for (const regionId of targets) {
   const grouped = new Map<string, BulkyWasteFee[]>();
   const skipped = new Map<string, number>();
   const note = (reason: string) => skipped.set(reason, (skipped.get(reason) ?? 0) + 1);
+
+  // 품명 칸에 금액이 들어앉아 있으면 열이 통째로 밀린 것이다. 구로구 조례가
+  // 「분야 | 품목 | 규격 | 수수료 | 비고」 5열이라 파서가 한 칸씩 밀려 읽었고,
+  // `itemName: "5,000원"` / `spec: "다리미"` 같은 행이 나왔다. 이런 덤프는 대부분
+  // 금액 0으로 걸러져 살아남는 몇 행만 통과하는데, 그 몇 행이 바로 "확신 있는
+  // 오답"이 된다 — 실제로 구로 1행(`air_purifier 6,000원`)은 구청 수수료표에
+  // 아예 없는 품목이었다. 행 단위로 버리지 않고 **지역 전체를 거부**한다.
+  // 열이 밀린 표에서 우연히 맞은 행을 골라낼 방법이 없기 때문이다.
+  const misaligned = dump.rows.filter((row) => /^[\d,]+\s*원$/.test((row.itemName ?? "").trim()));
+  if (misaligned.length > 0) {
+    console.error(
+      `${regionId}: 품명 칸에서 금액이 ${misaligned.length}행 나왔다 — 조례 표의 열 구성이 파서와 어긋난다. ` +
+        `이 지역은 넣지 않는다 (예: "${misaligned[0].itemName}" / 규격 "${misaligned[0].spec}").`,
+    );
+    misalignedRegions.push(regionId);
+    continue;
+  }
 
   for (const row of dump.rows) {
     if (row.free || row.feeKrw === 0) {
@@ -398,3 +425,6 @@ const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((n, s) => n + s.fees.length, 0)}행`);
 if (missing.length > 0) console.log(`원문이 없어 건너뛴 지역: ${missing.join(", ")}`);
+if (misalignedRegions.length > 0) {
+  console.log(`표의 열 구성이 어긋나 넣지 않은 지역: ${misalignedRegions.join(", ")}`);
+}

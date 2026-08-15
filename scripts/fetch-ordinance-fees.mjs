@@ -57,6 +57,15 @@ export const TARGETS = [
   { regionId: "yeongdeungpo_gu", 기관명: "서울특별시 영등포구" },
   { regionId: "dongjak_gu", 기관명: "서울특별시 동작구" },
   { regionId: "gangdong_gu", 기관명: "서울특별시 강동구" },
+  // 2026-08-16 서울 나머지 8개 구가 열리며 추가된 대상.
+  { regionId: "jung_gu", 기관명: "서울특별시 중구" },
+  { regionId: "seongdong_gu", 기관명: "서울특별시 성동구" },
+  { regionId: "dongdaemun_gu", 기관명: "서울특별시 동대문구" },
+  { regionId: "jungnang_gu", 기관명: "서울특별시 중랑구" },
+  { regionId: "seongbuk_gu", 기관명: "서울특별시 성북구" },
+  { regionId: "seodaemun_gu", 기관명: "서울특별시 서대문구" },
+  { regionId: "yangcheon_gu", 기관명: "서울특별시 양천구" },
+  { regionId: "guro_gu", 기관명: "서울특별시 구로구" },
 ];
 
 /**
