@@ -781,11 +781,39 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy): string | undefine
   return undefined;
 }
 
-function regionSpecialCollectionLines(region: RegionalPolicyData): string[] {
+/**
+ * 물어본 품목이 걸린 수거함만 전부 펼친다.
+ *
+ * 예전에는 두 항목 모두 `method[0]`만 실었다. 그래서 지역 데이터에 적어둔
+ * 둘째 줄부터가 어느 경로로도 사용자에게 못 갔다 — 성북 "평판형·십자형·원반형
+ * LED는 특수규격봉투", 중랑 "백열전구·LED등은 특수마대", 양천 "깨진 형광등은
+ * 불연성 마대", 중구 "리튬전지는 '비대상전지' 표기"가 전부 죽은 데이터였다.
+ * 하필 이런 예외가 사용자가 실제로 틀리는 지점이다.
+ *
+ * 그렇다고 항상 전부 실으면 지역 한 곳이 최대 일곱 줄까지 늘어난다. 폐의약품을
+ * 물었는데 형광등 예외까지 다 받을 이유는 없으므로, **물어본 품목이 속한 쪽만**
+ * 펼치고 나머지는 첫 줄로 둔다. 품목을 안 물었으면 둘 다 첫 줄만 — 예전 동작과
+ * 같아서 지역 개요 응답 크기는 그대로다.
+ */
+const MEDICINE_ITEM_IDS = new Set(["medicine"]);
+const BATTERY_LAMP_ITEM_IDS = new Set(["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"]);
+
+function collectionLines(label: string, method: string[] | undefined, expand: boolean): string[] {
+  const filled = (method ?? []).filter((line) => typeof line === "string" && line.trim().length > 0);
+  if (filled.length === 0) return [];
+  const shown = expand ? filled : filled.slice(0, 1);
+  return shown.map((line, index) => (index === 0 ? `- ${label}: ${line}` : `  - ${line}`));
+}
+
+function regionSpecialCollectionLines(region: RegionalPolicyData, item?: WasteItem): string[] {
   const { medicine, batteryAndFluorescentLamp } = region.specialCollections ?? {};
   return [
-    ...(medicine?.method?.[0] ? [`- 폐의약품: ${medicine.method[0]}`] : []),
-    ...(batteryAndFluorescentLamp?.method?.[0] ? [`- 폐건전지·폐형광등: ${batteryAndFluorescentLamp.method[0]}`] : []),
+    ...collectionLines("폐의약품", medicine?.method, Boolean(item && MEDICINE_ITEM_IDS.has(item.id))),
+    ...collectionLines(
+      "폐건전지·폐형광등",
+      batteryAndFluorescentLamp?.method,
+      Boolean(item && BATTERY_LAMP_ITEM_IDS.has(item.id)),
+    ),
   ];
 }
 
@@ -819,7 +847,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     : `"${region}"은(는) 아직 상세 지역 데이터가 없습니다. 아래 공식 경로에서 거주 지자체 기준을 바로 확인할 수 있습니다.`;
 
   const bulkyLines = regionMatch ? formatRegionBulkyContactLines(regionMatch.region) : [];
-  const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region) : [];
+  const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
   const hasSchedule = Boolean(regionMatch?.region.generalWaste && regionMatch.region.recycling);
 
   const lines = [

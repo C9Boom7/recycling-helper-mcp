@@ -955,6 +955,61 @@
     ]
   },
   {
+    "id": "region_special_lines_expand_for_asked_lamp",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성북구",
+      "itemName": "형광등"
+    },
+    "expectedTextIncludes": [
+      "폐건전지·폐형광등: 건전지·보조배터리·충전식 배터리는 제품에서 분리해",
+      "평판형·십자형·원반형 LED 조명은 분리배출 대상이 아니라 특수규격봉투"
+    ],
+    "expectedTextExcludes": [
+      "주민센터에서 나눠 주는 회수봉투"
+    ]
+  },
+  {
+    "id": "region_special_lines_expand_for_asked_medicine",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성북구",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "우체통에 넣을 때는 주민센터에서 나눠 주는 회수봉투"
+    ],
+    "expectedTextExcludes": [
+      "평판형·십자형·원반형 LED 조명"
+    ]
+  },
+  {
+    "id": "region_special_lines_stay_short_without_item",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성북구"
+    },
+    "expectedTextIncludes": [
+      "폐의약품: 폐의약품은 가까운 주민센터와 보건소",
+      "폐건전지·폐형광등: 건전지·보조배터리·충전식 배터리"
+    ],
+    "expectedTextExcludes": [
+      "평판형·십자형·원반형 LED 조명",
+      "주민센터에서 나눠 주는 회수봉투"
+    ]
+  },
+  {
+    "id": "region_special_lines_expand_lithium_warning_junggu",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 중구",
+      "itemName": "건전지"
+    },
+    "expectedTextIncludes": [
+      "리튬전지와 충전식 전지는 화재 위험이 있어 겉면에 '비대상전지'"
+    ]
+  },
+  {
     "id": "gangnam_nail_polish_remaining_content",
     "tool": "get_disposal_steps",
     "arguments": {
