@@ -2609,6 +2609,519 @@
     ]
   },
   {
+    "id": "jung_gu",
+    "name": "서울 중구",
+    "aliases": [
+      "중구",
+      "서울 중구",
+      "서울시 중구",
+      "서울특별시 중구",
+      "jung-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "중구는 대형폐기물 신청을 '빼기' 홈페이지와 앱에서 받고, 전화 접수는 수거대행업체 남부환경(1577-6731)이 맡습니다. 구청 자체 신청 화면과 수수료 조회 페이지는 없어서 품목별 금액은 구 조례 별표를 봐야 합니다. 폐형광등·폐건전지는 동주민센터와 거점 수거함에, 폐의약품은 수거함이나 우체통에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 구청과 보건소, 각 동주민센터에 놓인 수거함에 배출합니다. 물약을 뺀 나머지는 서울시 전역의 우체통에도 넣을 수 있습니다.",
+          "가루약과 조제 알약은 포장지를 뜯지 말고 그대로 배출하고, 정제형 알약은 겉 종이 포장만 벗겨 배출합니다. 물약과 연고는 마개를 잠가 용기째 배출합니다.",
+          "홍삼이나 자양강장제 같은 건강보조식품은 폐의약품 수거함에 넣지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 녹슬지 않게 물기를 없애고 원상태로 분리수거함에 배출합니다. 수거함은 각 동주민센터와 거점에 있습니다.",
+          "폐형광등은 포장을 벗기고 막대기형·원형·전구형으로 나눈 뒤 깨지지 않게 배출합니다.",
+          "리튬전지와 충전식 전지는 화재 위험이 있어 겉면에 '비대상전지'라고 적어서 배출함에 넣습니다.",
+          "백열등과 깨진 형광등, 전구형·직관형이 아닌 LED 램프는 분리배출 대상이 아니라 생활폐기물로 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.junggu.seoul.kr/content.do?cmsid=16063",
+      "feeUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2042009",
+      "phone": "02-3396-5453",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "중구 대형 생활폐기물 배출",
+        "url": "https://www.junggu.seoul.kr/content.do?cmsid=16063",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "'빼기' 홈페이지·앱과 전화 접수(남부환경 1577-6731) 경로, 청소행정과 02-3396-5453 확인"
+      },
+      {
+        "title": "중구 폐형광등·폐건전지",
+        "url": "https://www.junggu.seoul.kr/content.do?cmsid=14190",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등·폐건전지 배출방법과 리튬전지 표기 주의사항"
+      },
+      {
+        "title": "중구 폐의약품 분리배출 안내",
+        "url": "https://www.junggu.seoul.kr/content.do?cmsid=15918",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "약 형태별 배출방법과 수거함 설치 위치 17곳"
+      },
+      {
+        "title": "서울특별시 중구 폐기물 관리 조례",
+        "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2042009",
+        "sourceType": "law",
+        "checkedAt": "2026-08-16",
+        "basis": "[별표5] 대형생활폐기물 수수료(제32조제1항 관련) — 구 홈페이지에 수수료 조회 페이지가 없어 조례를 대신 건다"
+      }
+    ]
+  },
+  {
+    "id": "seongdong_gu",
+    "name": "서울 성동구",
+    "aliases": [
+      "성동구",
+      "서울 성동구",
+      "서울시 성동구",
+      "서울특별시 성동구",
+      "seongdong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "성동구는 구청 홈페이지에서 대형폐기물을 직접 신청받고(신청 화면은 구청 로그인이 필요합니다), '여기로'·'지구하다' 앱이나 전화(천일에너지 02-2248-1001)로도 접수합니다. 품목별 금액은 구청 부과기준표에서 확인합니다. 폐의약품 수거함은 동주민센터와 공공시설, 공동주택에 36곳이 있습니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 동주민센터 17곳과 구청·보건소 등 공공시설, 공동주택에 설치된 전용 수거함에 배출합니다.",
+          "가루약과 조제약은 포장지를 뜯지 말고 그대로, 정제형 알약은 겉 종이 포장만 벗겨 배출합니다. 물약과 연고는 마개를 잠가 용기째 배출합니다.",
+          "구내 우체통에 넣을 때는 회수봉투나 '폐의약품'이라고 적은 일반 봉투에 밀봉합니다. 물약은 우체통에 넣을 수 없습니다.",
+          "홍삼이나 자양강장제 같은 건강보조식품은 폐의약품 수거함에 넣지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 녹슬지 않게 물기를 제거하고 원상태로 분리수거함에 배출합니다.",
+          "폐형광등은 포장을 벗기고 막대기형·원형·전구형으로 나눈 뒤 깨지지 않게 가까운 분리수거함에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.sd.go.kr/main/contents.do?key=1670",
+      "feeUrl": "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html",
+      "phone": "02-2286-5532",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "성동구 대형생활폐기물 배출신고 안내",
+        "url": "https://www.sd.go.kr/main/contents.do?key=1670",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "구청 홈페이지 신청 경로(신청하기 → 통합로그인)와 상용 앱·전화 접수 병행, 청소행정과 02-2286-5532 확인"
+      },
+      {
+        "title": "성동구 대형생활폐기물 수집·운반 수수료 품목별 부과기준",
+        "url": "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "금액대별 품목 수수료표"
+      },
+      {
+        "title": "성동구 폐형광등·건전지 분리배출",
+        "url": "https://www.sd.go.kr/main/contents.do?key=1677",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐건전지·폐형광등 배출방법과 동별 분리수거함 위치"
+      },
+      {
+        "title": "성동구 폐의약품 분리배출",
+        "url": "https://www.sd.go.kr/main/contents.do?key=4522",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "약 형태별 배출방법, 우체통 배출 조건, 수거함 36곳"
+      }
+    ]
+  },
+  {
+    "id": "dongdaemun_gu",
+    "name": "서울 동대문구",
+    "aliases": [
+      "동대문구",
+      "서울 동대문구",
+      "서울시 동대문구",
+      "서울특별시 동대문구",
+      "dongdaemun-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "동대문구는 대형폐기물 신청을 '여기로'에 맡기고, 구청 안내 페이지에서 접수 경로와 수수료표 파일을 함께 안내합니다. 아직 쓸 만한 물건은 구 재활용센터가 무료로 견적을 내고 수거해 갑니다. 폐형광등·폐건전지는 주민센터와 아파트 수거함에, 폐의약품은 수거함이나 구내 우체통에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 동주민센터와 구청 보건소, 일부 아파트 단지에 설치된 수거함에 배출합니다.",
+          "동대문구에 놓인 우체통에도 넣을 수 있는데, 전용 봉투나 '폐의약품'이라고 손으로 적은 일반 봉투를 써야 수거됩니다.",
+          "물약은 우체통에 넣을 수 없으니 수거함에 배출합니다. 포장된 약은 용기째 그대로 내면 됩니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등은 깨지지 않게 조심해서 주민센터·구청 같은 관공서나 아파트·빌라의 자체 수거함에 배출합니다.",
+          "폐건전지도 가까운 폐건전지 수거함에 배출합니다. 근처에 수거함이 없으면 40~50개씩 모아 투명 비닐봉투에 담아 문 앞에 내놓습니다.",
+          "깨진 형광등은 신문지 등으로 감싸 다치지 않게 한 뒤 종량제봉투에 담아 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.ddm.go.kr/www/contents.do?key=82",
+      "feeUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1890205",
+      "phone": "02-2127-4620",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "동대문구 대형폐기물 배출신청",
+        "url": "https://www.ddm.go.kr/www/contents.do?key=82",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "'여기로' 접수 경로와 재활용센터·무상수거 분기, 수수료표 첨부, 청소행정과 자원순환팀 02-2127-4620 확인"
+      },
+      {
+        "title": "동대문구 재활용품분리배출",
+        "url": "https://www.ddm.go.kr/www/contents.do?key=860",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등·폐건전지 배출방법과 수거함이 없을 때의 문전배출 요령"
+      },
+      {
+        "title": "동대문구 올바른 폐의약품 배출 방법 알림",
+        "url": "https://www.ddm.go.kr/www/selectBbsNttView.do?key=198&bbsNo=38&nttNo=129980",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "수거함·우체통 배출 장소와 봉투 표기 조건"
+      },
+      {
+        "title": "서울특별시 동대문구 폐기물 관리 조례",
+        "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1890205",
+        "sourceType": "law",
+        "checkedAt": "2026-08-16",
+        "basis": "[별표1] 대형폐기물 수집운반수수료 품목별 부과 기준 — 구 홈페이지 수수료표는 내려받는 파일이라 조례를 대신 건다"
+      }
+    ]
+  },
+  {
+    "id": "jungnang_gu",
+    "name": "서울 중랑구",
+    "aliases": [
+      "중랑구",
+      "서울 중랑구",
+      "서울시 중랑구",
+      "서울특별시 중랑구",
+      "jungnang-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "중랑구는 대형폐기물 신청과 품목별 수수료 조회를 스마트클린 중랑에서 함께 처리합니다. 전화 접수는 사는 동에 따라 수거업체가 갈립니다. 폐형광등과 폐건전지는 동주민센터나 인근 전용배출함에, 폐의약품은 주민센터 수거함이나 우체통에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 동주민센터에 놓인 수거함이나 우체통에 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 동주민센터 수거함이나 인근 전용배출함에 배출합니다.",
+          "폐형광등은 깨지지 않게 동주민센터나 인근 전용배출함에 배출합니다. 백열전구와 LED전등은 분리배출 대상이 아니라 특수마대에 담아 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.smartclean-jungnang.kr/online/bulky/request",
+      "feeUrl": "https://www.smartclean-jungnang.kr/online/bulky/item",
+      "phone": "02-2094-1956",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "스마트클린 중랑 대형폐기물 배출신청",
+        "url": "https://www.smartclean-jungnang.kr/online/bulky/request",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "인터넷 신청 경로와 중랑구청이 운영하는 시스템 대표전화 02-2094-1956 확인"
+      },
+      {
+        "title": "중랑구 대형폐기물신고",
+        "url": "https://www.jungnang.go.kr/portal/main/contents.do?menuNo=200531",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "배출기준과 동별 수거업체 전화접수 번호 3곳"
+      },
+      {
+        "title": "중랑구 재활용품분리배출",
+        "url": "https://www.jungnang.go.kr/portal/main/contents.do?menuNo=200052",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등·폐건전지·폐의약품 배출 장소"
+      }
+    ]
+  },
+  {
+    "id": "seongbuk_gu",
+    "name": "서울 성북구",
+    "aliases": [
+      "성북구",
+      "서울 성북구",
+      "서울시 성북구",
+      "서울특별시 성북구",
+      "seongbuk-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "성북구는 대형폐기물 신청과 수수료 조회를 스마트클린 성북에서 함께 처리하고, 전화 접수는 콜센터 1866-0554가 받습니다. 폐의약품 수거함은 주민센터·보건소·구청과 복지관에 있고 관내 우체통도 쓸 수 있습니다. 전지는 제품에서 분리해 폐건전지수거함에 넣습니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 가까운 주민센터와 보건소, 구청에 설치된 수거함이나 관내 우체통에 배출합니다.",
+          "가루약과 알약은 포장을 뜯지 말고 밀봉 상태 그대로, 물약은 마개를 닫아 용기째 배출합니다. 물약은 우체통에 넣을 수 없습니다.",
+          "우체통에 넣을 때는 주민센터에서 나눠 주는 회수봉투를 쓰거나, 일반 봉투에 '폐의약품'이라고 적어 밀봉합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "건전지와 보조배터리, 충전식 배터리는 제품에서 분리해 가까운 폐건전지수거함에 배출합니다.",
+          "형광등과 전구형·직관형 LED등은 폐형광등수거함에 배출합니다.",
+          "평판형·십자형·원반형 LED 조명은 분리배출 대상이 아니라 특수규격봉투에 담아 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.sb.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.sb.go.kr/online/bulky/item",
+      "phone": "1866-0554",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "스마트클린 성북 대형폐기물 배출신청",
+        "url": "https://smartclean.sb.go.kr/online/bulky/request",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "인터넷 신청 경로와 전화 접수 콜센터 1866-0554 확인"
+      },
+      {
+        "title": "성북구 재활용품 분리배출",
+        "url": "https://www.sb.go.kr/www/selectBbsNttView.do?bbsNo=91&key=5927&nttNo=9502169",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "전지류·형광등 배출요령과 분리배출 대상 LED 조명 구분"
+      },
+      {
+        "title": "성북구 폐의약품 배출",
+        "url": "https://www.sb.go.kr/www/selectBbsNttView.do?key=5927&bbsNo=91&nttNo=9502165",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "배출 장소와 약 형태별 배출방법, 수거함·우체통 설치 위치"
+      }
+    ]
+  },
+  {
+    "id": "seodaemun_gu",
+    "name": "서울 서대문구",
+    "aliases": [
+      "서대문구",
+      "서울 서대문구",
+      "서울시 서대문구",
+      "서울특별시 서대문구",
+      "seodaemun-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "서대문구는 구청 홈페이지에서 대형폐기물을 신청받고 품목별 규격·부과금액도 같은 곳에서 조회하게 합니다. 전화 접수는 대행구역별 업체가 받습니다. 폐형광등·폐건전지는 공동주택 단지나 주민센터·주택가 수거함에, 폐의약품은 수거함이나 서울시 우체통에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 가까운 주민센터와 보건소, 구청, 국민건강보험공단 지사 민원실 등의 수거함이나 서울시 소재 우체통에 배출합니다.",
+          "가루약과 조제 알약은 포장과 밀봉 상태 그대로, 캡슐약은 포장된 채로 배출합니다. 물약과 시럽, 연고는 용기 마개를 닫아 그대로 배출합니다.",
+          "우체통에 넣을 때는 회수봉투나 '폐의약품'을 표기한 일반 봉투에 밀봉합니다. 물약은 우체통에 넣을 수 없어 다른 회수함을 써야 합니다. 회수봉투는 주민센터에서 나눠 줍니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "아파트 등 공동주택은 단지 안에 설치된 수거함에, 단독주택과 빌라는 인근 주민센터나 주택 골목에 놓인 수거함에 배출합니다.",
+          "LED와 전등 케이스, 일반 전구는 이 수거함에 넣으면 안 됩니다.",
+          "수거함 위치는 스마트 서울맵에서 '폐건전지 폐형광등 분리수거함'을 검색하면 확인할 수 있습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.sdm.go.kr/civil/print/xpay/reg.do",
+      "feeUrl": "https://www.sdm.go.kr/civil/print/waste/standards.do",
+      "phone": "02-330-1376",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "서대문구 대형폐기물 신고 배출절차",
+        "url": "https://www.sdm.go.kr/civil/print/waste.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "인터넷 접수와 동별 대행업체 경로, 청소행정과 청소작업팀 02-330-1376 확인"
+      },
+      {
+        "title": "서대문구 대형폐기물 폐기물 규격",
+        "url": "https://www.sdm.go.kr/civil/print/waste/standards.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "품목별 규격과 부과금액 조회표"
+      },
+      {
+        "title": "서대문구 폐금속자원 배출",
+        "url": "https://www.sdm.go.kr/civil/type/metal.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등·폐건전지 분리배출 방법과 수거함 위치 안내"
+      },
+      {
+        "title": "서대문구 폐의약품 배출",
+        "url": "https://www.sdm.go.kr/civil/type/pharmacy.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "배출 장소와 약 형태별 배출방법 (본문이 이미지 한 장이라 이미지를 읽어 확인)"
+      }
+    ]
+  },
+  {
+    "id": "yangcheon_gu",
+    "name": "서울 양천구",
+    "aliases": [
+      "양천구",
+      "서울 양천구",
+      "서울시 양천구",
+      "서울특별시 양천구",
+      "yangcheon-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "양천구는 대형폐기물 신청과 수수료 조회를 스마트클린 양천에서 함께 처리합니다. 폐의약품은 동주민센터와 공동주택 수거함, 서울시 우체통에 배출하고 야간에도 낼 수 있는 곳이 많습니다. 전지와 형광등은 주요 거점 전용수거함에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 가까운 동주민센터와 공동주택 수거함, 서울시 소재 우체통에 배출합니다.",
+          "가루약과 조제 알약은 포장과 밀봉 상태 그대로, 캡슐약은 포장된 채로 배출합니다. 물약과 시럽, 연고는 용기 마개를 닫아 그대로 배출합니다.",
+          "주민센터와 공동주택에 낼 때는 액체나 가루가 새지 않게 밀봉하고, 우체통에는 물약을 뺀 나머지를 봉투에 밀봉해 넣습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "일회용 건전지와 산화은전지는 제품에서 분리해 주요 거점 전용수거함에 배출합니다.",
+          "형광등류는 깨지지 않은 상태로 같은 전용수거함에 배출합니다.",
+          "깨진 형광등과 백열등은 재활용이 안 되니 불연성 마대 봉투에 담아 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.yangcheon.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.yangcheon.go.kr/online/bulky/item",
+      "phone": "02-2620-3420",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "스마트클린 양천 이용 방법",
+        "url": "https://smartclean.yangcheon.go.kr/online/bulky/guide",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "인터넷 신청·수수료 조회 경로와 청소행정과 02-2620-3420 확인"
+      },
+      {
+        "title": "양천구 폐의약품 배출방법 안내",
+        "url": "https://www.yangcheon.go.kr/site/yangcheon/05/10507040000002023122903.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "배출 장소와 약 형태별 배출방법"
+      },
+      {
+        "title": "양천구 올바른 쓰레기 배출요령 안내문",
+        "url": "https://www.yangcheon.go.kr/common/files/DownloadViewFile.do?cfIdx=CF00009413&cfGroup=COMMON&cfRename=c3af142f-7824-491d-9653-1dcb7fb94703.pdf",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "전지·형광등 배출요령 (구청 청소/위생 메뉴에는 항목이 없고 이 안내문에만 있다)"
+      }
+    ]
+  },
+  {
+    "id": "guro_gu",
+    "name": "서울 구로구",
+    "aliases": [
+      "구로구",
+      "서울 구로구",
+      "서울시 구로구",
+      "서울특별시 구로구",
+      "guro-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "seoul",
+    "checkedAt": "2026-08-16",
+    "summary": "구로구는 구청 홈페이지에서 대형폐기물을 신청받고 처리비용도 같은 곳에서 조회하게 합니다. 전화 접수는 콜센터 02-2615-3203이 받습니다. 폐형광등·폐건전지는 동주민센터와 아파트, 주택가에 놓인 수거함에 배출하고, 폐의약품은 주민센터·보건소 수거함이나 우체통에 냅니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 가까운 주민센터와 보건소, 서울시 소재 우체통에 배출합니다.",
+          "가루약과 조제 알약은 포장과 밀봉 상태 그대로, 캡슐약은 포장된 채로 배출합니다. 물약과 시럽, 연고는 용기 마개를 닫아 그대로 배출합니다.",
+          "우체통에 넣을 때는 회수봉투나 '폐의약품'을 표기한 일반 봉투에 밀봉합니다. 물약은 우체통에 넣을 수 없습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등과 폐건전지는 파손하지 말고 온전한 형태로 분리수거함에 배출합니다.",
+          "수거함은 각 동주민센터와 아파트 등 공동주택, 주택가에 있습니다. 단독주택은 가까운 동주민센터 수거함을, 아파트는 단지 안 수거함을 씁니다.",
+          "정확한 수거함 위치는 청소행정과(02-860-2620)나 관할 동주민센터에서 확인할 수 있습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.guro.go.kr/www/addInfoExhaustAgree.do?key=2659",
+      "feeUrl": "https://www.guro.go.kr/www/costList.do?key=3412",
+      "phone": "02-860-2945",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "구로구 대형폐기물 배출",
+        "url": "https://www.guro.go.kr/www/infoExhaust.do?key=3440",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "인터넷 신청·처리비용 조회 경로와 콜센터 02-2615-3203, 청소행정과 02-860-2945 확인"
+      },
+      {
+        "title": "구로구 쓰레기배출요령",
+        "url": "https://www.guro.go.kr/www/contents.do?key=2694",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등 수거함 배출 방법(단독주택·아파트 구분)"
+      },
+      {
+        "title": "구로구, 폐형광등·폐건전지 수거함 일제 정비 실시",
+        "url": "https://www.guro.go.kr/www/selectBbsNttView.do?key=1793&bbsNo=665&nttNo=217304",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐건전지 배출 방법과 수거함 설치 장소, 위치 문의처 02-860-2620 — 재활용품 분리배출 페이지에는 수거함 현황 파일만 있어 이 보도자료로 보완"
+      },
+      {
+        "title": "구로구 폐의약품 분리배출 안내",
+        "url": "https://www.guro.go.kr/www/selectBbsNttView.do?key=1790&bbsNo=662&nttNo=230069",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "배출 장소와 약 형태별 배출방법 (본문이 첨부 이미지라 이미지를 읽어 확인)"
+      }
+    ]
+  },
+  {
     "id": "seoul",
     "name": "서울특별시",
     "aliases": [

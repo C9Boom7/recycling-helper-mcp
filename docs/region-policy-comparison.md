@@ -18,11 +18,13 @@
 
 ### Standard tier (2026-08-14 추가)
 
-대형폐기물 인터넷 신청·수수료 조회 URL, 담당 직통번호, 폐의약품·폐건전지 수거함 안내까지 전부 확인된 서울 자치구 13곳이다. 배출 요일·시간은 담지 않는다.
+대형폐기물 인터넷 신청·수수료 조회 URL, 담당 직통번호, 폐의약품·폐건전지 수거함 안내까지 전부 확인된 서울 자치구 21곳이다. 배출 요일·시간은 담지 않는다.
 
 `jongno_gu`, `yongsan_gu`, `gwangjin_gu`, `gangbuk_gu`, `dobong_gu`, `nowon_gu`, `eunpyeong_gu`, `gangseo_gu`, `geumcheon_gu`, `yeongdeungpo_gu`, `dongjak_gu`, `gwanak_gu`, `gangdong_gu`
 
-서울 나머지 8개 구(중구·성동구·동대문구·중랑구·성북구·서대문구·양천구·구로구)는 완결 조건을 못 채워 넣지 않았다. 사유는 [data-decision-backlog.md](data-decision-backlog.md)에 있다.
+2026-08-16에 여덟 곳을 더했다 — `jung_gu`, `seongdong_gu`, `dongdaemun_gu`, `jungnang_gu`, `seongbuk_gu`, `seodaemun_gu`, `yangcheon_gu`, `guro_gu`. **이로써 서울 25개 구가 full 4곳 + standard 21곳으로 모두 채워졌다.**
+
+중구와 동대문구는 구 자체 신청 폼이 없어 `applicationUrl`이 구청 대형폐기물 안내 페이지를 가리키고, 수수료는 구 폐기물 관리 조례 별표(`law.go.kr`)를 건다. 두 곳만 다른 지역과 성격이 다르니 링크 점검 때 눈여겨본다. 근거와 결정은 [data-decision-backlog.md](data-decision-backlog.md)에 있다.
 
 ### Metro tier (2026-08-14 추가)
 
