@@ -54,9 +54,9 @@ Kakao Tools Preview에서 실사용 시나리오를 돌려 **툴 호출률과 �
 
 - `pnpm local:test` + mcp-answer-cases 최신화.
 - ~~p99 응답속도 간이 측정~~ — 2026-08-15 배포본에서 완료. 연결을 재사용한 39건이 평균 51ms·p95 71ms·최대 108ms로 목표(평균 100ms, p99 3,000ms) 안에 들어온다. 기록은 [deploy-verification-2026-08-15.md](../deploy-verification-2026-08-15.md).
-- README 갱신: 본선 아키텍처(Kakao Tools), 위젯, 폴백, 데이터 카운트.
-- `docs/prd/README.md` 진행 상태 표 마감.
-- QA 대응 런북 작성 (`docs/qa-runbook.md`): 로그 확인 방법(R6 로깅 필드), 재배포 절차, WIDGET_ENABLED 토글, 예상 문의 유형별 대응.
+- ~~README 갱신~~ — 2026-08-15 완료. 본선 무대를 Kakao Tools로 바꿔 적고 원샷 강건성 원칙을 밝혔다. 위젯·폴백 절을 새로 넣고 데이터 카운트를 현행값(품목 324, answer case 418, 수수료 18곳 2,025행)으로 맞췄다.
+- ~~`docs/prd/README.md` 진행 상태 표 마감~~ — 2026-08-15 완료. 4a를 완료로, 4b를 "R1~R3 완료, R4만 남음"으로 갱신했다.
+- ~~QA 대응 런북 작성 (`docs/qa-runbook.md`)~~ — 2026-08-15 완료. 30초 초기 점검, 로그 필드 읽는 법, 문의 5유형별 대응, `WIDGET_ENABLED` 토글, 수정·배포 절차, 건드리면 안 되는 것.
 
 ### R4. 마감 게이트
 
@@ -68,13 +68,13 @@ Kakao Tools Preview에서 실사용 시나리오를 돌려 **툴 호출률과 �
 
 1. 25개 시나리오 중 의도 발화의 툴 호출률 ≥ 80%, 비의도 발화 과호출 0.
 2. 오답/무용답 시나리오 0 (폴백 포함 모든 응답이 "다음 행동이 가능한" 답).
-3. R3 문서 4종 완료 — README, `docs/prd/README.md` 진행 상태 표, `docs/qa-runbook.md`, `docs/preview-test-results-<날짜>.md`(p99 측정 기록 포함).
+3. R3 문서 4종 완료 — README, `docs/prd/README.md` 진행 상태 표, `docs/qa-runbook.md`, p99 측정 기록(`docs/deploy-verification-2026-08-15.md`에 들어갔다. 당초 `preview-test-results-<날짜>.md`를 예정했으나 측정이 배포 검증과 같이 돌아 그쪽에 실렸다).
 4. 최종 상태가 본선 서버에 배포·확인됨.
 
 ## 완료 체크리스트
 
-- [ ] 4a 배포·연결 검증 (재배포 → endpoint → Preview 툴콜·위젯)
-- [ ] R1 매트릭스 작성·실행·기록
-- [ ] R2 튜닝 루프 (측정치 개선 기록)
-- [ ] R3 회귀·문서·런북
-- [ ] R4 마감 게이트 통과
+- [x] 4a 배포·연결 검증 (재배포 → endpoint → Preview 툴콜·위젯)
+- [x] R1 매트릭스 작성·실행·기록 — 30개 시나리오, `docs/preview-test-plan.jsonl`
+- [x] R2 튜닝 루프 — 오라우팅·카테고리어 과매칭·광역 임의 확정 3건을 잡아 배포로 검증
+- [x] R3 회귀·문서·런북 — README, 진행 상태 표, `qa-runbook.md`, p99 측정 기록
+- [ ] R4 마감 게이트 통과 (8/21 기능 변경 마감 → 8/23 최종 배포·재확인 → 8/24~26 QA)
