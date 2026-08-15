@@ -250,7 +250,7 @@ const SEQUENCE_COLUMN = /^(연번|순번|번호)$/;
 const UNIT_NOTE = /^\(\s*(단위\s*[:：][^)]*|원)\s*\)$/;
 /** 머리글 아래 따로 한 줄로 붙는 조문 참조. `(제29조제1항제2호 관련)` */
 const ARTICLE_REF = /^\(.*관련\s*\)$/;
-/** 머리글에서 열 이름 줄까지 훑을 최대 줄 수. 실측 최대는 광진구 3줄이다. */
+/** 머리글과 열 이름 줄 사이에 낀 잡음을 몇 줄까지 건너뛸지. 실측 최대는 광진구 3줄이다. */
 const MAX_HEADER_GAP = 6;
 
 /** 머리글과 열 이름 줄 사이에 끼는 줄인가. */
@@ -311,11 +311,14 @@ function readColumns(lines, startIndex) {
 function parseFeeRows(lines, startIndex) {
   const { columns, nextIndex } = readColumns(lines, startIndex);
   const feeIndex = columns.findIndex((column) => FEE_COLUMN.test(column));
-  const hasSequence = columns.some((column) => SEQUENCE_COLUMN.test(column));
+  const sequenceIndex = columns.findIndex((column) => SEQUENCE_COLUMN.test(column));
+  const hasSequence = sequenceIndex >= 0;
 
   const rows = [];
   let pending = [];
   let currentItem = null;
+  // 연번으로 걸러낸 값의 최대치. 아래 가드가 실제로 어디까지 버텼는지 본다.
+  let maxSequence = 0;
   // 금액 바로 뒤 토큰의 분포. 꼬리 열 판정에 쓰며, 표를 실제로 훑는 이 루프
   // 안에서 모아야 표 바깥(부칙·묶음 파일의 다른 별표) 토큰이 섞이지 않는다.
   const trailingCounts = new Map();
@@ -332,9 +335,16 @@ function parseFeeRows(lines, startIndex) {
     // 연번 열이 없어 해당 없다).
     //
     // 순번 카운터로 맞춰보는 방법은 병합 셀 하나에 어긋나면 복구되지 않는다.
-    // 위치를 쓴다 — 연번은 행의 첫 칸이라 직전 금액에서 pending을 비운 직후에만
-    // 온다. 반대로 금액은 행의 마지막이라 그 자리에 올 수 없다.
+    // 위치를 쓴다 — 직전 금액에서 pending을 비운 직후 자리에는 금액이 올 수
+    // 없다(금액은 행의 마지막이다). 그래서 그 자리의 맨숫자는 연번으로 본다.
+    //
+    // 다만 이 자리 판정이 성립하려면 연번이 행의 첫 칸이어야 한다. 종로·강북은
+    // 그렇지만(`연번`·`순번`이 0번 열) 은평·영등포는 그 앞에 `유형별`이 있어
+    // 연번이 1번 열이다. 저 둘은 유형이 병합돼 안 나오는 대다수 행에서만
+    // 맞고, 새 유형 그룹이 열리는 행은 pending에 유형명이 이미 쌓여 있어
+    // 가드를 빠져나간다. 루프 뒤에서 그 구멍을 따로 막는다.
     if (hasSequence && pending.length === 0 && /^\d{1,4}$/.test(token)) {
+      maxSequence = Math.max(maxSequence, Number(token));
       pending.push(token); // rawGroup에는 남긴다. 아래 labels 필터가 후보에서 뺀다.
       continue;
     }
@@ -373,6 +383,19 @@ function parseFeeRows(lines, startIndex) {
       currentItem = itemName;
     }
     pending = [];
+  }
+
+  // 연번이 첫 칸이 아닌 표(은평 `유형별`, 영등포 `유형` 다음에 온다)에서는 위
+  // 가드가 새 그룹이 열리는 행을 놓친다. 연번이 500을 넘기 전까지는 parseAmount가
+  // 걸러주니 새어 나가도 무해하지만, 넘는 순간부터는 가짜 행과 한 칸씩 밀린
+  // 품명·규격이 섞인 그럴듯한 오답이 된다. 조용히 내보내느니 형태 미지원으로
+  // 보고한다 — 지금 대상 중 연번 열이 있는 넷은 최대 324라 걸리지 않는다.
+  if (sequenceIndex > 0 && maxSequence >= 500) {
+    return {
+      rows: [],
+      columns,
+      unsupportedForm: `연번이 첫 칸이 아닌데(${sequenceIndex}번 열) ${maxSequence}까지 올라간다 — 금액과 구분되지 않는다`,
+    };
   }
 
   // 금액 뒤에 `비고`·`변경사항` 열이 더 있으면 금액 다음 토큰이 다음 행의
