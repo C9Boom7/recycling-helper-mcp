@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { tokenizeQuery } from "./korean/query-tokenizer.js";
 
 export type Confidence = "high" | "medium" | "low";
 export type SourceType = "official_guidance" | "local_guidance" | "law" | "safety_guidance" | "manual_review";
@@ -277,6 +278,11 @@ function isDisposalCategoryQuery(query: string): boolean {
 }
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
+// 짧은 별칭이 독립 낱말로 걸렸을 때의 점수 = 이 값 + 별칭 길이. 길이를 더하는 건
+// 질의 토큰에 조사를 지나쳐 깎은 형태가 섞여 들어오기 때문이다 — `요지는요?`는
+// `요지`(이쑤시개)와 `요`(이불)를 동시에 물고, 둘이 동점이면 `rankMatches`의 가나다
+// 순서가 이불을 뽑는다. 긴 별칭이 더 많은 글자를 설명하므로 그쪽을 믿는다.
+const SHORT_ALIAS_STANDALONE_BASE_SCORE = 77;
 const HIGH_CONFIDENCE_SCORE = 88;
 const MIN_MATCH_SCORE = 35;
 const MAX_AMBIGUOUS_CANDIDATES = 7;
@@ -301,10 +307,21 @@ const FUZZY_JAMO_STRONG_SIMILARITY = 0.85;
 const FUZZY_JAMO_MIN_SIMILARITY = 0.7;
 const SHORT_ALIAS_PARTICLE_SUFFIXES = ["으로", "은", "는", "이", "가", "을", "를", "에", "도", "만", "야", "요", "죠", "지", "로"];
 
+/** 품목명·별칭 쪽. 이건 우리가 쓴 데이터라 낱말 경계가 이미 띄어쓰기로 드러나 있다. */
 function normalizedTokens(value: string): string[] {
   return value
     .toLowerCase()
     .split(/[^\p{L}\p{N}]+/gu)
+    .map((token) => normalizeText(token))
+    .filter(Boolean);
+}
+
+/**
+ * 질의 쪽. 사용자가 쓴 문장이라 조사가 낱말에 붙어 들어오므로 낱말 경계 판단을
+ * `query-tokenizer`에 맡긴다 — 형태소 분석기를 끼울 수 있는 지점이다.
+ */
+function queryTokens(query: string): string[] {
+  return tokenizeQuery(query)
     .map((token) => normalizeText(token))
     .filter(Boolean);
 }
@@ -319,8 +336,9 @@ function stripShortAliasParticle(token: string): string {
   return token;
 }
 
+// 질의 토큰에는 조사를 떼어 가며 나온 중간 형태가 이미 다 들어 있다(`queryTokens`).
 function hasStandaloneShortAliasMatch(queryTokens: string[], normalizedName: string): boolean {
-  return queryTokens.some((token) => token === normalizedName || stripShortAliasParticle(token) === normalizedName);
+  return queryTokens.includes(normalizedName);
 }
 
 const HANGUL_CHOSEONG = ["ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
@@ -397,7 +415,10 @@ const indexedItems: IndexedItem[] = wasteItems.map((item) => ({
 type ScoredQuery = {
   raw: string;
   normalized: string;
+  /** 조사를 떼어 가며 나온 중간 형태까지 다 들어 있다 — 낱말 수를 세는 용도가 아니다. */
   tokens: string[];
+  /** 띄어쓰기·문장부호로만 자른 낱말 수. 질의가 한 낱말짜리인지 판단할 때 쓴다. */
+  wordCount: number;
 };
 
 type FuzzyQuery = {
@@ -406,12 +427,11 @@ type FuzzyQuery = {
   isBareItemName: boolean;
 };
 
-function buildFuzzyQuery({ normalized, tokens }: ScoredQuery): FuzzyQuery {
+function buildFuzzyQuery({ normalized, tokens, wordCount }: ScoredQuery): FuzzyQuery {
   const variants = new Set<string>([normalized]);
   for (const token of tokens) {
     if (token.length <= 1) continue;
     variants.add(token);
-    variants.add(stripShortAliasParticle(token));
   }
 
   return {
@@ -420,8 +440,9 @@ function buildFuzzyQuery({ normalized, tokens }: ScoredQuery): FuzzyQuery {
     // The weak band only fires on a bare item name. In a longer query a generic
     // compound token sits ~0.7 from unrelated items ("약과 포장지"↔"약 포장재"), and
     // the not_found material fallback answers those better than a coin-flip
-    // suggestion would.
-    isBareItemName: tokens.length <= 1,
+    // suggestion would. `tokens`가 아니라 `wordCount`로 센다 — `tokens`에는 조사를
+    // 뗀 중간 형태가 섞여 있어서 "카메래는" 한 낱말도 2개로 잡힌다.
+    isBareItemName: wordCount <= 1,
   };
 }
 
@@ -546,7 +567,7 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
         score = 20;
         kind = "target_mention";
       } else if (isShortAlias) {
-        score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? 78 : 0;
+        score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? SHORT_ALIAS_STANDALONE_BASE_SCORE + normalizedName.length : 0;
         kind = "short_alias_standalone";
       } else {
         const startsWithName = normalizedQuery.startsWith(normalizedName);
@@ -623,7 +644,12 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
     return [];
   }
 
-  const scoredQuery: ScoredQuery = { raw: query, normalized: normalizedQuery, tokens: normalizedTokens(query) };
+  const scoredQuery: ScoredQuery = {
+    raw: query,
+    normalized: normalizedQuery,
+    tokens: queryTokens(query),
+    wordCount: normalizedTokens(query).length,
+  };
   const named = rankMatches(indexedItems.map((indexed) => scoreItemNames(scoredQuery, indexed)));
   // Modifier hits alone do not count as a name hit: "에어컨" reaching only
   // "에어컨 리모컨" has still failed to name anything, so the typo tier below
