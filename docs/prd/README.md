@@ -66,6 +66,8 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 3. **Chrome에 카카오/ChatGPT 계정 로그인 유지** — Kakao Tools Preview 발화 테스트는 Claude가 Chrome 확장으로 대행한다.
 4. 그 외 데이터 모델링 등 급하지 않은 결정은 기존 규칙대로 `docs/data-decision-backlog.md`에 쌓고 묶어서 확인한다.
 
+마감 대비 이득이 작거나 프리징 때문에 이번 사이클에 넣을 수 없는 항목은 [docs/post-finals-backlog.md](../post-finals-backlog.md)에 모은다.
+
 ## 본선 규격 요약 (모든 Phase 공통 준수사항)
 
 - 툴 이름: 영문/숫자/`_`/`-`만, 128자 이내, 중복 금지. Kakao가 MCP 식별자를 prefix로 자동 부착하므로 이름에 서비스명 불필요.
