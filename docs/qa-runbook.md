@@ -30,9 +30,81 @@ curl -sS https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/health
 - 두 주소가 같은데 `items` 수가 최신 main과 다르다 → **재배포 누락이다.** 최신 main의 품목 수와 대조한다
   (`node -e "console.log(require('./src/data/waste-items.json').length)"`).
 
-"고쳤는데 왜 그대로냐"는 문의는 위 둘 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
+**`items`만으로는 부족하다. 데이터를 안 건드린 배포는 이 숫자가 그대로다.** 매칭 규칙처럼 코드만 바뀐 배포는
+품목 수가 똑같아서 옛 빌드가 떠 있어도 "정상"으로 읽힌다. 2026-08-15에 조사 처리 개선(PR #27)을 머지했을 때가 그랬다.
+재배포 대상의 `items`가 배포 전에도 324, 배포 후에도 324여서 이 숫자로는 재배포가 됐는지 알 길이 없었다.
+(같은 날 등록 주소가 130이던 것은 바로 위에 적은 등록 불일치이고, 이 문제와는 별개다.)
+그래서 기능 프로브를 한 번 더 친다. **여기서도 주소를 둘 다 찍는다.**
 
-품목 수가 맞으면 문제를 재현한다.
+```bash
+PROBE='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}'
+# 재배포 대상
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" \
+  https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp
+# 운영 등록이 가리키는 주소
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" \
+  https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp
+```
+
+**응답에 `칫솔`이 보이는지로 판정하면 안 된다.** 못 찾았을 때의 폴백 문구가 질의를 그대로 되풀이해서
+(`입력한 품목 "칫솔은요?"을(를) ... 확실히 찾지 못했습니다`) 구버전 응답에도 `칫솔`이 들어 있다.
+눈으로 훑거나 `grep 칫솔`로 보면 옛 빌드를 최신으로 읽는다 — 이 절이 막으려는 바로 그 오진이다.
+
+### 프로브를 고르는 법 — 이게 본체다
+
+아래 명령은 PR #27용 예시일 뿐이다. **매번 새로 골라야 하고, 고를 때 지켜야 할 것이 셋이다.**
+
+1. **두 빌드의 응답이 실제로 갈리는 질의여야 한다.** 그리고 **갈리는 지점을 문자열로 적어 둔다.** 아래 예시는
+   "구버전은 폴백, 최신은 카드"라 `widget` 유무로 갈리지만, 수수료 표기나 문구를 고친 배포는 **양쪽 다 카드**라
+   `widget`으로는 안 갈린다. 그런 배포는 바뀐 문구 자체를 찾아야 한다(예: `수수료 4,000원~8,000원`).
+2. **판정 문자열을 배포 전에 실제로 확인한다.** 고친 브랜치를 로컬에서 띄워 한 번, 배포 전 서버에 한 번 쳐 보고
+   두 응답이 정말 다른지 본다. 이걸 안 하면 "안 갈리는 프로브"를 근거로 삼게 된다.
+3. **되묻기 경로는 문구가 다르다.** not_found는 `확실히 찾지 못했습니다`, 되묻기는 `정확히 찾지 못했습니다`다
+   (`src/server.ts`). 프로브의 이전 상태가 되묻기였다면 이 문자열로 잡아야 한다.
+
+`WIDGET_ENABLED=false`로 돌려놓은 상태라면 확정 매칭도 텍스트로 나가므로 `widget` 판정은 쓸 수 없다.
+4절에서 위젯을 끈 채 운영 중이면 프로브도 텍스트 기준으로 다시 잡는다.
+
+### 예시 — PR #27 (조사 처리) 기준
+
+확정 매칭만 위젯 카드로 나가므로 `widget`이라는 낱말이 신호다
+(응답 안에서는 `{\"widget\":...`로 이스케이프돼 있어 따옴표까지 넣어 찾으면 안 걸린다).
+
+```bash
+PROBE='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}'
+for H in https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io \
+         https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io; do
+  R=$(curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" $H/mcp)
+  printf "%-60s " "$H"
+  if   echo "$R" | grep -q 'Not Acceptable';        then echo "406 — JSON-only 미지원 빌드"
+  elif echo "$R" | grep -q '찾지 못했습니다';        then echo "구버전 (폴백 또는 되묻기)"
+  elif echo "$R" | grep -q 'widget';                 then echo "최신 (카드)"
+  else echo "판정 불가 — 응답 원문을 직접 본다"; fi
+done
+```
+
+`칫솔은요?`는 회귀 케이스로 고정돼 있지 않다. 칫솔이 들어간 별칭이 하나 더 늘면 되묻기로 바뀌어
+**멀쩡한 빌드에 "구버전" 판정이 난다** — 그때도 `pnpm local:test`는 초록이다. 판정이 이상하면 프로브부터 의심한다.
+
+한쪽 주소만 최신으로 나오면 `items`가 같더라도 등록 불일치다 — 위의 등록 불일치 항목으로 돌아간다.
+
+`Not Acceptable: Client must accept both application/json and text/event-stream` 오류가 돌아오는 경우도 있다.
+**JSON-only `tools/call`을 지원하기 전 빌드라는 뜻이다.** 이 지원은 Phase 0 코드 리뷰 후속으로 들어갔으므로,
+"Phase 0 이전"이라고 단정하지는 마라 — `items`가 130인 빌드 중에도 이 경로가 되는 것과 안 되는 것이 갈린다
+([playmcp-in-kc.md](playmcp-in-kc.md)의 `a696026` 검증 이력). 어느 커밋인지는 이 신호만으로 못 짚는다.
+
+**어느 주소에서 났는지가 다음 행동을 가른다.**
+
+- 운영 등록 주소에서 났다 → 등록 불일치다. 등록 불일치 항목으로 간다. (2026-08-15 기준이 이 상태다.)
+- **재배포 대상에서 났다 → 등록 문제가 아니라 우리 서버에 옛 빌드가 떠 있는 것이다.** 롤백이나 배포 실패를 의심하고
+  PlayMCP in KC 콘솔에서 다시 배포한다. 이쪽을 등록 문제로 오해하면 엉뚱한 데를 파게 된다.
+
+**런타임을 고칠 때마다 이 프로브도 갱신한다.** 배포 여부를 가르는 기준은 "그 배포에서만 달라지는 응답"이지
+품목 수가 아니다. 데이터만 바뀐 배포라면 `items`로 충분하다.
+
+"고쳤는데 왜 그대로냐"는 문의는 위 셋 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
+
+`items`와 기능 프로브가 모두 최신 빌드를 가리키면 그때 문제를 재현한다.
 
 ```bash
 curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
@@ -127,7 +199,10 @@ WIDGET_ENABLED=false
 3. 브랜치를 푸시하고 PR을 연다.
 4. **사용자에게 머지를 요청한다. 머지가 배포 게이트다.**
 5. 머지 후 사용자가 PlayMCP in KC에서 "재배포"를 누른다. Status가 `Active`가 될 때까지 기다린다.
-6. `/health`의 `items`로 반영을 확인한다. 툴 호출까지 재현해 본다.
+6. 반영을 확인한다. `/health`의 `items`는 데이터를 고쳤을 때만 움직이므로, **코드만 고쳤다면 1절의 기능 프로브가 유일한 근거다.**
+   1절의 "프로브를 고르는 법" 셋을 그대로 따른다 — 이번 수정으로 갈리는 질의를 고르고, **갈리는 문자열까지 정하고,
+   배포 전에 두 응답이 실제로 다른지 확인한다.** 그리고 재배포 대상과 운영 등록 주소를 둘 다 친다.
+   그 다음 문의받은 상황을 툴 호출로 재현해 본다.
 
 **재배포 횟수를 아끼려면 수정을 묶어서 내보낸다.** 하루 1~2회가 적당하다.
 
