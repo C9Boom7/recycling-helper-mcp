@@ -1,7 +1,8 @@
 /**
  * 자치법규 별표 → `src/data/bulky-waste-fees.json` 인제스트 (Phase 6 R3).
  *
- * Phase 6 담당 10곳만 대상으로 한다. 용산·노원·강서·관악은 공공데이터포털
+ * Phase 6 담당 18곳만 대상으로 한다(2026-08-16에 서울 신규 8개 구를 더했다).
+ * 용산·노원·강서·관악은 공공데이터포털
  * 표준데이터 트랙이 `scripts/import-bulky-fees.ts`로 넣고, 골든셋 4곳
  * (강남·서초·송파·마포)은 기존 수기 데이터를 그대로 둔다.
  *
@@ -50,7 +51,7 @@ const GROUPS_PATH = "src/data/disposal-groups.json";
  */
 const MAX_FEE_ROWS = 12;
 
-/** Phase 6 담당 10곳. 여기 없는 지역은 인자로 줘도 받지 않는다. */
+/** Phase 6 담당 18곳. 여기 없는 지역은 인자로 줘도 받지 않는다. */
 const TARGETS = [
   "seongnam_si",
   "jongno_gu",
@@ -263,6 +264,7 @@ if (unknown.length > 0) {
 const targets = requested.length > 0 ? requested : TARGETS;
 const regions = JSON.parse(readFileSync(REGIONS_PATH, "utf8")) as RegionalPolicyData[];
 const misalignedRegions: string[] = [];
+const tableless: string[] = [];
 const existing = JSON.parse(readFileSync(FEES_PATH, "utf8")) as BulkyWasteFeeSchedule[];
 
 const built: BulkyWasteFeeSchedule[] = [];
@@ -283,8 +285,14 @@ for (const regionId of targets) {
     continue;
   }
   if (!dump.law || !dump.attachment || dump.rows.length === 0) {
+    // 표가 없는 지역이 전체 배치를 세우면 안 된다. 성동·양천이 그 경우다 —
+    // `fees:fetch`는 못 찾아도 덤프 파일을 쓰기 때문에, 예전 코드는 대상 목록에
+    // 이 둘이 들어온 순간 `pnpm fees:fetch && pnpm import:ordinance` 재현 흐름이
+    // 통째로 죽고 수수료 파일이 아예 안 써졌다. 콕 집어 요청했을 때만 세운다.
     console.error(`${regionId}: 조례에서 행을 뽑지 못했다 (${dump.errors.join(" / ") || "사유 없음"})`);
-    process.exit(1);
+    if (requested.length === 1) process.exit(1);
+    tableless.push(regionId);
+    continue;
   }
 
   const region = regions.find((item) => item.id === regionId);
@@ -415,12 +423,22 @@ for (const regionId of targets) {
 }
 
 if (built.length === 0) {
-  console.error(`\n넣을 지역이 없다 — 먼저 pnpm fees:fetch [regionId...]로 원문을 받아라.`);
+  if (misalignedRegions.length > 0 || tableless.length > 0) {
+    console.error(
+      `\n넣을 지역이 없다 — 표의 열 구성이 어긋난 지역: ${misalignedRegions.join(", ") || "없음"} / ` +
+        `표를 못 찾은 지역: ${tableless.join(", ") || "없음"}. 수집 문제가 아니라 파싱 문제다.`,
+    );
+  } else {
+    console.error(`\n넣을 지역이 없다 — 먼저 pnpm fees:fetch [regionId...]로 원문을 받아라.`);
+  }
   process.exit(1);
 }
 
 // 다른 트랙이 넣은 지역(골든셋 4곳, 표준데이터 4곳)은 건드리지 않는다.
-const managed = new Set(built.map((schedule) => schedule.regionId));
+// 거부·실패한 지역도 `managed`에 넣는다. 안 넣으면 예전에 잘 들어갔던 지역이
+// 나중에 어긋났을 때 낡은 행을 그대로 달고 있으면서 실행 로그에는 "넣지 않은
+// 지역"으로 찍힌다 — 데이터와 보고가 어긋나는 최악의 조합이다.
+const managed = new Set([...built.map((schedule) => schedule.regionId), ...misalignedRegions, ...tableless]);
 const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)), ...built];
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((n, s) => n + s.fees.length, 0)}행`);
@@ -428,3 +446,4 @@ if (missing.length > 0) console.log(`원문이 없어 건너뛴 지역: ${missin
 if (misalignedRegions.length > 0) {
   console.log(`표의 열 구성이 어긋나 넣지 않은 지역: ${misalignedRegions.join(", ")}`);
 }
+if (tableless.length > 0) console.log(`조례에서 표를 못 찾아 넣지 않은 지역: ${tableless.join(", ")}`);
