@@ -9,6 +9,8 @@ import { readFileSync } from "node:fs";
  */
 const regionPolicyPath = new URL("../src/data/region-policies.json", import.meta.url);
 const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8"));
+const bulkyWasteFeesPath = new URL("../src/data/bulky-waste-fees.json", import.meta.url);
+const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
 
 // 다수 지자체 사이트가 기본 fetch UA를 막고 403이나 빈 응답을 준다. 브라우저
 // UA를 쓰지 않으면 멀쩡한 링크가 전부 죽은 것으로 보고된다.
@@ -31,6 +33,16 @@ function collectTargets() {
     for (const [index, source] of (region.sources ?? []).entries()) {
       if (source.url) targets.push({ regionId: region.id, field: `sources[${index}].url`, url: source.url });
     }
+  }
+
+  // 수수료표도 자기 몫의 URL을 갖고 있고, 답변에 신청·수수료 링크로 나가는 건
+  // 이쪽 값이다(`formatBulkyWasteFeeLines`). 정책 쪽만 훑으면 `full` 티어 4곳처럼
+  // 정책에 `feeUrl`이 없는 지역의 링크는 아무도 두드리지 않는다 — 죽어도 100/100이 나온다.
+  for (const schedule of bulkyWasteFeeSchedules) {
+    const { regionId, applicationUrl, feeUrl, source } = schedule;
+    if (applicationUrl) targets.push({ regionId, field: "fees.applicationUrl", url: applicationUrl });
+    if (feeUrl) targets.push({ regionId, field: "fees.feeUrl", url: feeUrl });
+    if (source?.url) targets.push({ regionId, field: "fees.source.url", url: source.url });
   }
 
   // 같은 URL이 여러 지역·필드에 걸리면 한 번만 두드린다.
