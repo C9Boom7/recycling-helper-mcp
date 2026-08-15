@@ -3739,7 +3739,8 @@
       "책상의자",
       "식탁의자",
       "컴퓨터 의자",
-      "낡은 의자"
+      "낡은 의자",
+      "화장대 의자"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -7826,7 +7827,10 @@
       "폐토너",
       "토너 가루",
       "누출된 토너 카트리지",
-      "프린터 잉크 카트리지"
+      "프린터 잉크 카트리지",
+      "복사기 토너",
+      "복사기 카트리지",
+      "복사기 토너 카트리지"
     ],
     "category": "office_supplies_mixed",
     "disposalType": "general_or_takeback_if_not_empty",
