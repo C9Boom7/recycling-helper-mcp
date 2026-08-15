@@ -599,6 +599,12 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
     if (schedule.source.url !== undefined && !/^https?:\/\//.test(schedule.source.url)) {
       errors.push(`${prefix}.source.url must start with http:// or https://`);
     }
+    // 조례를 근거로 든 수수료표는 조례 링크가 있어야 한다. 링크가 없으면 금액을
+    // 되짚을 방법이 없고, 개정 여부도 확인할 수 없다. 자치법규 ETL로 들어오는
+    // 행이라 사람이 손으로 채울 일이 없으므로 error로 막는다.
+    if (schedule.source.sourceType === "law" && !isNonEmptyString(schedule.source.url)) {
+      errors.push(`${prefix}.source.url is required when sourceType is law`);
+    }
     if (!isNonEmptyString(schedule.source.basis)) warnings.push(`${prefix}.source.basis should explain what the source supports`);
   }
 
@@ -617,8 +623,25 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
   }
 
   if (Array.isArray(schedule.fees) && schedule.fees.length > 0) {
+    // 같은 (itemId, itemName, spec)이 두 번 나오면 한 규격에 금액이 둘 붙는다는
+    // 뜻이라 답변에 같은 줄이 값만 다르게 두 번 찍힌다.
+    //
+    // 키에서 itemName을 빼면 안 된다. 조례·고시의 서로 다른 품목이 우리 itemId
+    // 하나로 모이면서 spec 문구까지 같아지는 경우가 실제로 있다 — 마포구 chair
+    // `1인당`(의자(바퀴) 4,000원 / 좌식의자·접의자 2,000원 / 쿠션 의자 2,000원),
+    // 관악구 bed_frame `1인용`(접이식 침대 7,000원 / 돌+옥+황토 침대 20,000원).
+    // `formatBulkyWasteFeeLines`가 찍는 줄이 `{itemName} {spec}: {금액}`이라
+    // 이런 행은 화면에서 서로 다른 줄로 보인다 — 중복이 아니다.
+    const seenFeeKeys = new Map();
     for (const [feeIndex, fee] of schedule.fees.entries()) {
       const feePrefix = `${prefix}.fees[${feeIndex}]`;
+      const feeKey = `${fee.itemId}|${fee.itemName}|${fee.spec}`;
+      const firstIndex = seenFeeKeys.get(feeKey);
+      if (firstIndex !== undefined) {
+        errors.push(`${feePrefix} duplicates fees[${firstIndex}] (${fee.itemId} / ${fee.itemName} / ${fee.spec})`);
+      } else {
+        seenFeeKeys.set(feeKey, feeIndex);
+      }
       if (!isNonEmptyString(fee.itemId)) errors.push(`${feePrefix}.itemId must be a non-empty string`);
       if (isNonEmptyString(fee.itemId) && !ids.has(fee.itemId)) errors.push(`${feePrefix}.itemId references unknown item ${fee.itemId}`);
       if (!isNonEmptyString(fee.category)) errors.push(`${feePrefix}.category must be a non-empty string`);
