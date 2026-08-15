@@ -205,7 +205,7 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
   { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
   { category: "paper_cardboard", pattern: /종이|박스|상자|골판지|신문|서류|공책/u },
-  { category: "can_metal", pattern: /캔|깡통|고철|금속|알루미늄|스텐|스테인리스|양은/u },
+  { category: "can_metal", pattern: /캔|깡통|고철|금속|철|쇠|알루미늄|스텐|스테인리스|양은/u },
   { category: "glass_bottle", pattern: /유리/u },
   { category: "plastic_container", pattern: /플라스틱|페트|트레이|아크릴/u },
   { category: "textile", pattern: /옷|의류|섬유|이불|담요|커튼|수건|헝겊/u },
@@ -275,6 +275,38 @@ const DISPOSAL_CATEGORY_QUERIES = new Set(
 
 function isDisposalCategoryQuery(query: string): boolean {
   return DISPOSAL_CATEGORY_QUERIES.has(normalizeText(query));
+}
+
+/**
+ * 재질만 가리키는 낱말도 품목이 아니다. 카테고리어와 같은 이유로 막지만 근거는 조금 다르다 —
+ * 카테고리어는 문장형 별칭에 얹혀 걸렸고, 이쪽은 **별칭 안에 재질 이름이 들어 있다는 이유로**
+ * 엉뚱한 품목이 확정된다.
+ *
+ * `종이`가 `코팅지`(별칭 "코팅 종이", generic_fragment 91점)로 확정되던 것이 그 예다.
+ * 종이를 물은 사람에게 "코팅지는 재활용이 안 됩니다" 카드가 나갔다. 차점이 `종이호일`(87점,
+ * "기름종이")이라 둘 중 어느 쪽이 이겨도 오답이다. `비닐`은 `비닐류 포장재`와 `뽁뽁이`가
+ * 88점 동점이라 사실상 동전던지기였다.
+ *
+ * 확정하지 않고 not_found로 보내면 Phase 1의 재질 폴백이 `material-guidelines.json`의
+ * 원칙으로 답한다. 실제로 "종이 어떻게 버려?"라는 **문장**은 이미 그 경로로 제대로 답하고
+ * 있었다 — 답을 갖고 있으면서 명사 하나만 넘어올 때 엉뚱한 카드가 그걸 가로채고 있던 셈이다.
+ * 호스트 LLM은 보통 명사만 뽑아 넘기므로 실사용 경로는 그쪽이다.
+ *
+ * **`플라스틱`·`유리`·`나무`·`천`은 일부러 넣지 않았다.** 이들은 지금 되묻기로 착지하는데,
+ * 되묻기가 더 나은 답이다 — 같은 유리라도 유리병은 재활용, 깨진 유리는 신문지에 싸서
+ * 종량제·불연성이라 배출법이 갈린다. 재질 원칙 하나로 답하면 둘 중 하나는 틀린다.
+ * 여기 넣는 기준은 "재질어인가"가 아니라 **"재질 안내가 지금 답보다 나은가"**다.
+ *
+ * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 exact로 먼저 걸리므로 영향이 없다.
+ */
+const MATERIAL_ONLY_QUERIES = new Set(
+  ["종이", "비닐", "고무", "금속", "철", "쇠", "목재", "섬유", "가죽", "알루미늄", "스텐", "스테인리스", "헝겊"].map(
+    normalizeText,
+  ),
+);
+
+function isMaterialOnlyQuery(query: string): boolean {
+  return MATERIAL_ONLY_QUERIES.has(normalizeText(query));
 }
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
@@ -640,7 +672,7 @@ function rankMatches(matches: WasteMatch[]): WasteMatch[] {
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
   const normalizedQuery = normalizeText(query);
-  if (!normalizedQuery || isDisposalCategoryQuery(query)) {
+  if (!normalizedQuery || isDisposalCategoryQuery(query) || isMaterialOnlyQuery(query)) {
     return [];
   }
 
