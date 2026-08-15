@@ -781,6 +781,16 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy): string | undefine
   return undefined;
 }
 
+const MEDICINE_ITEM_IDS = new Set(["medicine"]);
+const BATTERY_LAMP_ITEM_IDS = new Set(["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"]);
+
+function collectionLines(label: string, method: string[] | undefined, expand: boolean): string[] {
+  const filled = (method ?? []).filter((line) => typeof line === "string" && line.trim().length > 0);
+  if (filled.length === 0) return [];
+  const shown = expand ? filled : filled.slice(0, 1);
+  return shown.map((line, index) => (index === 0 ? `- ${label}: ${line}` : `  - ${line}`));
+}
+
 /**
  * 물어본 품목이 걸린 수거함만 전부 펼친다.
  *
@@ -794,17 +804,12 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy): string | undefine
  * 물었는데 형광등 예외까지 다 받을 이유는 없으므로, **물어본 품목이 속한 쪽만**
  * 펼치고 나머지는 첫 줄로 둔다. 품목을 안 물었으면 둘 다 첫 줄만 — 예전 동작과
  * 같아서 지역 개요 응답 크기는 그대로다.
+ *
+ * 주의: `method`의 모든 줄은 사용자에게 그대로 나간다. 예전에는 둘째 줄부터가
+ * 죽어 있어서 작성 메모("보수적 안내를 유지합니다" 같은 우리 쪽 서술)를 적어둔
+ * 지역이 있었는데, 이 함수가 열리면서 전부 사용자 문장이 됐다. 지역을 추가할
+ * 때 `method`에 작업 메모를 남기지 않는다.
  */
-const MEDICINE_ITEM_IDS = new Set(["medicine"]);
-const BATTERY_LAMP_ITEM_IDS = new Set(["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"]);
-
-function collectionLines(label: string, method: string[] | undefined, expand: boolean): string[] {
-  const filled = (method ?? []).filter((line) => typeof line === "string" && line.trim().length > 0);
-  if (filled.length === 0) return [];
-  const shown = expand ? filled : filled.slice(0, 1);
-  return shown.map((line, index) => (index === 0 ? `- ${label}: ${line}` : `  - ${line}`));
-}
-
 function regionSpecialCollectionLines(region: RegionalPolicyData, item?: WasteItem): string[] {
   const { medicine, batteryAndFluorescentLamp } = region.specialCollections ?? {};
   return [

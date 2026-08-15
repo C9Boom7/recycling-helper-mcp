@@ -984,6 +984,21 @@
     ]
   },
   {
+    "id": "region_special_lines_no_authoring_notes_gangnam",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "하수구나 변기에 버리거나 일반쓰레기에 섞지 않습니다"
+    ],
+    "expectedTextExcludes": [
+      "보수적 안내를 유지",
+      "구조화하지 않았습니다"
+    ]
+  },
+  {
     "id": "region_special_lines_stay_short_without_item",
     "tool": "get_region_disposal_info",
     "arguments": {
