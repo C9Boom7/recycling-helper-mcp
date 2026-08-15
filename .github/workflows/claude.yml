@@ -20,6 +20,16 @@ jobs:
       id-token: write
       actions: read
     steps:
+      # 시크릿이 없으면 액션이 조용히 건너뛰고 job은 초록불로 끝난다. 그 전에 잡는다.
+      - name: 토큰 시크릿 확인
+        env:
+          TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN 시크릿이 없다. 'claude setup-token'으로 발급해 저장소 시크릿에 등록할 것."
+            exit 1
+          fi
+
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1

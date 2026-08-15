@@ -11,6 +11,8 @@ concurrency:
 
 jobs:
   review:
+    # 공개 저장소라 fork PR에는 시크릿이 전달되지 않는다. 같은 저장소 브랜치만 리뷰한다.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -19,6 +21,16 @@ jobs:
       issues: read
       id-token: write
     steps:
+      # 시크릿이 없으면 액션이 조용히 건너뛰고 job은 초록불로 끝난다. 그 전에 잡는다.
+      - name: 토큰 시크릿 확인
+        env:
+          TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN 시크릿이 없다. 'claude setup-token'으로 발급해 저장소 시크릿에 등록할 것."
+            exit 1
+          fi
+
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
