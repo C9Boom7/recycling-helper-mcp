@@ -97,8 +97,10 @@ export function particleStrippedForms(word: string): string[] {
   while (stripped) {
     stripped = false;
     for (const particle of TRAILING_PARTICLES) {
-      // 남는 알맹이가 최소 한 글자는 되어야 한다 — `요`(이불) 같은 한 글자 별칭이
-      // 조사만 남은 껍데기에서 튀어나오면 안 된다.
+      // 알맹이가 한 글자는 남아야 한다. 한 글자까지 깎이는 건 막지 않는다 — `옷은`,
+      // `약이`, `칼도`처럼 한 글자 별칭에 조사가 붙는 게 흔해서다. 대신 지나쳐 깎인
+      // `요지` -> `요`(이불) 같은 게 진짜 별칭을 밀어내지 않도록, 어느 후보를 믿을지는
+      // 부르는 쪽이 별칭 길이로 가린다(`hasStandaloneShortAliasMatch` 호출부).
       if (current.length > particle.length && current.endsWith(particle)) {
         current = current.slice(0, -particle.length);
         forms.push(current);

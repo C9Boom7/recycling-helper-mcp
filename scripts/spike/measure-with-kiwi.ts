@@ -70,15 +70,20 @@ function judge(probe: Probe): { verdict: Verdict; detail: string } {
   return { verdict: "wrong", detail: `${matchedId} (${resolved.match.matchKind}, ${resolved.match.score})` };
 }
 
-type Run = { label: string; results: Map<string, Map<string, { verdict: Verdict; detail: string }>>; elapsedMs: number };
+type Judgement = { query: string; verdict: Verdict; detail: string };
+// 질의 문자열을 키로 쓰면 안 된다. 백로그와 발화 로그는 계속 덧붙는 파일이라 같은
+// 질의가 겹치는 순간 표본이 조용히 줄어든다 — 세트 순서 그대로 배열에 담아 두고
+// 구성 간 비교는 같은 자리끼리 한다.
+type Run = { label: string; results: Map<string, Judgement[]>; elapsedMs: number };
 
 function runAll(label: string): Run {
-  const results = new Map<string, Map<string, { verdict: Verdict; detail: string }>>();
+  const results = new Map<string, Judgement[]>();
   const started = Date.now();
   for (const set of SETS) {
-    const perQuery = new Map<string, { verdict: Verdict; detail: string }>();
-    for (const probe of set.probes) perQuery.set(probe.query, judge(probe));
-    results.set(set.label, perQuery);
+    results.set(
+      set.label,
+      set.probes.map((probe) => ({ query: probe.query, ...judge(probe) })),
+    );
   }
 
   return { label, results, elapsedMs: Date.now() - started };
@@ -87,10 +92,10 @@ function runAll(label: string): Run {
 function summarize(run: Run): void {
   console.log(`\n## ${run.label}  (전체 ${run.elapsedMs}ms)`);
   for (const set of SETS) {
-    const perQuery = run.results.get(set.label)!;
+    const judgements = run.results.get(set.label)!;
     const counts: Record<Verdict, number> = { ok: 0, wrong: 0, ambiguous: 0, not_found: 0 };
-    for (const result of perQuery.values()) counts[result.verdict] += 1;
-    const total = perQuery.size;
+    for (const result of judgements) counts[result.verdict] += 1;
+    const total = judgements.length;
     if (LABELLED.has(set.label)) {
       const rate = ((counts.ok / total) * 100).toFixed(1);
       console.log(
@@ -112,10 +117,10 @@ function diff(before: Run, after: Run, limit = 25): void {
     const fixed: string[] = [];
     const broken: string[] = [];
 
-    for (const [query, beforeResult] of beforeResults) {
-      const afterResult = afterResults.get(query)!;
+    for (const [index, beforeResult] of beforeResults.entries()) {
+      const afterResult = afterResults[index];
       if (beforeResult.verdict === afterResult.verdict && beforeResult.detail === afterResult.detail) continue;
-      const line = `"${query}": ${beforeResult.verdict}(${beforeResult.detail}) -> ${afterResult.verdict}(${afterResult.detail})`;
+      const line = `"${beforeResult.query}": ${beforeResult.verdict}(${beforeResult.detail}) -> ${afterResult.verdict}(${afterResult.detail})`;
 
       if (!LABELLED.has(set.label)) {
         // 라벨이 없으니 개선/악화를 판정하지 않는다. 바뀐 것만 모아 사람에게 넘긴다.

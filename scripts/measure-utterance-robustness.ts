@@ -1,7 +1,7 @@
 /**
  * 보류 발화 세트로 현재 매칭기의 조사·어미 내성을 잰다.
  *
- * 실행: pnpm tsx scripts/spike/measure-utterance-robustness.ts [--verbose]
+ * 실행: pnpm measure:utterances [--verbose]
  */
 import { resolveWasteItem, wasteItems } from "../src/data.ts";
 import { UTTERANCE_TEMPLATES } from "./utterance-templates.ts";
