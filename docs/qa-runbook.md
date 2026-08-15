@@ -30,7 +30,22 @@ curl -sS https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/health
 - 두 주소가 같은데 `items` 수가 최신 main과 다르다 → **재배포 누락이다.** 최신 main의 품목 수와 대조한다
   (`node -e "console.log(require('./src/data/waste-items.json').length)"`).
 
-"고쳤는데 왜 그대로냐"는 문의는 위 둘 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
+**`items`만으로는 부족하다. 데이터를 안 건드린 배포는 이 숫자가 그대로다.** 매칭 규칙처럼 코드만 바뀐 배포는
+품목 수가 똑같아서 옛 빌드가 떠 있어도 "정상"으로 읽힌다. 실제로 2026-08-15에 조사 처리 개선(PR #27)이 머지된 뒤
+`items`는 양쪽 다 324인 채로 배포만 누락된 적이 있다. 그래서 기능 프로브를 한 번 더 친다.
+
+```bash
+curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}' \
+  https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/mcp
+```
+
+`칫솔` 카드가 나오면 조사 처리가 들어간 빌드다. `확실히 찾지 못했습니다`가 나오면 그 이전 빌드다.
+
+**런타임을 고칠 때마다 이 프로브도 갱신한다.** 배포 여부를 가르는 기준은 "그 배포에서만 달라지는 응답"이지
+품목 수가 아니다. 데이터만 바뀐 배포라면 `items`로 충분하다.
+
+"고쳤는데 왜 그대로냐"는 문의는 위 셋 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
 
 품목 수가 맞으면 문제를 재현한다.
 
