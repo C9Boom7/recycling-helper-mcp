@@ -413,43 +413,51 @@
   },
   {
     "region": "서울 중구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "jung_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 성동구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "seongdong_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 동대문구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "dongdaemun_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 중랑구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "jungnang_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 성북구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "seongbuk_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 서대문구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "seodaemun_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 양천구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "yangcheon_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "서울 구로구",
-    "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedRegionId": "guro_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "경기 성남시",

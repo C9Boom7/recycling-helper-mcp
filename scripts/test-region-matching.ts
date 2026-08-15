@@ -28,9 +28,11 @@ const regionEvaluationCases = JSON.parse(
 ) as RegionEvaluationCase[];
 
 /**
- * 동명 자치구 되묻기 회귀. 실데이터에는 아직 같은 이름의 구가 둘 이상 없어서
- * (서울 중구·부산 중구 모두 완결 조건을 못 채워 백로그에 있다) 픽스처로 고정한다.
- * 실데이터 기반 케이스는 그 지역들이 들어오는 배치에서 함께 넣는다.
+ * 동명 자치구 되묻기 회귀. 서울 중구는 실데이터에 들어왔지만 부산·대구·인천 등의
+ * 중구가 아직 없어서, 바로 그 이유로 서울 중구에는 맨 앞 별칭 "중구"를 달지 않았다
+ * (달면 "중구"가 서울 중구로 단독 확정돼 다른 지역 주민에게 틀린 안내가 나간다).
+ * 그래서 되묻기 자체는 여전히 픽스처로 고정한다. 실데이터 기반 케이스는 같은 이름의
+ * 구가 둘 이상 들어오는 배치에서 함께 넣는다.
  */
 function metro(id: string, name: string, aliases: string[]): RegionalPolicyData {
   return {
@@ -149,6 +151,38 @@ for (const region of regionalPolicies) {
           ? `ambiguous(${resolution.candidates.map((candidate) => candidate.region.id).join(", ")})`
           : "not_found";
     failures.push(`region ${region.id} alias "${alias}" resolves to ${actual}`);
+  }
+}
+
+// 위 루프의 반대 방향. 별칭을 "그 지역으로 가는지"만 보면, 전국에 여럿인 이름을
+// 한 지역이 독차지하는 사고는 통과한다 — 실제로 서울 중구를 넣으면서 `중구`와
+// `jung-gu`가 서울 중구로 단독 확정돼, 부산 중구 주민이 서울 중구의 전화번호와
+// 조례 수수료표를 받게 돼 있었다. 같은 이름의 자치구가 여럿인 이름은 광역 접두어
+// 없이 자치구로 확정되면 안 된다. 확정을 안 하는 한 되묻기든 폴백이든 상관없다.
+// 목록을 늘릴 때는 "서울에 있는 이름"이 아니라 **전국에 둘 이상 있는 이름**을 기준으로
+// 본다. 강서구가 그래서 빠져 있었다 — 서울에만 있는 줄 알기 쉽지만 부산에도 있다.
+const nationallyAmbiguousDistrictQueries = [
+  "중구",
+  "jung-gu",
+  "동구",
+  "dong-gu",
+  "서구",
+  "seo-gu",
+  "남구",
+  "nam-gu",
+  "북구",
+  "buk-gu",
+  "강서구",
+  "gangseo-gu",
+];
+
+for (const query of nationallyAmbiguousDistrictQueries) {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status === "match" && resolution.match.level === "district") {
+    failures.push(
+      `"${query}" confidently resolved to district ${resolution.match.region.id}; ` +
+        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다",
+    );
   }
 }
 
