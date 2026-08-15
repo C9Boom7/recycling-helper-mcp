@@ -608,6 +608,17 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
     if (!isNonEmptyString(schedule.source.basis)) warnings.push(`${prefix}.source.basis should explain what the source supports`);
   }
 
+  // `feeUrl`은 region-policies와 이 파일에 같은 값으로 복제돼 있다. 사용자에게
+  // 수수료 출처로 나가는 건 이쪽 값이고, `check:links`는 region-policies만 읽는다.
+  // 그래서 한쪽만 고치면 링크 점검은 초록인데 답변에는 옛 주소가 나가는 상태가
+  // 조용히 만들어진다(2026-08-15 성남시가 실제로 그랬다).
+  if (isNonEmptyString(schedule.feeUrl)) {
+    const policyFeeUrl = regionalPolicies.find((region) => region?.id === schedule.regionId)?.bulkyWaste?.feeUrl;
+    if (isNonEmptyString(policyFeeUrl) && policyFeeUrl !== schedule.feeUrl) {
+      errors.push(`${prefix}.feeUrl must match region-policies ${schedule.regionId}.bulkyWaste.feeUrl (${policyFeeUrl})`);
+    }
+  }
+
   if (!Array.isArray(schedule.fees) || schedule.fees.length === 0) {
     errors.push(`${prefix}.fees must contain at least one fee`);
   } else {

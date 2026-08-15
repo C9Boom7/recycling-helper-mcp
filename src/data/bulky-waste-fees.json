@@ -6087,7 +6087,7 @@
     "regionName": "경기도 성남시",
     "checkedAt": "2026-08-15",
     "applicationUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=1",
-    "feeUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
+    "feeUrl": "https://waste.isdc.co.kr/contents/order_item.php?cIdx=4",
     "phone": "031-729-3205",
     "source": {
       "title": "성남시 생활폐기물의 배출방법 및 수수료 등의 부과·징수에 관한 조례 [별표 1] 대형폐기물의품목및수수료기준(제2조,제4조, 제9조 관련)",
