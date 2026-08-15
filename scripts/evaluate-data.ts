@@ -13,7 +13,7 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { resolveWasteItem, wasteItems } from "../src/data.js";
+import { normalizeText, reservedQueryWords, resolveWasteItem, wasteItems } from "../src/data.js";
 
 type EvaluationCase = {
   query: string;
@@ -76,6 +76,20 @@ for (const testCase of evaluationCases) {
     failures.push(
       `"${testCase.query}" matched ${item.id} with disposalType ${item.disposalType}; expected ${testCase.expectedDisposalType}`,
     );
+  }
+}
+
+// 예약어(카테고리어·재질 이름)는 `findWasteItems` 맨 앞에서 질의를 끊는다. 품목명이나
+// 별칭이 예약어와 같아지면 그 품목은 exact 매칭에 닿기도 전에 잘려 **모든 툴에서
+// 사라진다.** 데이터만 봐서는 드러나지 않는 결합이라 여기서 막는다.
+const reserved = new Set(reservedQueryWords);
+for (const item of wasteItems) {
+  for (const label of [item.name, ...(item.aliases ?? [])]) {
+    if (reserved.has(normalizeText(label))) {
+      failures.push(
+        `${item.id}의 "${label}"이(가) 예약어와 같습니다 — 이 품목은 검색에서 통째로 사라집니다. 별칭을 바꾸거나 예약어에서 빼세요.`,
+      );
+    }
   }
 }
 

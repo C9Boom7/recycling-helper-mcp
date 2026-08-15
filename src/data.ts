@@ -217,6 +217,13 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
 ];
 
 export function inferMaterialCategories(query: string, limit = 2): string[] {
+  // 재질 이름 하나만 들어온 경우는 부분 문자열 표를 훑지 않고 바로 갈래를 준다.
+  // 그 표는 `철` 같은 한 글자를 담을 수 없기 때문이다(MATERIAL_ONLY_QUERIES 주석 참고).
+  const materialOnly = MATERIAL_ONLY_QUERIES.get(normalizeText(query));
+  if (materialOnly) {
+    return [materialOnly];
+  }
+
   const lowered = query.toLowerCase();
   const categories: string[] = [];
   for (const { category, pattern } of MATERIAL_QUERY_PATTERNS) {
@@ -276,6 +283,65 @@ const DISPOSAL_CATEGORY_QUERIES = new Set(
 function isDisposalCategoryQuery(query: string): boolean {
   return DISPOSAL_CATEGORY_QUERIES.has(normalizeText(query));
 }
+
+/**
+ * 재질만 가리키는 낱말도 품목이 아니다. 카테고리어와 같은 이유로 막지만 근거는 조금 다르다 —
+ * 카테고리어는 문장형 별칭에 얹혀 걸렸고, 이쪽은 **별칭 안에 재질 이름이 들어 있다는 이유로**
+ * 엉뚱한 품목이 확정된다.
+ *
+ * `종이`가 `코팅지`(별칭 "코팅 종이", generic_fragment 91점)로 확정되던 것이 그 예다.
+ * 종이를 물은 사람에게 "코팅지는 재활용이 안 됩니다" 카드가 나갔다. 차점이 `종이호일`(87점,
+ * "기름종이")이라 둘 중 어느 쪽이 이겨도 오답이다. `비닐`은 `비닐류 포장재`와 `뽁뽁이`가
+ * 88점 동점이라 사실상 동전던지기였다.
+ *
+ * 확정하지 않고 not_found로 보내면 Phase 1의 재질 폴백이 `material-guidelines.json`의
+ * 원칙으로 답한다. 실제로 "종이 어떻게 버려?"라는 **문장**은 이미 그 경로로 제대로 답하고
+ * 있었다 — 답을 갖고 있으면서 명사 하나만 넘어올 때 엉뚱한 카드가 그걸 가로채고 있던 셈이다.
+ * 호스트 LLM은 보통 명사만 뽑아 넘기므로 실사용 경로는 그쪽이다.
+ *
+ * **`플라스틱`·`유리`·`나무`·`천`은 일부러 넣지 않았다.** 이들은 지금 되묻기로 착지하는데,
+ * 되묻기가 더 나은 답이다 — 같은 유리라도 유리병은 재활용, 깨진 유리는 신문지에 싸서
+ * 종량제·불연성이라 배출법이 갈린다. 재질 원칙 하나로 답하면 둘 중 하나는 틀린다.
+ * 여기 넣는 기준은 "재질어인가"가 아니라 **"재질 안내가 지금 답보다 나은가"**다.
+ *
+ * 낱말과 붙는 재질 갈래를 값으로 함께 둔다. `철`·`쇠`는 `MATERIAL_QUERY_PATTERNS`에 넣을 수 없다 —
+ * 그 표는 부분 문자열로 훑으므로 `지하철`·`철거`·`철학책`·`쇠고기`까지 캔·고철류로 끌고 간다
+ * (표 위 주석이 `글라스`·`껍질`을 뺀 것과 같은 이유다). **질의 전체가 그 낱말일 때만** 갈래를
+ * 지정하면 그 위험 없이 안내를 붙일 수 있다.
+ *
+ * 값이 `undefined`면 확정만 막고 갈래는 폴백의 기본 메뉴에 맡긴다. `목재`처럼 대응하는
+ * 재질 가이드가 없는 낱말은 아예 넣지 않는다 — 막아도 나아지는 게 없다.
+ *
+ * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 여기 없어야 한다. 게이트가
+ * `resolveWasteItem` 맨 앞에서 끊으므로 exact 매칭보다 먼저 걸려 **그 품목을 확정할 수
+ * 없게 된다.** `scripts/evaluate-data.ts`가 품목명·별칭과 예약어의 충돌을 검사한다
+ * (`validate-data.mjs`는 TS를 읽지 못해 목록을 복제해야 하므로 그쪽에 두지 않았다).
+ */
+const MATERIAL_ONLY_QUERIES = new Map<string, string | undefined>(
+  (
+    [
+      ["종이", "paper_cardboard"],
+      ["비닐", "vinyl_film"],
+      ["고무", "general_trash"],
+      ["가죽", "general_trash"],
+      ["금속", "can_metal"],
+      ["철", "can_metal"],
+      ["쇠", "can_metal"],
+      ["알루미늄", "can_metal"],
+      ["스텐", "can_metal"],
+      ["스테인리스", "can_metal"],
+      ["섬유", "textile"],
+      ["헝겊", "textile"],
+    ] as Array<[string, string | undefined]>
+  ).map(([word, category]) => [normalizeText(word), category]),
+);
+
+function isMaterialOnlyQuery(query: string): boolean {
+  return MATERIAL_ONLY_QUERIES.has(normalizeText(query));
+}
+
+/** 예약어 목록. validate가 품목명·별칭과의 충돌을 막는 데 쓴다. */
+export const reservedQueryWords: string[] = [...DISPOSAL_CATEGORY_QUERIES, ...MATERIAL_ONLY_QUERIES.keys()];
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
 // 짧은 별칭이 독립 낱말로 걸렸을 때의 점수 = 이 값 + 별칭 길이. 길이를 더하는 건
@@ -727,6 +793,15 @@ export type WasteQueryResolution =
  * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
  */
 export function resolveWasteItem(query: string): WasteQueryResolution {
+  // 재질 이름 하나짜리 질의는 **확정만** 막는다. 카테고리어와 달리 게이트가
+  // `findWasteItems`가 아니라 여기 있는 이유가 있다 — `check_confusing_item`은
+  // `findWasteItems`를 직접 부르는데, "종이"에 코팅지·종이호일을 늘어놓는 것은
+  // 그 툴에서는 **정확히 원하는 동작**이다. 헷갈리는 품목을 보여 달라는 툴이니까.
+  // 잘못된 건 그 목록의 첫 줄을 답으로 확정하는 것이지 목록 자체가 아니다.
+  if (isMaterialOnlyQuery(query)) {
+    return { status: "not_found" };
+  }
+
   // A bare category term comes back empty from findWasteItems, which lands on
   // the not_found fallback below.
   const matches = findWasteItems(query, wasteItems.length);

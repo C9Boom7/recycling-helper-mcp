@@ -336,6 +336,17 @@ function isMaterialGuideline(guideline: MaterialGuideline | undefined): guidelin
 // not_found means findWasteItems already came back empty for this query, so the
 // answer is the material fallback: inferred principles when the query names a
 // material, otherwise the one-line menu.
+/**
+ * 못 찾았을 때 한 줄이라도 쥐여 보내는 재질 원칙. `get_disposal_steps`의 not_found는
+ * 전용 폴백(`unknownItemResult`)이 재질 메뉴까지 펼치지만, `make_cleanup_plan`과
+ * `get_region_disposal_info`는 한 줄짜리 요약 자리뿐이라 이쪽을 쓴다.
+ * 추정되는 재질이 없으면 빈 문자열이라 문구가 늘어지지 않는다.
+ */
+function materialPrincipleSuffix(itemName: string): string {
+  const principle = inferMaterialCategories(itemName, 1).map(findMaterialGuideline).filter(isMaterialGuideline)[0];
+  return principle ? ` 재질로 보면 ${principle.label}: ${principle.quickRule}` : "";
+}
+
 function unknownItemResult(itemName: string): CallToolResult {
   const inferred = inferMaterialCategories(itemName).map(findMaterialGuideline).filter(isMaterialGuideline);
   const isInferred = inferred.length > 0;
@@ -629,11 +640,14 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   const planned = items.map((rawName) => {
     const resolved = resolveWasteItem(rawName);
     if (resolved.status === "not_found") {
+      // 못 찾았다고 빈손으로 돌려보내지 않는다. `get_disposal_steps`의 not_found는 이미
+      // 재질 원칙으로 착지하는데(Phase 1), 여기만 "확실히 찾지 못했습니다"로 끝나 있었다.
+      // 계획에 열 개를 넣으면 못 찾은 항목만 아무 안내 없이 남는다.
       return {
         input: rawName,
         found: false as const,
         group: "확인 필요",
-        summary: "초기 데이터에서 확실히 찾지 못했습니다.",
+        summary: `초기 데이터에서 확실히 찾지 못했습니다.${materialPrincipleSuffix(rawName)}`,
       };
     }
 
@@ -791,7 +805,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     : ambiguousCandidates
     ? `품목: "${itemName}" — ${ambiguousCandidateSummary(ambiguousCandidates)}`
     : itemName
-    ? `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.`
+    ? // 못 찾았어도 재질 원칙은 붙인다. 지역 체크리스트가 함께 나가므로 답이 비지는
+      // 않지만, `make_cleanup_plan`과 같은 이유로 한 줄이라도 더 쥐여 보낸다.
+      `입력한 품목 "${itemName}"을(를) 초기 데이터에서 확실히 찾지 못했습니다.${materialPrincipleSuffix(itemName)}`
     : "품목을 함께 입력하면 확인해야 할 항목을 더 좁혀드릴 수 있습니다.";
 
   // 지역을 확정하지 못해도 첫 줄에 입력한 지역명을 그대로 되비추고,

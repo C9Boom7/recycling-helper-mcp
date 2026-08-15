@@ -8118,5 +8118,128 @@
     "expectedStructuredIncludes": [
       "서울특별시 대형폐기물 접수는 시·군·구 소관이라"
     ]
+  },
+  {
+    "id": "material_paper_falls_back_to_guideline",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다",
+      "종이·상자류",
+      "펴서 묶어 종이류로 배출"
+    ],
+    "expectedTextExcludes": [
+      "## 코팅지",
+      "## 종이호일"
+    ]
+  },
+  {
+    "id": "material_vinyl_falls_back_to_guideline",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비닐"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다",
+      "비닐·필름류"
+    ],
+    "expectedTextExcludes": [
+      "## 비닐류 포장재",
+      "## 뽁뽁이"
+    ]
+  },
+  {
+    "id": "material_iron_infers_can_metal",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "철"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다",
+      "캔·고철류"
+    ]
+  },
+  {
+    "id": "material_paper_cup_still_confirms",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이컵"
+    },
+    "expectedTextIncludes": [
+      "## 종이컵"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"paper_cup\""
+    ]
+  },
+  {
+    "id": "material_paper_foil_still_confirms",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이호일"
+    },
+    "expectedTextIncludes": [
+      "## 종이호일"
+    ]
+  },
+  {
+    "id": "material_coated_paper_still_confirms",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "코팅지"
+    },
+    "expectedTextIncludes": [
+      "## 코팅지"
+    ]
+  },
+  {
+    "id": "material_vinyl_wrap_still_confirms",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비닐랩"
+    },
+    "expectedTextIncludes": [
+      "## 비닐랩"
+    ]
+  },
+  {
+    "id": "material_cleanup_plan_gives_principle",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": [
+        "비닐",
+        "종이",
+        "우산"
+      ]
+    },
+    "expectedTextIncludes": [
+      "확인 필요",
+      "재질로 보면 비닐·필름류",
+      "재질로 보면 종이·상자류"
+    ]
+  },
+  {
+    "id": "material_confusing_item_still_lists",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "종이"
+    },
+    "expectedTextIncludes": [
+      "코팅지"
+    ]
+  },
+  {
+    "id": "material_region_info_gives_principle",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "비닐"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다",
+      "재질로 보면 비닐·필름류"
+    ]
   }
 ]
