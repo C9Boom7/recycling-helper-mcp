@@ -10,6 +10,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "check:links": "node scripts/check-region-links.mjs",
     "fees:fetch": "node scripts/fetch-ordinance-fees.mjs",
+    "fees:verify": "node scripts/verify-ordinance-fees.mjs",
     "measure:region": "tsx scripts/measure-region-resolution.ts",
     "measure:bulky": "pnpm build && node scripts/measure-bulky-items.mjs",
     "eval:data": "tsx scripts/evaluate-data.ts",
@@ -22,7 +23,8 @@
     "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && tsx scripts/evaluate-data.ts && tsx scripts/test-region-matching.ts",
     "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
     "local:test": "pnpm check && pnpm smoke:mcp",
-    "import:fees": "tsx scripts/import-bulky-fees.ts"
+    "import:fees": "tsx scripts/import-bulky-fees.ts",
+    "import:ordinance": "tsx scripts/import-ordinance-fees.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",

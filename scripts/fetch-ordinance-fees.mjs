@@ -23,7 +23,8 @@
  *      "그 지역엔 표가 없다"는 커버리지 착시를 만든다.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { extractHwpText } from "./hwp-text.mjs";
 
@@ -45,7 +46,7 @@ const MAX_SEARCH_PAGES = 20;
  * `기관명`은 법제처 `지자체기관명`과 정확히 일치해야 한다 — 우리 지역명
  * ("서울 종로구")과 표기가 다르다.
  */
-const TARGETS = [
+export const TARGETS = [
   { regionId: "seongnam_si", 기관명: "경기도 성남시" },
   { regionId: "jongno_gu", 기관명: "서울특별시 종로구" },
   { regionId: "gwangjin_gu", 기관명: "서울특별시 광진구" },
@@ -56,6 +57,18 @@ const TARGETS = [
   { regionId: "yeongdeungpo_gu", 기관명: "서울특별시 영등포구" },
   { regionId: "dongjak_gu", 기관명: "서울특별시 동작구" },
   { regionId: "gangdong_gu", 기관명: "서울특별시 강동구" },
+];
+
+/**
+ * R2 골든셋. 이 넷은 이미 검증된 수기 데이터가 있어 파서를 대조할 기준이 된다.
+ * 추출 대상이 아니라 검증 대상이므로 TARGETS와 분리해 둔다 —
+ * `pnpm fees:fetch`가 실수로 골든셋을 덮어쓰지 않게 하려는 것이다.
+ */
+export const GOLDEN_TARGETS = [
+  { regionId: "gangnam_gu", 기관명: "서울특별시 강남구" },
+  { regionId: "seocho_gu", 기관명: "서울특별시 서초구" },
+  { regionId: "songpa_gu", 기관명: "서울특별시 송파구" },
+  { regionId: "mapo_gu", 기관명: "서울특별시 마포구" },
 ];
 
 /** 폐기물이 이름에 들어가도 대형폐기물 수수료와 무관한 법규들. */
@@ -242,6 +255,16 @@ const COLUMN_WORDS =
   /^(분\s*류|[0-9]\s*차\s*분\s*류|대분류|소분류|종\s*별|종\s*류|유\s*형(\s*별)?|품\s*목(\s*별)?|품\s*명|규\s*격|가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비|비\s*고|변경\s*사항|연\s*번|순\s*번|번\s*호)$/;
 /** 금액 칸 뒤에 더 붙는 열. 있으면 "금액이 행의 마지막"이라는 전제가 깨진다. */
 const TRAILING_COLUMN = /^(비\s*고|변경\s*사항)$/;
+/**
+ * `변경사항`·`비고` 칸에 실제로 적히는 값. 개정 이력을 표 안에 적어 둔 것이라
+ * 어휘가 닫혀 있다 — 동작구 별표의 꼬리 칸 값 59개가 전부 이 여섯 개다
+ * (품목추가 29, 항목추가 21, 변경 4, 규격변경 3, 품목세분화·세분화 각 2).
+ *
+ * 품명이 이 낱말과 겹칠 일은 없으므로, 꼬리 열을 선언한 표에서 금액 바로 뒤에
+ * 이 값이 오면 다음 행의 품명이 아니라 같은 행의 꼬리로 보고 버린다. 이 어휘
+ * 바깥의 값이 꼬리 자리를 채우고 있으면 그건 여전히 미지원 형태다.
+ */
+const TRAILING_VALUE = /^(품목|항목|규격|명칭|금액)?(추가|삭제|변경|세분화|신설)$|^(신규|삭제|변경)$/;
 const FEE_COLUMN = /^(가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비)$/;
 /** 행 번호 열. 선언돼 있으면 행 머리의 일련번호를 금액과 구분해야 한다. */
 const SEQUENCE_COLUMN = /^(연번|순번|번호)$/;
@@ -298,12 +321,32 @@ function readColumns(lines, startIndex) {
 }
 
 /**
+ * 좌우 2단 조판인지 본다. 열 구성이 통째로 한 번 더 반복되면 한 페이지에 표를
+ * 두 벌 앉힌 것이다(강남·강동·금천의 `종류|품목|규격|수수료` ×2, 송파의
+ * `품목별|규격|부과금액` ×2).
+ *
+ * 반복 여부만으로 판정하는 이유는 열 이름이 지자체마다 다르기 때문이다. 어차피
+ * 같은 이름이 두 번 나오는 정상 단일 표는 없다.
+ */
+function laneCount(columns) {
+  if (columns.length < 4 || columns.length % 2 !== 0) return 1;
+  const half = columns.length / 2;
+  return columns.slice(0, half).join("|") === columns.slice(half).join("|") ? 2 : 1;
+}
+
+/**
  * 5단계 — 표를 (품명, 규격, 금액) 행으로 만든다.
  *
  * 셀이 순차 텍스트로 나오므로, 금액 셀을 만날 때까지 쌓인 라벨을 보고
  * 마지막이 규격, 그 앞이 품명이라고 본다. 라벨이 하나뿐이면 규격만 바뀐
  * 연속 행이라 품명을 이어 쓴다. 종별 칸이 세로로 쪼개져 들어오는 것 같은
  * 잉여 라벨은 앞쪽에 쌓이므로 자연히 버려진다.
+ *
+ * 좌우 2단 조판에서는 그 "이어 쓰기"가 반대편 단의 품명을 물어온다. 텍스트는
+ * 시각적 행 순서대로 왼쪽·오른쪽·왼쪽·오른쪽으로 나오므로, 품명 칸이 병합돼
+ * 생략된 행은 두 칸 앞의 품명을 이어야 한다. R2 골든셋에서 강남구 "의자
+ * 100cm미만 1쪽 10,000원"이 이 결함으로 나왔다 — 실제로는 장롱의 둘째 행이다.
+ * 그래서 금액 순번의 홀짝으로 단을 갈라 품명을 단별로 이어 쓴다.
  *
  * 완벽하지 않다 — 셀 안에서 줄바꿈된 품명은 뒷줄만 남는다. 그래서 각 행에
  * `rawGroup`을 같이 저장해 검수 때 원본을 볼 수 있게 한다.
@@ -313,19 +356,36 @@ function parseFeeRows(lines, startIndex) {
   const feeIndex = columns.findIndex((column) => FEE_COLUMN.test(column));
   const sequenceIndex = columns.findIndex((column) => SEQUENCE_COLUMN.test(column));
   const hasSequence = sequenceIndex >= 0;
+  const lanes = laneCount(columns);
 
   const rows = [];
   let pending = [];
-  let currentItem = null;
+  const currentItems = new Array(lanes).fill(null);
+  let amountIndex = 0;
   // 연번으로 걸러낸 값의 최대치. 아래 가드가 실제로 어디까지 버텼는지 본다.
   let maxSequence = 0;
   // 금액 바로 뒤 토큰의 분포. 꼬리 열 판정에 쓰며, 표를 실제로 훑는 이 루프
   // 안에서 모아야 표 바깥(부칙·묶음 파일의 다른 별표) 토큰이 섞이지 않는다.
   const trailingCounts = new Map();
   let trailingSamples = 0;
+  // 꼬리 열을 선언했는가. 선언만으로는 막지 않고(성남시는 `비고`를 통째로 비워뒀다)
+  // 아래에서 실제로 채워져 있는지 함께 본다.
+  const declaresTrailing = feeIndex >= 0 && columns.slice(feeIndex + 1).some((column) => TRAILING_COLUMN.test(column));
+  // 꼬리 칸을 몇 개나 걷어냈는지. 판정이 실제로 일을 했는지 보고에 쓴다.
+  let trailingConsumed = 0;
+  let afterAmount = false;
 
   for (let i = nextIndex; i < lines.length; i += 1) {
     const token = lines[i];
+
+    // 금액 바로 뒤에 개정 이력 낱말이 오면 같은 행의 `변경사항`·`비고` 칸이다.
+    // 다음 행의 품명으로 쌓으면 그 뒤가 통째로 한 칸씩 밀린다. 칸이 둘일 수
+    // 있으므로(동작구 `품목추가` + `신규`) 연달아 걷어낸다.
+    if (declaresTrailing && afterAmount && TRAILING_VALUE.test(token)) {
+      trailingConsumed += 1;
+      continue;
+    }
+    afterAmount = false;
 
     // 연번 열이 있는 표(종로·강북·은평·영등포)에서는 행 머리의 일련번호가
     // 금액 자리로 끼어든다. parseAmount는 콤마 없는 맨숫자도 500 이상이면
@@ -357,19 +417,31 @@ function parseFeeRows(lines, startIndex) {
       continue;
     }
 
-    const follower = lines[i + 1];
+    // 걷어낸 꼬리 칸 다음 토큰을 본다. 걷어낸 값 자체를 표본에 넣으면 판정이
+    // 스스로를 근거로 삼는 꼴이라, 이미 해결한 형태를 계속 미지원으로 막는다.
+    let followerIndex = i + 1;
+    while (declaresTrailing && lines[followerIndex] !== undefined && TRAILING_VALUE.test(lines[followerIndex])) {
+      followerIndex += 1;
+    }
+    const follower = lines[followerIndex];
     // 연번은 행마다 값이 달라 분포가 퍼지므로 표본에서 뺀다. 남겨두면
     // 표본만 부풀려 꼬리 열 판정의 비율을 희석한다.
     const followerIsSequence = hasSequence && follower !== undefined && /^\d{1,4}$/.test(follower);
-    if (follower !== undefined && !followerIsSequence && parseAmount(follower) === null) {
+    // 열 이름은 쪽이 넘어갈 때 표 머리가 다시 찍힌 것이지 꼬리 열의 값이 아니다.
+    // 빼지 않으면 마포구가 `비고`를 채워둔 표로 잘못 판정된다 — 실제 꼬리 값은
+    // 하나도 없고 반복된 머리글 `유형별`이 6회 잡혔을 뿐이었다.
+    const followerIsHeader = follower !== undefined && COLUMN_WORDS.test(follower);
+    if (follower !== undefined && !followerIsSequence && !followerIsHeader && parseAmount(follower) === null) {
       trailingCounts.set(follower, (trailingCounts.get(follower) ?? 0) + 1);
       trailingSamples += 1;
     }
 
     // 품명이 맨숫자인 경우는 없으므로 후보에서 뺀다.
     const labels = pending.filter((token) => !/^\d{1,4}$/.test(token));
+    const lane = amountIndex % lanes;
+    amountIndex += 1;
 
-    let itemName = currentItem;
+    let itemName = currentItems[lane];
     let spec = "";
     if (labels.length >= 2) {
       itemName = labels[labels.length - 2];
@@ -379,10 +451,23 @@ function parseFeeRows(lines, startIndex) {
     }
 
     if (itemName) {
-      rows.push({ itemName, spec, feeKrw: amount.feeKrw, free: amount.free, rawGroup: [...pending] });
-      currentItem = itemName;
+      rows.push({
+        itemName,
+        spec,
+        feeKrw: amount.feeKrw,
+        free: amount.free,
+        lane,
+        // 품명 칸이 이 행에 직접 나왔는지. 아니면 병합 셀이라 보고 앞 행에서
+        // 이어 쓴 것이다. 이어 쓴 품명은 좌우 2단 조판에서 단이 한 번 어긋나면
+        // 그때부터 통째로 반대편 품명을 물어오므로, R3 임포터가 출처 신뢰도를
+        // 가릴 수 있도록 표시해 둔다.
+        nameInherited: labels.length < 2,
+        rawGroup: [...pending],
+      });
+      currentItems[lane] = itemName;
     }
     pending = [];
+    afterAmount = true;
   }
 
   // 연번이 첫 칸이 아닌 표(은평 `유형별`, 영등포 `유형` 다음에 온다)에서는 위
@@ -394,19 +479,20 @@ function parseFeeRows(lines, startIndex) {
     return {
       rows: [],
       columns,
+      trailingConsumed,
       unsupportedForm: `연번이 첫 칸이 아닌데(${sequenceIndex}번 열) ${maxSequence}까지 올라간다 — 금액과 구분되지 않는다`,
     };
   }
 
   // 금액 뒤에 `비고`·`변경사항` 열이 더 있으면 금액 다음 토큰이 다음 행의
-  // 품명이 아니라 같은 행의 꼬리다. 이 형태를 단순 규칙으로 밀면 품명과
-  // 규격이 한 칸씩 밀린 그럴듯한 오답이 나온다 — 내지 않는 편이 낫다.
+  // 품명이 아니라 같은 행의 꼬리다. 개정 이력 어휘로 적힌 꼬리는 위에서 걷어냈고,
+  // 여기서는 그러고도 남은 값이 있는지 본다. 남아 있다면 어휘를 벗어난 자유 서술이
+  // 채워져 있다는 뜻이라, 단순 규칙으로 밀면 품명과 규격이 한 칸씩 밀린 그럴듯한
+  // 오답이 나온다 — 내지 않는 편이 낫다.
   //
-  // 다만 열 이름만 보고 막으면 안 된다. 성남시처럼 `비고`를 선언해놓고 실제로는
-  // 전부 비워둔 표가 있고, 그건 단순 규칙으로 정확히 읽힌다. 그래서 헤더 선언과
-  // 데이터 증거를 모두 요구한다 — 금액 바로 뒤 토큰이 특정 값으로 반복되면
-  // (동작구 `품목추가` 29회) 꼬리 열이 실제로 채워져 있다는 뜻이다.
-  const declaresTrailing = feeIndex >= 0 && columns.slice(feeIndex + 1).some((column) => TRAILING_COLUMN.test(column));
+  // 열 이름만 보고 막으면 안 된다는 것도 그대로다. 성남시는 `비고`를 선언해놓고
+  // 전 행을 비워뒀고, 그 표는 단순 규칙으로 정확히 읽힌다. 그래서 헤더 선언과
+  // 데이터 증거를 모두 요구한다.
   if (declaresTrailing) {
     const [topToken, topCount] = [...trailingCounts.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
     if (trailingSamples > 0 && topCount >= 5 && topCount / trailingSamples >= 0.05) {
@@ -414,12 +500,13 @@ function parseFeeRows(lines, startIndex) {
       return {
         rows: [],
         columns,
-        unsupportedForm: `금액 뒤 ${trailingNames} 열이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
+        trailingConsumed,
+        unsupportedForm: `금액 뒤 ${trailingNames} 열에 개정 이력 어휘 밖의 값이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
       };
     }
   }
 
-  return { rows, columns, unsupportedForm: null };
+  return { rows, columns, trailingConsumed, unsupportedForm: null };
 }
 
 function normalizeLines(text) {
@@ -429,7 +516,7 @@ function normalizeLines(text) {
     .filter((line) => line.length > 0);
 }
 
-async function collectRegion(target) {
+export async function collectRegion(target) {
   const result = {
     regionId: target.regionId,
     기관명: target.기관명,
@@ -482,12 +569,12 @@ async function collectRegion(target) {
       });
       if (start < 0) continue;
 
-      const { rows, columns, unsupportedForm } = parseFeeRows(lines, start);
+      const { rows, columns, trailingConsumed, unsupportedForm } = parseFeeRows(lines, start);
       if (unsupportedForm) {
         // 표는 찾았는데 파서가 못 다루는 형태다. 원문은 남기고 사유를 보고한다 —
         // 그냥 넘기면 "표 없음"과 구별되지 않아 커버리지 착시가 생긴다.
         result.law = law;
-        result.attachment = { ...attachment, header: lines[start], columns };
+        result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
         result.rawText = text;
         result.errors.push(`[${law.name}] ${attachment.title || "(제목 없음)"}: 열 구성 미지원 — ${unsupportedForm}`);
         return result;
@@ -502,7 +589,7 @@ async function collectRegion(target) {
       }
 
       result.law = law;
-      result.attachment = { ...attachment, header: lines[start], columns };
+      result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
       result.rows = rows;
       result.rawText = text;
       return result;
@@ -549,7 +636,11 @@ async function main() {
 
     if (result.rows.length > 0) {
       const items = new Set(result.rows.map((row) => row.itemName)).size;
-      console.log(`${result.rows.length}행 / 품명 ${items}종 — ${result.law.kind} 「${result.law.name}」 시행 ${result.law.effectiveDate}`);
+      const trailing = result.attachment?.trailingConsumed ?? 0;
+      console.log(
+        `${result.rows.length}행 / 품명 ${items}종 — ${result.law.kind} 「${result.law.name}」 시행 ${result.law.effectiveDate}` +
+          (trailing > 0 ? ` (꼬리 칸 ${trailing}개 걷어냄)` : ""),
+      );
     } else {
       console.log("표 없음");
       failed += 1;
@@ -561,4 +652,8 @@ async function main() {
   if (failed > 0) process.exitCode = 1;
 }
 
-await main();
+// R2 검증 스크립트가 이 파일의 수집·파싱을 그대로 재사용한다. import될 때까지
+// main()이 돌면 골든셋 검증이 추출을 한 번 더 돌리는 꼴이 되므로 직접 실행일 때만 돈다.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
+}

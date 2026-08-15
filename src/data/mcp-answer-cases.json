@@ -8067,5 +8067,56 @@
       "\"ambiguous\":true",
       "\"itemName\":\"상\""
     ]
+  },
+  {
+    "id": "phase6_fee_jongno_gu_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 종로구"
+    },
+    "expectedTextIncludes": [
+      "서울 종로구 대형생활폐기물 수수료 후보",
+      "쇼파 1인용: 4,000원",
+      "쇼파 장의자: 8,000원",
+      "신청 URL: https://www.jongno.go.kr/waste/mo/web/order/insertAgreeForm.do"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase6_fee_row_absent_dongjak_gu_canvas_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "캔버스 액자",
+      "region": "서울 동작구"
+    },
+    "expectedTextIncludes": [
+      "문의/신청 안내 전화: 02-820-1326",
+      "인터넷 신청: https://smartclean.dongjak.go.kr/online/bulky/request",
+      "수수료 조회: https://smartclean.dongjak.go.kr/online/bulky/item"
+    ],
+    "expectedTextExcludes": [
+      "대형생활폐기물 수수료 후보"
+    ]
+  },
+  {
+    "id": "phase6_fee_not_leaked_to_seoul_metro",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울"
+    },
+    "expectedTextIncludes": [
+      "서울특별시 대형폐기물 접수는 시·군·구 소관"
+    ],
+    "expectedTextExcludes": [
+      "대형생활폐기물 수수료 후보",
+      "쇼파 1인용"
+    ],
+    "expectedStructuredIncludes": [
+      "서울특별시 대형폐기물 접수는 시·군·구 소관이라"
+    ]
   }
 ]
