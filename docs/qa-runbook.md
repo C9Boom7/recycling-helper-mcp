@@ -11,17 +11,26 @@
 
 ## 1. 30초 안에 확인할 것
 
-문의를 받으면 서버가 살아 있는지와 어떤 빌드가 떠 있는지부터 본다.
+문의를 받으면 서버가 살아 있는지와 어떤 빌드가 떠 있는지부터 본다. **주소를 둘 다 찍는다.** 우리가 재배포하는 서버와
+사용자가 실제로 닿는 서버가 어긋나 있어서, 한쪽만 보면 멀쩡해 보인다.
 
 ```bash
+# 재배포 대상
 curl -sS https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/health
+# 운영 등록이 가리키는 주소
+curl -sS https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/health
 ```
 
-`{"ok":true,"service":"RecyclingHelper(재활용척척)","items":324}`가 정상이다.
+둘 다 `{"ok":true,"service":"RecyclingHelper(재활용척척)","items":324}`여야 정상이다.
 
 - 응답이 없다 → 서버가 내려갔다. PlayMCP in KC 콘솔에서 Status를 확인한다. 코드 문제가 아니다.
-- `items` 수가 다르다 → **옛 빌드가 떠 있다.** 최신 main의 품목 수와 대조한다(`node -e "console.log(require('./src/data/waste-items.json').length)"`).
-  이 경우 "고쳤는데 왜 그대로냐"는 문의의 원인이 재배포 누락일 수 있다.
+- **두 주소의 `items`가 다르다 → 등록 불일치다. 여기서 멈추고 이것부터 해결한다.** 2026-08-15 기준 재배포 대상은 324,
+  등록 주소는 130(Phase 0 이전 빌드)이다. 이 상태에서는 무엇을 고쳐 배포해도 사용자에게 닿지 않는다.
+  해결 방법은 사용자 결정이 필요하다 — [playmcp-in-kc.md](playmcp-in-kc.md)의 "등록 주소와 재배포 주소가 어긋나 있습니다"를 본다.
+- 두 주소가 같은데 `items` 수가 최신 main과 다르다 → **재배포 누락이다.** 최신 main의 품목 수와 대조한다
+  (`node -e "console.log(require('./src/data/waste-items.json').length)"`).
+
+"고쳤는데 왜 그대로냐"는 문의는 위 둘 중 하나가 원인인 경우가 많다. 코드를 파기 전에 여기부터 지운다.
 
 품목 수가 맞으면 문제를 재현한다.
 
@@ -62,7 +71,8 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 폴백이 재질별 안내로 이어졌다면 설계대로 동작한 것이다. 그래도 자주 나오는 품목이면 데이터를 추가한다.
 
 - 고치는 곳: `src/data/waste-items.json`에 품목 추가 + `evaluation-cases.json`에 케이스 추가.
-- **런타임 코드를 건드리지 않으므로 8/21 기능 변경 마감 이후에도 가능하다.**
+- **런타임 코드를 건드리지 않으므로 8/21 기능 변경 마감 이후에도 가능하다.** 단 스키마·코드 변경 없이 검증을 통과하는
+  데이터여야 하고, 재배포가 필요하므로 **8/27 프리징까지가 상한이다.**
 - 공식 근거 없이 추가하지 않는다. 근거는 생활폐기물 분리배출 누리집 품목사전이나 지자체 공식 안내다.
 
 ### ② "엉뚱한 품목을 알려준다" — 오매칭
@@ -85,8 +95,12 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 서버 문제가 아닐 가능성이 높다. 호스트 LLM이 툴을 고르지 않은 것이다.
 
 - 로그에 해당 시각의 호출이 없으면 서버까지 오지 않은 것이다.
-- description 조정이 유일한 수단인데 **이건 런타임 변경이라 8/21 이후에는 못 한다.** 프리징 후에는 대응 불가로 분류한다.
-- PlayMCP는 툴 목록을 **등록 시점 스냅샷**으로 저장한다. description을 고쳤다면 등록도 갱신해야 반영된다.
+- description 조정이 유일한 수단이다. **8/21 기능 변경 마감에는 걸리지 않는다** — 마감되는 건 기능이고, description은
+  마감 이후에도 허용되는 "문구 수정"이다([phase-4-release.md](prd/phase-4-release.md) R4). 8/27 프리징까지는 고칠 수 있다.
+- 걸리는 건 날짜가 아니라 **등록 갱신**이다. PlayMCP는 툴 목록을 **등록 시점 스냅샷**으로 저장하므로, 서버의 description을
+  고쳐 배포해도 등록을 갱신하지 않으면 ChatGPT는 계속 옛 description으로 툴을 고른다.
+  운영 등록은 `심사 완료` 상태라 수정이 재심사를 유발하는지부터 확인해야 한다. 그래서 **서버 수정보다 이쪽이 오래 걸린다.**
+  당일 대응이 필요하면 이 절차부터 사용자와 합의하고 시작한다.
 
 ### ⑤ "응답이 느리다"
 

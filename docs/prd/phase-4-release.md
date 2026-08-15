@@ -68,7 +68,7 @@ Kakao Tools Preview에서 실사용 시나리오를 돌려 **툴 호출률과 �
 
 1. 25개 시나리오 중 의도 발화의 툴 호출률 ≥ 80%, 비의도 발화 과호출 0.
 2. 오답/무용답 시나리오 0 (폴백 포함 모든 응답이 "다음 행동이 가능한" 답).
-3. R3 문서 4종 완료 — README, `docs/prd/README.md` 진행 상태 표, `docs/qa-runbook.md`, `docs/preview-test-results-<날짜>.md`(p99 측정 기록 포함).
+3. R3 문서 4종 완료 — README, `docs/prd/README.md` 진행 상태 표, `docs/qa-runbook.md`, p99 측정 기록(`docs/deploy-verification-2026-08-15.md`에 들어갔다. 당초 `preview-test-results-<날짜>.md`를 예정했으나 측정이 배포 검증과 같이 돌아 그쪽에 실렸다).
 4. 최종 상태가 본선 서버에 배포·확인됨.
 
 ## 완료 체크리스트
