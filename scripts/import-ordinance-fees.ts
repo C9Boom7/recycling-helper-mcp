@@ -81,10 +81,24 @@ const HEAD_COLLISION_NAMES = new Set(["식기건조대", "욕실 수납장", "�
  *
  * 괄호나 규격에서 다른 품목이 잡히면 무조건 그쪽으로 보내는 일반 규칙은
  * 표준데이터 트랙이 실측으로 버렸다(새 오귀속이 그만큼 생긴다). 근거를 확인한
- * 쌍만 적는다. "매트포함"은 세트 가격이라 침대 프레임에 그대로 둔다.
+ * 쌍만 적는다.
+ *
+ * `deny`는 낱말이 걸려도 옮기지 말아야 할 문맥이다. 조례는 침대 행을 세 갈래로
+ * 적는다 — 프레임만(`매트리스제외`), 세트(`매트리스포함`), 매트리스만. 낱말만
+ * 보면 셋 다 매트리스로 가서, 매트리스를 물어본 사람에게 매트리스를 뺀 프레임
+ * 값이나 세트 값이 나간다. 실제로 강북구 6행 중 4행이 그렇게 들어갔다.
+ * `(라텍스 포함)`처럼 다른 낱말에 붙은 `포함`은 걸리지 않도록 낱말 바로 뒤만 본다.
  */
-const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string }> = [
-  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress" },
+const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?: RegExp }> = [
+  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress", deny: /(매트리스|토퍼)\s*[)）]?\s*(제외|미포함|불포함|없음|포함)/ },
+  // 조례는 돌·옥·황토 침대를 「침대」 아래 규격으로 적는다 — 종로 「1인용 돌침대
+  // 26,000」, 강북 「돌침대, 전동침대 1인용」, 광진 「1인용 돌, 옥, 황토」. 그대로 두면
+  // 돌침대를 물은 사람은 금액을 못 받고, 침대 프레임을 물은 사람은 돌침대 값을 받는다.
+  { from: "bed_frame", hint: /돌\s*침대|옥\s*침대|흙\s*침대|황\s*토/, to: "stone_bed" },
+  // 헬스자전거는 핵심어가 `자전거`라 수식어 위치 검사를 통과해 버린다. 타는 물건이
+  // 아니라 운동기구이고 `exercise_machine` 별칭에도 `실내자전거`가 있다. 그대로 두면
+  // 강동구에서 자전거를 물은 사람이 헬스자전거 3,000~7,000원을 함께 받는다.
+  { from: "bicycle", hint: /헬스\s*자전거|실내\s*자전거/, to: "exercise_machine" },
 ];
 
 /**
@@ -154,6 +168,24 @@ const SPEC_LIKE =
   /\d|모든\s*규격|소\s*형|중\s*형|대\s*형|특대|일\s*반|업소용|영업용|가정용|유아용|아동용|성인용|미\s*만|이\s*상|이\s*하|초\s*과|당$|개당|쪽당|폭당|접이식|휴대용|기\s*타/;
 
 /**
+ * 규격 칸에서 품목명 후보를 뽑는다. 괄호 안은 버린다 — 조례가 괄호에 적는 것은
+ * 「(세면대 제외)」·「(측면책꽂이 포함)」·「(책상+의자 1개)」처럼 값에 무엇이 들고
+ * 나는지에 대한 설명이라, 그 자체가 다른 품목의 행이라는 뜻이 아니다.
+ *
+ * 나머지는 구분자와 공백으로 쪼개 낱말 단위로 본다. 한 낱말짜리는 건너뛴다.
+ */
+function specNameCandidates(spec: string): string[] {
+  const stripped = spec.replace(/[(（][^)）]*[)）]/g, " ");
+  // `없음`·`제외`가 붙은 구절은 무엇이 빠졌는지를 적은 것이다 — 강북구
+  // 「서랍, 수납장 없음」은 수납장 행이 아니라 수납장이 없는 책상 행이다.
+  if (/없\s*음|제\s*외|미포함|불포함|별\s*도/.test(stripped)) return [];
+  return stripped
+    .split(/[\s/,·ㆍ、]+/)
+    .map((part) => part.trim())
+    .filter((part) => part.length >= 2);
+}
+
+/**
  * 이 행을 근거로 써도 되는가. 조례 표에서만 나오는 두 가지를 막는다.
  *
  * 1. **무상 행.** 폐가전 무상방문수거 대상은 금액이 `무상`이다. 0원을 수수료로
@@ -168,12 +200,28 @@ const SPEC_LIKE =
  *    규격처럼 보이지 않아도, 규격 칸이 이어 쓴 품명과 같은 품목으로 풀리면
  *    남긴다 — 금천구 「의자 / 흔들의자」처럼 규격 자리에 세부 품명을 적는 표가
  *    있고, 그건 밀린 게 아니라 원래 그 품목의 행이다.
+ * 3. **규격 칸이 다른 품목으로 확정되는 행.** 2번의 크기 어휘 검사는 숫자나
+ *    `유아용` 하나만 있어도 통과시켜서, 규격 자리로 밀려온 품목명을 그대로
+ *    지나 보냈다 — 영등포구 「유아용 의자(쇼파) / 어린이 2층 침대 15,000」,
+ *    광진·은평·영등포 「장판 / 전기장판(1인용)」·「장판 / 온수매트 1인용」이
+ *    그렇게 들어갔다. 의자를 물으면 2층 침대 값이, 전기장판을 물으면 전기담요
+ *    값이 나가고 정작 전기장판 금액은 장판 아래 숨는다.
+ *
+ *    SPLIT_HINTS로 근거를 확인한 쌍만 옮기고, 나머지는 넣지 않는다. 어느 쪽 행인지
+ *    가릴 근거가 없는데 상위 품명 쪽으로 미는 것이 가장 나쁜 선택이다.
  */
 function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: string } {
   if (row.free || row.feeKrw === 0) return { ok: false, reason: "free_row" };
-  if (!row.nameInherited) return { ok: true };
 
   const spec = cleanLabel(row.spec);
+  for (const candidate of specNameCandidates(spec)) {
+    const verdict = classifyName(candidate);
+    if (verdict.ok && verdict.itemId !== itemId && hasBulkyRoute(verdict.itemId)) {
+      return { ok: false, reason: "spec_names_other_item" };
+    }
+  }
+
+  if (!row.nameInherited) return { ok: true };
   if (SPEC_LIKE.test(spec)) return { ok: true };
 
   const specVerdict = classifyName(spec);
@@ -208,13 +256,21 @@ const regions = JSON.parse(readFileSync(REGIONS_PATH, "utf8")) as RegionalPolicy
 const existing = JSON.parse(readFileSync(FEES_PATH, "utf8")) as BulkyWasteFeeSchedule[];
 
 const built: BulkyWasteFeeSchedule[] = [];
+const missing: string[] = [];
 for (const regionId of targets) {
   let dump: OrdinanceDump;
   try {
     dump = JSON.parse(readFileSync(`${RAW_DIR}/${regionId}.json`, "utf8")) as OrdinanceDump;
   } catch {
-    console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 pnpm fees:fetch ${regionId}`);
-    process.exit(1);
+    // 콕 집어 요청한 지역이 없으면 오타이거나 수집을 빠뜨린 것이라 세워야 한다.
+    // 인자 없이 전체를 돌릴 때는 준비된 지역까지 함께 막을 이유가 없다 — 원문은
+    // gitignore 대상이라 한 배치씩 받아 넣는 게 정상 흐름이다.
+    if (requested.length > 0) {
+      console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 pnpm fees:fetch ${regionId}`);
+      process.exit(1);
+    }
+    missing.push(regionId);
+    continue;
   }
   if (!dump.law || !dump.attachment || dump.rows.length === 0) {
     console.error(`${regionId}: 조례에서 행을 뽑지 못했다 (${dump.errors.join(" / ") || "사유 없음"})`);
@@ -242,7 +298,13 @@ for (const regionId of targets) {
       note(verdict.reason);
       continue;
     }
-    const hint = SPLIT_HINTS.find((rule) => rule.from === verdict.itemId && rule.hint.test(`${itemName} ${spec}`));
+    // 품명을 앞 행에서 이어 쓴 행은 규격 칸만 본다. 품명 쪽 수식어는 그 행의
+    // 것이 아니라 병합된 셀의 것이라, 같이 보면 한 행의 갈래가 그룹 전체로 번진다 —
+    // 강동구 「침대(흙,돌,황토,의료)」 아래의 접이식 침대 행까지 돌침대가 된다.
+    const hintText = row.nameInherited ? spec : `${itemName} ${spec}`;
+    const hint = SPLIT_HINTS.find(
+      (rule) => rule.from === verdict.itemId && rule.hint.test(hintText) && !(rule.deny?.test(hintText) ?? false),
+    );
     const itemId = hint?.to ?? verdict.itemId;
     if (!hasBulkyRoute(itemId)) {
       note("not_bulky_route");
@@ -267,12 +329,33 @@ for (const regionId of targets) {
 
   const fees: BulkyWasteFee[] = [];
   const trimmed: string[] = [];
+  const conflicts: string[] = [];
   for (const [itemId, group] of grouped) {
     // 조례 표는 같은 행이 쪽마다 반복되기도 하고, 좌우 2단에서 같은 셀이 두 번
     // 읽히기도 한다. 라벨·금액이 모두 같으면 같은 행이다.
     const unique = new Map<string, BulkyWasteFee>();
     for (const fee of group) unique.set(`${fee.itemName}|${fee.spec}|${fee.feeKrw}`, fee);
-    const sorted = [...unique.values()].sort((a, b) => a.feeKrw - b.feeKrw);
+
+    // 라벨이 같은데 금액만 다르면 같은 행으로 볼 수 없다. `validate-data.mjs`가
+    // (itemId, itemName, spec) 중복을 error로 막으므로 그대로 두면 방금 쓴 파일이
+    // `pnpm check`에서 걸린다. 답변에도 같은 줄이 값만 다르게 두 번 찍힌다.
+    // 어느 금액이 맞는지 가릴 근거가 없으니 그 라벨은 통째로 뺀다.
+    const byLabel = new Map<string, BulkyWasteFee[]>();
+    for (const fee of unique.values()) {
+      const label = `${fee.itemName}|${fee.spec}`;
+      byLabel.set(label, [...(byLabel.get(label) ?? []), fee]);
+    }
+    const kept: BulkyWasteFee[] = [];
+    for (const [label, rows] of byLabel) {
+      if (rows.length === 1) {
+        kept.push(rows[0]);
+        continue;
+      }
+      conflicts.push(`${label} (${rows.map((fee) => fee.feeKrw).join("/")})`);
+      note("conflicting_fee");
+    }
+
+    const sorted = kept.sort((a, b) => a.feeKrw - b.feeKrw);
     if (sorted.length > MAX_FEE_ROWS) trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
     fees.push(...trimToCap(sorted));
   }
@@ -301,6 +384,12 @@ for (const regionId of targets) {
   console.log(`${regionId} (${region.name}): 조례 ${dump.rows.length}행 → 품목 ${grouped.size}개 / fee ${fees.length}행`);
   console.log(`  제외: ${JSON.stringify(Object.fromEntries([...skipped].sort((a, b) => b[1] - a[1])))}`);
   if (trimmed.length > 0) console.log(`  상한 적용: ${trimmed.join(", ")}`);
+  if (conflicts.length > 0) console.log(`  라벨 같고 금액 다름 — 제외: ${conflicts.join(", ")}`);
+}
+
+if (built.length === 0) {
+  console.error(`\n넣을 지역이 없다 — 먼저 pnpm fees:fetch [regionId...]로 원문을 받아라.`);
+  process.exit(1);
 }
 
 // 다른 트랙이 넣은 지역(골든셋 4곳, 표준데이터 4곳)은 건드리지 않는다.
@@ -308,3 +397,4 @@ const managed = new Set(built.map((schedule) => schedule.regionId));
 const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)), ...built];
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((n, s) => n + s.fees.length, 0)}행`);
+if (missing.length > 0) console.log(`원문이 없어 건너뛴 지역: ${missing.join(", ")}`);

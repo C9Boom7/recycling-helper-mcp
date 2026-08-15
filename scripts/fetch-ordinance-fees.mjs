@@ -479,6 +479,7 @@ function parseFeeRows(lines, startIndex) {
     return {
       rows: [],
       columns,
+      trailingConsumed,
       unsupportedForm: `연번이 첫 칸이 아닌데(${sequenceIndex}번 열) ${maxSequence}까지 올라간다 — 금액과 구분되지 않는다`,
     };
   }
@@ -499,6 +500,7 @@ function parseFeeRows(lines, startIndex) {
       return {
         rows: [],
         columns,
+        trailingConsumed,
         unsupportedForm: `금액 뒤 ${trailingNames} 열에 개정 이력 어휘 밖의 값이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
       };
     }
@@ -567,12 +569,12 @@ export async function collectRegion(target) {
       });
       if (start < 0) continue;
 
-      const { rows, columns, unsupportedForm } = parseFeeRows(lines, start);
+      const { rows, columns, trailingConsumed, unsupportedForm } = parseFeeRows(lines, start);
       if (unsupportedForm) {
         // 표는 찾았는데 파서가 못 다루는 형태다. 원문은 남기고 사유를 보고한다 —
         // 그냥 넘기면 "표 없음"과 구별되지 않아 커버리지 착시가 생긴다.
         result.law = law;
-        result.attachment = { ...attachment, header: lines[start], columns };
+        result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
         result.rawText = text;
         result.errors.push(`[${law.name}] ${attachment.title || "(제목 없음)"}: 열 구성 미지원 — ${unsupportedForm}`);
         return result;
@@ -587,7 +589,7 @@ export async function collectRegion(target) {
       }
 
       result.law = law;
-      result.attachment = { ...attachment, header: lines[start], columns };
+      result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
       result.rows = rows;
       result.rawText = text;
       return result;
@@ -634,7 +636,11 @@ async function main() {
 
     if (result.rows.length > 0) {
       const items = new Set(result.rows.map((row) => row.itemName)).size;
-      console.log(`${result.rows.length}행 / 품명 ${items}종 — ${result.law.kind} 「${result.law.name}」 시행 ${result.law.effectiveDate}`);
+      const trailing = result.attachment?.trailingConsumed ?? 0;
+      console.log(
+        `${result.rows.length}행 / 품명 ${items}종 — ${result.law.kind} 「${result.law.name}」 시행 ${result.law.effectiveDate}` +
+          (trailing > 0 ? ` (꼬리 칸 ${trailing}개 걷어냄)` : ""),
+      );
     } else {
       console.log("표 없음");
       failed += 1;

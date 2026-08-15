@@ -105,6 +105,7 @@ async function main() {
   let totalBySpec = 0;
   let totalMismatched = 0;
   let totalUnresolved = 0;
+  let emptyRegions = 0;
 
   for (const target of targets) {
     const schedule = schedules.find((item) => item.regionId === target.regionId);
@@ -119,11 +120,16 @@ async function main() {
     writeFileSync(`${OUTPUT_DIR}/${target.regionId}.json`, `${JSON.stringify(collected, null, 2)}\n`, "utf8");
 
     const law = collected.law;
-    console.log(
-      collected.rows.length > 0
-        ? `조례 ${collected.rows.length}행 — ${law.kind} 「${law.name}」 시행 ${law.effectiveDate}`
-        : "조례에서 행을 뽑지 못했다",
-    );
+    if (collected.rows.length === 0) {
+      // 대조할 원문이 없으면 이 지역은 검증되지 않은 것이다. 그냥 넘기면 아래에서
+      // 우리 행이 전부 `미확인`으로 빠지고 불일치는 0이 되어, 파서를 한 번도 못
+      // 맞춰본 실행이 통과로 읽힌다.
+      console.log("조례에서 행을 뽑지 못했다 — 대조 불가");
+      for (const error of collected.errors) console.log(`    ! ${error}`);
+      emptyRegions += 1;
+      continue;
+    }
+    console.log(`조례 ${collected.rows.length}행 — ${law.kind} 「${law.name}」 시행 ${law.effectiveDate}`);
     for (const error of collected.errors) console.log(`    ! ${error}`);
 
     const { matched, matchedBySpec, mismatched, unresolved } = verifyRegion(schedule, collected.rows);
@@ -151,12 +157,26 @@ async function main() {
   console.log(
     `\n합계 ${totalRows}행 — 일치 ${totalMatched + totalBySpec}, 불일치 ${totalMismatched}, 미확인 ${totalUnresolved}`,
   );
+  if (emptyRegions > 0) {
+    console.log(`${emptyRegions}개 지역에서 조례를 못 읽어 대조하지 못했다. 수집부터 고친 뒤 다시 돌린다.`);
+    process.exitCode = 1;
+    return;
+  }
   if (totalMismatched > 0) {
     console.log("불일치가 있다. 파서 결함인지 조례 개정인지 판별해 문서에 남긴 뒤 진행한다.");
     process.exitCode = 1;
     return;
   }
-  console.log("금액 불일치 0건 — R2 통과.");
+  // 불일치 0건만으로는 부족하다. 라벨이 안 맞아 대조에 못 쓴 행은 `미확인`으로
+  // 빠지는데, 그 수가 늘기만 해도 불일치는 계속 0이다. 실제로 맞춰본 행이 얼마나
+  // 되는지에 바닥을 둔다 — 실측 61/69(88%)라 절반은 넉넉한 선이다.
+  const matchedAll = totalMatched + totalBySpec;
+  if (totalRows === 0 || matchedAll * 2 < totalRows) {
+    console.log(`대조에 성공한 행이 ${matchedAll}/${totalRows}뿐이다 — 파서가 골든셋을 읽지 못하고 있다.`);
+    process.exitCode = 1;
+    return;
+  }
+  console.log(`금액 불일치 0건, 대조 ${matchedAll}/${totalRows}행 — R2 통과.`);
 }
 
 await main();
