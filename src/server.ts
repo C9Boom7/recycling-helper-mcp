@@ -629,11 +629,19 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   const planned = items.map((rawName) => {
     const resolved = resolveWasteItem(rawName);
     if (resolved.status === "not_found") {
+      // 못 찾았다고 빈손으로 돌려보내지 않는다. `get_disposal_steps`의 not_found는 이미
+      // 재질 원칙으로 착지하는데(Phase 1), 여기만 "확실히 찾지 못했습니다"로 끝나 있었다.
+      // 계획에 열 개를 넣으면 못 찾은 항목만 아무 안내 없이 남는다.
+      const principle = inferMaterialCategories(rawName, 1)
+        .map(findMaterialGuideline)
+        .filter(isMaterialGuideline)[0];
       return {
         input: rawName,
         found: false as const,
         group: "확인 필요",
-        summary: "초기 데이터에서 확실히 찾지 못했습니다.",
+        summary: principle
+          ? `초기 데이터에서 확실히 찾지 못했습니다. 재질로 보면 ${principle.label}: ${principle.quickRule}`
+          : "초기 데이터에서 확실히 찾지 못했습니다.",
       };
     }
 

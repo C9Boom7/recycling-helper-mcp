@@ -205,7 +205,7 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
   { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
   { category: "paper_cardboard", pattern: /종이|박스|상자|골판지|신문|서류|공책/u },
-  { category: "can_metal", pattern: /캔|깡통|고철|금속|철|쇠|알루미늄|스텐|스테인리스|양은/u },
+  { category: "can_metal", pattern: /캔|깡통|고철|금속|알루미늄|스텐|스테인리스|양은/u },
   { category: "glass_bottle", pattern: /유리/u },
   { category: "plastic_container", pattern: /플라스틱|페트|트레이|아크릴/u },
   { category: "textile", pattern: /옷|의류|섬유|이불|담요|커튼|수건|헝겊/u },
@@ -217,6 +217,13 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
 ];
 
 export function inferMaterialCategories(query: string, limit = 2): string[] {
+  // 재질 이름 하나만 들어온 경우는 부분 문자열 표를 훑지 않고 바로 갈래를 준다.
+  // 그 표는 `철` 같은 한 글자를 담을 수 없기 때문이다(MATERIAL_ONLY_QUERIES 주석 참고).
+  const materialOnly = MATERIAL_ONLY_QUERIES.get(normalizeText(query));
+  if (materialOnly) {
+    return [materialOnly];
+  }
+
   const lowered = query.toLowerCase();
   const categories: string[] = [];
   for (const { category, pattern } of MATERIAL_QUERY_PATTERNS) {
@@ -297,17 +304,43 @@ function isDisposalCategoryQuery(query: string): boolean {
  * 종량제·불연성이라 배출법이 갈린다. 재질 원칙 하나로 답하면 둘 중 하나는 틀린다.
  * 여기 넣는 기준은 "재질어인가"가 아니라 **"재질 안내가 지금 답보다 나은가"**다.
  *
- * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 exact로 먼저 걸리므로 영향이 없다.
+ * 낱말과 붙는 재질 갈래를 값으로 함께 둔다. `철`·`쇠`는 `MATERIAL_QUERY_PATTERNS`에 넣을 수 없다 —
+ * 그 표는 부분 문자열로 훑으므로 `지하철`·`철거`·`철학책`·`쇠고기`까지 캔·고철류로 끌고 간다
+ * (표 위 주석이 `글라스`·`껍질`을 뺀 것과 같은 이유다). **질의 전체가 그 낱말일 때만** 갈래를
+ * 지정하면 그 위험 없이 안내를 붙일 수 있다.
+ *
+ * 값이 `undefined`면 확정만 막고 갈래는 폴백의 기본 메뉴에 맡긴다. `목재`처럼 대응하는
+ * 재질 가이드가 없는 낱말은 아예 넣지 않는다 — 막아도 나아지는 게 없다.
+ *
+ * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 여기 없어야 한다. 이 게이트는
+ * `findWasteItems` 맨 앞에서 끊으므로 exact 매칭보다 먼저 걸려 **그 품목이 모든 툴에서
+ * 안 잡히게 된다.** `validate-data.mjs`가 품목명·별칭이 예약어와 겹치는지 검사한다.
  */
-const MATERIAL_ONLY_QUERIES = new Set(
-  ["종이", "비닐", "고무", "금속", "철", "쇠", "목재", "섬유", "가죽", "알루미늄", "스텐", "스테인리스", "헝겊"].map(
-    normalizeText,
-  ),
+const MATERIAL_ONLY_QUERIES = new Map<string, string | undefined>(
+  (
+    [
+      ["종이", "paper_cardboard"],
+      ["비닐", "vinyl_film"],
+      ["고무", "general_trash"],
+      ["가죽", "general_trash"],
+      ["금속", "can_metal"],
+      ["철", "can_metal"],
+      ["쇠", "can_metal"],
+      ["알루미늄", "can_metal"],
+      ["스텐", "can_metal"],
+      ["스테인리스", "can_metal"],
+      ["섬유", "textile"],
+      ["헝겊", "textile"],
+    ] as Array<[string, string | undefined]>
+  ).map(([word, category]) => [normalizeText(word), category]),
 );
 
 function isMaterialOnlyQuery(query: string): boolean {
   return MATERIAL_ONLY_QUERIES.has(normalizeText(query));
 }
+
+/** 예약어 목록. validate가 품목명·별칭과의 충돌을 막는 데 쓴다. */
+export const reservedQueryWords: string[] = [...DISPOSAL_CATEGORY_QUERIES, ...MATERIAL_ONLY_QUERIES.keys()];
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
 // 짧은 별칭이 독립 낱말로 걸렸을 때의 점수 = 이 값 + 별칭 길이. 길이를 더하는 건

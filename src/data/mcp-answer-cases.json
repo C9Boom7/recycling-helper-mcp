@@ -8203,5 +8203,21 @@
     "expectedTextIncludes": [
       "## 비닐랩"
     ]
+  },
+  {
+    "id": "material_cleanup_plan_gives_principle",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": [
+        "비닐",
+        "종이",
+        "우산"
+      ]
+    },
+    "expectedTextIncludes": [
+      "확인 필요",
+      "재질로 보면 비닐·필름류",
+      "재질로 보면 종이·상자류"
+    ]
   }
 ]
