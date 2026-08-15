@@ -296,15 +296,15 @@
     "regionId": "songpa_gu",
     "regionName": "서울 송파구",
     "checkedAt": "2026-07-02",
-    "applicationUrl": "https://www.songpa.go.kr/www/addWstExhAppView.do?key=2119",
-    "feeUrl": "https://www.songpa.go.kr/www/exhaustPrdlstList.do?key=2118&rep=1",
+    "applicationUrl": "https://smartclean.songpa.go.kr/online/bulky/request",
+    "feeUrl": "https://smartclean.songpa.go.kr/online/bulky/item",
     "phone": "02-2147-6380",
     "source": {
-      "title": "송파구청 품목별수거기준 및 비용",
-      "url": "https://www.songpa.go.kr/www/exhaustPrdlstList.do?key=2118&rep=1",
+      "title": "스마트클린 송파 대형폐기물 수수료 안내 (구 송파구청 품목별수거기준 및 비용)",
+      "url": "https://smartclean.songpa.go.kr/online/bulky/item",
       "sourceType": "local_guidance",
       "checkedAt": "2026-07-02",
-      "basis": "품목별수거기준 및 비용 표에서 Top 대형폐기물 일부와 사용자 질문 확장 후보인 빨래건조대, 화분, 장난감, 인형 행만 우선 구조화했습니다. 전체 표, 소파·책상·장롱·가전·컬러박스·전기담요 등 미선정 행은 이번 수집 범위에서 제외했습니다."
+      "basis": "품목별수거기준 및 비용 표에서 Top 대형폐기물 일부와 사용자 질문 확장 후보인 빨래건조대, 화분, 장난감, 인형 행만 우선 구조화했습니다. 전체 표, 소파·책상·장롱·가전·컬러박스·전기담요 등 미선정 행은 이번 수집 범위에서 제외했습니다. 2026-08-15 확인 시 기존 songpa.go.kr 페이지가 404였고 스마트클린 송파로 옮겨져 주소를 갱신했습니다. 금액은 2026-07-02 확인분 그대로이며 새 페이지 대조는 하지 않았습니다."
     },
     "fees": [
       {
