@@ -131,6 +131,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 강남구 지역 기준: [docs/gangnam-region-policy.md](docs/gangnam-region-policy.md)
 - 지역 정책 비교: [docs/region-policy-comparison.md](docs/region-policy-comparison.md)
 - 로컬 MCP 검증 흐름: [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)
+- 본선 이후로 미룬 과제: [docs/post-finals-backlog.md](docs/post-finals-backlog.md)
 
 품목 리뷰 상태: `verified` 39 / `region_review_needed` 84 / `needs_source` 7 / `standard_import` 142. 질문 백로그: `covered` 110 / `wont_fix` 1 / `todo` 0.
 
