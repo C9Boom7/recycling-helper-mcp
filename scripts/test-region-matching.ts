@@ -159,6 +159,8 @@ for (const region of regionalPolicies) {
 // `jung-gu`가 서울 중구로 단독 확정돼, 부산 중구 주민이 서울 중구의 전화번호와
 // 조례 수수료표를 받게 돼 있었다. 같은 이름의 자치구가 여럿인 이름은 광역 접두어
 // 없이 자치구로 확정되면 안 된다. 확정을 안 하는 한 되묻기든 폴백이든 상관없다.
+// 목록을 늘릴 때는 "서울에 있는 이름"이 아니라 **전국에 둘 이상 있는 이름**을 기준으로
+// 본다. 강서구가 그래서 빠져 있었다 — 서울에만 있는 줄 알기 쉽지만 부산에도 있다.
 const nationallyAmbiguousDistrictQueries = [
   "중구",
   "jung-gu",
@@ -170,6 +172,8 @@ const nationallyAmbiguousDistrictQueries = [
   "nam-gu",
   "북구",
   "buk-gu",
+  "강서구",
+  "gangseo-gu",
 ];
 
 for (const query of nationallyAmbiguousDistrictQueries) {
