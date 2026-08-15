@@ -1050,6 +1050,27 @@
         "feeKrw": 0
       },
       {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지(전기오븐)",
+        "spec": "높이1m미만",
+        "feeKrw": 0
+      },
+      {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지(전기오븐)",
+        "spec": "높이1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "signboard",
+        "category": "기타",
+        "itemName": "(입)간판",
+        "spec": "긴 면 기준 100cm 당 (플라스틱 재질에 한함)",
+        "feeKrw": 1000
+      },
+      {
         "itemId": "blender",
         "category": "가전제품류",
         "itemName": "믹서기",
@@ -1358,6 +1379,13 @@
         "feeKrw": 5000
       },
       {
+        "itemId": "copier",
+        "category": "가전제품류",
+        "itemName": "복사기",
+        "spec": "모든규격",
+        "feeKrw": 0
+      },
+      {
         "itemId": "baby_walker",
         "category": "기타",
         "itemName": "보행기",
@@ -1505,6 +1533,13 @@
         "feeKrw": 4000
       },
       {
+        "itemId": "paper_shredder",
+        "category": "가전제품류",
+        "itemName": "세단기",
+        "spec": "모든규격",
+        "feeKrw": 5000
+      },
+      {
         "itemId": "electric_fan",
         "category": "가전제품류",
         "itemName": "선풍기",
@@ -1629,6 +1664,20 @@
         "itemName": "소파 겸용 침대",
         "spec": "일반형",
         "feeKrw": 13000
+      },
+      {
+        "itemId": "jade_mat",
+        "category": "가전제품류",
+        "itemName": "옥매트",
+        "spec": "1인용",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "jade_mat",
+        "category": "가전제품류",
+        "itemName": "옥매트",
+        "spec": "2인용",
+        "feeKrw": 7000
       },
       {
         "itemId": "game_console",
@@ -2000,6 +2049,13 @@
         "itemName": "휠체어",
         "spec": "전동",
         "feeKrw": 11000
+      },
+      {
+        "itemId": "vanity_table",
+        "category": "가구류",
+        "itemName": "화장대",
+        "spec": "거울이 포함된 경우, 생활용품류>거울을 추가 접수하세요",
+        "feeKrw": 3000
       },
       {
         "itemId": "flower_pot",
@@ -2503,6 +2559,13 @@
         "feeKrw": 3000
       },
       {
+        "itemId": "paper_shredder",
+        "category": "가전제품류",
+        "itemName": "세단기",
+        "spec": "높이1m이상",
+        "feeKrw": 5000
+      },
+      {
         "itemId": "electric_fan",
         "category": "가전제품류",
         "itemName": "선풍기",
@@ -2608,6 +2671,20 @@
         "feeKrw": 4000
       },
       {
+        "itemId": "copier",
+        "category": "가전제품류",
+        "itemName": "복사기(1599-0903단일 무상 수거 품목)",
+        "spec": "긴 면이1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "copier",
+        "category": "가전제품류",
+        "itemName": "복사기(1599-0903단일 무상 수거 품목)",
+        "spec": "영업용",
+        "feeKrw": 10000
+      },
+      {
         "itemId": "dishwasher",
         "category": "가전제품류",
         "itemName": "식기세척기(1599-0903단일 무상 수거 품목)",
@@ -2702,6 +2779,13 @@
         "itemId": "rice_cooker",
         "category": "가전제품류",
         "itemName": "전기밥솥",
+        "spec": "가정용 소형",
+        "feeKrw": 0
+      },
+      {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지",
         "spec": "가정용 소형",
         "feeKrw": 0
       },
@@ -3665,6 +3749,34 @@
         "feeKrw": 2000
       },
       {
+        "itemId": "signboard",
+        "category": "생활용품류",
+        "itemName": "입간판",
+        "spec": "판형(높이100㎝당)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "signboard",
+        "category": "생활용품류",
+        "itemName": "간판",
+        "spec": "입체형(문자당)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "signboard",
+        "category": "생활용품류",
+        "itemName": "간판",
+        "spec": "판형(긴 면이100㎝당)",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "signboard",
+        "category": "생활용품류",
+        "itemName": "입간판",
+        "spec": "에어라이트(광고풍선)",
+        "feeKrw": 5000
+      },
+      {
         "itemId": "sewing_machine",
         "category": "생활용품류",
         "itemName": "재봉틀",
@@ -4096,6 +4208,20 @@
         "feeKrw": 4000
       },
       {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지",
+        "spec": "2구",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지",
+        "spec": "3구",
+        "feeKrw": 4000
+      },
+      {
         "itemId": "electric_heater",
         "category": "가전제품류",
         "itemName": "온풍기",
@@ -4290,6 +4416,27 @@
         "itemName": "의자",
         "spec": "나무, 철제, 등받이",
         "feeKrw": 1000
+      },
+      {
+        "itemId": "vanity_table",
+        "category": "가구류",
+        "itemName": "화장대",
+        "spec": "높이 1M 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "vanity_table",
+        "category": "가구류",
+        "itemName": "화장대",
+        "spec": "모든 규격",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "vanity_table",
+        "category": "가구류",
+        "itemName": "화장대",
+        "spec": "높이 1M 이상",
+        "feeKrw": 5000
       },
       {
         "itemId": "drawer_chest",
@@ -4611,6 +4758,20 @@
         "category": "가구류",
         "itemName": "책상",
         "spec": "회의용 책상",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "copier",
+        "category": "가전제품류",
+        "itemName": "복사기",
+        "spec": "높이 1M 미만",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "copier",
+        "category": "가전제품류",
+        "itemName": "복사기",
+        "spec": "높이 1M 이상",
         "feeKrw": 10000
       },
       {
@@ -5038,6 +5199,13 @@
         "feeKrw": 4000
       },
       {
+        "itemId": "gas_range",
+        "category": "가전제품류",
+        "itemName": "가스레인지",
+        "spec": "가로x세로x높이_50센티미터x50센티미터x20센티미터 기준",
+        "feeKrw": 2000
+      },
+      {
         "itemId": "air_purifier",
         "category": "가전제품류",
         "itemName": "공기청정기",
@@ -5190,6 +5358,20 @@
         "itemName": "피아노",
         "spec": "일반",
         "feeKrw": 15000
+      },
+      {
+        "itemId": "paper_shredder",
+        "category": "기타",
+        "itemName": "세단기",
+        "spec": "제한사항 없음",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "copier",
+        "category": "기타",
+        "itemName": "복사기",
+        "spec": "제한사항 없음",
+        "feeKrw": 10000
       },
       {
         "itemId": "fire_extinguisher",
