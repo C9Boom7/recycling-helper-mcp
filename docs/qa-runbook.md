@@ -46,13 +46,38 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$
   https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/mcp
 ```
 
-두 주소 모두 `칫솔` 카드가 나와야 조사 처리가 들어간 빌드다. `확실히 찾지 못했습니다`가 나오면 그 이전 빌드다.
-**한쪽만 카드가 나오면 `items`가 같더라도 등록 불일치다** — 위의 등록 불일치 항목으로 돌아간다.
+**응답에 `칫솔`이 보이는지로 판정하면 안 된다.** 못 찾았을 때의 폴백 문구가 질의를 그대로 되풀이해서
+(`입력한 품목 "칫솔은요?"을(를) ... 확실히 찾지 못했습니다`) 구버전 응답에도 `칫솔`이 들어 있다.
+눈으로 훑거나 `grep 칫솔`로 보면 옛 빌드를 최신으로 읽는다 — 이 절이 막으려는 바로 그 오진이다.
+
+판정은 아래를 그대로 쓴다. 확정 매칭만 위젯 카드로 나가므로 `widget`이라는 낱말 자체가 신호다
+(응답 안에서는 `{\"widget\":...`로 이스케이프돼 있어 따옴표까지 넣어 찾으면 안 걸린다).
+
+```bash
+PROBE='{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_disposal_steps","arguments":{"itemName":"칫솔은요?"}}}'
+for H in https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io \
+         https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io; do
+  R=$(curl -sS -H 'content-type: application/json' -H 'accept: application/json' -d "$PROBE" $H/mcp)
+  printf "%-60s " "$H"
+  if   echo "$R" | grep -q 'Not Acceptable';        then echo "406 — JSON-only 미지원 빌드"
+  elif echo "$R" | grep -q '확실히 찾지 못했습니다'; then echo "구버전 (폴백)"
+  elif echo "$R" | grep -q 'widget';                 then echo "최신 (카드)"
+  else echo "판정 불가 — 응답 원문을 직접 본다"; fi
+done
+```
+
+한쪽 주소만 최신으로 나오면 `items`가 같더라도 등록 불일치다 — 위의 등록 불일치 항목으로 돌아간다.
 
 `Not Acceptable: Client must accept both application/json and text/event-stream` 오류가 돌아오는 경우도 있다.
-**이건 Phase 0 이전 빌드라는 뜻이다** — JSON-only `tools/call` 지원이 Phase 0에서 들어갔기 때문이다.
-2026-08-15 기준 운영 등록 주소가 이 상태다. 카드도 폴백도 아닌 오류이므로 위 두 판정에 걸리지 않는데,
-사실 가장 확실한 구버전 신호다. 이때는 응답 내용을 더 볼 것 없이 등록 불일치 항목으로 간다.
+**JSON-only `tools/call`을 지원하기 전 빌드라는 뜻이다.** 이 지원은 Phase 0 코드 리뷰 후속으로 들어갔으므로,
+"Phase 0 이전"이라고 단정하지는 마라 — `items`가 130인 빌드 중에도 이 경로가 되는 것과 안 되는 것이 갈린다
+([playmcp-in-kc.md](playmcp-in-kc.md)의 `a696026` 검증 이력). 어느 커밋인지는 이 신호만으로 못 짚는다.
+
+**어느 주소에서 났는지가 다음 행동을 가른다.**
+
+- 운영 등록 주소에서 났다 → 등록 불일치다. 등록 불일치 항목으로 간다. (2026-08-15 기준이 이 상태다.)
+- **재배포 대상에서 났다 → 등록 문제가 아니라 우리 서버에 옛 빌드가 떠 있는 것이다.** 롤백이나 배포 실패를 의심하고
+  PlayMCP in KC 콘솔에서 다시 배포한다. 이쪽을 등록 문제로 오해하면 엉뚱한 데를 파게 된다.
 
 **런타임을 고칠 때마다 이 프로브도 갱신한다.** 배포 여부를 가르는 기준은 "그 배포에서만 달라지는 응답"이지
 품목 수가 아니다. 데이터만 바뀐 배포라면 `items`로 충분하다.
