@@ -1752,7 +1752,7 @@
       ],
       "phone": "031-729-3205",
       "applicationUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=1",
-      "feeUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
+      "feeUrl": "https://waste.isdc.co.kr/contents/order_item.php?cIdx=4",
       "contactCheckedAt": "2026-07-05"
     },
     "smallElectronics": {
@@ -1940,7 +1940,7 @@
       },
       {
         "title": "성남시 대형폐기물 인터넷 배출신고 - 처리비용안내",
-        "url": "https://waste.isdc.co.kr/contents/content.php?cIdx=4",
+        "url": "https://waste.isdc.co.kr/contents/order_item.php?cIdx=4",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-15",
         "basis": "품목별 처리비용 표. 성남도시개발공사 운영, 대표자 성남시장. 장롱 폭120cm이상 1쪽 15,000원, 책상 상판길이 150cm 이상 8,000원 등이 확인되며 냉장고·세탁기는 무상수거로 표기된다"
