@@ -56,7 +56,7 @@ Kakao Tools Preview에서 실사용 시나리오를 돌려 **툴 호출률과 �
 - ~~p99 응답속도 간이 측정~~ — 2026-08-15 배포본에서 완료. 연결을 재사용한 39건이 평균 51ms·p95 71ms·최대 108ms로 목표(평균 100ms, p99 3,000ms) 안에 들어온다. 기록은 [deploy-verification-2026-08-15.md](../deploy-verification-2026-08-15.md).
 - README 갱신: 본선 아키텍처(Kakao Tools), 위젯, 폴백, 데이터 카운트.
 - `docs/prd/README.md` 진행 상태 표 마감.
-- QA 대응 런북 작성 (`docs/qa-runbook.md`): 로그 확인 방법(R6 로깅 필드), 재배포 절차, WIDGET_ENABLED 토글, 예상 문의 유형별 대응.
+- ~~QA 대응 런북 작성 (`docs/qa-runbook.md`)~~ — 2026-08-15 완료. 30초 초기 점검, 로그 필드 읽는 법, 문의 5유형별 대응, `WIDGET_ENABLED` 토글, 수정·배포 절차, 건드리면 안 되는 것.
 
 ### R4. 마감 게이트
 
