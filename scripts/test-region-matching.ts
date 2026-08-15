@@ -154,6 +154,34 @@ for (const region of regionalPolicies) {
   }
 }
 
+// 위 루프의 반대 방향. 별칭을 "그 지역으로 가는지"만 보면, 전국에 여럿인 이름을
+// 한 지역이 독차지하는 사고는 통과한다 — 실제로 서울 중구를 넣으면서 `중구`와
+// `jung-gu`가 서울 중구로 단독 확정돼, 부산 중구 주민이 서울 중구의 전화번호와
+// 조례 수수료표를 받게 돼 있었다. 같은 이름의 자치구가 여럿인 이름은 광역 접두어
+// 없이 자치구로 확정되면 안 된다. 확정을 안 하는 한 되묻기든 폴백이든 상관없다.
+const nationallyAmbiguousDistrictQueries = [
+  "중구",
+  "jung-gu",
+  "동구",
+  "dong-gu",
+  "서구",
+  "seo-gu",
+  "남구",
+  "nam-gu",
+  "북구",
+  "buk-gu",
+];
+
+for (const query of nationallyAmbiguousDistrictQueries) {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status === "match" && resolution.match.level === "district") {
+    failures.push(
+      `"${query}" confidently resolved to district ${resolution.match.region.id}; ` +
+        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다",
+    );
+  }
+}
+
 for (const testCase of regionEvaluationCases) {
   const resolution = resolveRegionalPolicy(testCase.region);
 
