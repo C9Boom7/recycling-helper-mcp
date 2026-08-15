@@ -1,4 +1,7 @@
-node_modules/
+# 뒤에 슬래시를 붙이면 디렉터리만 걸러진다. 워크트리는 node_modules를 메인
+# 저장소로 거는 심볼릭 링크로 두는데, 슬래시가 붙어 있으면 그 링크가 무시 대상에서
+# 빠져 git에 커밋돼 버린다(실제로 커밋돼 있었다).
+node_modules
 dist/
 .pnpm-store/
 .DS_Store
