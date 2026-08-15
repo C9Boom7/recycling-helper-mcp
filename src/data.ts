@@ -312,9 +312,10 @@ function isDisposalCategoryQuery(query: string): boolean {
  * 값이 `undefined`면 확정만 막고 갈래는 폴백의 기본 메뉴에 맡긴다. `목재`처럼 대응하는
  * 재질 가이드가 없는 낱말은 아예 넣지 않는다 — 막아도 나아지는 게 없다.
  *
- * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 여기 없어야 한다. 이 게이트는
- * `findWasteItems` 맨 앞에서 끊으므로 exact 매칭보다 먼저 걸려 **그 품목이 모든 툴에서
- * 안 잡히게 된다.** `validate-data.mjs`가 품목명·별칭이 예약어와 겹치는지 검사한다.
+ * 품목명·별칭과 정확히 일치하는 낱말(`스티로폼`, `캔`)은 여기 없어야 한다. 게이트가
+ * `resolveWasteItem` 맨 앞에서 끊으므로 exact 매칭보다 먼저 걸려 **그 품목을 확정할 수
+ * 없게 된다.** `scripts/evaluate-data.ts`가 품목명·별칭과 예약어의 충돌을 검사한다
+ * (`validate-data.mjs`는 TS를 읽지 못해 목록을 복제해야 하므로 그쪽에 두지 않았다).
  */
 const MATERIAL_ONLY_QUERIES = new Map<string, string | undefined>(
   (
@@ -705,7 +706,7 @@ function rankMatches(matches: WasteMatch[]): WasteMatch[] {
 
 export function findWasteItems(query: string, limit = 5): WasteMatch[] {
   const normalizedQuery = normalizeText(query);
-  if (!normalizedQuery || isDisposalCategoryQuery(query) || isMaterialOnlyQuery(query)) {
+  if (!normalizedQuery || isDisposalCategoryQuery(query)) {
     return [];
   }
 
@@ -792,6 +793,15 @@ export type WasteQueryResolution =
  * before (e.g. "약" and "약병" can both legitimately hit in the same sentence).
  */
 export function resolveWasteItem(query: string): WasteQueryResolution {
+  // 재질 이름 하나짜리 질의는 **확정만** 막는다. 카테고리어와 달리 게이트가
+  // `findWasteItems`가 아니라 여기 있는 이유가 있다 — `check_confusing_item`은
+  // `findWasteItems`를 직접 부르는데, "종이"에 코팅지·종이호일을 늘어놓는 것은
+  // 그 툴에서는 **정확히 원하는 동작**이다. 헷갈리는 품목을 보여 달라는 툴이니까.
+  // 잘못된 건 그 목록의 첫 줄을 답으로 확정하는 것이지 목록 자체가 아니다.
+  if (isMaterialOnlyQuery(query)) {
+    return { status: "not_found" };
+  }
+
   // A bare category term comes back empty from findWasteItems, which lands on
   // the not_found fallback below.
   const matches = findWasteItems(query, wasteItems.length);

@@ -8219,5 +8219,27 @@
       "재질로 보면 비닐·필름류",
       "재질로 보면 종이·상자류"
     ]
+  },
+  {
+    "id": "material_confusing_item_still_lists",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "종이"
+    },
+    "expectedTextIncludes": [
+      "코팅지"
+    ]
+  },
+  {
+    "id": "material_region_info_gives_principle",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 강남구",
+      "itemName": "비닐"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다",
+      "재질로 보면 비닐·필름류"
+    ]
   }
 ]
