@@ -3739,7 +3739,8 @@
       "책상의자",
       "식탁의자",
       "컴퓨터 의자",
-      "낡은 의자"
+      "낡은 의자",
+      "화장대 의자"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -7826,7 +7827,10 @@
       "폐토너",
       "토너 가루",
       "누출된 토너 카트리지",
-      "프린터 잉크 카트리지"
+      "프린터 잉크 카트리지",
+      "복사기 토너",
+      "복사기 카트리지",
+      "복사기 토너 카트리지"
     ],
     "category": "office_supplies_mixed",
     "disposalType": "general_or_takeback_if_not_empty",
@@ -20822,6 +20826,413 @@
       "lastReviewedAt": "2026-08-14",
       "notes": [
         "Phase 7 대형폐기물 품목 확장. 난로 질의가 일회용 손난로로 오매칭되던 것을 해소."
+      ]
+    }
+  },
+  {
+    "id": "vanity_table",
+    "name": "화장대",
+    "aliases": [
+      "경대",
+      "대리석 화장대",
+      "화장 테이블"
+    ],
+    "category": "furniture",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky"
+    ],
+    "summary": "화장대는 지자체에 대형폐기물로 신고한 뒤 스티커를 붙여 배출하고, 거울이 달려 있으면 신고할 때 함께 알립니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "거울이 붙어 있으면 신고할 때 함께 적습니다. 거울을 따로 매기는 지자체가 있습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다."
+    ],
+    "cautions": [
+      "가정에서 나온 목재 가구는 표면에 방부제·페인트·오일이 처리돼 있어 물질 재활용이 어렵고 주로 소각하거나 고형연료로 씁니다.",
+      "수수료 고시에 \"화장대(거울 별도)\"로 적어 둔 지자체가 많으므로 거울 포함 여부를 확인합니다.",
+      "상태가 좋으면 재활용센터에서 매입하거나 무상으로 가져가기도 하니 배출 전에 문의해 볼 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고 절차와 수수료, 거울을 따로 매기는지가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "거울 별도 신고 여부"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 화장대",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 화장대",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%ED%99%94%EC%9E%A5%EB%8C%80",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "화장대는 대형폐기물로 배출합니다. 가정에서 배출하는 목재제품은 표면에 방부제·페인트·오일이 처리되어 있어 물질 재활용이 어려워 주로 소각하거나 고형연료제품으로 에너지 재활용합니다. 상태가 좋은 폐가구는 재활용센터에 판매할 수 있고 무상으로 수거하는 업체도 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 137개 지자체가 \"화장대\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "\"화장대(거울 별도)\", \"화장대*거울별도\"처럼 거울을 분리해 매기는 표기가 반복해서 나옵니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 물티슈로 되묻던 화장대 질의를 이 품목이 받는다.",
+        "mirror의 별칭 \"화장대 거울\"은 수식어 위치라 확정 근거가 되지 못했고, \"화장대 거울\" 질의는 여전히 거울로 간다."
+      ]
+    }
+  },
+  {
+    "id": "signboard",
+    "name": "간판",
+    "aliases": [
+      "입간판",
+      "광고판",
+      "광고 간판"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky",
+      "mixed_material"
+    ],
+    "summary": "간판은 지자체에 대형폐기물로 신고하고 수수료를 낸 뒤 배출합니다.",
+    "steps": [
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "신고할 때 가로·세로 크기와 벽면 간판인지 입간판인지를 알립니다. 규격에 따라 수수료가 달라집니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다."
+    ],
+    "cautions": [
+      "간판과 입간판을 따로 고시한 지자체가 많으므로 신고할 때 어느 쪽인지 밝힙니다.",
+      "네온관이나 형광램프가 들어 있으면 램프를 따로 빼야 하는지 지자체에 확인합니다.",
+      "철제 프레임과 아크릴이 붙어 있어 그대로는 재활용품으로 분리배출되지 않습니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고 절차와 규격별 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "규격별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 97개 지자체가 \"간판\"을 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "품목사전에 개별 항목이 없어 지자체 고시 등재 사실을 근거로 삼았습니다. \"(입)간판\", \"간판(입간판, 광고판)\", \"간판류\" 표기가 함께 나옵니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 계란판으로 되묻던 간판 질의를 이 품목이 받는다.",
+        "품목사전 근거가 없어 confidence는 medium으로 둔다."
+      ]
+    }
+  },
+  {
+    "id": "copier",
+    "name": "복사기",
+    "aliases": [
+      "전자복사기",
+      "사무용 복사기",
+      "업무용 복사기"
+    ],
+    "category": "electronics_appliance",
+    "disposalType": "free_visit_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "bulky"
+    ],
+    "summary": "복사기는 폐가전제품 무상방문수거 서비스(1599-0903)로 1대부터 무료로 배출할 수 있고, 이용이 어려우면 지자체 대형폐기물로 신고합니다.",
+    "steps": [
+      "폐가전제품 무상방문수거 서비스(1599-0903 또는 www.15990903.or.kr)에 예약합니다. 복사기는 단일배출품목이라 1대부터 무상 수거됩니다.",
+      "토너·잉크 카트리지는 본체와 배출 기준이 다르므로 미리 분리해 따로 배출합니다.",
+      "무상수거를 이용하기 어려우면 지자체에 대형폐기물로 신고하고 수수료를 낸 뒤 배출합니다."
+    ],
+    "cautions": [
+      "분해했거나 원형이 훼손된 제품은 무상방문수거 대상에서 빠집니다.",
+      "상태가 좋으면 재활용센터에서 매입하거나 무상으로 가져가기도 하니 배출 전에 문의해 볼 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "무상방문수거를 이용하지 못하면 대형폐기물로 가는데, 신고 방법과 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "무상방문수거 예약 가능 여부",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 복사기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 복사기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%B3%B5%EC%82%AC%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "복사기는 폐가전제품 무상방문수거 서비스(1599-0903)를 이용해 배출하고, 이용이 어려운 경우에는 대형폐기물로 배출합니다. 복사기는 대형가전제품으로 단일배출품목에 해당해 1개 이상 배출할 때 무상방문수거서비스를 이용할 수 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 100개 지자체가 \"복사기\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "\"복사기(1599-0903단일 무상 수거 품목)\", \"복사기(*무상수거 불가한 경우에만 해당)\" 표기가 있어 무상수거가 먼저이고 대형폐기물이 보조 경로임을 고시에서도 확인할 수 있습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 프린터로 되묻던 복사기 질의를 이 품목이 받는다.",
+        "프린터는 소형가전이라 5개 이상 모아야 무상수거가 되지만 복사기는 1대부터 된다 — 그래서 별도 품목으로 둔다.",
+        "\"복합기\"는 기존대로 프린터가 계속 받는다."
+      ]
+    }
+  },
+  {
+    "id": "gas_range",
+    "name": "가스레인지",
+    "aliases": [
+      "가스렌지",
+      "가정용 가스레인지",
+      "업소용 가스레인지"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky",
+      "mixed_material"
+    ],
+    "summary": "가스레인지는 폐가전 무상방문수거로 가져가지 않는 품목이라 지자체에 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "가스 밸브를 잠그고 연결 호스를 분리한 뒤 남은 부탄가스가 없는지 확인합니다.",
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다."
+    ],
+    "cautions": [
+      "가스레인지는 폐가전제품 무상방문수거 서비스로 배출할 수 없습니다.",
+      "오븐이 붙은 가스오븐레인지는 고시에서 별도 품목이라 수수료가 다를 수 있습니다.",
+      "가스레인지를 올려 두는 가스레인지대(받침장)는 가구로 따로 매기는 지자체가 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고 절차와 수수료가 지역마다 다릅니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "배출 장소와 일자"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 가스레인지",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 가스레인지",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EA%B0%80%EC%8A%A4%EB%A0%88%EC%9D%B8%EC%A7%80",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "가스레인지는 가스를 이용한 취사도구로 대형폐기물로 배출합니다. 유의사항으로 \"무상방문수거서비스를 통한 배출 불가\"가 명시되어 있고, 유사검색어에 가스오븐레인지가 별도로 올라 있습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 58개 지자체가 \"가스레인지\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "\"가스레인지대\"(받침장)는 가구 쪽 품목이라 이 품목과 구분해야 합니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 라이터로 되묻던 가스레인지 질의를 이 품목이 받는다.",
+        "가스오븐레인지와 서로 잡아먹지 않는지 확인했다. 별칭 \"가스레인지 오븐\"은 수식어 위치(36점)라 확정 근거가 못 되고, \"가스오븐레인지\"·\"가스오븐렌지\" 질의는 그대로 가스오븐레인지가 받는다."
+      ]
+    }
+  },
+  {
+    "id": "jade_mat",
+    "name": "옥매트",
+    "aliases": [
+      "옥장판",
+      "돌매트",
+      "황토매트"
+    ],
+    "category": "bulky_household",
+    "disposalType": "bulky_waste",
+    "conditions": [
+      "bulky",
+      "electronics"
+    ],
+    "summary": "옥매트는 폐가전 무상방문수거에서 빠지는 품목이라 지자체에 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "전원선을 뽑고 온도조절기를 매트와 함께 묶어 부피를 줄입니다.",
+      "지자체 대형폐기물 신고(앱·인터넷·주민센터)를 하고 배출번호(스티커)를 받습니다.",
+      "발급받은 스티커를 붙여 지정된 장소와 일자에 배출합니다."
+    ],
+    "cautions": [
+      "옥장판은 폐가전제품 무상방문수거 서비스에서 수거하지 않는 품목입니다.",
+      "전기장판과 온수매트는 별도 품목이라 배출 방법과 수수료가 다릅니다.",
+      "옥돌이 들어 있어 무거우므로 신고할 때 크기와 무게를 함께 알립니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고 절차와 수수료가 지역마다 다르고, 전기매트류를 한 품목으로 묶어 고시한 곳도 있습니다.",
+      "checkItems": [
+        "대형폐기물 신고 방법",
+        "품목별 수수료",
+        "전기매트류 묶음 고시 여부"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 전기장판",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 전기장판",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%A0%84%EA%B8%B0%EC%9E%A5%ED%8C%90",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전기장판 항목의 유의사항에 \"옥장판은 무상방문수거서비스 수거 불가 품목\"이 명시되어 있습니다. 수거함 배출이 어렵거나 무상수거를 이용할 수 없는 경우에는 대형폐기물로 배출합니다.",
+        "note": "옥매트 개별 항목이 없어, 옥장판을 무상수거에서 제외한다는 같은 항목의 유의사항을 근거로 삼았습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 50개 지자체가 \"옥매트\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "\"옥매트, 황토매트, 온수매트, 전기매트\"처럼 전기매트류를 한 줄로 묶어 고시한 지자체가 많습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 요가매트로 되묻던 옥매트 질의를 이 품목이 받는다.",
+        "전기장판(electric_blanket)·온수매트(water_heating_mat)의 별칭은 건드리지 않았다. \"전기매트\"·\"온수매트\" 질의는 그대로 각자 품목이 받는다.",
+        "품목사전에 옥매트 개별 항목이 없어 confidence는 medium으로 둔다."
+      ]
+    }
+  },
+  {
+    "id": "paper_shredder",
+    "name": "세단기",
+    "aliases": [
+      "문서세단기",
+      "문서파쇄기",
+      "종이 세절기"
+    ],
+    "category": "electronics",
+    "disposalType": "small_electronics_collection_or_bulky",
+    "conditions": [
+      "electronics",
+      "separate_parts"
+    ],
+    "summary": "세단기는 소형전기전자제품 전용수거함에 넣고, 사무용처럼 커서 들어가지 않으면 대형폐기물로 신고해 배출합니다.",
+    "steps": [
+      "안에 남은 종이 부스러기와 수거통을 비웁니다.",
+      "주민센터·아파트 단지의 소형전기전자제품 전용수거함에 넣습니다. 중소형 가전이 5개 이상이거나 대형가전과 함께 내놓으면 무상방문수거(1599-0903)를 이용합니다.",
+      "수거함에 들어가지 않는 사무용 대형 세단기는 지자체에 대형폐기물로 신고합니다."
+    ],
+    "cautions": [
+      "전용수거함 위치와 대형폐기물 전환 기준은 지역마다 다르므로 거주 지자체 안내를 확인합니다.",
+      "잘게 잘린 종이는 따로 나오므로 배출 방법을 지자체 안내에서 확인합니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "regionPolicy": {
+      "scope": "local_collection_point",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "소형가전 전용수거함 위치와 대형폐기물 전환 기준이 지역마다 다릅니다.",
+      "checkItems": [
+        "소형전기전자제품 전용수거함 위치",
+        "대형폐기물 신고 방법",
+        "품목별 수수료"
+      ]
+    },
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+      "전국대형폐기물수거수수료정보표준데이터 (행정안전부)"
+    ],
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 선풍기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%84%A0%ED%92%8D%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "소형 전기전자제품은 전용수거함으로 배출하고, 5개 이상이거나 대형 제품과 함께 낼 때는 무상방문수거(1599-0903)를 이용합니다. 전용수거함이 없으면 지자체에 문의합니다.",
+        "note": "세단기 개별 항목이 없어 소형 전기전자제품 공통 안내를 적용했습니다."
+      },
+      {
+        "title": "전국대형폐기물수거수수료정보표준데이터 (행정안전부)",
+        "url": "https://www.data.go.kr/data/15114146/standard.do",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-15",
+        "basis": "전국 37개 지자체가 \"세단기\"를 대형폐기물 수수료 고시 품목으로 등재하고 있습니다.",
+        "note": "\"세단기(*무상수거 불가한 경우에만 해당)\" 표기가 있어 대형폐기물이 보조 경로임을 확인할 수 있습니다."
+      }
+    ],
+    "review": {
+      "status": "standard_import",
+      "reviewer": "phase-7-bulky-item-expansion",
+      "lastReviewedAt": "2026-08-15",
+      "notes": [
+        "Phase 7 후속 배치. 품목이 없어 세면대·세탁기로 되묻던 세단기 질의를 이 품목이 받는다. 측정 세트 밖이지만 되묻는 원인은 다섯 건과 같다.",
+        "품목사전에 개별 항목이 없어 confidence는 medium으로 둔다."
       ]
     }
   }

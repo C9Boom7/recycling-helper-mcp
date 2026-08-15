@@ -91,7 +91,7 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 4b | 미착수 | - | 4a 완주 이후 |
 | 5 | 완료 (PR #10·#11 머지됨) | claude/phase5-doc-plan-review-4dcfdb 외 | 지역 5 → 35(full 5, standard 13, metro 17). R4는 최소선 21곳 중 13곳, 8곳은 백로그 |
 | 6 | R0 완료 (14/14), R1 대기 | - | 조사 결과는 `docs/ordinance-fee-availability-2026-08-15.md`. 겹치던 4곳(용산·노원·강서·관악)은 공공데이터포털 표준데이터 트랙으로 넘겨 Phase 6은 10곳 담당 |
-| 7 | PRD + R1 완료 (PR #14) | claude/region-expansion-analysis | 복합명사 수식어 오매칭 교정으로 오매칭 13 → 6. R2 품목 확장·R3 별칭·R4 수수료 4곳 남음 |
+| 7 | R1~R5 완료, 후속 배치 PR 진행 중 | claude/phase7-r2-batch4 외 | 오매칭 13 → 0, 답변 가능 94/100, 품목 324개. 되묻기 5건 해소 배치까지 마쳐 ambiguous는 포괄어 4건만 남았다 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
 

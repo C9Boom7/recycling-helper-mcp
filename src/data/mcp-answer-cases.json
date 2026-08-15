@@ -7759,5 +7759,313 @@
     "expectedStructuredIncludes": [
       "\"id\":\"mattress\""
     ]
+  },
+  {
+    "id": "phase7b_vanity_table_gangseo_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장대",
+      "region": "서울 강서구"
+    },
+    "expectedTextIncludes": [
+      "## 화장대",
+      "화장대 높이 1M 이상: 5,000원"
+    ],
+    "expectedTextExcludes": [
+      "## 물티슈"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"vanity_table\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_vanity_mirror_query_still_mirror",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장대 거울",
+      "region": "서울 강서구"
+    },
+    "expectedTextIncludes": [
+      "## 거울"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"mirror\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"vanity_table\""
+    ]
+  },
+  {
+    "id": "phase7b_vanity_chair_still_chair",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "화장대 의자"
+    },
+    "expectedTextIncludes": [
+      "## 의자"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"chair\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"vanity_table\""
+    ]
+  },
+  {
+    "id": "phase7b_signboard_nowon_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "간판",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "## 간판",
+      "입간판 판형(높이100㎝당): 2,000원"
+    ],
+    "expectedTextExcludes": [
+      "## 계란판"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"signboard\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_egg_tray_query_still_egg_tray",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "계란판"
+    },
+    "expectedTextIncludes": [
+      "## 계란판"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"signboard\""
+    ]
+  },
+  {
+    "id": "phase7b_copier_gwanak_free_visit_first",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "복사기",
+      "region": "서울 관악구"
+    },
+    "expectedTextIncludes": [
+      "## 복사기",
+      "1599-0903",
+      "단일배출품목",
+      "복사기 제한사항 없음: 10,000원"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"copier\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_multifunction_printer_still_printer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "복합기"
+    },
+    "expectedTextIncludes": [
+      "## 프린터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"printer\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"copier\""
+    ]
+  },
+  {
+    "id": "phase7b_copier_toner_cartridge_still_toner",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "복사기 토너 카트리지"
+    },
+    "expectedTextIncludes": [
+      "## 토너 카트리지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toner_cartridge\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"copier\""
+    ]
+  },
+  {
+    "id": "phase7b_copier_toner_still_toner",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "복사기 토너"
+    },
+    "expectedTextIncludes": [
+      "## 토너 카트리지"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"copier\""
+    ]
+  },
+  {
+    "id": "phase7b_gas_range_gangseo_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스레인지",
+      "region": "서울 강서구"
+    },
+    "expectedTextIncludes": [
+      "## 가스레인지",
+      "무상방문수거 서비스로 배출할 수 없습니다",
+      "가스레인지 2구: 3,000원"
+    ],
+    "expectedTextExcludes": [
+      "## 라이터",
+      "## 가스오븐레인지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"gas_range\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_gas_oven_range_not_eaten_by_gas_range",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스오븐레인지"
+    },
+    "expectedTextIncludes": [
+      "## 가스오븐레인지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"gas_oven_range\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "phase7b_gas_range_oven_phrase_still_oven_range",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스레인지 오븐"
+    },
+    "expectedTextIncludes": [
+      "## 가스오븐레인지"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"gas_oven_range\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "phase7b_jade_mat_yongsan_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옥매트",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "## 옥매트",
+      "무상방문수거 서비스에서 수거하지 않는 품목입니다",
+      "옥매트 2인용: 7,000원"
+    ],
+    "expectedTextExcludes": [
+      "## 요가매트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"jade_mat\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_electric_mat_still_electric_blanket",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전기매트"
+    },
+    "expectedTextIncludes": [
+      "## 전기장판"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"electric_blanket\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"jade_mat\""
+    ]
+  },
+  {
+    "id": "phase7b_jade_bed_query_still_stone_bed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "옥침대"
+    },
+    "expectedTextIncludes": [
+      "## 돌침대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stone_bed\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"jade_mat\""
+    ]
+  },
+  {
+    "id": "phase7b_paper_shredder_yongsan_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "세단기",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "## 세단기",
+      "세단기 모든규격: 5,000원"
+    ],
+    "expectedTextExcludes": [
+      "## 세면대",
+      "## 세탁기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"paper_shredder\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "phase7b_washbasin_still_washbasin",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "세면대"
+    },
+    "expectedTextIncludes": [
+      "## 세면대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"washbasin\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"paper_shredder\""
+    ]
+  },
+  {
+    "id": "phase7b_table_word_stays_ambiguous",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "상"
+    },
+    "expectedTextIncludes": [
+      "여러 품목에 해당할 수 있어",
+      "후보:",
+      "식탁"
+    ],
+    "expectedTextExcludes": [
+      "## 식탁",
+      "## 책상"
+    ],
+    "expectedStructuredIncludes": [
+      "\"ambiguous\":true",
+      "\"itemName\":\"상\""
+    ]
   }
 ]

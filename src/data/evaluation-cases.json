@@ -1906,5 +1906,41 @@
     "expectedItemId": "space_heater",
     "expectedDisposalType": "small_electronics_collection_or_bulky",
     "notes": "Phase 7. 일회용 손난로로 오매칭되던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "화장대 어떻게 버려?",
+    "expectedItemId": "vanity_table",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 후속 배치. 품목이 없어 물티슈로 되묻던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "간판 어떻게 버려?",
+    "expectedItemId": "signboard",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 후속 배치. 품목이 없어 계란판으로 되묻던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "복사기 어떻게 버려?",
+    "expectedItemId": "copier",
+    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "notes": "Phase 7 후속 배치. 프린터로 되묻던 질의를 이 품목이 받고, 무상방문수거를 먼저 안내한다."
+  },
+  {
+    "query": "가스레인지 어떻게 버려?",
+    "expectedItemId": "gas_range",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 후속 배치. 품목이 없어 라이터로 되묻던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "옥매트 어떻게 버려?",
+    "expectedItemId": "jade_mat",
+    "expectedDisposalType": "bulky_waste",
+    "notes": "Phase 7 후속 배치. 요가매트로 되묻던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "세단기 어떻게 버려?",
+    "expectedItemId": "paper_shredder",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "notes": "Phase 7 후속 배치. 세면대·세탁기로 되묻던 질의를 이 품목이 받는다."
   }
 ]
