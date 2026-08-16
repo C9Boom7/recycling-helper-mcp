@@ -227,6 +227,85 @@ for (const query of metroAmbiguousNames) {
   );
 }
 
+/**
+ * 광역으로 착지한 뒤 **어느 시·군·구를 지목했는지**를 실데이터로 전수 확인한다.
+ * 지목에 실패하면 응답은 방금 들은 이름을 다시 묻고, 잘못 지목하면 사용자가 대지도
+ * 않은 지역의 상세 데이터가 없다고 답한다. 둘 다 조용히 지나가는 실패라 케이스를
+ * 손으로 적는 대신 데이터를 그대로 돈다.
+ */
+const namingSweep = { standalone: 0, prefixed: 0 };
+
+function checkNaming(query: string, expectedMetroId: string, expectedName: string): void {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status !== "match" || resolution.match.region.id !== expectedMetroId || resolution.match.level !== "metro") {
+    const actual =
+      resolution.status === "match" ? `${resolution.match.region.id}/${resolution.match.level}` : resolution.status;
+    failures.push(`"${query}" resolved to ${actual}; expected ${expectedMetroId} at the metro level`);
+    return;
+  }
+
+  const named = findNamedSubRegion(resolution.match.region, query);
+  if (named !== expectedName) {
+    failures.push(`"${query}" named ${named ?? "(none)"}; expected ${expectedName}`);
+  }
+}
+
+for (const metro of regionalPolicies) {
+  const districtAliases = metro.districtAliases ?? [];
+  const prefixOnlyAliases = metro.prefixOnlyDistrictAliases ?? [];
+
+  // 이름만 대도 광역이 정해지는 쪽. 착지 지역과 부르는 이름이 모두 맞아야 한다.
+  for (const alias of districtAliases) {
+    namingSweep.standalone += 1;
+    checkNaming(alias, metro.id, alias);
+  }
+
+  // 이름만으로는 광역이 안 정해지는 쪽. 이 광역으로 확정돼서도, 이 광역이 그 이름을
+  // 지목해서도 안 된다 — 맨 "중구"에 대고 "부산 중구 상세 데이터가 없다"고 답하는 게
+  // 바로 이 검사가 막는 실패다. (`광주시`처럼 다른 광역이 원래 갖고 있는 표기도 있어서
+  // "아무 데로도 확정되면 안 된다"로는 못 적는다. 이 광역으로만 안 가면 된다.)
+  for (const alias of prefixOnlyAliases) {
+    const resolution = resolveRegionalPolicy(alias);
+    if (resolution.status === "match" && resolution.match.region.id === metro.id) {
+      failures.push(
+        `"${alias}" confidently resolved to ${metro.id}; 이 이름은 광역 접두어 없이 이 광역으로 가면 안 된다`,
+      );
+    }
+    const named = findNamedSubRegion(metro, alias);
+    if (named !== undefined) {
+      failures.push(`"${alias}" alone made ${metro.id} name ${named}; 광역 접두어가 없으면 지목하지 않아야 한다`);
+    }
+  }
+
+  // 광역 표기가 앞에 붙은 조합. 여기서는 두 목록 모두 이름을 불러야 한다 —
+  // 앞의 광역명이 이미 광역을 확정했으므로 남은 조각을 지목하는 데 위험이 없다.
+  for (const alias of [...districtAliases, ...prefixOnlyAliases]) {
+    for (const metroName of [metro.name, ...metro.aliases]) {
+      namingSweep.prefixed += 1;
+      checkNaming(`${metroName} ${alias}`, metro.id, alias);
+    }
+  }
+}
+
+// 위 스윕의 반대편. 광역 표기 뒤에 아무 말이나 붙었다고 지목하면, 있지도 않은 지역을
+// 두고 "상세 데이터가 없다"고 답하게 된다 — 되묻는 지금보다 나쁘다. 목록에 있는
+// 이름에만 걸려야 한다.
+const nonDistrictRemainders: Array<{ query: string; metroId: string }> = [
+  { query: "부산 어쩌구", metroId: "busan" },
+  { query: "부산 그런구", metroId: "busan" },
+  // 강남구는 서울에만 있다. 부산 질의에서 서울 자치구 이름을 지목하면 안 된다.
+  { query: "부산 강남구", metroId: "busan" },
+];
+
+for (const { query, metroId } of nonDistrictRemainders) {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status !== "match" || resolution.match.region.id !== metroId) continue;
+  const named = findNamedSubRegion(resolution.match.region, query);
+  if (named !== undefined) {
+    failures.push(`"${query}" named ${named}; 기초자치단체 이름이 아닌 조각은 지목하면 안 된다`);
+  }
+}
+
 for (const testCase of regionEvaluationCases) {
   const resolution = resolveRegionalPolicy(testCase.region);
 
@@ -311,5 +390,7 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Region matching test passed: ${expectations.length} fixture cases, ${regionEvaluationCases.length} region cases, ${regionalPolicies.length} policies' aliases`,
+  `Region matching test passed: ${expectations.length} fixture cases, ${regionEvaluationCases.length} region cases, ` +
+    `${regionalPolicies.length} policies' aliases, ` +
+    `${namingSweep.standalone} sub-region names, ${namingSweep.prefixed} metro-prefixed combinations`,
 );

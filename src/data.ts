@@ -116,6 +116,20 @@ export type RegionalPolicyData = {
    * 응답이 그 이름을 그대로 부를 수 있다.
    */
   districtAliases?: string[];
+  /**
+   * 같은 자리의 시·군·구지만 **이름만으로는 광역이 안 정해지는** 것들. 중구·동구·
+   * 서구·남구·북구·강서구는 광역시 여섯 곳에 흩어져 있고, 고성군은 강원과 경남에
+   * 하나씩, 광주시는 광주광역시와 표기가 겹친다.
+   *
+   * 그래서 `districtAliases`와 달리 **매칭에는 절대 쓰지 않는다**(`regionMatchNames`
+   * 참조). 맨 "중구"는 지금처럼 되물어야 한다 — 어느 광역인지 모르는 채로 상세
+   * 데이터가 없다고 답하면 없는 확신을 파는 것이다.
+   *
+   * 쓰이는 데는 한 곳뿐이다. 질의 앞에 이 광역의 표기가 실제로 붙어 있어서 광역이
+   * 이미 확정된 경우(`부산 중구`), 남은 조각을 지목한 이름으로 부를 수 있게 한다.
+   * `metro` 항목에만 둔다.
+   */
+  prefixOnlyDistrictAliases?: string[];
   coverageTier: RegionCoverageTier;
   /** 자치구·시가 속한 광역시도의 region id. `metro` 항목에는 없다. */
   metroId?: string;
@@ -960,7 +974,10 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
 /**
  * 이 지역으로 착지시킬 수 있는 모든 표기. 광역 자신의 이름과, 상세 데이터가
  * 없어 이 광역이 대신 받는 시·군·구 이름을 함께 본다 — 둘을 갈라 저장할 뿐
- * 매칭 대상에서 빠지지는 않는다.
+ * 여기서는 빠지지 않는다.
+ *
+ * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
+ * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
  */
 function regionMatchNames(policy: RegionalPolicyData): string[] {
   return [policy.name, ...policy.aliases, ...(policy.districtAliases ?? [])];
@@ -1022,6 +1039,13 @@ const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, Reg
  *
  * 여기서는 `districtAliases`를 보지 않는다. 떼려는 건 광역 표기이지 그 밑의
  * 시·군·구 이름이 아니다.
+ *
+ * 이 한 줄이 이 함수의 유일한 동작 변화다. 예전에는 시·군·구 이름도 `aliases`에
+ * 섞여 있어 접두어로 떨어졌고, 그래서 "안산시 성남시" 꼴이면 앞의 안산시를 떼고
+ * 뒤의 성남시로 착지했다. 이제는 경기도로 착지한다. 실사용 질의로는 나올 일이
+ * 없다 — 한국어 주소는 큰 단위부터 적으니 미등록 시·군 이름이 등록된 시 앞에
+ * 오지 않는다. 게다가 이 경로는 광역 안에 등록된 하위 지역을 찾는 것이라,
+ * 서울 밖에서 그런 하위 지역을 가진 광역은 경기도뿐이다.
  */
 function splitLeadingMetro(
   policies: RegionalPolicyData[],
@@ -1115,38 +1139,53 @@ export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undef
  * `matchedBy`를 그대로 쓰지 않는 이유는 "부산 해운대구"다 — 이건 광역 접두
  * 강도로 걸려 `matchedBy`가 "부산"이 된다. 그래서 질의에서 광역 표기를 뗀
  * 나머지도 함께 본다.
+ *
+ * 뗀 나머지에서만 `prefixOnlyDistrictAliases`까지 본다. "부산 중구"는 앞의
+ * "부산"이 이미 광역을 확정했으므로 남은 "중구"를 지목하는 데 위험이 없지만,
+ * 맨 "중구"는 어느 광역인지 모른 채 답하는 것이라 되물어야 한다.
  */
 export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): string | undefined {
   const districtAliases = metro.districtAliases ?? [];
-  if (districtAliases.length === 0 || !region) return undefined;
+  const prefixOnlyAliases = metro.prefixOnlyDistrictAliases ?? [];
+  if ((districtAliases.length === 0 && prefixOnlyAliases.length === 0) || !region) return undefined;
 
   const normalizedQuery = normalizeText(region);
   if (!normalizedQuery) return undefined;
 
   const ownNames = new Set([metro.name, ...metro.aliases].map((name) => normalizeText(name)).filter(Boolean));
 
-  const targets = [normalizedQuery];
+  // 이 광역의 표기를 실제로 떼어낸 조각들. "떼어낸 게 있다" 자체가 뒤에서 근거로
+  // 쓰이므로 질의 전체와 갈라 둔다.
+  const strippedTargets: string[] = [];
   for (const name of ownNames) {
     if (normalizedQuery === name || !normalizedQuery.startsWith(name)) continue;
     const rest = normalizedQuery.slice(name.length);
-    if (rest) targets.push(rest);
+    if (rest) strippedTargets.push(rest);
   }
 
   // 강도 기준은 지역 매칭과 같다. 앞부분으로만 겹치게 두어야 "부산 사상구"의
-  // 뒷조각이 엉뚱한 이름에 걸리지 않는다.
+  // 뒷조각이 엉뚱한 이름에 걸리지 않는다. 목록에 있는 이름에만 걸리므로
+  // "부산 어쩌구"의 "어쩌구"는 아무것도 지목하지 못한다.
   //
   // 광역 자신을 부르는 표기는 아예 후보에서 뺀다. 안 그러면 "제주"가 접두
   // 조각으로 "제주시"에 걸려, 도 전체를 물은 사람에게 시 하나를 지목했다고
   // 답한다. 광역명으로 말한 사람에게는 되묻는 쪽이 맞다.
   let best: { alias: string; strength: RegionMatchStrength } | undefined;
-  for (const target of targets) {
-    if (ownNames.has(target)) continue;
-    for (const alias of districtAliases) {
+  const consider = (target: string, aliases: string[]): void => {
+    if (ownNames.has(target)) return;
+    for (const alias of aliases) {
       const strength = regionMatchStrength(target, normalizeText(alias));
       if (!strength) continue;
       if (!best || strength > best.strength) best = { alias, strength };
     }
-  }
+  };
+
+  for (const target of [normalizedQuery, ...strippedTargets]) consider(target, districtAliases);
+
+  // 이름만으로 광역이 안 정해지는 쪽은 **떼어낸 조각에만** 건다. 광역 표기가
+  // 앞에 붙어 있었다는 게 곧 광역이 확정됐다는 뜻이라, 남은 "중구"를 지목하는 데
+  // 위험이 없다. 맨 "중구"는 여기 닿지 않아 예전처럼 되묻는다.
+  for (const target of strippedTargets) consider(target, prefixOnlyAliases);
 
   return best?.alias;
 }

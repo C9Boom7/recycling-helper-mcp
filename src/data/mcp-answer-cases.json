@@ -6501,6 +6501,70 @@
     ]
   },
   {
+    "id": "region_metro_names_the_homonym_district_busan_jung",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 중구"
+    },
+    "expectedTextIncludes": [
+      "부산광역시 지역 확인 안내",
+      "중구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 중구 소관이니"
+    ],
+    "expectedTextExcludes": [
+      "시·군·구를 알려주시면",
+      "거주 중인 시·군·구를 확인해야"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"부산 중구\"",
+      "\"matchedRegion\":\"부산광역시\"",
+      "\"regionStatus\":\"unregistered_district\""
+    ]
+  },
+  {
+    "id": "region_bare_homonym_district_stays_national_jung",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "중구"
+    },
+    "expectedTextIncludes": [
+      "\"중구\"은(는) 아직 상세 지역 데이터가 없습니다",
+      "생활폐기물 분리배출 누리집 지역별 안내"
+    ],
+    "expectedTextExcludes": [
+      "부산광역시",
+      "상세 데이터는 아직 없어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"중구\"",
+      "\"regionStatus\":\"unknown\""
+    ]
+  },
+  {
+    "id": "region_metro_named_homonym_district_bulky_item_daegu_dong",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대구 동구",
+      "itemName": "책상의자"
+    },
+    "expectedTextIncludes": [
+      "대구광역시 지역 확인 안내",
+      "동구 상세 데이터는 아직 없어 대구광역시 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 동구 소관이니",
+      "품목: 의자"
+    ],
+    "expectedTextExcludes": [
+      "시·군·구를 알려주시면",
+      "거주 중인 시·군·구를 확인해야"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"대구 동구\"",
+      "\"matchedRegion\":\"대구광역시\"",
+      "\"regionStatus\":\"unregistered_district\"",
+      "\"item\":\"의자\""
+    ]
+  },
+  {
     "id": "region_standard_tier_jongno",
     "tool": "get_region_disposal_info",
     "arguments": {

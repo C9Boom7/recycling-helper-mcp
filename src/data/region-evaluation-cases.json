@@ -375,6 +375,48 @@
     "expectedNamedSubRegion": "해운대구"
   },
   {
+    "region": "부산 중구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "중구"
+  },
+  {
+    "region": "대구 동구",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "동구"
+  },
+  {
+    "region": "인천 서구",
+    "expectedRegionId": "incheon",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "서구"
+  },
+  {
+    "region": "부산 어쩌구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
+  },
+  {
+    "region": "경기 광주시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "광주시"
+  },
+  {
+    "region": "강원 고성군",
+    "expectedRegionId": "gangwon",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "고성군"
+  },
+  {
+    "region": "경남 고성군",
+    "expectedRegionId": "gyeongnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "고성군"
+  },
+  {
     "region": "분당구",
     "expectedRegionId": "seongnam_si",
     "expectedLevel": "district"
