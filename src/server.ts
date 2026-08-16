@@ -147,7 +147,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), confidence, and whether local municipality rules matter. Use for quick yes/no judgment questions like '피자박스 재활용 돼?', '이거 분리수거 되나?', '스티로폼은 어디에 버려?'. For full step-by-step disposal instructions, prefer get_disposal_steps.",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), confidence, and whether local municipality rules matter. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -177,7 +177,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "check_confusing_item",
     title: "Check Confusing Item",
     description:
-      "Explains commonly confused Korean waste-sorting cases with RecyclingHelper(재활용척척), comparing up to 3 similar items and their exceptions. Use when the user is unsure between categories or asks why — e.g. '영수증은 종이인데 왜 재활용 안 돼?', '컵라면 용기는 종이야 플라스틱이야?', '이것도 재활용 되는 거 맞아?'.",
+      "Explains commonly confused Korean waste-sorting cases with RecyclingHelper(재활용척척), comparing up to 3 similar items and their exceptions. Use when the question sets two things against each other or asks why a rule goes the way it does — e.g. '영수증은 종이인데 왜 재활용 안 돼?', '컵라면 용기는 종이야 플라스틱이야?', '종이컵이랑 종이팩이랑 같이 버려도 돼?'. For a single item with no comparison in the question, prefer classify_waste_item or get_disposal_steps.",
     inputShape: {
       itemName: z.string().min(1).max(80).describe("Confusing household waste item name or situation in Korean."),
     },
