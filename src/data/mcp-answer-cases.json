@@ -6535,10 +6535,10 @@
     ]
   },
   {
-    "id": "region_metro_fallback_suwon",
+    "id": "region_metro_fallback_ansan",
     "tool": "get_region_disposal_info",
     "arguments": {
-      "region": "수원시"
+      "region": "안산시"
     },
     "expectedTextIncludes": [
       "경기도 지역 확인 안내",
@@ -6552,7 +6552,7 @@
       "문의/신청 안내 전화"
     ],
     "expectedStructuredIncludes": [
-      "\"region\":\"수원시\"",
+      "\"region\":\"안산시\"",
       "\"matchedRegion\":\"경기도\"",
       "\"regionStatus\":\"metro\""
     ]

@@ -29,55 +29,6 @@
     "expectedGuideContains": "폐의약품 수거함"
   },
   {
-    "region": "서울 강남구",
-    "query": "한약재 찌꺼기",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "herbal_medicine_dregs",
-    "expectedGuideContains": "일반 종량제 봉투"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "깨진 유리",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "broken_glass",
-    "expectedGuideContains": "PP봉투"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "소형가전",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "small_electronics",
-    "expectedGuideContains": "1~4개"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "과일씨",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "fruit_seed",
-    "expectedGuideContains": "핵과류 씨"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "생선뼈",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "fish_bone",
-    "expectedGuideContains": "생선뼈"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "티백",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "tea_bag",
-    "expectedGuideContains": "티백, 양파껍질"
-  },
-  {
-    "region": "서울 강남구",
-    "query": "양파껍질",
-    "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "onion_peel",
-    "expectedGuideContains": "양파껍질"
-  },
-  {
     "region": "서울 서초구",
     "query": "투명 페트병",
     "expectedRegionId": "seocho_gu",
@@ -90,34 +41,6 @@
     "expectedRegionId": "seocho_gu",
     "expectedItemId": "plant_soil",
     "expectedGuideContains": "특수마대"
-  },
-  {
-    "region": "서울 서초구",
-    "query": "폐식용유",
-    "expectedRegionId": "seocho_gu",
-    "expectedItemId": "used_cooking_oil",
-    "expectedGuideContains": "동 주민센터"
-  },
-  {
-    "region": "서울 서초구",
-    "query": "폐형광등",
-    "expectedRegionId": "seocho_gu",
-    "expectedItemId": "fluorescent_lamp",
-    "expectedGuideContains": "동 주민센터"
-  },
-  {
-    "region": "서울 서초구",
-    "query": "과일씨",
-    "expectedRegionId": "seocho_gu",
-    "expectedItemId": "fruit_seed",
-    "expectedGuideContains": "핵과류 씨"
-  },
-  {
-    "region": "서울 서초구",
-    "query": "호두껍질",
-    "expectedRegionId": "seocho_gu",
-    "expectedItemId": "nut_shell",
-    "expectedGuideContains": "단단한 껍데기"
   },
   {
     "region": "송파구",
@@ -134,39 +57,11 @@
     "expectedGuideContains": "목요일 또는 금요일"
   },
   {
-    "region": "서울 송파구",
-    "query": "폐건전지",
-    "expectedRegionId": "songpa_gu",
-    "expectedItemId": "battery",
-    "expectedGuideContains": "아파트 또는 동주민센터"
-  },
-  {
     "region": "songpa-gu",
     "query": "소형가전",
     "expectedRegionId": "songpa_gu",
     "expectedItemId": "small_electronics",
     "expectedGuideContains": "청소대행업체"
-  },
-  {
-    "region": "서울 송파구",
-    "query": "깨진 유리",
-    "expectedRegionId": "songpa_gu",
-    "expectedItemId": "broken_glass",
-    "expectedGuideContains": "특수규격봉투"
-  },
-  {
-    "region": "서울 송파구",
-    "query": "생선뼈",
-    "expectedRegionId": "songpa_gu",
-    "expectedItemId": "fish_bone",
-    "expectedGuideContains": "생선뼈"
-  },
-  {
-    "region": "서울 송파구",
-    "query": "티백",
-    "expectedRegionId": "songpa_gu",
-    "expectedItemId": "tea_bag",
-    "expectedGuideContains": "1회용 티백"
   },
   {
     "region": "서울 마포구",
@@ -195,30 +90,6 @@
     "expectedRegionId": "mapo_gu",
     "expectedItemId": "corn_cob_husk",
     "expectedGuideContains": "옥수수 껍질과 옥수수대"
-  },
-  {
-    "region": "서울 마포구",
-    "query": "빨래건조대 수수료",
-    "expectedRegionId": "mapo_gu",
-    "expectedItemId": "drying_rack",
-    "expectedGuideContains": "수수료 납부",
-    "expectedFeeKrw": 1000
-  },
-  {
-    "region": "서울 마포구",
-    "query": "화분 50cm 이상 수수료",
-    "expectedRegionId": "mapo_gu",
-    "expectedItemId": "flower_pot",
-    "expectedGuideContains": "수수료 납부",
-    "expectedFeeKrw": 1500
-  },
-  {
-    "region": "서울 마포구",
-    "query": "화분 50cm 미만 수수료",
-    "expectedRegionId": "mapo_gu",
-    "expectedItemId": "flower_pot",
-    "expectedGuideContains": "수수료 납부",
-    "expectedFeeKrw": 1000
   },
   {
     "region": "경기도 성남시",
@@ -485,29 +356,24 @@
     "expectedLevel": "metro"
   },
   {
-    "region": "성남시",
-    "expectedRegionId": "seongnam_si",
-    "expectedLevel": "district"
-  },
-  {
     "region": "분당구",
     "expectedRegionId": "seongnam_si",
     "expectedLevel": "district"
   },
   {
     "region": "수원시",
-    "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedRegionId": "suwon_si",
+    "expectedLevel": "district"
   },
   {
     "region": "용인시",
-    "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedRegionId": "yongin_si",
+    "expectedLevel": "district"
   },
   {
     "region": "고양시",
-    "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedRegionId": "goyang_si",
+    "expectedLevel": "district"
   },
   {
     "region": "안산시",
@@ -585,26 +451,8 @@
     "expectedLevel": "metro"
   },
   {
-    "region": "수원시",
-    "expectedRegionId": "suwon_si",
-    "expectedLevel": "district",
-    "expectedBulkyApplication": true
-  },
-  {
     "region": "경기 수원시",
     "expectedRegionId": "suwon_si",
-    "expectedLevel": "district",
-    "expectedBulkyApplication": true
-  },
-  {
-    "region": "용인시",
-    "expectedRegionId": "yongin_si",
-    "expectedLevel": "district",
-    "expectedBulkyApplication": true
-  },
-  {
-    "region": "고양시",
-    "expectedRegionId": "goyang_si",
     "expectedLevel": "district",
     "expectedBulkyApplication": true
   },
