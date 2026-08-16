@@ -914,19 +914,23 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       ambiguousCandidates,
       defaultSummary: match?.item.summary,
       checkList,
-      // Phase 0 R5가 정한 상한은 3개다. 합친 뒤 한 번 더 자르는 이유가 있다 —
-      // 지금은 광역 17곳이 전부 `sources` 1개라 1+2로 딱 맞지만, 어느 광역에든
-      // 출처를 하나만 더하면 4개가 되어 **데이터 추가만으로 코드 스펙이 조용히 깨진다.**
-      officialSources: (regionMatch
-        ? [
-            ...regionMatch.region.sources.map((source) => ({ title: source.title, url: source.url })),
-            // text 쪽과 같은 이유로 광역 착지에는 전국 안내를 덧붙인다(위 주석 참고).
-            ...(regionMatch.level === "metro"
-              ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
-              : []),
-          ]
-        : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
-      ).slice(0, MAX_OFFICIAL_SOURCES),
+      // Phase 0 R5 상한은 3개다. **자를 곳은 합친 뒤가 아니라 지역 출처 쪽이다.**
+      // 합친 배열을 자르면 광역이 출처를 하나 더 갖는 순간 정부24가 조용히 밀려나고
+      // text에는 그대로 찍혀 둘이 어긋난다. 둘 더 가지면 49e712e가 고친 링크 소실이
+      // 그대로 되살아난다 — 데이터 추가만으로 회귀하는 셈이라 순서를 뒤집는다.
+      officialSources: regionMatch
+        ? (() => {
+            const national =
+              regionMatch.level === "metro"
+                ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
+                : [];
+            const room = Math.max(0, MAX_OFFICIAL_SOURCES - national.length);
+            return [
+              ...regionMatch.region.sources.slice(0, room).map((source) => ({ title: source.title, url: source.url })),
+              ...national,
+            ];
+          })()
+        : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
     },
     {
       matchedId: match?.item.id,

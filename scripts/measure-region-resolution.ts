@@ -15,7 +15,8 @@ import type { RegionalPolicyData, RegionMatchLevel } from "../src/data.js";
  * after는 `src/data.ts`의 리졸버를 그대로 불러 쓴다. 예전에는 여기에 사본을
  * 뒀는데, 그러면 런타임 매칭을 고쳐도 측정값은 옛 규칙으로 계속 나온다.
  */
-type MeasurementQuery = { query: string; expectedRegionId: string };
+/** `expectRefusal`은 착지하지 않는 것이 정답인 질의다 — 전국 동명 이름이 여기 해당한다. */
+type MeasurementQuery = { query: string; expectedRegionId?: string; expectRefusal?: boolean };
 
 const queries = readFileSync(new URL("../logs/region-expansion-queries.example.jsonl", import.meta.url), "utf8")
   .split("\n")
@@ -72,6 +73,10 @@ type Bucket = "district" | "metro_fallback" | "national_fallback" | "ambiguous" 
 type Row = MeasurementQuery & { resolved?: string; bucket: Bucket };
 
 function classify(resolvedId: string | undefined, resolvedLevel: RegionMatchLevel | undefined, testCase: MeasurementQuery): Bucket {
+  // 확정 거부가 정답인 질의는 반대로 읽는다. `강서구`처럼 전국 동명인 이름은 착지하지
+  // 않는 것이 성공이고, 누군가 별칭을 달아 확정되게 만들면 그건 회귀다. 이 분기가 없으면
+  // `classify`가 미확정에서 먼저 빠져나가 오매칭으로 잡히지 않는다.
+  if (testCase.expectRefusal) return resolvedId ? "mismatch" : "national_fallback";
   if (!resolvedId) return "national_fallback";
   if (resolvedId !== testCase.expectedRegionId) return "mismatch";
   return resolvedLevel === "metro" ? "metro_fallback" : "district";
@@ -114,7 +119,7 @@ function report(label: string, rows: Row[]): Record<Bucket, number> {
   const mismatches = rows.filter((row) => row.bucket === "mismatch");
   if (mismatches.length > 0) {
     console.log("  오매칭 상세:");
-    for (const row of mismatches) console.log(`  - "${row.query}" -> ${row.resolved} (기대: ${row.expectedRegionId})`);
+    for (const row of mismatches) console.log(`  - "${row.query}" -> ${row.resolved} (기대: ${row.expectRefusal ? "확정 거부" : row.expectedRegionId})`);
   }
   return counts;
 }

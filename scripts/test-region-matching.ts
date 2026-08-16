@@ -178,10 +178,12 @@ const nationallyAmbiguousDistrictQueries = [
 
 for (const query of nationallyAmbiguousDistrictQueries) {
   const resolution = resolveRegionalPolicy(query);
-  if (resolution.status === "match" && resolution.match.level === "district") {
+  // level을 district로 좁혀 보면 안 된다. 광역 별칭에 `서구`를 달면 metro 강도로
+  // 확정되는데, 그때도 다른 광역 주민이 남의 안내를 받는 것은 똑같다. 확정 자체를 막는다.
+  if (resolution.status === "match") {
     failures.push(
-      `"${query}" confidently resolved to district ${resolution.match.region.id}; ` +
-        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다",
+      `"${query}" confidently resolved to ${resolution.match.region.id} (level: ${resolution.match.level}); ` +
+        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다 — 자치구든 광역 별칭이든 마찬가지다",
     );
   }
 }
