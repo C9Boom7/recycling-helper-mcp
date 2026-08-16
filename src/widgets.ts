@@ -47,6 +47,13 @@ export type DisposalWidgetInput = {
   item: WasteItem;
   /** Representative source title, resolved by the caller (server.ts owns that rule). */
   sourceTitle: string;
+  /**
+   * Confirmation date of that same source. The text path has carried it since
+   * Phase 0 (formatSources), so the card was the one place a reader could not
+   * tell whether a 조례 수수료 was checked this summer or last year. Optional
+   * because the `sourceRefs` fallback has a title and no date.
+   */
+  sourceCheckedAt?: string;
   /** Canonical name of the matched region, not the user's raw input. */
   regionName?: string;
   /** Region guidance lines the handler already computed, in "- text" form. */
@@ -120,7 +127,7 @@ function orderCautions(cautions: string[]): string[] {
 }
 
 export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetPayload {
-  const { item, sourceTitle } = input;
+  const { item, sourceTitle, sourceCheckedAt } = input;
   const cautions = orderCautions(item.cautions).slice(0, MAX_CARD_CAUTIONS);
   const region = regionNodes(input);
 
@@ -132,7 +139,7 @@ export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetP
     ...item.steps.map((step, index) => text(`${index + 1}. ${step}`)),
     ...(cautions.length > 0 ? [divider(), ...cautions.map((line) => caption(`주의: ${line}`))] : []),
     ...(region.length > 0 ? [divider(), ...region] : []),
-    caption(`근거: ${sourceTitle}`),
+    caption(sourceCheckedAt ? `근거: ${sourceTitle} · ${sourceCheckedAt} 확인` : `근거: ${sourceTitle}`),
   ];
 
   return {

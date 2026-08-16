@@ -793,6 +793,15 @@ async function runWidgetBuilderCases() {
   assert(sharp, "widget builder cases are missing their 주의 fixture");
   assert(card({ item: sharp }).includes("다치지 않게"), "safety caution should outrank informational ones");
 
+  // The card names a source; without the date a reader cannot tell a 조례
+  // 수수료 checked this summer from one checked a year ago. The text path has
+  // always carried it, so the card was the only place it was missing.
+  const dated = card({ item: nationwide, sourceCheckedAt: "2026-06-27" });
+  assert(dated.includes("근거: 테스트 출처 · 2026-06-27 확인"), "card should date the source it names");
+  // Closing quote included: a dateless source must end the caption there rather
+  // than trail a separator with nothing after it.
+  assert(card({ item: nationwide }).includes('"근거: 테스트 출처"'), "a source with no date must not leave a dangling separator");
+
   const payload = buildDisposalWidget({ item: regional, sourceTitle: "테스트 출처" });
   assert(!("status" in payload), "widget payload must not define status — Kakao fills it");
   assert(!("status" in payload.widget), "widget node must not define status — Kakao fills it");
@@ -873,6 +882,9 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
 async function runWidgetSmoke() {
   const port = await getFreePort();
   const baseUrl = `http://${HOST}:${port}`;
+  const { wasteItems } = await import("../dist/data.js");
+  const pizzaBox = wasteItems.find((item) => item.id === "pizza_box_oily");
+  assert(pizzaBox, "widget smoke is missing its confirmed-match fixture");
   const { server, getOutput } = startServer(port, { widgets: true });
 
   const stopServer = () => {
@@ -897,6 +909,12 @@ async function runWidgetSmoke() {
     assert(
       JSON.stringify(payload.widget).includes("깨끗한 부분과 오염된 부분을 분리합니다."),
       "widget card is missing the disposal steps",
+    );
+    // The date comes off the same sources[0] the title does, so this pins the
+    // wiring end to end rather than just the builder's formatting.
+    assert(
+      JSON.stringify(payload.widget).includes(`${pizzaBox.sources[0].checkedAt} 확인`),
+      "widget card is missing the source confirmation date",
     );
 
     const ambiguous = await callTool(baseUrl, "get_disposal_steps", { itemName: "전구" }, requestId);

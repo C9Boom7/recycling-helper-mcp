@@ -323,6 +323,13 @@ function briefSourceTitle(item: WasteItem): string {
   return item.sources[0]?.title ?? item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
 }
 
+// Reads the same sources[0] briefSourceTitle does, so a card can never date a
+// different source than the one it names. The sourceRefs fallback is a bare
+// title with no date attached, hence undefined rather than a guess.
+function briefSourceCheckedAt(item: WasteItem): string | undefined {
+  return item.sources[0]?.checkedAt;
+}
+
 const FALLBACK_ASK_FOR = ["재질", "오염 여부", "크기", "지역"];
 // Material menu shown when the query gives no material hint. Kept to 5 one-line
 // rules to respect the Phase 0 response-size budget.
@@ -562,6 +569,7 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
       buildDisposalWidget({
         item,
         sourceTitle: briefSourceTitle(item),
+        sourceCheckedAt: briefSourceCheckedAt(item),
         regionName: regionMatch?.region.name,
         regionNotes,
         regionFeeLine: buildRegionFeeLine(item, regionMatch),
