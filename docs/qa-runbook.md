@@ -119,22 +119,21 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 서버는 툴 호출마다 stdout에 JSON 한 줄을 찍는다. PlayMCP in KC 콘솔의 로그에서 본다.
 
 ```json
-{"ts":"...","tool":"get_disposal_steps","input":{...},"status":"match","matchedId":"pizza_box_oily","matchedRegion":"서울 강남구","score":100,"matched":1,"total":1,"ms":3}
+{"ts":"...","tool":"get_disposal_steps","status":"match","matchedId":"pizza_box_oily","matchedRegion":"서울 강남구","score":100,"matched":1,"total":1,"ms":3}
 ```
 
 | 필드 | 읽는 법 |
 | --- | --- |
 | `tool` | 호스트가 어느 툴을 골랐는지. 오라우팅 의심 문의는 여기부터 본다 |
-| `input` | 호스트가 넘긴 인자. **사용자 발화 원문이 아니라 LLM이 뽑은 값**이다 |
 | `status` | `match` / `ambiguous` / `not_found` / `error` |
 | `matchedId` | 확정된 품목 id. 엉뚱한 값이면 오매칭이다 |
 | `score` | 매칭 점수. 88 미만이면 폴백 티어에서 걸린 것 |
 | `matched` / `total` | 후보 수. `ambiguous`의 후보 폭을 본다 |
 | `ms` | 서버 처리 시간. 한 자릿수가 정상이다 |
 
-`status: "error"`면 `message`가 함께 찍힌다. 이건 코드 결함이므로 최우선으로 다룬다.
+`status: "error"`는 코드 결함이므로 최우선으로 다룬다. 운영 로그에는 인자와 예외 메시지를 남기지 않는다. 로컬 QA에서만 `CALL_LOG_DETAILS=true`로 일시적으로 확인하며, 해당 로그는 공유·보관하지 않는다.
 
-**사용자 프롬프트는 수집하지 않는다.** 본선 규격이 금지한다. `input`은 호스트가 인자로 넘긴 값일 뿐이며, 이 범위를 넘겨 로깅을 늘리지 않는다.
+**사용자 프롬프트는 수집하지 않는다.** 본선 규격이 금지한다. 호스트 인자도 임의 문자열일 수 있으므로 기본 로그에 남기지 않는다.
 
 ## 3. 문의 유형별 대응
 

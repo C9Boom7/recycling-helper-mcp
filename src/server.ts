@@ -42,6 +42,9 @@ const SERVICE_NAME = "RecyclingHelper(재활용척척)";
 // unset value) leaves them on, so QA can disable a misrendering card by
 // redeploying with one env var instead of shipping a code change.
 const WIDGET_ENABLED = process.env.WIDGET_ENABLED !== "false";
+// Tool arguments and thrown messages can contain arbitrary user text. Keep
+// production container logs aggregate-safe; local QA can opt into detail.
+const CALL_LOG_DETAILS_ENABLED = process.env.CALL_LOG_DETAILS === "true";
 const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
 const HOST = process.env.HOST ?? "127.0.0.1";
 // Suffix wildcards (leading "*.") cover whatever hostname PlayMCP in KC assigns
@@ -993,10 +996,10 @@ function callStatus(result: CallToolResult): string {
 
 /**
  * Emits one JSON line per tool call to stdout (collected as container logs).
- * Inputs here are only item/region names, never free-form user prompts, so
- * there is no personal data concern — do not log anything beyond these fields.
  * Log identifiers come from the handler's `_log` metadata (stripped here so it
  * never reaches a client), not from client-facing structuredContent fields.
+ * Item names and errors are omitted by default because callers can provide
+ * arbitrary strings; local QA may opt in with CALL_LOG_DETAILS=true.
  */
 function withCallLog(
   tool: string,
@@ -1016,7 +1019,7 @@ function withCallLog(
         JSON.stringify({
           ts: new Date().toISOString(),
           tool,
-          input,
+          ...(CALL_LOG_DETAILS_ENABLED ? { input } : {}),
           status: _log?.status ?? callStatus(result),
           matchedId: _log?.matchedId,
           matchedRegion: _log?.matchedRegion,
@@ -1032,9 +1035,9 @@ function withCallLog(
         JSON.stringify({
           ts: new Date().toISOString(),
           tool,
-          input,
+          ...(CALL_LOG_DETAILS_ENABLED ? { input } : {}),
           status: "error",
-          message: error instanceof Error ? error.message : String(error),
+          ...(CALL_LOG_DETAILS_ENABLED ? { message: error instanceof Error ? error.message : String(error) } : {}),
           ms: Date.now() - startedAt,
         }),
       );
