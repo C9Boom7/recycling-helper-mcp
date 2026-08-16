@@ -694,6 +694,29 @@ async function runSmoke() {
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
     requestId += 1;
 
+    // WIDGET_ENABLED is a rendering rollback, so it must not move the telemetry
+    // the finals-window 지역 해상도 numbers are read off. This server runs with
+    // widgets *off* — the branch where classify used to skip region matching
+    // entirely and log no matchedRegion at all.
+    await callTool(baseUrl, "classify_waste_item", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const classifyTextLog = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"classify_waste_item"'))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      })
+      .at(-1);
+    assert(classifyTextLog, "no classify_waste_item call was logged on the text path");
+    assert(
+      classifyTextLog.matchedRegion === "서울 강남구",
+      `classify text path logged matchedRegion=${classifyTextLog.matchedRegion}, expected it to match the widget path`,
+    );
+
     console.log(`MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases)`);
   } finally {
     stopServer();

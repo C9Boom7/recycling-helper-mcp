@@ -543,16 +543,18 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   const { match } = resolved;
   const { item } = match;
 
+  // Resolved on both sides of the switch on purpose. WIDGET_ENABLED is a
+  // rendering rollback (qa-runbook 4절); if the region were only matched in the
+  // widget branch, flipping it off would also drop `matchedRegion` from the
+  // logs, and the finals-window 지역 해상도 numbers are read off those.
+  const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+
   // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
   // follow-up turn and a card closes the conversation. A confirmed match does
   // not, so it takes the same card get_disposal_steps serves.
   if (WIDGET_ENABLED) {
-    const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-    return widgetResult(matchedItemWidget(item, regionMatch), {
-      matchedId: item.id,
-      score: match.score,
-      matchedRegion: regionMatch?.region.name,
-    });
+    return widgetResult(matchedItemWidget(item, regionMatch), log);
   }
 
   const text = [
@@ -588,7 +590,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
       regionGuidance: itemRegionGuidance(item),
       primarySource: itemTopSources(item, 1)[0] ?? { title: "재활용척척 보수 안내 정책" },
     },
-    { matchedId: item.id, score: match.score },
+    log,
   );
 }
 
