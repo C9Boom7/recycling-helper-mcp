@@ -99,6 +99,18 @@ const itemNameParam = z
   .max(80)
   .describe("Household waste item name or short description in Korean.");
 const optionalRegionParam = z.string().max(80).optional().describe("Optional Korean city, district, or neighborhood.");
+/**
+ * 이름이 어디서 왔는지 알려주는 신호. 서버로 오는 건 어느 쪽이든 그냥 문자열이라,
+ * 호스트가 얹어주지 않으면 사람이 직접 친 이름과 사진에서 알아본 이름을 구분할 수
+ * 없다. 사진 쪽은 틀릴 확률이 눈에 띄게 높아서 확정 매칭에 확인 문구를 붙인다.
+ *
+ * 값은 "photo" 하나로 둔다. 늘리면 호스트가 매번 골라야 할 게 늘고 description 예산도
+ * 같이 먹는데, 지금 필요한 판단은 "사진에서 왔나"뿐이다.
+ */
+const inputSourceParam = z
+  .enum(["photo"])
+  .optional()
+  .describe('Set to "photo" when itemName came from an image the user sent rather than text they typed.');
 
 const READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
@@ -128,7 +140,26 @@ type ToolLogMeta = {
    * 유일한 신호이고, 값은 재질 카탈로그에서 오므로 호출자 문자열이 섞이지 않는다.
    */
   fallbackTier?: string;
+  /**
+   * 품목명이 사진에서 왔는지. 사진 경로가 실제로 얼마나 들어오는지 세는 유일한 근거다.
+   * `fallbackTier`와 같은 이유로 운영 로그에 그대로 남겨도 된다 — 값이 `"photo"`
+   * 하나뿐이라 호출자 문자열이 섞일 자리가 없다.
+   */
+  inputSource?: InputSource;
 };
+
+type InputSource = "photo";
+
+/**
+ * 사진에서 왔다는 표시는 매칭 결과와 상관없이 남긴다. 사진에서 알아본 이름일수록
+ * 카탈로그에 없는 말로 나올 확률이 높은데, 확정된 호출만 세면 정작 궁금한 쪽(사진을
+ * 보냈지만 답을 못 준 경우)이 통째로 빠진다.
+ */
+function withInputSourceLog(result: CallToolResult, inputSource?: InputSource): LoggedToolResult {
+  if (!inputSource) return result;
+  const { _log } = result as LoggedToolResult;
+  return { ...result, _log: { ..._log, inputSource } };
+}
 
 type LoggedToolResult = CallToolResult & { _log?: ToolLogMeta };
 
@@ -173,10 +204,12 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_disposal_steps",
     title: "Get Disposal Steps",
     description:
-      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. This is the primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Use it even when the user also mentions where they live — pass that as region and the result carries the local rules and bulky-waste fee — e.g. '강남구 사는데 침대 어떻게 버려?'. Accepts vague or partial item names; if ambiguous, the result lists candidates so you can ask the user which one they mean.",
+      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. This is the primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Use it even when the user also mentions where they live — pass that as region and the result carries the local rules and bulky-waste fee — e.g. '강남구 사는데 침대 어떻게 버려?'. Accepts vague or partial item names; if ambiguous, the result lists candidates so you can ask the user which one they mean. " +
+      "If the user sends a photo instead of naming the item, identify only the object being discarded — not the room, background, or people — and pass its common Korean name as itemName (foam food tray → 스티로폼 용기, foil-lined snack bag → 과자봉지), adding the material when the object type alone is ambiguous, and set inputSource to \"photo\". For a photo showing several items, call make_cleanup_plan with one name per item.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
+      inputSource: inputSourceParam,
     },
     annotations: {
       title: "Get Disposal Steps",
@@ -554,7 +587,11 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
  * only rides along on widget responses — so which of the two tools the host
  * happened to pick should not decide whether the user gets a card.
  */
-function matchedItemWidget(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined): DisposalWidgetPayload {
+function matchedItemWidget(
+  item: WasteItem,
+  regionMatch: MatchedRegionPolicy | undefined,
+  photoNote?: string,
+): DisposalWidgetPayload {
   return buildDisposalWidget({
     item,
     sourceTitle: briefSourceTitle(item),
@@ -562,7 +599,26 @@ function matchedItemWidget(item: WasteItem, regionMatch: MatchedRegionPolicy | u
     regionName: regionMatch?.region.name,
     regionNotes: buildRegionNotes(item, regionMatch),
     regionFeeLine: buildRegionFeeLine(item, regionMatch),
+    photoNote,
   });
+}
+
+/** 받침에 따라 갈리는 '로/으로'. 품목명이 데이터에서 그대로 오므로 "(으)로"로 뭉개지 않는다. */
+function roParticle(word: string): string {
+  const code = word.charCodeAt(word.length - 1);
+  if (Number.isNaN(code) || code < 0xac00 || code > 0xd7a3) return "로";
+  const jongseong = (code - 0xac00) % 28;
+  // 받침이 없거나(0) ㄹ(8)이면 '로', 나머지는 '으로'.
+  return jongseong === 0 || jongseong === 8 ? "로" : "으로";
+}
+
+/**
+ * 사진으로 들어온 이름을 되비추는 한 줄. 물건을 알아보는 건 호스트의 비전이고 서버는
+ * 그 결과를 문자열로 받을 뿐이라, 잘못 알아본 이름도 확정 매칭으로 착지하면 그대로
+ * 확정된 답이 된다. 무엇으로 봤는지 밝히고 고칠 길을 열어두는 편이 낫다.
+ */
+function photoConfirmLine(item: WasteItem): string {
+  return `사진 속 물건을 "${item.name}"${roParticle(item.name)} 봤습니다. 다르면 품목명을 알려주세요.`;
 }
 
 async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
@@ -624,24 +680,38 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   );
 }
 
-async function handleGetDisposalSteps({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
+async function handleGetDisposalSteps({
+  itemName,
+  region,
+  inputSource,
+}: {
+  itemName: string;
+  region?: string;
+  inputSource?: InputSource;
+}): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
-  if (resolved.status === "not_found") return unknownItemResult(itemName);
-  if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
+  // 되묻는 두 갈래는 이미 "이게 맞냐"고 묻고 있어서 확인 문구를 겹쳐 붙일 자리가 없다.
+  // 사진에서 왔다는 표시만 로그에 남긴다.
+  if (resolved.status === "not_found") return withInputSourceLog(unknownItemResult(itemName), inputSource);
+  if (resolved.status === "ambiguous") {
+    return withInputSourceLog(ambiguousItemResult(itemName, resolved.candidates), inputSource);
+  }
 
   const { match } = resolved;
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+  const photoNote = inputSource === "photo" ? photoConfirmLine(item) : undefined;
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, photoNote), log);
   }
 
   // Below the widget branch on purpose: the card builds its own region lines
   // (matchedItemWidget), so this is the text path's alone.
   const regionNotes = buildRegionNotes(item, regionMatch);
-  const text = formatItemGuide(item, region);
+  // 확인 문구는 안내 위에 둔다. 잘못 알아본 이름이면 아래 내용을 읽을 이유가 없다.
+  const text = photoNote ? `${photoNote}\n\n${formatItemGuide(item, region)}` : formatItemGuide(item, region);
   return textResult(
     text,
     {
@@ -1069,6 +1139,7 @@ function withCallLog(
           matched: _log?.matched,
           total: _log?.total,
           fallbackTier: _log?.fallbackTier,
+          inputSource: _log?.inputSource,
           ms: Date.now() - startedAt,
         }),
       );
