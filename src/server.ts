@@ -761,6 +761,9 @@ const NATIONAL_FALLBACK_LINKS = [
 /** 광역 안내로 착지했을 때 좁혀줄 자치구는 몇 곳만 보인다 — 응답 줄 수 예산을 지킨다. */
 const MAX_LISTED_DISTRICTS = 6;
 
+/** `get_region_disposal_info`의 structuredContent 상한. Phase 0 R5가 정한 값이다. */
+const MAX_OFFICIAL_SOURCES = 3;
+
 function metroNarrowingLine(metro: MatchedRegionPolicy): string {
   const districts = findRegisteredDistricts(metro.region);
   if (districts.length === 0) {
@@ -911,15 +914,19 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       ambiguousCandidates,
       defaultSummary: match?.item.summary,
       checkList,
-      officialSources: regionMatch
+      // Phase 0 R5가 정한 상한은 3개다. 합친 뒤 한 번 더 자르는 이유가 있다 —
+      // 지금은 광역 17곳이 전부 `sources` 1개라 1+2로 딱 맞지만, 어느 광역에든
+      // 출처를 하나만 더하면 4개가 되어 **데이터 추가만으로 코드 스펙이 조용히 깨진다.**
+      officialSources: (regionMatch
         ? [
-            ...regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url })),
+            ...regionMatch.region.sources.map((source) => ({ title: source.title, url: source.url })),
             // text 쪽과 같은 이유로 광역 착지에는 전국 안내를 덧붙인다(위 주석 참고).
             ...(regionMatch.level === "metro"
               ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
               : []),
           ]
-        : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
+        : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
+      ).slice(0, MAX_OFFICIAL_SOURCES),
     },
     {
       matchedId: match?.item.id,
