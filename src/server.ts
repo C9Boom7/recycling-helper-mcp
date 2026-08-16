@@ -121,6 +121,12 @@ type ToolLogMeta = {
   status?: string;
   matched?: number;
   total?: number;
+  /**
+   * not_found가 어느 폴백으로 착지했는지. 재질을 추정했으면 그 재질 id, 아무 단서도
+   * 없어 메뉴만 펼쳤으면 `menu`다. 로그에서 품목명이 빠진 뒤 not_found 줄에 남는
+   * 유일한 신호이고, 값은 재질 카탈로그에서 오므로 호출자 문자열이 섞이지 않는다.
+   */
+  fallbackTier?: string;
 };
 
 type LoggedToolResult = CallToolResult & { _log?: ToolLogMeta };
@@ -365,7 +371,7 @@ function materialPrincipleSuffix(itemName: string): string {
   return principle ? ` 재질로 보면 ${principle.label}: ${principle.quickRule}` : "";
 }
 
-function unknownItemResult(itemName: string): CallToolResult {
+function unknownItemResult(itemName: string): LoggedToolResult {
   const inferred = inferMaterialCategories(itemName).map(findMaterialGuideline).filter(isMaterialGuideline);
   const isInferred = inferred.length > 0;
   const guidelines = isInferred
@@ -388,26 +394,33 @@ function unknownItemResult(itemName: string): CallToolResult {
     lines.push(`  - 재활용이 어려운 경우: ${guideline.whenGeneral}`);
   }
 
-  return textResult(lines.join("\n"), {
-    found: false,
-    itemName,
-    fallback: {
-      inferred: isInferred,
-      materials: guidelines.map((guideline) => ({
-        id: guideline.id,
-        label: guideline.label,
-        quickRule: guideline.quickRule,
-        ...(isInferred
-          ? {
-              steps: guideline.steps.slice(0, FALLBACK_STEP_LIMIT),
-              whenGeneral: guideline.whenGeneral,
-              source: guideline.source,
-            }
-          : {}),
-      })),
-      askFor: FALLBACK_ASK_FOR,
+  return textResult(
+    lines.join("\n"),
+    {
+      found: false,
+      itemName,
+      fallback: {
+        inferred: isInferred,
+        materials: guidelines.map((guideline) => ({
+          id: guideline.id,
+          label: guideline.label,
+          quickRule: guideline.quickRule,
+          ...(isInferred
+            ? {
+                steps: guideline.steps.slice(0, FALLBACK_STEP_LIMIT),
+                whenGeneral: guideline.whenGeneral,
+                source: guideline.source,
+              }
+            : {}),
+        })),
+        askFor: FALLBACK_ASK_FOR,
+      },
     },
-  });
+    // 품목명이 로그에서 빠진 뒤로 not_found 줄에는 status와 ms만 남는다. 어느 재질로
+    // 착지했는지, 단서가 없어 메뉴만 폈는지라도 남겨야 폴백 품질을 집계로 본다.
+    // 추정이 없을 때의 guidelines는 고정 메뉴라 그 첫 항목을 쓰면 추정한 재질처럼 읽힌다.
+    { status: "not_found", fallbackTier: isInferred ? (inferred[0]?.id ?? "menu") : "menu" },
+  );
 }
 
 function ambiguousCandidateLabel(match: WasteMatch): string {
@@ -995,11 +1008,26 @@ function callStatus(result: CallToolResult): string {
 }
 
 /**
+ * Names the failure without quoting it. The class name and the top stack frame
+ * are written in this repository, not by a caller, so they survive the privacy
+ * cut that drops `message` — and without them a production `status: "error"`
+ * line says only that something threw, which the runbook cannot act on.
+ * A thrown non-Error is reported by type alone; its value could be caller text.
+ */
+function errorSignature(error: unknown): { errorName: string; errorAt?: string } {
+  if (!(error instanceof Error)) return { errorName: `non-error:${typeof error}` };
+
+  // stack[0] is "Name: message" — start at [1] so no message text rides along.
+  const frame = error.stack?.split("\n")[1]?.trim();
+  return { errorName: error.name, ...(frame ? { errorAt: frame } : {}) };
+}
+
+/**
  * Emits one JSON line per tool call to stdout (collected as container logs).
  * Log identifiers come from the handler's `_log` metadata (stripped here so it
  * never reaches a client), not from client-facing structuredContent fields.
- * Item names and errors are omitted by default because callers can provide
- * arbitrary strings; local QA may opt in with CALL_LOG_DETAILS=true.
+ * Item names and exception messages are omitted by default because callers can
+ * provide arbitrary strings; local QA may opt in with CALL_LOG_DETAILS=true.
  */
 function withCallLog(
   tool: string,
@@ -1026,6 +1054,7 @@ function withCallLog(
           score: _log?.score,
           matched: _log?.matched,
           total: _log?.total,
+          fallbackTier: _log?.fallbackTier,
           ms: Date.now() - startedAt,
         }),
       );
@@ -1037,6 +1066,7 @@ function withCallLog(
           tool,
           ...(CALL_LOG_DETAILS_ENABLED ? { input } : {}),
           status: "error",
+          ...errorSignature(error),
           ...(CALL_LOG_DETAILS_ENABLED ? { message: error instanceof Error ? error.message : String(error) } : {}),
           ms: Date.now() - startedAt,
         }),
@@ -1279,7 +1309,10 @@ app.post("/mcp", async (req: Request, res: Response) => {
       void server.close();
     });
   } catch (error) {
-    console.error("Error handling MCP request:", error);
+    // Transport-level failures can carry request-derived text in `message`, and
+    // "운영 로그에 예외 메시지를 남기지 않는다"(qa-runbook 2절) has to hold on this
+    // path too, not just in withCallLog.
+    console.error("Error handling MCP request:", CALL_LOG_DETAILS_ENABLED ? error : errorSignature(error));
     if (!res.headersSent) {
       res.status(500).json({
         jsonrpc: "2.0",

@@ -129,9 +129,15 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 | `matchedId` | 확정된 품목 id. 엉뚱한 값이면 오매칭이다 |
 | `score` | 매칭 점수. 88 미만이면 폴백 티어에서 걸린 것 |
 | `matched` / `total` | 후보 수. `ambiguous`의 후보 폭을 본다 |
+| `fallbackTier` | `not_found`가 착지한 곳. 재질 id면 추정이 먹힌 것, `menu`면 단서가 없어 재질 메뉴만 편 것 |
+| `errorName` / `errorAt` | `error`일 때만. 예외 클래스 이름과 스택 맨 윗줄(파일:라인) |
 | `ms` | 서버 처리 시간. 한 자릿수가 정상이다 |
 
-`status: "error"`는 코드 결함이므로 최우선으로 다룬다. 운영 로그에는 인자와 예외 메시지를 남기지 않는다. 로컬 QA에서만 `CALL_LOG_DETAILS=true`로 일시적으로 확인하며, 해당 로그는 공유·보관하지 않는다.
+`status: "error"`는 코드 결함이므로 최우선으로 다룬다. `errorName`과 `errorAt`이 어느 코드에서 터졌는지까지는 짚어 주지만, 예외 메시지와 호출 인자는 운영 로그에 남지 않는다. 재현이 필요하면 로컬에서 `CALL_LOG_DETAILS=true`로 띄워 확인하고, 그때 나온 로그는 공유하거나 보관하지 않는다.
+
+```bash
+CALL_LOG_DETAILS=true pnpm start   # 로컬 전용. 배포 환경변수에는 넣지 않는다
+```
 
 **사용자 프롬프트는 수집하지 않는다.** 본선 규격이 금지한다. 호스트 인자도 임의 문자열일 수 있으므로 기본 로그에 남기지 않는다.
 
@@ -140,6 +146,8 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 ### ① "품목을 못 찾는다" — `status: not_found`
 
 폴백이 재질별 안내로 이어졌다면 설계대로 동작한 것이다. 그래도 자주 나오는 품목이면 데이터를 추가한다.
+
+**어떤 품목이 안 잡혔는지는 운영 로그로 알 수 없다.** 품목명을 남기지 않기 때문이다. 로그로 볼 수 있는 건 `fallbackTier`뿐이고, `menu` 비중이 높으면 재질 추정조차 못 하는 질의가 많다는 뜻이다. 품목 자체는 문의 내용이나 로컬 테스트에서 모은다 — `pnpm log:query -- --query "..."`로 쌓고 `pnpm backlog:auto -- --input logs/manual-queries.jsonl`로 후보를 뽑는다.
 
 - 고치는 곳: `src/data/waste-items.json`에 품목 추가 + `evaluation-cases.json`에 케이스 추가.
 - **런타임 코드를 건드리지 않으므로 8/21 기능 변경 마감 이후에도 가능하다.** 단 스키마·코드 변경 없이 검증을 통과하는
