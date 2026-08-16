@@ -8384,5 +8384,70 @@
       "확실히 찾지 못했습니다",
       "재질로 보면 비닐·필름류"
     ]
+  },
+  {
+    "id": "gyeonggi_suwon_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "수원시"
+    },
+    "expectedTextIncludes": [
+      "경기도 수원시",
+      "031-5191-3249"
+    ],
+    "expectedTextExcludes": [
+      "아직 상세 지역 데이터가 없습니다",
+      "경기도 광역 기준 안내"
+    ]
+  },
+  {
+    "id": "gyeonggi_bucheon_lamp_has_no_note",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부천시",
+      "itemName": "형광등"
+    },
+    "expectedTextIncludes": [
+      "자원순환과"
+    ],
+    "expectedTextExcludes": [
+      "확인하지 못했습니다",
+      "찾지 못해"
+    ]
+  },
+  {
+    "id": "gyeonggi_yongin_lamp_has_no_note",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "용인시",
+      "itemName": "형광등"
+    },
+    "expectedTextExcludes": [
+      "따로 언급하지 않습니다"
+    ]
+  },
+  {
+    "id": "gyeonggi_namyangju_medicine_is_actionable",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "남양주시",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "행정복지센터"
+    ],
+    "expectedTextExcludes": [
+      "길라잡이에는 약국도 함께 적혀"
+    ]
+  },
+  {
+    "id": "gyeonggi_gwanggyo_not_pinned_to_suwon",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "광교"
+    },
+    "expectedTextExcludes": [
+      "031-5191-3249"
+    ]
   }
 ]
