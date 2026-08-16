@@ -9,7 +9,7 @@
  * p99 3초를 요구하므로, 수집은 빌드타임 전용이고 결과만 커밋한다.
  *
  * 실행: node scripts/fetch-ordinance-fees.mjs [regionId...]
- *   인자가 없으면 Phase 6 대상 18곳을 전부 돈다.
+ *   인자가 없으면 Phase 6 대상 10곳을 전부 돈다.
  *   출력: data/ordinance-raw/<regionId>.json (gitignore 대상 — 검수용 중간 산출물)
  *
  * 설계상 지켜야 할 것이 넷 있다. R0 조사에서 전부 실제로 걸렸다.
@@ -40,8 +40,7 @@ const REQUEST_DELAY_MS = 400;
 const MAX_SEARCH_PAGES = 20;
 
 /**
- * Phase 6 대상 18곳(2026-08-16에 서울 신규 8개 구를 더했다).
- * 용산·노원·강서·관악은 공공데이터포털 표준데이터
+ * Phase 6 조례 트랙 대상 10곳. 용산·노원·강서·관악은 공공데이터포털 표준데이터
  * 트랙이 맡으므로 여기 없다(PRD "트랙 분담").
  *
  * `기관명`은 법제처 `지자체기관명`과 정확히 일치해야 한다 — 우리 지역명
@@ -58,15 +57,10 @@ export const TARGETS = [
   { regionId: "yeongdeungpo_gu", 기관명: "서울특별시 영등포구" },
   { regionId: "dongjak_gu", 기관명: "서울특별시 동작구" },
   { regionId: "gangdong_gu", 기관명: "서울특별시 강동구" },
-  // 2026-08-16 서울 나머지 8개 구가 열리며 추가된 대상.
-  { regionId: "jung_gu", 기관명: "서울특별시 중구" },
-  { regionId: "seongdong_gu", 기관명: "서울특별시 성동구" },
-  { regionId: "dongdaemun_gu", 기관명: "서울특별시 동대문구" },
-  { regionId: "jungnang_gu", 기관명: "서울특별시 중랑구" },
-  { regionId: "seongbuk_gu", 기관명: "서울특별시 성북구" },
-  { regionId: "seodaemun_gu", 기관명: "서울특별시 서대문구" },
-  { regionId: "yangcheon_gu", 기관명: "서울특별시 양천구" },
-  { regionId: "guro_gu", 기관명: "서울특별시 구로구" },
+  // 서울 신규 8개 구는 여기 없다. 성북·중랑·양천·서대문·성동·구로는 구청 수수료표
+  // 트랙(`fetch-district-fees.mjs`)이 맡고, 중구·동대문구는 조례가 유일한 경로지만
+  // 규격 사다리가 이웃 품목으로 넘어오는 문제를 못 고쳐 아직 넣지 않는다.
+  // 여기 두면 인자 없는 `pnpm fees:fetch`가 쓰지도 않을 별표를 8곳 더 내려받는다.
 ];
 
 /**

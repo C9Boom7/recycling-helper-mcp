@@ -5,5 +5,5 @@
     "rootDir": ".",
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*", "scripts/**/*.ts"]
+  "include": ["src/**/*", "scripts/**/*.ts", "scripts/**/*.d.mts"]
 }
