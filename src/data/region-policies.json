@@ -3116,6 +3116,468 @@
     ]
   },
   {
+    "id": "suwon_si",
+    "name": "경기도 수원시",
+    "aliases": [
+      "수원시",
+      "경기도 수원시",
+      "경기 수원시",
+      "수원특례시",
+      "수원",
+      "장안구",
+      "권선구",
+      "팔달구",
+      "영통구",
+      "suwon",
+      "suwon-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "수원시는 시가 직접 운영하는 대형폐기물 인터넷신고시스템에서 배출 신고를 받고, 품목별 처리비용도 같은 곳에서 조회하게 합니다. 스티커를 출력하지 않는 '빼기' 앱 간편신고와 판매소 실물 스티커도 함께 안내합니다. 폐건전지·폐형광등은 전용수거함에 내고, 동 행정복지센터에 가져가면 새 건전지나 종량제봉투로 바꿔 줍니다. 폐의약품은 시 안내가 두 갈래라 아래 설명을 함께 보세요. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 보건소와 동 행정복지센터에 놓인 전용 수거함에 배출합니다. 아파트 단지 안에 수거함을 둔 곳도 있습니다.",
+          "배출 전에 가까운 동 행정복지센터에 수거함 운영 여부를 확인하는 편이 확실합니다. 수원시보건소는 2024년 6월 안내에서 시가 폐의약품을 전량 소각한다며 소각용 종량제봉투 배출을 함께 안내한 적이 있어, 두 안내가 함께 도는 상태입니다.",
+          "하수구나 변기에는 버리지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 전용수거함이나 투명한 봉투에 담아 배출합니다. 일반 쓰레기에 섞으면 화재 위험이 있습니다.",
+          "제품에 들어 있는 건전지 중 뺄 수 있는 것은 분리해 내고, 보조배터리·전자담배·손선풍기처럼 일체형인 제품은 그대로 냅니다. 폐건전지 0.5kg 또는 15개를 동 행정복지센터·자원회수시설·수원체육문화센터에 가져가면 새 건전지 한 세트나 10L 종량제봉투로 바꿔 줍니다.",
+          "폐형광등은 깨지지 않게 전용수거함에 내고, 깨진 것은 신문지로 감싸 배출합니다. 백열등은 재활용이 안 돼 종량제봉투에 넣습니다. 수원시는 폐LED조명 재활용 시범사업 중이라 LED 조명도 폐형광등 전용수거함으로 받습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://waste.suwon.go.kr/lmth/02_waste/waste_0101.asp",
+      "feeUrl": "https://waste.suwon.go.kr/lmth/01_intro/intro_0201.asp",
+      "phone": "031-5191-3249",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "수원시 생활쓰레기 배출",
+        "url": "https://www.suwon.go.kr/sw-www/deptHome/dep_env/env_03/env_03_11/env_03_01.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "실물 스티커·인터넷 신고·'빼기' 앱 세 갈래 신고 경로와 동별 수거업체 표, 담당부서 청소자원과 031-5191-3249 (수정일 2026-01-30)"
+      },
+      {
+        "title": "수원시 대형폐기물 인터넷 신고 - 수수료 및 세부요금",
+        "url": "https://waste.suwon.go.kr/lmth/01_intro/intro_0201.asp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "가구류·가전제품류·기타 탭으로 나뉜 품목별 처리비용 표. 이미지가 아니라 파싱 가능한 HTML 표이고 인코딩은 euc-kr이다"
+      },
+      {
+        "title": "수원시 재활용분리배출",
+        "url": "https://www.suwon.go.kr/sw-www/deptHome/dep_env/env_03/env_03_09.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐건전지·폐형광등 배출 방법과 교환 기준, 폐LED조명 전용수거함 배출 안내 (수정일 2026-07-07)"
+      },
+      {
+        "title": "수원시 정책제안 답변 - 폐의약품 처리 해결방안",
+        "url": "https://www.suwon.go.kr/web/manmin/propse/BD_propseView.do?propseNo=P-00000901&q_rowPerPage=8",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "청소자원과 답변에서 '보건소와 각 동 행정복지센터에 폐의약품 수거함을 운영중' 확인"
+      },
+      {
+        "title": "수원시보건소 폐의약품 처리 관련 안내",
+        "url": "https://health.suwon.go.kr/board_view.asp?page_code=sub060901&no=592&bd_gubn=4",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "2024년 6월 기준 약 형태별 소각용 종량제봉투 배출 안내. 수거함 안내와 어긋나 두 갈래를 함께 실었다"
+      }
+    ]
+  },
+  {
+    "id": "yongin_si",
+    "name": "경기도 용인시",
+    "aliases": [
+      "용인시",
+      "경기도 용인시",
+      "경기 용인시",
+      "용인특례시",
+      "용인",
+      "처인구",
+      "기흥구",
+      "수지구",
+      "yongin",
+      "yongin-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "용인시는 2025년 3월 온라인 대형폐기물 접수를 '빼기'로 일원화하면서 시 홈페이지 신청 폼을 닫았습니다. 지금은 시청 배출신청안내에서 앱·읍면동 방문·스티커 판매소 세 갈래를 함께 보여주고, 품목별 수수료 기준표도 시청 페이지에 표로 올려 둡니다. 폐의약품은 읍면동 행정복지센터와 구청·보건소 수거함에, 폐건전지는 읍면동 주민센터 등 거점 수거함에 냅니다. 배출 요일과 시간은 구·지역별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 읍·면·동 행정복지센터와 구청, 보건소에 놓인 폐의약품 수거함에 배출합니다.",
+          "알약과 가루약은 포장지를 뜯지 말고 그대로 내고, 물약과 연고는 마개를 잘 잠가 용기째 냅니다.",
+          "하수구나 변기에 흘려보내면 수질과 토양을 오염시키니 절대 그렇게 버리지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 제품에서 전지를 분리한 뒤 가까운 읍·면·동 주민센터나 주요 거점에 놓인 수거함에 배출합니다.",
+          "전자제품 대리점이나 시계점 같은 역회수 경로로 내도 되고, 지정된 전지류 수거일과 장소에 맞춰 배출해도 됩니다.",
+          "폐형광등은 직관형·환형·안정기 내장형·컴팩트형 등 수은이 든 조명제품을 형광등 분리배출용기에 냅니다. LED 조명은 이 수거 대상이 아니므로 배출 방법을 읍·면·동 행정복지센터에 확인합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_01.jsp",
+      "feeUrl": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_03.jsp",
+      "phone": "031-6193-2694",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "용인시 대형폐기물 배출신청안내",
+        "url": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_01.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "'빼기' 앱·읍면동 방문·스티커 판매소 세 갈래 신청 경로와 구별 수거 요일, 자원순환과 031-6193-2694 확인"
+      },
+      {
+        "title": "용인시 대형폐기물 수수료 기준표",
+        "url": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_03.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "품목·규격·수수료 3열 HTML 표. 매트리스 킹 10,000원, 장롱 가로 1.2m 이상 1쪽 18,000원 등 150개 넘는 품목이 그대로 실려 있다"
+      },
+      {
+        "title": "용인시 재활용분리 배출요령",
+        "url": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_08_03/www12_08_03_03.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "전지류와 형광등 배출 방법, 읍면동 주민센터 수거함 안내"
+      },
+      {
+        "title": "용인시 폐의약품 올바른 배출 방법 안내문",
+        "url": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20240924104604530",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "자원순환과 2024-09-24 시정소식. 본문이 이미지 한 장이라 이미지를 읽어 배출 장소와 형태별 방법을 확인했다"
+      }
+    ]
+  },
+  {
+    "id": "goyang_si",
+    "name": "경기도 고양시",
+    "aliases": [
+      "고양시",
+      "경기도 고양시",
+      "경기 고양시",
+      "고양특례시",
+      "고양",
+      "덕양구",
+      "일산동구",
+      "일산서구",
+      "일산",
+      "goyang",
+      "goyang-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "고양시는 고양도시관리공사가 운영하는 대형폐기물 인터넷신고센터에서 배출 신고를 받습니다. 신청 화면에서 관할 구와 동, 수거대행업체를 고르면 되고 창구는 시 하나로 통합돼 있습니다. 품목별 수수료는 시 폐기물관리 조례 별표를 같은 사이트에 표로 올려 둡니다. 폐의약품은 동 행정복지센터와 구 보건소, 지정 약국의 수거함에, 폐형광등·폐건전지는 동 행정복지센터 분리배출함에 냅니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 동 행정복지센터 민원실에 놓인 수거함과 덕양구·일산동구·일산서구 보건소, 지정 약국에 배출합니다.",
+          "가루약은 포장지를 뜯지 말고 그대로, 알약은 비닐과 종이를 벗겨 내용물만, 물약과 시럽은 한 용기에 모아 밀봉해서 냅니다. 연고·안약·스프레이처럼 특수용기에 든 약은 용기째 배출합니다.",
+          "약 봉투에는 이름과 병원 정보가 남아 있으니 떼어 내고 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등과 폐건전지는 동 행정복지센터에 놓인 재활용품 분리배출함에 배출합니다. 의류 수거함과 함께 세 종류가 놓여 있습니다.",
+          "폐형광등은 수은이 들어 있으니 깨지지 않게 본체만 수거함에 넣고 포장재는 재질별로 따로 냅니다. 깨진 형광등은 신문지에 밀봉해 종량제봉투에 넣고, 분리배출 대상이 아닌 LED 조명도 종량제봉투에 배출합니다.",
+          "폐건전지는 리모컨이나 온도계처럼 전지가 들어 있는 제품에서 전지를 빼서 냅니다. 보조배터리·전자담배·충전식 손난로처럼 일체형이면 제품째 넣고, 충전식을 포함한 모든 폐건전지는 반드시 전용수거함에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://clean.gys.or.kr/clean/request",
+      "feeUrl": "https://clean.gys.or.kr/clean/waste_list",
+      "phone": "031-8075-2685",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "고양시 대형폐기물 배출방법",
+        "url": "https://www.goyang.go.kr/www/www03/www03_3/www03_3_3/www03_3_3_tab2.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "전화·인터넷·모바일 세 갈래 배출 방법과 12개 대행구역 수거업체 표, 자원순환과 자원순환정책팀 031-8075-2685 확인"
+      },
+      {
+        "title": "고양시 대형폐기물 인터넷신고센터 - 배출신청",
+        "url": "https://clean.gys.or.kr/clean/request",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "고양도시관리공사 운영. 관할 구·동과 수거대행업체를 고르고 품목·수량·배출일시를 넣는 실제 접수 폼"
+      },
+      {
+        "title": "고양시 대형폐기물 인터넷신고센터 - 품목별 수수료",
+        "url": "https://clean.gys.or.kr/clean/waste_list",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "고양시 폐기물관리에 관한 조례 [별표 3] 기준 품목별 수수료 HTML 표. 시청 쪽 수수료는 파일 내려받기라 표로 된 곳은 여기뿐이다"
+      },
+      {
+        "title": "고양시 행정복지센터 내 재활용품 분리배출함 배치 현황",
+        "url": "https://www.goyang.go.kr/www/www03/www03_3/www03_3_3/www03_3_3_tab5.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐형광등·폐건전지·의류 수거함 배출 요령과 LED·깨진 형광등 예외"
+      },
+      {
+        "title": "고양시 행정복지센터 폐의약품 수거함 운영 안내",
+        "url": "https://www.goyang.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1030&q_bbscttSn=20251106103125077",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "자원순환과 2025-11-06 새소식. 동 행정복지센터 민원실 수거함 운영과 약 형태별 배출 요령, 약 봉투 제거 안내"
+      }
+    ]
+  },
+  {
+    "id": "hwaseong_si",
+    "name": "경기도 화성시",
+    "aliases": [
+      "화성시",
+      "경기도 화성시",
+      "경기 화성시",
+      "화성특례시",
+      "동탄",
+      "동탄구",
+      "병점구",
+      "만세구",
+      "효행구",
+      "hwaseong",
+      "hwaseong-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "화성시는 청소행정포털에서 대형폐기물 배출 신청과 품목 수수료 검색을 한 화면에 두고, 접수는 '빼기' 앱과 지역별 청소업체 전화 두 갈래로 받습니다. 구가 넷으로 늘었어도 접수 창구는 시 하나이고 수거만 청소구역별 대행업체가 나눠 맡습니다. 폐의약품은 읍면동 행정복지센터·보건소·종합사회복지관 37개소 수거함과 ECO 우체통에, 폐건전지·폐형광등은 행정복지센터와 공동주택 수거함에 냅니다. 배출 요일과 시간은 지역·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 읍·면·동 행정복지센터와 보건소, 종합사회복지관에 놓인 전용수거함 37개소에 배출합니다. ECO 우체통에 넣어도 됩니다.",
+          "전용수거함에 낼 때는 알약은 포장을 벗겨 봉지에 담고, 가루약은 원래 포장 그대로, 연고는 겉포장만 떼고 용기째, 물약은 밀봉해서 배출합니다. 건강보조식품은 넣으면 안 됩니다.",
+          "우체통에는 알약과 가루약만 넣습니다. 전용회수봉투나 편지봉투에 '폐의약품'이라고 적어 넣고, 안약·물약·연고 같은 액체류는 우편물을 훼손할 수 있어 전용수거함을 이용합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 단독주택이면 읍·면·동 행정복지센터와 거점 수거함에, 공동주택이면 단지 안 수거함에 배출합니다.",
+          "리모컨·시계·장난감에 쓰는 1회용 건전지와 스마트폰·노트북·보조배터리의 충전지, 전자담배·스마트워치·무선이어폰처럼 배터리가 붙어 있는 제품이 모두 대상입니다. 일체형 제품을 임의로 분해하지 않습니다. 행정복지센터에 폐건전지 0.5kg을 가져가면 새 건전지 두 개로 바꿔 줍니다.",
+          "폐형광등은 아파트나 행정복지센터의 전용수거함에 내고, 깨진 것은 신문지에 싸서 배출합니다. 평판형·십자형·원반형 LED 조명은 폐형광등이 아니라 대형폐기물로 신고해 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://h-waste.hscity.go.kr/05_recycle/05_recycle0103.asp",
+      "feeUrl": "https://h-waste.hscity.go.kr/05_recycle/wastefee.pdf",
+      "phone": "031-5189-6818",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "화성시 청소행정포털 - 대형폐기물배출신청",
+        "url": "https://h-waste.hscity.go.kr/05_recycle/05_recycle0103.asp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "'빼기' 앱과 지역별 청소업체 전화 접수 두 갈래, 분류·품목명으로 찾는 품목수수료 검색이 한 페이지에 있다"
+      },
+      {
+        "title": "화성시 대형폐기물 품목가격표",
+        "url": "https://h-waste.hscity.go.kr/05_recycle/wastefee.pdf",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "청소행정포털이 내려주는 전체 품목 수수료표 PDF. 시청 도메인에 품목 전체가 펼쳐진 HTML 표는 없고 조회는 검색형이다"
+      },
+      {
+        "title": "화성시 청소행정포털 - 생활유해폐기물",
+        "url": "https://h-waste.hscity.go.kr/05_recycle/05_recycle0104.asp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "폐의약품 수거함 37개소와 ECO 우체통 배출, 폐건전지·폐형광등 배출 장소와 LED 예외"
+      },
+      {
+        "title": "화성시 대형폐기물 배출 신청 안내",
+        "url": "https://www.hscity.go.kr/www/partInfo/trnsportEnvrn/gatda.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "시청 홈페이지 안내. 담당부서 자원순환과와 연락처 031-5189-6818 확인"
+      }
+    ]
+  },
+  {
+    "id": "bucheon_si",
+    "name": "경기도 부천시",
+    "aliases": [
+      "부천시",
+      "경기도 부천시",
+      "경기 부천시",
+      "부천",
+      "원미구",
+      "소사구",
+      "오정구",
+      "중동신도시",
+      "bucheon",
+      "bucheon-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "부천시는 시가 운영하는 대형폐기물 인터넷신고 사이트에서 배출 신청과 품목별 수거 비용 조회를 함께 제공합니다. 행정복지센터 방문과 콜센터 전화 접수도 되고, 접수 창구는 시 하나로 통합돼 있습니다. 폐의약품은 보건소 세 곳과 거점 약국의 수거함에, 폐건전지는 전지수거함과 폐자원 수거보상제로 냅니다. 폐형광등은 배출 장소를 자원순환과에 확인하고 냅니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 부천시보건소·소사보건소·오정보건소 1층과 시가 지정한 거점 약국의 수거함에 배출합니다. 명단에 없는 약국은 받아 주는지 먼저 물어보고 가져갑니다.",
+          "조제한 알약은 이름이 적힌 약봉투와 비닐 포장을 벗겨 알약만, 눌러 빼는 PTP 포장은 케이스에서 알약만 분리해 냅니다. 물약과 시럽은 플라스틱 밀폐용기에 모아 밀봉하고, 가루약은 약포지째, 연고·안약·흡입제·스프레이는 종이갑만 벗겨 마개를 잠가 용기째 배출합니다.",
+          "수거함에는 의약품만 넣습니다. 일반식품과 건강기능식품, 의약외품, 소독제, 살충제는 대상이 아닙니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 전지수거함에 배출합니다. 장난감이나 충전식 제품에서 뺄 수 있는 배터리는 반드시 분리해 내고, 전기자전거·전동킥보드처럼 분리가 어려우면 제품째 대형폐기물로 신고합니다.",
+          "부풀거나 흠집이 난 배터리는 비닐로 감싸 공기와 수분을 막고, 전선이 붙어 있으면 단자에 절연테이프를 붙여 냅니다. 소금물에 담가 방전시키는 방법은 폭발과 오염 위험이 있어 쓰지 않습니다. 동 행정복지센터에서 폐건전지 0.5kg을 10L 종량제봉투 한 장으로 바꿔 주는 폐자원 수거보상제도 운영합니다.",
+          "폐형광등 배출 장소는 자원순환과(032-625-3212)에 확인하고 냅니다. 깨지지 않게 옮기고, 깨진 것은 종이에 감싸 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://clean.bucheon.go.kr/site/main/onlineApply/wasteReportWrite?sub=03&main=01",
+      "feeUrl": "https://clean.bucheon.go.kr/site/main/wasteCleaning/wasteItemList?sub=02&main=01",
+      "phone": "032-625-3193",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "부천시 대형폐기물 배출 안내",
+        "url": "https://www.bucheon.go.kr/site/homepage/menu/viewMenu?menuid=148006007006004",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "행정복지센터 방문·온라인 신고·전화 신고 세 갈래 경로와 정보제공부서 자원순환과 재활용팀 032-625-3193 (최종수정 2026-04-17)"
+      },
+      {
+        "title": "부천시 대형폐기물 인터넷신고 - 품목별 수거기준 및 비용",
+        "url": "https://clean.bucheon.go.kr/site/main/wasteCleaning/wasteItemList?sub=02&main=01",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "번호·분류·물품·규격·단가 5열 HTML 표에 전체 210건. 가구·가전·주방물품 등 8개 분류 탭과 품목 검색을 함께 제공한다"
+      },
+      {
+        "title": "부천시보건소 가정 내 폐의약품 올바른 폐기방법 안내",
+        "url": "https://pubhealth.bucheon.go.kr/site/program/board/basicboard/view?menuid=161005001&boardtypeid=27528&boardid=1151117",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "보건소 세 곳과 거점 약국 96개소 배출처, 제형별 배출 방법과 수거 대상이 아닌 품목"
+      },
+      {
+        "title": "부천시 청소알림방 - 폐건전지(배터리) 올바른 분리배출 요령",
+        "url": "https://www.bucheon.go.kr/site/program/board/webzineboard/view?menuid=148006007006006&pagesize=12&boardtypeid=27344&encid=WAM9kJRRVTtJJJuUET5Faw==",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "전지수거함 배출과 분리 기준, 손상 배터리 취급 주의. 메뉴가 아니라 청소알림방 게시글에 있었다"
+      }
+    ]
+  },
+  {
+    "id": "namyangju_si",
+    "name": "경기도 남양주시",
+    "aliases": [
+      "남양주시",
+      "경기도 남양주시",
+      "경기 남양주시",
+      "남양주",
+      "다산신도시",
+      "별내",
+      "평내호평",
+      "namyangju",
+      "namyangju-si"
+    ],
+    "coverageTier": "standard",
+    "metroId": "gyeonggi",
+    "checkedAt": "2026-08-16",
+    "summary": "남양주시는 대형폐기물 통합관리센터에서 배출 신청과 품목별 수수료 조회를 함께 제공합니다. 권역 행정복지센터가 여덟이지만 온라인 접수는 한 곳으로 모였고, 신청 화면에서 행정동을 고르는 구조입니다. 읍면동사무소 방문과 무인 키오스크, 콜센터 접수도 됩니다. 폐의약품은 읍면동 행정복지센터 16곳과 보건소 두 곳에, 폐건전지·폐형광등은 공동주택이나 읍면동사무소 전용수거함에 내면 종량제봉투로 바꿔 줍니다. 배출 요일과 시간은 권역·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 읍·면·동 행정복지센터 16곳과 남양주보건소, 남양주풍양보건소에 배출합니다.",
+          "가루약은 포장지를 뜯지 말고 그대로 모아서 내고, 알약은 포장지와 플라스틱 통을 벗겨 알약만 비닐에 모읍니다. 물약은 남은 시럽을 한 병에 모으고, 바르는 물약·연고·안약은 겉 종이박스만 떼어 배출합니다.",
+          "행정복지센터와 보건소가 확실한 배출처입니다. 약국에 내려면 받아 주는지 먼저 물어보고 가져갑니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지와 폐형광등은 공동주택 단지나 읍·면·동사무소에 놓인 전용수거함에 배출합니다.",
+          "폐건전지는 생활폐기물과 섞으면 화재가 나므로 반드시 전용수거함에 냅니다. 부풀어 오른 전지는 수분이 들어가지 않게 랩으로 감싸고, 임의로 분리하거나 분해하면 폭발 위험이 있어 형태 그대로 배출합니다. 읍면동사무소에 폐건전지 500g을 가져가면 10L 종량제봉투 한 장, 폐형광등 5개면 10L 한 장으로 바꿔 줍니다.",
+          "폐형광등은 깨지지 않게 전용수거함에 내고, 깨진 것은 감싸서 일반 종량제봉투에 넣습니다. 남양주시는 LED를 일괄 제외하지 않습니다 — 전구형·직관형과 컨버터 일체형·분리형 LED는 재활용 대상이고, 평판형·십자형·원반형 LED는 대상이 아닙니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://smartclean.nyj.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.nyj.go.kr/online/bulky/item",
+      "phone": "031-590-8280",
+      "contactCheckedAt": "2026-08-16"
+    },
+    "sources": [
+      {
+        "title": "남양주시 대형폐기물 배출 방법",
+        "url": "https://www.nyj.go.kr/www/contents.do?key=3006",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "온라인 배출신고·읍면동사무소 방문·모바일앱 세 갈래 경로와 통합관리센터 주소, 담당 자원순환정책팀 031-590-8280 (최종수정 2026-01-09)"
+      },
+      {
+        "title": "남양주 대형폐기물 통합관리센터 - 수수료 안내",
+        "url": "https://smartclean.nyj.go.kr/online/bulky/item",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "분류·품목·규격·가격 4열 표에 227개 품목. 시청 쪽 수수료표는 HWP 첨부뿐이라 표로 열린 곳은 여기다"
+      },
+      {
+        "title": "남양주시 부서 업무검색 - 자원순환정책팀",
+        "url": "https://www.nyj.go.kr/www/selectDeptEmployeeList.do?key=2535&searchDeptCode=1596610917002",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "031-590-8280 담당업무가 '대형폐기물 수집·운반 대행업체 관리, 생활(대형)폐기물 처리 대행'으로 확인된다. 시청 대표번호 031-590-2114와 다르다"
+      },
+      {
+        "title": "남양주시 생활쓰레기 분리 배출 요령",
+        "url": "https://www.nyj.go.kr/www/contents.do?key=3004",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "형광등을 공동주택 수거함 또는 읍면동사무소에 배출하는 기준. 첨부된 2026년 분리배출 길라잡이에서 전지류 취급 주의와 LED 재활용 대상 구분을 확인했다"
+      },
+      {
+        "title": "남양주시 재활용정보",
+        "url": "https://www.nyj.go.kr/www/contents.do?key=3010",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "자원재활용 인센티브 대상 5종과 폐건전지·폐형광등 교환 기준, 접수장소 읍면동사무소"
+      },
+      {
+        "title": "남양주보건소 폐의약품 배출 안내",
+        "url": "https://www.nyj.go.kr/health/selectBbsNttView.do?key=462&bbsNo=128&nttNo=486749",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-16",
+        "basis": "2024-10-04 보건소 게시글. 본문이 이미지 한 장이라 첨부 이미지를 읽어 배출 장소 16개 읍면동과 보건소 두 곳, 약 형태별 방법을 확인했다"
+      }
+    ]
+  },
+  {
     "id": "seoul",
     "name": "서울특별시",
     "aliases": [
@@ -3323,13 +3785,7 @@
       "경기",
       "경기도",
       "gyeonggi",
-      "수원시",
-      "고양시",
-      "용인시",
-      "부천시",
-      "화성시",
       "안산시",
-      "남양주시",
       "안양시",
       "평택시",
       "시흥시",
