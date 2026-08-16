@@ -68,10 +68,14 @@ const TARGETS = [
   "yeongdeungpo_gu",
   "dongjak_gu",
   "gangdong_gu",
+  // 구청이 기계로 읽을 표를 안 내놓는 두 곳. 중구는 조례 별표뿐이고 동대문구는
+  // 수수료표가 내려받는 HWP다. `ladderBleed`로 이웃 사다리 오염을 막고 열었다.
+  "jung_gu",
+  "dongdaemun_gu",
 ];
 
 /**
- * 서울 신규 8개 구는 **여기 없다.** 한 번 넣었다가 뺐다.
+ * 서울 신규 8개 구 중 **여섯 곳이 여기 없다.**
  *
  * 성북·중랑·양천·서대문·성동·구로는 구청이 직접 띄운 수수료표가 더 정확해서
  * `import-district-fees.ts`가 맡는다. 두 트랙이 같은 지역을 관리하면 인자 없는
@@ -79,9 +83,8 @@ const TARGETS = [
  * 세탁기가 다시 1,000원(고무통 값)이 되고, 조례가 표를 못 뽑는 성동·양천·구로는
  * 아예 지워진다.
  *
- * 중구·동대문구는 구청에 기계로 읽을 표가 없어 조례가 유일한 경로지만, 조례 표에서
- * 규격 사다리가 이웃 품목으로 넘어오는 문제를 아직 못 고쳤다. 고치기 전에는 넣지
- * 않는다 — 대상 목록에 두면 전체 배치에서 조용히 들어간다.
+ * 중구·동대문구는 구청에 기계로 읽을 표가 없어 조례가 유일한 경로다. 이웃 사다리가
+ * 넘어오는 문제는 `ladderBleed`가 막는다.
  */
 
 /**
@@ -126,6 +129,89 @@ function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: s
   const specVerdict = classifyName(spec);
   if (specVerdict.ok && specVerdict.itemId === itemId) return { ok: true };
   return { ok: false, reason: "spec_is_not_a_size" };
+}
+
+
+/**
+ * 규격의 '사다리 지문'. 그 규격이 어떤 자로 재는 것인지를 나타낸다.
+ *
+ * ㎜·㎝·m는 **하나로 묶는다.** 나누면 같은 사다리를 단위만 바꿔 적은 행이 오탐으로
+ * 걸린다 — 광진 「간판 / 가장 긴면 1m 이상」은 다른 행이 ㎝로 적혀 있을 뿐 같은 자다.
+ */
+const SPEC_SHAPES: Array<[string, RegExp]> = [
+  // 단위가 끼어도 치수쌍이다 — 「90㎝×180㎝」를 length로 보면 사다리가 갈리지 않는다.
+  ["dimpair", /\d+\s*(㎝|cm|㎜|mm|m)?\s*[xX×*]\s*\d+/i],
+  ["liter", /ℓ|리터|\d+\s*L\b/i],
+  ["weight", /\d*\s*kg|㎏/i],
+  ["aircon", /㎡\s*형|평형/],
+  ["seats", /\d+\s*인용/],
+  ["tiers", /\d+\s*단/],
+  ["inch", /인치/],
+  ["length", /㎜|mm|㎝|cm|\d+\s*m\b|미터/i],
+  ["area", /㎡|평(?!형)/],
+  ["perunit", /자\)?\s*당|폭당|쪽당|개당/],
+];
+
+function specShape(spec: string): Set<string> {
+  return new Set(SPEC_SHAPES.filter(([, pattern]) => pattern.test(spec)).map(([name]) => name));
+}
+
+const shareShape = (a: Set<string>, b: Set<string>) => [...a].some((token) => b.has(token));
+
+/**
+ * 이웃 품목의 규격 사다리가 통째로 넘어온 행을 찾는다.
+ *
+ * 조례 HWP는 여러 품목 사다리를 옆으로 늘어놓은 표다. 한 줄로 펴면서 병합 셀의
+ * 품명이 이어지는데, 그 이어짐이 한 칸 어긋나면 **앞 품목의 마지막 계단이 다음
+ * 품목의 이름을 달고 들어온다.** 서대문이 그랬다 — 고무통의 「소형(60X100 미만)
+ * 1,000원」이 세탁기 행이 되어, 세탁기를 물은 사람에게 1,000원이 나갔다.
+ *
+ * `usableRow`의 `spec_names_other_item`은 규격 칸에 다른 품목의 **이름**이 올 때만
+ * 잡는다. 숫자 사다리가 넘어오는 이 경우는 이름이 없어 그대로 통과했다.
+ *
+ * 판정은 **세 조건을 모두** 만족할 때만 한다. 하나라도 빼면 멀쩡한 행이 걸린다.
+ *   1. 품명을 이어받은 행이다 (`nameInherited`).
+ *   2. 그 규격이 **자기 품목의 사다리와 다른 자**로 재고 있다.
+ *   3. 그런데 **읽기 순서상 직전 품목의 사다리와는 같은 자**다.
+ *
+ * 3번이 없으면 정상 행이 무더기로 걸린다 — 책장이 「3단 이상」과 「90X180㎝」를
+ * 함께 쓰는 건 흔하다. 18곳 3,689행에 돌려 8행이 걸렸고 전부 서대문의 실제 오염,
+ * 오탐은 0이었다.
+ */
+function ladderBleed(rows: OrdinanceRow[]): Set<OrdinanceRow> {
+  const ownShapes = new Map<string, Set<string>>();
+  for (const row of rows) {
+    if (row.nameInherited) continue;
+    const shapes = ownShapes.get(row.itemName) ?? new Set<string>();
+    for (const token of specShape(String(row.spec ?? ""))) shapes.add(token);
+    ownShapes.set(row.itemName, shapes);
+  }
+
+  // 직전 품목은 **행 순서로** 잡는다. 이름을 키로 쓰면 같은 이름이 두 번 나오는
+  // 표에서 마지막 것만 남아, 이웃이 자기 자신이 되어 검사가 통째로 꺼지거나
+  // 엉뚱한 이웃과 비교해 멀쩡한 행을 버린다. 동대문 표에 이미 이름이 두 번
+  // 나오는 품목이 있다.
+  const bled = new Set<OrdinanceRow>();
+  let currentName: string | null = null;
+  let previousName: string | null = null;
+  for (const row of rows) {
+    if (!row.nameInherited) {
+      if (row.itemName !== currentName) {
+        previousName = currentName;
+        currentName = row.itemName;
+      }
+      continue;
+    }
+    if (row.free || !row.feeKrw) continue;
+    const shape = specShape(String(row.spec ?? ""));
+    if (shape.size === 0) continue;
+    const mine = ownShapes.get(row.itemName) ?? new Set<string>();
+    if (mine.size === 0 || shareShape(shape, mine)) continue;
+    const neighbour = ownShapes.get(previousName ?? "") ?? new Set<string>();
+    if (neighbour === mine || !shareShape(shape, neighbour)) continue;
+    bled.add(row);
+  }
+  return bled;
 }
 
 /** 금액 분포를 대표하도록 최저·최고를 남기고 그 사이를 고르게 뽑는다. */
@@ -210,7 +296,13 @@ for (const regionId of targets) {
     continue;
   }
 
+  const bledRows = ladderBleed(dump.rows);
+
   for (const row of dump.rows) {
+    if (bledRows.has(row)) {
+      note("neighbour_ladder_bleed");
+      continue;
+    }
     if (row.free || row.feeKrw === 0) {
       note("free_row");
       continue;
@@ -222,10 +314,20 @@ for (const regionId of targets) {
       note(verdict.reason);
       continue;
     }
-    // 품명을 앞 행에서 이어 쓴 행은 규격 칸만 본다. 품명 쪽 수식어는 그 행의
-    // 것이 아니라 병합된 셀의 것이라, 같이 보면 한 행의 갈래가 그룹 전체로 번진다 —
-    // 강동구 「침대(흙,돌,황토,의료)」 아래의 접이식 침대 행까지 돌침대가 된다.
-    const hintText = row.nameInherited ? spec : `${itemName} ${spec}`;
+    // 품명을 앞 행에서 이어 쓴 행이라도 **품명 자체는 본다.** 예전에는 규격만 봐서
+    // 갈래 판정이 그룹의 첫 행에만 걸렸다 — 강동구 헬스자전거는 「(접이식)」 행만
+    // 운동기구로 가고 이어진 「기타5kg이하」·「기타10kg이하」는 자전거에 남아, 강동구에서
+    // 자전거를 물으면 헬스자전거 값 3,000·7,000원이 그대로 나갔다.
+    //
+    // 다만 품명의 **괄호 안은 뗀다.** 병합 셀의 괄호는 그 그룹 전체를 설명하는
+    // 열거지 이 행의 성격이 아니다 — 강동구 「침대(흙,돌,황토,의료)」를 그대로 보면
+    // 아래 접이식 침대 행까지 돌침대가 된다.
+    // 품명을 직접 든 행은 괄호까지 그대로 본다 — 강동구 「침대(흙,돌,황토,의료)」는
+    // 괄호가 곧 그 행의 성격이라, 떼면 돌침대 갈래가 사라진다.
+    // 이어 쓴 행은 괄호를 뗀 품명으로 본다 — 병합 셀의 괄호는 그룹 전체를 설명하는
+    // 열거지 이 행의 성격이 아니라, 그대로 두면 같은 표의 접이식 침대까지 돌침대가 된다.
+    const hintName = row.nameInherited ? itemName.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim() : itemName;
+    const hintText = `${hintName} ${spec}`;
     const hint = SPLIT_HINTS.find(
       (rule) => rule.from === verdict.itemId && rule.hint.test(hintText) && !(rule.deny?.test(hintText) ?? false),
     );

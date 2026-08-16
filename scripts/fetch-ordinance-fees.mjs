@@ -57,10 +57,11 @@ export const TARGETS = [
   { regionId: "yeongdeungpo_gu", 기관명: "서울특별시 영등포구" },
   { regionId: "dongjak_gu", 기관명: "서울특별시 동작구" },
   { regionId: "gangdong_gu", 기관명: "서울특별시 강동구" },
-  // 서울 신규 8개 구는 여기 없다. 성북·중랑·양천·서대문·성동·구로는 구청 수수료표
-  // 트랙(`fetch-district-fees.mjs`)이 맡고, 중구·동대문구는 조례가 유일한 경로지만
-  // 규격 사다리가 이웃 품목으로 넘어오는 문제를 못 고쳐 아직 넣지 않는다.
-  // 여기 두면 인자 없는 `pnpm fees:fetch`가 쓰지도 않을 별표를 8곳 더 내려받는다.
+  // 성북·중랑·양천·서대문·성동·구로는 구청 수수료표 트랙(`fetch-district-fees.mjs`)이
+  // 맡는다. 여기 두면 쓰지도 않을 별표를 6곳 더 내려받는다.
+  // 중구·동대문구는 구청이 기계로 읽을 표를 안 내놔 조례가 유일한 경로다.
+  { regionId: "jung_gu", 기관명: "서울특별시 중구" },
+  { regionId: "dongdaemun_gu", 기관명: "서울특별시 동대문구" },
 ];
 
 /**

@@ -27,7 +27,8 @@
     "import:fees": "tsx scripts/import-bulky-fees.ts",
     "import:ordinance": "tsx scripts/import-ordinance-fees.ts",
     "fees:fetch:district": "node scripts/fetch-district-fees.mjs",
-    "import:district": "tsx scripts/import-district-fees.ts"
+    "import:district": "tsx scripts/import-district-fees.ts",
+    "fees:verify:rows": "node scripts/verify-fee-rows.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",

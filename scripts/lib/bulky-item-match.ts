@@ -10,12 +10,11 @@
  * 사본이 생길 참이라 여기로 뺐다 — 사본이 어긋나면 트랙마다 다른 답이 나오고,
  * 그게 어느 쪽 잘못인지 알아내는 데 시간이 다 든다.
  *
- * **`import-bulky-fees.ts`(공공데이터포털 표준데이터)는 아직 자기 사본을 쓴다.**
- * 그리고 이미 갈라져 있다 — 매트리스 힌트에 `deny`가 없고, `stone_bed`·`bicycle`
- * 규칙과 `short_alias_standalone` 수식어 검사도 없다. 그대로 `pnpm import:fees`를
- * 다시 돌리면 조례 트랙이 고쳐 둔 오귀속이 되살아난다. 이 PR에서 함께 옮기지 않은
- * 이유는 옮기는 순간 용산·노원·강서·관악 4곳의 행이 실제로 바뀌기 때문이다 —
- * 조례 트랙 이관 때처럼 "산출물이 같다"로 확인할 수 없어 별도 검수가 필요하다.
+ * 2026-08-16에 `import-bulky-fees.ts`(공공데이터포털 표준데이터)의 사본까지 걷어
+ * **세 트랙이 모두 이 모듈을 쓴다.** 그 사본은 이미 갈라져 있었다 — 매트리스 힌트에
+ * `deny`가 없고 `stone_bed`·`bicycle` 규칙과 짧은 별칭 수식어 검사도 없었다.
+ * 옮기면서 용산·노원·강서·관악 4곳의 행이 실제로 바뀌었고(+8/−19) 변화를 하나씩
+ * 확인했다. 자세한 내용은 [Phase 6 PRD](../../docs/prd/phase-6-bulky-fee-etl.md).
  */
 import { readFileSync } from "node:fs";
 
@@ -49,9 +48,11 @@ export const HEAD_COLLISION_NAMES = new Set(["식기건조대", "욕실 수납�
  * 보면 셋 다 매트리스로 가서, 매트리스를 물어본 사람에게 매트리스를 뺀 프레임
  * 값이나 세트 값이 나간다. 실제로 강북구 6행 중 4행이 그렇게 들어갔다.
  * `(라텍스 포함)`처럼 다른 낱말에 붙은 `포함`은 걸리지 않도록 낱말 바로 뒤만 본다.
+ * `별도`도 같은 뜻인데 빠져 있었다 — 성동구 「침대틀 / 1인용, 매트리스 별도 / 5,000원」이
+ * `mattress`로 들어가, 매트리스를 물은 사람이 프레임만의 값을 후보로 받았다.
  */
 export const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?: RegExp }> = [
-  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress", deny: /(매트리스|토퍼)\s*[)）]?\s*(제외|미포함|불포함|없음|포함)/ },
+  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress", deny: /(매트리스|토퍼)\s*[)）]?\s*(제외|미포함|불포함|없음|포함|별도)/ },
   // 조례는 돌·옥·황토 침대를 「침대」 아래 규격으로 적는다 — 종로 「1인용 돌침대
   // 26,000」, 강북 「돌침대, 전동침대 1인용」, 광진 「1인용 돌, 옥, 황토」. 그대로 두면
   // 돌침대를 물은 사람은 금액을 못 받고, 침대 프레임을 물은 사람은 돌침대 값을 받는다.
@@ -83,10 +84,22 @@ export function cleanLabel(text: string): string {
 export type Verdict = { ok: true; itemId: string } | { ok: false; reason: string };
 
 export function classifyName(rawName: string): Verdict {
-  const base = rawName.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim();
+  // 밑줄은 「품목_조건」을 가르는 표기다 — 관악구 고시명이 그렇다. 「식탁_유리제외」는
+  // 유리를 뺀 식탁이고, 「화장대_거울+의자 제외」는 화장대다. 한국어는 핵심어가 뒤에
+  // 온다는 규칙을 그대로 적용하면 뒤쪽 조건이 핵심어로 잡혀 통째로 버려진다 — 실제로
+  // 관악구는 이 규칙 하나로 식탁과 난로가 전부 사라졌다. 밑줄 앞을 품명으로 본다.
+  // 「커튼 지지대_커튼 봉」처럼 앞쪽 자체가 부속품이면 아래 수식어 검사가 그대로 잡는다.
+  const named = rawName.split("_")[0];
+  const base = named.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim();
   if (base.length === 0) return { ok: false, reason: "empty_after_paren_strip" };
+  // `+`는 규칙으로 가르지 않는다. 여러 품목을 묶은 것(「난로+가스히터」,
+  // 「골프채+낚싯대+등산스틱」)도 있지만, 한 품목의 재질·동의어를 잇는 것
+  // (「돌+옥+황토 침대」, 「김장독+항아리」, 「천막+텐트」)도 있어서 `+`만 보고
+  // 버리면 멀쩡한 행이 함께 사라진다. 실제로 넣어 봤다가 관악구에서 항아리·천막·
+  // 라켓이 통째로 빠지고 돌침대 재지정까지 막혀 되돌렸다. 뒤쪽이 핵심어면 아래
+  // 수식어 검사가, 정말 다른 품목이면 규격 검사가 각각 맡는다.
   if (/[,/·ㆍ]/.test(base)) return { ok: false, reason: "multi_item_name" };
-  if (/별도|추가금|추가 요금/.test(rawName)) return { ok: false, reason: "surcharge_row" };
+  if (/별도|추가금|추가 요금/.test(named)) return { ok: false, reason: "surcharge_row" };
   if (HEAD_COLLISION_NAMES.has(base)) return { ok: false, reason: "head_collision" };
 
   const resolved = resolveWasteItem(base);
