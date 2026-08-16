@@ -475,7 +475,7 @@
     "expectedLevel": "district"
   },
   {
-    "region": "경기도 수원시",
+    "region": "경기도 평택시",
     "expectedRegionId": "gyeonggi",
     "expectedLevel": "metro"
   },
@@ -583,5 +583,59 @@
     "region": "울주군",
     "expectedRegionId": "ulsan",
     "expectedLevel": "metro"
+  },
+  {
+    "region": "수원시",
+    "expectedRegionId": "suwon_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "경기 수원시",
+    "expectedRegionId": "suwon_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "용인시",
+    "expectedRegionId": "yongin_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "고양시",
+    "expectedRegionId": "goyang_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "일산",
+    "expectedRegionId": "goyang_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "화성시",
+    "expectedRegionId": "hwaseong_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "동탄",
+    "expectedRegionId": "hwaseong_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "부천시",
+    "expectedRegionId": "bucheon_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "남양주시",
+    "expectedRegionId": "namyangju_si",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   }
 ]
