@@ -694,6 +694,29 @@ async function runSmoke() {
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
     requestId += 1;
 
+    // WIDGET_ENABLED is a rendering rollback, so it must not move the telemetry
+    // the finals-window 지역 해상도 numbers are read off. This server runs with
+    // widgets *off* — the branch where classify used to skip region matching
+    // entirely and log no matchedRegion at all.
+    await callTool(baseUrl, "classify_waste_item", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const classifyTextLog = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"classify_waste_item"'))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      })
+      .at(-1);
+    assert(classifyTextLog, "no classify_waste_item call was logged on the text path");
+    assert(
+      classifyTextLog.matchedRegion === "서울 강남구",
+      `classify text path logged matchedRegion=${classifyTextLog.matchedRegion}, expected it to match the widget path`,
+    );
+
     console.log(`MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases)`);
   } finally {
     stopServer();
@@ -720,6 +743,15 @@ function assertPlainTextResponse(result, context) {
 // PRD phase-3 R2: one unsupported node type drops the whole card to text
 // fallback, and that only shows up in Preview — a push + redeploy away.
 const ALLOWED_WIDGET_NODE_TYPES = new Set(["Card", "Title", "Text", "Caption", "Divider"]);
+
+/** 카드 안의 모든 텍스트 값을 트리 순서대로 펼친다. 어느 줄이 무엇을 싣는지 보는 케이스는
+ * 카드 전체를 JSON.stringify로 훑으면 이웃 줄의 문자열까지 같이 걸려서 통과해버린다. */
+function cardTextValues(node) {
+  if (!isPlainObject(node)) return [];
+  const own = typeof node.value === "string" ? [node.value] : [];
+  const children = Array.isArray(node.children) ? node.children.flatMap(cardTextValues) : [];
+  return [...own, ...children];
+}
 
 function assertWidgetNode(node, context) {
   assert(isPlainObject(node), `${context} is not a widget node`);
@@ -793,6 +825,15 @@ async function runWidgetBuilderCases() {
   assert(sharp, "widget builder cases are missing their 주의 fixture");
   assert(card({ item: sharp }).includes("다치지 않게"), "safety caution should outrank informational ones");
 
+  // The card names a source; without the date a reader cannot tell a 조례
+  // 수수료 checked this summer from one checked a year ago. The text path has
+  // always carried it, so the card was the only place it was missing.
+  const dated = card({ item: nationwide, sourceCheckedAt: "2026-06-27" });
+  assert(dated.includes("근거: 테스트 출처 · 2026-06-27 확인"), "card should date the source it names");
+  // Closing quote included: a dateless source must end the caption there rather
+  // than trail a separator with nothing after it.
+  assert(card({ item: nationwide }).includes('"근거: 테스트 출처"'), "a source with no date must not leave a dangling separator");
+
   const payload = buildDisposalWidget({ item: regional, sourceTitle: "테스트 출처" });
   assert(!("status" in payload), "widget payload must not define status — Kakao fills it");
   assert(!("status" in payload.widget), "widget node must not define status — Kakao fills it");
@@ -815,6 +856,28 @@ async function runWidgetBuilderCases() {
   const shortCopy = buildDisposalWidget({ item: oneStep, sourceTitle: "테스트 출처" }).copy_text.split("\n");
   assert(shortCopy.length >= 3, `single-step copy_text is ${shortCopy.length} lines, under the 3-line floor`);
   assert(shortCopy.includes(oneStep.summary), "single-step copy_text should carry the conclusion");
+
+  // The caveat the card shows on a non-high item has to ride along on the share.
+  // copy_text is all the recipient of a 카톡 forward sees, so leaving it off the
+  // share hands them a medium verdict dressed as a settled one.
+  const uncertain = items.find((item) => item.confidence !== "high");
+  const certain = items.find((item) => item.confidence === "high");
+  assert(uncertain && certain, "widget builder cases are missing their confidence fixtures");
+  const copyOf = (item) => buildDisposalWidget({ item, sourceTitle: "테스트 출처" }).copy_text;
+  assert(copyOf(uncertain).includes("분류가 갈릴 수 있"), "a non-high item's copy_text must carry the confidence caveat");
+  assert(!copyOf(certain).includes("분류가 갈릴 수 있"), "a high-confidence item's copy_text must not hedge");
+
+  // That caveat costs a line, so the steps have to give one back. No catalogue
+  // item is both non-high and long enough to prove it today, so the fixture is
+  // built — the budget has to hold the day one of them is.
+  const longest = items.reduce((worst, item) => (item.steps.length > worst.steps.length ? item : worst), items[0]);
+  const uncertainLong = copyOf({ ...longest, confidence: "medium" }).split("\n");
+  assert(
+    uncertainLong.length >= 3 && uncertainLong.length <= 6,
+    `a ${longest.steps.length}-step medium item shares as ${uncertainLong.length} lines, outside the 3~6 budget`,
+  );
+  assert(uncertainLong.at(-1).startsWith("(남은 "), "the caveat must not push steps out silently");
+  assert(uncertainLong.some((line) => line.includes("분류가 갈릴 수 있")), "the caveat is what the extra line was spent on");
 }
 
 /**
@@ -873,6 +936,11 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
 async function runWidgetSmoke() {
   const port = await getFreePort();
   const baseUrl = `http://${HOST}:${port}`;
+  const { wasteItems, bulkyWasteFeeSchedules } = await import("../dist/data.js");
+  const pizzaBox = wasteItems.find((item) => item.id === "pizza_box_oily");
+  const chair = wasteItems.find((item) => item.id === "chair");
+  const mediumItem = wasteItems.find((item) => item.id === "spring_notebook");
+  assert(pizzaBox && chair && mediumItem, "widget smoke is missing its confirmed-match fixtures");
   const { server, getOutput } = startServer(port, { widgets: true });
 
   const stopServer = () => {
@@ -897,6 +965,12 @@ async function runWidgetSmoke() {
     assert(
       JSON.stringify(payload.widget).includes("깨끗한 부분과 오염된 부분을 분리합니다."),
       "widget card is missing the disposal steps",
+    );
+    // The date comes off the same sources[0] the title does, so this pins the
+    // wiring end to end rather than just the builder's formatting.
+    assert(
+      JSON.stringify(payload.widget).includes(`${pizzaBox.sources[0].checkedAt} 확인`),
+      "widget card is missing the source confirmation date",
     );
 
     const ambiguous = await callTool(baseUrl, "get_disposal_steps", { itemName: "전구" }, requestId);
@@ -925,8 +999,75 @@ async function runWidgetSmoke() {
     assert(!regionalCard.includes("거주 지역 기준 확인 필요"), "regional card should not ask for a region the user already gave");
 
     const regionless = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자" }, requestId);
+    requestId += 1;
     const regionlessCard = JSON.stringify(parseWidgetPayload(regionless, "regionless match").widget);
     assert(regionlessCard.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
+
+    // 수수료는 품목이 아니라 지역 고시에서 오고 확인일도 따로 붙는데, 카드에서 그 줄 바로 아래가
+    // sources[0] 날짜를 실은 근거 줄이다. 용산구는 두 날짜가 8개월 벌어져 있어(수수료 2025-11-03,
+    // 의자 출처 2026-07-02) 근거 줄 날짜를 수수료로 읽는 회귀가 여기서 걸린다.
+    const feeSchedule = bulkyWasteFeeSchedules.find((schedule) => schedule.regionId === "yongsan_gu");
+    assert(feeSchedule, "fee-date case is missing its 용산구 fee schedule");
+    assert(
+      feeSchedule.checkedAt !== chair.sources[0].checkedAt,
+      `fee-date case needs a region whose fee date differs from the item source date (both are ${feeSchedule.checkedAt})`,
+    );
+    const feeDated = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자", region: "서울 용산구" }, requestId);
+    requestId += 1;
+    const feeLine = cardTextValues(parseWidgetPayload(feeDated, "용산구 fee card").widget).find((value) => value.startsWith("수수료 "));
+    assert(feeLine, "용산구 card is missing its fee line");
+    assert(feeLine.includes(`${feeSchedule.checkedAt} 확인`), `fee line should carry the fee schedule's own date, got: ${feeLine}`);
+    assert(!feeLine.includes(chair.sources[0].checkedAt), `fee line is dated with the item source date instead: ${feeLine}`);
+
+    // 위젯 응답에는 structuredContent가 없어(R4) 텍스트 경로가 싣던 "확신도: 보통"이 통째로
+    // 빠졌다. 324개 중 75개가 medium이라, 그 줄이 없으면 한 번 더 확인해야 할 답이 확정된
+    // 답으로 나간다. high 249개는 종전대로 아무 말도 덧붙이지 않는다. 문구는 분류 이야기만
+    // 한다 — 지역을 다시 확인하라는 말은 지역 줄이 이미 자기 조건에 맞게 하고 있다.
+    assert(mediumItem.confidence === "medium" && pizzaBox.confidence === "high", "confidence-note case lost its high/medium pair");
+    const mediumMatch = await callTool(baseUrl, "get_disposal_steps", { itemName: mediumItem.name }, requestId);
+    requestId += 1;
+    const mediumValues = cardTextValues(parseWidgetPayload(mediumMatch, "medium confidence card").widget);
+    assert(
+      mediumValues.some((value) => value.includes("분류가 갈릴 수 있")),
+      `medium-confidence card should flag that the classification may go either way: ${mediumValues.join(" | ")}`,
+    );
+    assert(
+      !cardTextValues(payload.widget).some((value) => value.includes("분류가 갈릴 수 있")),
+      "high-confidence card should not hedge a verdict it is sure of",
+    );
+
+    // A text answer is the host's to rewrite and carries no Kakao Tools label,
+    // so a confirmed match must not depend on which of the two item tools the
+    // host picked. The card is built by one shared function — this pins that
+    // the two tools actually reach it with the same inputs.
+    const classified = await callTool(baseUrl, "classify_waste_item", { itemName: "기름 묻은 피자박스" }, requestId);
+    requestId += 1;
+    const classifiedPayload = parseWidgetPayload(classified, "classify confirmed match");
+    assert(classified.structuredContent === undefined, "classify widget response must not carry structuredContent");
+    assert(
+      JSON.stringify(classifiedPayload.widget) === JSON.stringify(payload.widget),
+      "classify and get_disposal_steps should serve the same card for the same match",
+    );
+
+    // R1's line holds on this tool too: the two paths that need a follow-up turn
+    // stay text, because a card closes the conversation.
+    const classifyAmbiguous = await callTool(baseUrl, "classify_waste_item", { itemName: "전구" }, requestId);
+    requestId += 1;
+    assert(classifyAmbiguous.structuredContent?.ambiguous === true, "classify 전구 should still resolve as ambiguous");
+    assertPlainTextResponse(classifyAmbiguous, "classify ambiguous response");
+
+    const classifyNotFound = await callTool(baseUrl, "classify_waste_item", { itemName: "존재하지않는품목zzz" }, requestId);
+    requestId += 1;
+    assert(classifyNotFound.structuredContent?.found === false, "classify unknown item should still resolve as not_found");
+    assertPlainTextResponse(classifyNotFound, "classify not_found response");
+
+    // classify used to echo the raw region string without resolving it, so the
+    // card is the first time this tool has to actually match a 구.
+    const classifyRegional = await callTool(baseUrl, "classify_waste_item", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const classifyRegionalCard = JSON.stringify(parseWidgetPayload(classifyRegional, "classify regional match").widget);
+    assert(classifyRegionalCard.includes("서울 강남구 기준"), "classify regional card is missing the matched region name");
+    assert(!classifyRegionalCard.includes("거주 지역 기준 확인 필요"), "classify regional card should not ask for a region the user already gave");
 
     // PRD phase-3 R5: a widget response has no structuredContent for callStatus()
     // to read, so the handler must log status explicitly or every confirmed
@@ -949,6 +1090,25 @@ async function runWidgetSmoke() {
     assert(
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
+    );
+
+    // Same trap on the tool that just gained a widget: no structuredContent for
+    // callStatus() to read means a confirmed match logs as a plain "ok" unless
+    // the handler says otherwise, and the finals-window match rate reads off this.
+    const classifyLog = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"classify_waste_item"'))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
+    assert(classifyLog.length > 0, "no classify_waste_item call was logged");
+    assert(
+      classifyLog[0].status === "match" && classifyLog[0].matchedId === "pizza_box_oily",
+      `classify widget call logged status=${classifyLog[0].status}, matchedId=${classifyLog[0].matchedId}`,
     );
 
     await sweepWidgetCatalogue(baseUrl, requestId + 1);

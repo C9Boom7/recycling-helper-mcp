@@ -187,13 +187,16 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 
 ## 4. 위젯이 문제일 때 — `WIDGET_ENABLED`
 
-확정 매칭 응답은 위젯 카드 JSON으로 나간다. 카드 렌더링 자체가 깨지면 환경변수로 텍스트 응답으로 되돌릴 수 있다.
+`get_disposal_steps`와 `classify_waste_item`의 확정 매칭 응답은 위젯 카드 JSON으로 나간다. 두 툴은 같은 카드를 낸다.
+카드 렌더링 자체가 깨지면 환경변수로 텍스트 응답으로 되돌릴 수 있고, 스위치 하나가 두 툴을 함께 되돌린다.
 
 ```bash
 WIDGET_ENABLED=false
 ```
 
-`false`가 아닌 값이면 전부 활성이다(기본값 활성). 텍스트 폴백은 마크다운으로 나가며 내용은 같다.
+`false`가 아닌 값이면 전부 활성이다(기본값 활성). 텍스트 폴백은 마크다운으로 나간다.
+
+**두 툴의 되돌아가는 자리가 다르다.** `get_disposal_steps`는 내용이 같고 렌더링만 바뀐다. `classify_waste_item`은 답의 성격이 바뀐다 — 카드는 배출 단계와 지역 수수료까지 싣지만, 텍스트 분기는 원래의 분류 요약(갈래·확신도·판단 범위·대표 근거)이다. 로그의 `matchedRegion`은 스위치와 무관하게 양쪽에서 남는다.
 
 **되돌리기 전에 알아둘 것**: 텍스트 폴백은 응답이 커진다(노원구 매트리스 기준 5.7KB). 원인은 수수료가 아니라 지역 안내가 text와 structuredContent에 두 번 실리는 것이고, 본선 실사용 경로가 위젯이라 지금은 손대지 않았다. 자세한 분해는 [post-finals-backlog.md](post-finals-backlog.md) 1번에 있다.
 

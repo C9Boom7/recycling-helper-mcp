@@ -13,6 +13,7 @@ import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteI
 import {
   confidenceLabel,
   disposalGroupLabel,
+  findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findMaterialGuideline,
   findRegionalPolicy,
@@ -147,7 +148,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), confidence, and whether local municipality rules matter. Use for quick yes/no judgment questions like '피자박스 재활용 돼?', '이거 분리수거 되나?', '스티로폼은 어디에 버려?'. For full step-by-step disposal instructions, prefer get_disposal_steps.",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): answers which bucket the item goes in (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨) and what the verdict rests on. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -177,7 +178,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "check_confusing_item",
     title: "Check Confusing Item",
     description:
-      "Explains commonly confused Korean waste-sorting cases with RecyclingHelper(재활용척척), comparing up to 3 similar items and their exceptions. Use when the user is unsure between categories or asks why — e.g. '영수증은 종이인데 왜 재활용 안 돼?', '컵라면 용기는 종이야 플라스틱이야?', '이것도 재활용 되는 거 맞아?'.",
+      "Explains commonly confused Korean waste-sorting cases with RecyclingHelper(재활용척척), comparing up to 3 similar items and their exceptions. Use when the question sets two things against each other or asks why a rule goes the way it does — e.g. '영수증은 종이인데 왜 재활용 안 돼?', '컵라면 용기는 종이야 플라스틱이야?', '종이컵이랑 종이팩이랑 같이 버려도 돼?'. For a single item with no comparison in the question, prefer classify_waste_item or get_disposal_steps.",
     inputShape: {
       itemName: z.string().min(1).max(80).describe("Confusing household waste item name or situation in Korean."),
     },
@@ -279,10 +280,17 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   const min = Math.min(...amounts);
   const max = Math.max(...amounts);
 
+  // 수수료는 품목이 아니라 지역 고시에서 오고, 확인일도 거기 따로 붙어 있다(2025-11-03 ~
+  // 2026-08-16으로 흩어져 있다). 카드 맨 아래 근거 줄은 sources[0]의 날짜라, 이 줄에 날짜가
+  // 없으면 바로 위에 놓인 수수료가 품목 출처를 확인한 날에 확인된 값으로 읽힌다.
+  // 스케줄이 없으면 날짜 없이 둔다 — 추측한 확인일은 없는 것보다 나쁘다.
+  const checkedAt = findBulkyWasteFeeSchedule(regionMatch.region)?.checkedAt;
+  const paren = (detail: string) => (checkedAt ? `(${detail}, ${checkedAt} 확인)` : `(${detail})`);
+
   // A single tier can name itself; several tiers become a range, because listing
   // four specs would blow the card and picking one for the user would be a guess.
-  if (fees.length === 1) return `수수료 ${krw(min)} (${fees[0].spec})`;
-  return `수수료 ${krw(min)}~${krw(max)} (규격 ${fees.length}종)`;
+  if (fees.length === 1) return `수수료 ${krw(min)} ${paren(fees[0].spec)}`;
+  return `수수료 ${krw(min)}~${krw(max)} ${paren(`규격 ${fees.length}종`)}`;
 }
 
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
@@ -321,6 +329,13 @@ function briefSourceLabel(item: WasteItem): string {
 // basis + URL label would balloon the text for every item.
 function briefSourceTitle(item: WasteItem): string {
   return item.sources[0]?.title ?? item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
+}
+
+// Reads the same sources[0] briefSourceTitle does, so a card can never date a
+// different source than the one it names. The sourceRefs fallback is a bare
+// title with no date attached, hence undefined rather than a guess.
+function briefSourceCheckedAt(item: WasteItem): string | undefined {
+  return item.sources[0]?.checkedAt;
 }
 
 const FALLBACK_ASK_FOR = ["재질", "오염 여부", "크기", "지역"];
@@ -502,6 +517,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
   return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
 }
 
+/**
+ * The card for a confirmed match, shared by the two tools that resolve a single
+ * item. Kakao renders a widget as-is while a text answer is the host's to
+ * rewrite (Kakao Tools 개발 가이드 §3), and the `Kakao Tools · 재활용척척` label
+ * only rides along on widget responses — so which of the two tools the host
+ * happened to pick should not decide whether the user gets a card.
+ */
+function matchedItemWidget(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined): DisposalWidgetPayload {
+  return buildDisposalWidget({
+    item,
+    sourceTitle: briefSourceTitle(item),
+    sourceCheckedAt: briefSourceCheckedAt(item),
+    regionName: regionMatch?.region.name,
+    regionNotes: buildRegionNotes(item, regionMatch),
+    regionFeeLine: buildRegionFeeLine(item, regionMatch),
+  });
+}
+
 async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return unknownItemResult(itemName);
@@ -509,6 +542,21 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
 
   const { match } = resolved;
   const { item } = match;
+
+  // Resolved on both sides of the switch on purpose. WIDGET_ENABLED is a
+  // rendering rollback (qa-runbook 4절); if the region were only matched in the
+  // widget branch, flipping it off would also drop `matchedRegion` from the
+  // logs, and the finals-window 지역 해상도 numbers are read off those.
+  const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+
+  // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
+  // follow-up turn and a card closes the conversation. A confirmed match does
+  // not, so it takes the same card get_disposal_steps serves.
+  if (WIDGET_ENABLED) {
+    return widgetResult(matchedItemWidget(item, regionMatch), log);
+  }
+
   const text = [
     `분류 결과: ${item.name}`,
     `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
@@ -542,7 +590,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
       regionGuidance: itemRegionGuidance(item),
       primarySource: itemTopSources(item, 1)[0] ?? { title: "재활용척척 보수 안내 정책" },
     },
-    { matchedId: item.id, score: match.score },
+    log,
   );
 }
 
@@ -554,22 +602,15 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const { match } = resolved;
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const regionNotes = buildRegionNotes(item, regionMatch);
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(
-      buildDisposalWidget({
-        item,
-        sourceTitle: briefSourceTitle(item),
-        regionName: regionMatch?.region.name,
-        regionNotes,
-        regionFeeLine: buildRegionFeeLine(item, regionMatch),
-      }),
-      log,
-    );
+    return widgetResult(matchedItemWidget(item, regionMatch), log);
   }
 
+  // Below the widget branch on purpose: the card builds its own region lines
+  // (matchedItemWidget), so this is the text path's alone.
+  const regionNotes = buildRegionNotes(item, regionMatch);
   const text = formatItemGuide(item, region);
   return textResult(
     text,
