@@ -6,6 +6,7 @@
 {"query":"노원구","expectedRegionId":"nowon_gu","expectedLevel":"district"}
 {"query":"은평구","expectedRegionId":"eunpyeong_gu","expectedLevel":"district"}
 {"query":"서울 강서구","expectedRegionId":"gangseo_gu","expectedLevel":"district"}
+{"query":"강서구","expectedRegionId":"gangseo_gu","expectedLevel":"district","note":"전국 동명(서울·부산)이라 확정 거부가 정답 — 전국 폴백 버킷으로 잡힌다"}
 {"query":"금천구","expectedRegionId":"geumcheon_gu","expectedLevel":"district"}
 {"query":"영등포구","expectedRegionId":"yeongdeungpo_gu","expectedLevel":"district"}
 {"query":"동작구","expectedRegionId":"dongjak_gu","expectedLevel":"district"}

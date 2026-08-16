@@ -889,6 +889,14 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ...(regionMatch
       ? formatRegionSourceList(regionMatch.region)
       : NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)),
+    // 광역까지만 좁혀졌으면 전국 안내 링크를 함께 남긴다. 시·군 이름을 광역 별칭으로
+    // 흡수한 뒤 `안산시`는 미등록 폴백 대신 경기도로 착지하는데, 그 순간 분리배출.kr
+    // 지역별 안내와 정부24 신청 민원이 함께 사라졌다. 광역 요약이 더 구체적이긴 해도
+    // **사용자가 자기 시 기준을 실제로 찾아갈 수 있는 경로**는 그 둘뿐이라, 빠지면
+    // 안내가 오히려 얕아진다. 광역 링크에 이어 붙여 잃는 것 없이 얻기만 하게 한다.
+    ...(regionMatch?.level === "metro"
+      ? NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)
+      : []),
   ].filter(Boolean);
 
   return textResult(
@@ -904,7 +912,13 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       defaultSummary: match?.item.summary,
       checkList,
       officialSources: regionMatch
-        ? regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url }))
+        ? [
+            ...regionMatch.region.sources.slice(0, 3).map((source) => ({ title: source.title, url: source.url })),
+            // text 쪽과 같은 이유로 광역 착지에는 전국 안내를 덧붙인다(위 주석 참고).
+            ...(regionMatch.level === "metro"
+              ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
+              : []),
+          ]
         : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
     },
     {

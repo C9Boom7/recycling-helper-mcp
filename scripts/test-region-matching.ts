@@ -193,13 +193,25 @@ for (const query of nationallyAmbiguousDistrictQueries) {
  * 어느 한쪽에 달면 다른 쪽 주민이 남의 광역 안내를 조용히 받는다. 확정만 안 하면
  * 되묻기든 전국 폴백이든 상관없다.
  */
-const metroAmbiguousNames = ["고성군", "고성", "광주시"];
+const metroAmbiguousNames = ["고성군", "고성"];
+
+// `광주시`는 위 목록에 넣어봐야 검사가 되지 않는다 — 광주광역시가 원래 이 이름을
+// 별칭으로 갖고 있어 항상 확정되고, 예외 처리를 달면 어떤 경우에도 실패하지 않는
+// 빈 검사가 된다. 대신 **경기도가 이 이름을 가져가지 않았는지**만 직접 본다.
+{
+  const resolution = resolveRegionalPolicy("광주시");
+  const owner = resolution.status === "match" ? resolution.match.region.id : `(${resolution.status})`;
+  if (owner !== "gwangju") {
+    failures.push(
+      `"광주시"가 ${owner}로 갔다. 이 이름은 광주광역시가 원래 갖고 있고 경기도 광주시와 표기가 같다 — ` +
+        "경기도 별칭에 더하면 두 광역이 같은 이름을 물어 되묻기로 빠진다",
+    );
+  }
+}
 
 for (const query of metroAmbiguousNames) {
   const resolution = resolveRegionalPolicy(query);
   if (resolution.status !== "match") continue;
-  // 광주광역시는 자기 이름으로 확정되는 게 맞다. 막아야 하는 건 경기도가 가져가는 쪽이다.
-  if (query === "광주시" && resolution.match.region.id === "gwangju") continue;
   failures.push(
     `"${query}" confidently resolved to ${resolution.match.region.id}; ` +
       "이 이름은 광역이 유일하게 정해지지 않아 광역 별칭으로 달면 안 된다",
