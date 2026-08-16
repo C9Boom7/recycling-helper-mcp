@@ -7824,10 +7824,61 @@
     "expectedTextIncludes": [
       "서울 관악구",
       "수수료",
-      "책상 상판 면적 120센티미터x60센티미터 기준: 2,000원"
+      "책상_서랍+책꽂이+유리 제외 상판면적 40센티미터x40센티미터 당: 1,000원"
     ],
     "expectedStructuredIncludes": [
       "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedTextExcludes": [
+      "책상 상판 면적 120센티미터x60센티미터 기준",
+      "책상 서랍 폭 40센티미터x높이 60센티미터 기준"
+    ]
+  },
+  {
+    "id": "ordinance_fee_jung_gu_sofa_after_ladder_rule",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 중구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "3,000원"
+    ]
+  },
+  {
+    "id": "ordinance_fee_dongdaemun_refrigerator",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉장고",
+      "region": "서울 동대문구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "4,000원"
+    ]
+  },
+  {
+    "id": "standard_fee_gwanak_stone_bed_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "돌침대",
+      "region": "서울 관악구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "20,000원"
+    ]
+  },
+  {
+    "id": "standard_fee_bicycle_excludes_exercise_machine",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "자전거",
+      "region": "서울 강서구"
+    },
+    "expectedTextExcludes": [
+      "헬스자전거"
     ]
   },
   {

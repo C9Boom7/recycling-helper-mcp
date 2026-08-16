@@ -12,8 +12,8 @@
  * 실행: pnpm import:fees [원본경로]
  */
 import { readFileSync, writeFileSync } from "node:fs";
-import { normalizeText, resolveWasteItem } from "../src/data.js";
 import type { BulkyWasteFee, BulkyWasteFeeSchedule, RegionalPolicyData } from "../src/data.js";
+import { SPLIT_HINTS, classifyName } from "./lib/bulky-item-match.js";
 
 type StandardRow = {
   CTPV_NM: string;
@@ -41,9 +41,6 @@ const TARGETS: Array<[string, string, string]> = [
   ["관악구", "gwanak_gu", "서울 관악구"],
 ];
 
-type Verdict =
-  | { ok: true; itemId: string }
-  | { ok: false; reason: string };
 
 /**
  * 고시명을 우리 품목에 붙일 수 있는지 판정한다.
@@ -65,51 +62,17 @@ type Verdict =
  */
 
 /**
- * 핵심어 일치만으로는 걸러지지 않는 오귀속. "식기건조대"는 "건조대"가 빨래건조대의
- * 별칭이라 붙고, "상자"·"김치통"·"골프채 가방"도 더 넓은 품목의 핵심어에 얹힌다.
- * 규칙을 더 조이면 정상 매칭(밥상→식탁 등)을 깨뜨리므로 명시적으로 뺀다.
+ * 품명 판정과 갈래 재지정은 `scripts/lib/bulky-item-match.ts`를 조례·구청 트랙과
+ * 함께 쓴다. 예전에는 이 파일이 자기 사본을 들고 있었는데, 조례 트랙이 실측으로
+ * 고친 규칙(매트리스 힌트의 `deny`, 돌·옥·황토 침대 분리, 헬스자전거 분리, 짧은
+ * 별칭의 수식어 위치 검사)이 여기에는 없어 이미 갈라져 있었다. 그대로 두면 이
+ * 스크립트를 다시 돌릴 때마다 고쳐 둔 오귀속이 되살아난다.
  */
-const HEAD_COLLISION_NAMES = new Set(["식기건조대", "욕실 수납장", "상자", "김치통", "골프채 가방"]);
-
-/**
- * 고시명이 상위어로 뭉뚱그려져 있을 때 실제 품목을 가르는 표.
- *
- * 용산구는 매트리스 가격을 "침대(매트리스, 라텍스, 토퍼)"로, 관악구는 고시명 "침대" +
- * 규격 "1인용 매트리스"로 적는다. 괄호를 떼면 둘 다 "침대"만 남아 침대 프레임에 붙었고,
- * 그래서 용산구는 매트리스 수수료가 아예 안 나오고 관악구는 라텍스 값만 나왔다.
- *
- * 괄호·규격에서 다른 품목이 잡히면 무조건 그쪽으로 보내는 일반 규칙도 만들어 봤지만
- * 새 오귀속이 그만큼 생긴다 — "커튼(블라인드)"가 블라인드로, "전기장판 (전기담요,
- * 온수매트)"가 온수매트로, "(침대)매트리스(일반)"이 되레 침대 프레임으로 갔다.
- * 근거를 확인한 쌍만 여기 적는다.
- */
-const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string }> = [
-  // "매트포함"은 세트 가격이라 침대 프레임에 그대로 둔다.
-  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress" },
-];
-
 function overrideItemId(rawName: string, spec: string, baseItemId: string): string | undefined {
   const text = `${rawName} ${spec}`;
-  return SPLIT_HINTS.find((rule) => rule.from === baseItemId && rule.hint.test(text))?.to;
-}
-
-function classifyName(rawName: string): Verdict {
-  const base = rawName.replace(/[(（][^)）]*[)）]/g, " ").trim();
-  if (/[,/·]/.test(base)) return { ok: false, reason: "multi_item_name" };
-  if (/별도|추가금|추가 요금/.test(rawName)) return { ok: false, reason: "surcharge_row" };
-  if (HEAD_COLLISION_NAMES.has(base)) return { ok: false, reason: "head_collision" };
-
-  const resolved = resolveWasteItem(base);
-  if (resolved.status !== "match") return { ok: false, reason: resolved.status };
-
-  const { item, matchedBy, matchKind } = resolved.match;
-  if (matchKind === "fuzzy_jamo") return { ok: false, reason: "typo_tier" };
-  if (matchKind === "generic_fragment") return { ok: false, reason: "reverse_containment" };
-  if (matchKind === "query_contains_name" && !normalizeText(base).endsWith(normalizeText(matchedBy))) {
-    return { ok: false, reason: "modifier_position" };
-  }
-
-  return { ok: true, itemId: item.id };
+  return SPLIT_HINTS.find(
+    (rule) => rule.from === baseItemId && rule.hint.test(text) && !(rule.deny?.test(text) ?? false),
+  )?.to;
 }
 
 /** 금액 분포를 대표하도록 최저·최고를 남기고 그 사이를 고르게 뽑는다. */

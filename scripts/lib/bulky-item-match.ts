@@ -83,10 +83,22 @@ export function cleanLabel(text: string): string {
 export type Verdict = { ok: true; itemId: string } | { ok: false; reason: string };
 
 export function classifyName(rawName: string): Verdict {
-  const base = rawName.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim();
+  // 밑줄은 「품목_조건」을 가르는 표기다 — 관악구 고시명이 그렇다. 「식탁_유리제외」는
+  // 유리를 뺀 식탁이고, 「화장대_거울+의자 제외」는 화장대다. 한국어는 핵심어가 뒤에
+  // 온다는 규칙을 그대로 적용하면 뒤쪽 조건이 핵심어로 잡혀 통째로 버려진다 — 실제로
+  // 관악구는 이 규칙 하나로 식탁과 난로가 전부 사라졌다. 밑줄 앞을 품명으로 본다.
+  // 「커튼 지지대_커튼 봉」처럼 앞쪽 자체가 부속품이면 아래 수식어 검사가 그대로 잡는다.
+  const named = rawName.split("_")[0];
+  const base = named.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim();
   if (base.length === 0) return { ok: false, reason: "empty_after_paren_strip" };
+  // `+`는 규칙으로 가르지 않는다. 여러 품목을 묶은 것(「난로+가스히터」,
+  // 「골프채+낚싯대+등산스틱」)도 있지만, 한 품목의 재질·동의어를 잇는 것
+  // (「돌+옥+황토 침대」, 「김장독+항아리」, 「천막+텐트」)도 있어서 `+`만 보고
+  // 버리면 멀쩡한 행이 함께 사라진다. 실제로 넣어 봤다가 관악구에서 항아리·천막·
+  // 라켓이 통째로 빠지고 돌침대 재지정까지 막혀 되돌렸다. 뒤쪽이 핵심어면 아래
+  // 수식어 검사가, 정말 다른 품목이면 규격 검사가 각각 맡는다.
   if (/[,/·ㆍ]/.test(base)) return { ok: false, reason: "multi_item_name" };
-  if (/별도|추가금|추가 요금/.test(rawName)) return { ok: false, reason: "surcharge_row" };
+  if (/별도|추가금|추가 요금/.test(named)) return { ok: false, reason: "surcharge_row" };
   if (HEAD_COLLISION_NAMES.has(base)) return { ok: false, reason: "head_collision" };
 
   const resolved = resolveWasteItem(base);
