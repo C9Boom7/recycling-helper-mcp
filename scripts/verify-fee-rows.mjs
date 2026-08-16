@@ -46,6 +46,12 @@ function parseTable(text) {
 }
 
 const [file, regionId] = process.argv.slice(2);
+// 검증을 읽기보다 먼저 한다. 순서가 반대면 인자를 빠뜨렸을 때 사용법 대신
+// ERR_INVALID_ARG_TYPE 스택이 떨어져, 정작 이 가드를 넣은 이유가 사라진다.
+if (!file || !regionId) {
+  console.error("Usage: node scripts/verify-fee-rows.mjs <별표파일> <regionId>");
+  process.exit(1);
+}
 const parsed = parseTable(await extractHwpText(readFileSync(file)));
 const src = new Map();
 for (const r of parsed) {

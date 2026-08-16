@@ -21633,7 +21633,7 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "mattress",
+        "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대틀",
         "spec": "1인용, 매트리스 별도",
@@ -21647,7 +21647,7 @@
         "feeKrw": 7000
       },
       {
-        "itemId": "mattress",
+        "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대틀",
         "spec": "2인용, 매트리스 별도",

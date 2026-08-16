@@ -988,6 +988,9 @@
     "expectedTextIncludes": [
       "수수료",
       "7,000원"
+    ],
+    "expectedTextExcludes": [
+      "침대틀"
     ]
   },
   {
