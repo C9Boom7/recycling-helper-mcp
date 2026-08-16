@@ -25,7 +25,9 @@
     "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
     "local:test": "pnpm check && pnpm smoke:mcp",
     "import:fees": "tsx scripts/import-bulky-fees.ts",
-    "import:ordinance": "tsx scripts/import-ordinance-fees.ts"
+    "import:ordinance": "tsx scripts/import-ordinance-fees.ts",
+    "fees:fetch:district": "node scripts/fetch-district-fees.mjs",
+    "import:district": "tsx scripts/import-district-fees.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",

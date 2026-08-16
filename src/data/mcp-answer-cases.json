@@ -955,6 +955,56 @@
     ]
   },
   {
+    "id": "district_fee_guro_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 구로구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "3,000원"
+    ]
+  },
+  {
+    "id": "district_fee_yangcheon_sofa",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 양천구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "6,000원"
+    ]
+  },
+  {
+    "id": "district_fee_seongdong_mattress",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 성동구"
+    },
+    "expectedTextIncludes": [
+      "수수료",
+      "7,000원"
+    ]
+  },
+  {
+    "id": "district_fee_seodaemun_washer_no_bleed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "세탁기",
+      "region": "서울 서대문구"
+    },
+    "expectedTextIncludes": [
+      "3,000원"
+    ],
+    "expectedTextExcludes": [
+      "1,000원"
+    ]
+  },
+  {
     "id": "region_special_lines_expand_for_asked_lamp",
     "tool": "get_region_disposal_info",
     "arguments": {
