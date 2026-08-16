@@ -138,6 +138,10 @@ function startServer(port, { widgets = false } = {}) {
       // a widget response replaces — so the suite must not depend on whatever
       // WIDGET_ENABLED happens to be set to in the caller's shell.
       WIDGET_ENABLED: widgets ? "true" : "false",
+      // 같은 이유로 고정한다. 런북 2절이 로컬 QA에 CALL_LOG_DETAILS=true를 권하므로
+      // 그 셸에서 그대로 돌리면 서버가 물려받고, 아래 로그 단언이 검사하는 기본
+      // 동작(인자를 남기지 않는다)이 조용히 빠진다.
+      CALL_LOG_DETAILS: "false",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -1109,6 +1113,22 @@ async function runWidgetSmoke() {
     assert(
       classifyLog[0].status === "match" && classifyLog[0].matchedId === "pizza_box_oily",
       `classify widget call logged status=${classifyLog[0].status}, matchedId=${classifyLog[0].matchedId}`,
+    );
+
+    // 인자와 예외 메시지를 운영 로그에서 뺀 건 본선 규격 때문이라 조용히 되살아나면
+    // 안 된다. 기본값 서버의 로그 줄에 input이나 message가 다시 끼면 여기서 걸린다.
+    const leakedLines = [...logLines, ...classifyLog].filter((line) => "input" in line || "message" in line);
+    assert(
+      leakedLines.length === 0,
+      `call log kept caller detail without CALL_LOG_DETAILS: ${JSON.stringify(leakedLines[0])}`,
+    );
+
+    // not_found는 matchedId도 score도 없다. fallbackTier까지 빠지면 남는 건
+    // status와 ms뿐이라, 폴백이 어디로 착지했는지 로그로는 알 수 없다.
+    const notFoundLog = classifyLog.find((line) => line.status === "not_found");
+    assert(
+      typeof notFoundLog?.fallbackTier === "string",
+      `not_found call logged no fallbackTier: ${JSON.stringify(notFoundLog)}`,
     );
 
     await sweepWidgetCatalogue(baseUrl, requestId + 1);
