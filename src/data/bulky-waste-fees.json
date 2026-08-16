@@ -18760,7 +18760,7 @@
       {
         "itemId": "air_purifier",
         "category": "electronics",
-        "itemName": "공기청정기.",
+        "itemName": "공기청정기",
         "spec": "높이 1m이상",
         "feeKrw": 4000
       },
@@ -18774,7 +18774,7 @@
       {
         "itemId": "refrigerator",
         "category": "electronics_appliance",
-        "itemName": "냉장고.",
+        "itemName": "냉장고",
         "spec": "300L 미만",
         "feeKrw": 5000
       },
@@ -18788,14 +18788,14 @@
       {
         "itemId": "refrigerator",
         "category": "electronics_appliance",
-        "itemName": "냉장고.",
+        "itemName": "냉장고",
         "spec": "300L~500L미만",
         "feeKrw": 10000
       },
       {
         "itemId": "refrigerator",
         "category": "electronics_appliance",
-        "itemName": "냉장고.",
+        "itemName": "냉장고",
         "spec": "500L 이상",
         "feeKrw": 15000
       },
@@ -18914,7 +18914,7 @@
       {
         "itemId": "copier",
         "category": "electronics_appliance",
-        "itemName": "복사기.",
+        "itemName": "복사기",
         "spec": "(원형 미보전) 1m이상, 한 명이 들기 어려운 정도",
         "feeKrw": 10000
       },
@@ -19026,7 +19026,7 @@
       {
         "itemId": "electric_fan",
         "category": "electronics_appliance",
-        "itemName": "선풍기..",
+        "itemName": "선풍기",
         "spec": "1M이상 가정용 이외",
         "feeKrw": 10000
       },
@@ -19040,14 +19040,14 @@
       {
         "itemId": "washing_machine",
         "category": "electronics_appliance",
-        "itemName": "세탁기.",
+        "itemName": "세탁기",
         "spec": "10KG 미만",
         "feeKrw": 3000
       },
       {
         "itemId": "washing_machine",
         "category": "electronics_appliance",
-        "itemName": "세탁기.",
+        "itemName": "세탁기",
         "spec": "10KG 이상",
         "feeKrw": 5000
       },
@@ -19159,7 +19159,7 @@
       {
         "itemId": "audio_system",
         "category": "electronics_appliance",
-        "itemName": "오디오..",
+        "itemName": "오디오",
         "spec": "스피커(1개당)",
         "feeKrw": 1000
       },
@@ -19173,7 +19173,7 @@
       {
         "itemId": "arcade_machine",
         "category": "bulky_household",
-        "itemName": "오락기.",
+        "itemName": "오락기",
         "spec": "업소용",
         "feeKrw": 11000
       },
@@ -19436,7 +19436,7 @@
       "url": "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html",
       "sourceType": "local_guidance",
       "checkedAt": "2026-08-16",
-      "basis": "서울 성동구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 152행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
+      "basis": "서울 성동구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 151행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
     "fees": [
@@ -19453,13 +19453,6 @@
         "itemName": "거울",
         "spec": "높이 50cm 이상",
         "feeKrw": 2000
-      },
-      {
-        "itemId": "water_purifier",
-        "category": "electronics_appliance",
-        "itemName": "정수만 나오는 정수기",
-        "spec": "모든 규격",
-        "feeKrw": 1000
       },
       {
         "itemId": "ironing_board",

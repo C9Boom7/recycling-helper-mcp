@@ -1,15 +1,21 @@
 /**
  * 조례·구청 수수료표를 우리 품목으로 잇는 공용 규칙 (Phase 6).
  *
- * 같은 판정을 세 트랙이 쓴다 — 자치법규 조례(`import-ordinance-fees.ts`),
- * 구청 수수료표(`import-district-fees.ts`), 공공데이터포털 표준데이터
- * (`import-bulky-fees.ts`). 출처는 달라도 위험은 같다: 질의는 빗나가도 사용자가
- * 다시 물으면 되지만, 여기서 잘못 붙은 이름은 그대로 금액이 되어 확신 있는
- * 오답으로 굳는다. 그래서 규칙을 한 곳에 둔다.
+ * 지금 이 모듈을 쓰는 트랙은 **둘**이다 — 자치법규 조례(`import-ordinance-fees.ts`)와
+ * 구청 수수료표(`import-district-fees.ts`). 출처는 달라도 위험은 같다: 질의는
+ * 빗나가도 사용자가 다시 물으면 되지만, 여기서 잘못 붙은 이름은 그대로 금액이 되어
+ * 확신 있는 오답으로 굳는다.
  *
- * 원래는 `import-ordinance-fees.ts`에 있던 코드다. 구청 수수료표 트랙을 만들며
- * 세 번째 사본이 생길 참이라 여기로 뺐다 — 사본이 어긋나면 트랙마다 다른 답이
- * 나오고, 그게 어느 쪽 잘못인지 알아내는 데 시간이 다 든다.
+ * 원래는 `import-ordinance-fees.ts`에 있던 코드다. 구청 트랙을 만들며 세 번째
+ * 사본이 생길 참이라 여기로 뺐다 — 사본이 어긋나면 트랙마다 다른 답이 나오고,
+ * 그게 어느 쪽 잘못인지 알아내는 데 시간이 다 든다.
+ *
+ * **`import-bulky-fees.ts`(공공데이터포털 표준데이터)는 아직 자기 사본을 쓴다.**
+ * 그리고 이미 갈라져 있다 — 매트리스 힌트에 `deny`가 없고, `stone_bed`·`bicycle`
+ * 규칙과 `short_alias_standalone` 수식어 검사도 없다. 그대로 `pnpm import:fees`를
+ * 다시 돌리면 조례 트랙이 고쳐 둔 오귀속이 되살아난다. 이 PR에서 함께 옮기지 않은
+ * 이유는 옮기는 순간 용산·노원·강서·관악 4곳의 행이 실제로 바뀌기 때문이다 —
+ * 조례 트랙 이관 때처럼 "산출물이 같다"로 확인할 수 없어 별도 검수가 필요하다.
  */
 import { readFileSync } from "node:fs";
 
@@ -63,6 +69,10 @@ export const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?:
  */
 export function cleanLabel(text: string): string {
   let out = text.replace(/\s+/g, " ").trim();
+  // 같은 품명을 여러 줄에 적을 때 뒤에 마침표를 붙여 구분하는 표가 있다 — 서대문
+  // 「냉장고.」·「선풍기..」·「오디오..」. 답변에 그대로 찍히므로 떼어낸다. 품명 안쪽
+  // 마침표(`1.5L` 같은)는 건드리지 않도록 끝에 붙은 것만 본다.
+  out = out.replace(/[.·]+$/, "").trim();
   const open = (out.match(/[(（]/g) ?? []).length;
   const close = (out.match(/[)）]/g) ?? []).length;
   if (close > open) out = out.replace(/[)）]+\s*$/, "").trim();

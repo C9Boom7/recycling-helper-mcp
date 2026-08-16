@@ -1,8 +1,7 @@
 /**
  * 자치법규 별표 → `src/data/bulky-waste-fees.json` 인제스트 (Phase 6 R3).
  *
- * Phase 6 담당 18곳만 대상으로 한다(2026-08-16에 서울 신규 8개 구를 더했다).
- * 용산·노원·강서·관악은 공공데이터포털
+ * Phase 6 조례 트랙 10곳만 대상으로 한다. 용산·노원·강서·관악은 공공데이터포털
  * 표준데이터 트랙이 `scripts/import-bulky-fees.ts`로 넣고, 골든셋 4곳
  * (강남·서초·송파·마포)은 기존 수기 데이터를 그대로 둔다.
  *
@@ -57,7 +56,7 @@ const REGIONS_PATH = "src/data/region-policies.json";
  */
 const MAX_FEE_ROWS = 12;
 
-/** Phase 6 담당 18곳. 여기 없는 지역은 인자로 줘도 받지 않는다. */
+/** Phase 6 조례 트랙 10곳. 여기 없는 지역은 인자로 줘도 받지 않는다. */
 const TARGETS = [
   "seongnam_si",
   "jongno_gu",

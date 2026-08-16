@@ -36,7 +36,9 @@ type DistrictDump = {
   name: string;
   kind: string;
   url: string;
+  collectedAt?: string;
   rows: DistrictRow[];
+  warnings?: string[];
   errors: string[];
 };
 
@@ -68,7 +70,6 @@ if (unknown.length > 0) {
 const targets = requested.length > 0 ? requested : TARGETS;
 const regions = JSON.parse(readFileSync(REGIONS_PATH, "utf8")) as RegionalPolicyData[];
 const existing = JSON.parse(readFileSync(FEES_PATH, "utf8")) as BulkyWasteFeeSchedule[];
-const today = new Date().toISOString().slice(0, 10);
 
 const built: BulkyWasteFeeSchedule[] = [];
 const missing: string[] = [];
@@ -100,6 +101,14 @@ for (const regionId of targets) {
   const region = regions.find((item) => item.id === regionId);
   if (!region?.bulkyWaste?.applicationUrl || !region.bulkyWaste.feeUrl || !region.bulkyWaste.phone) {
     throw new Error(`${regionId}: region-policies.json에 대형폐기물 신청 URL·수수료 URL·전화번호가 모두 있어야 합니다.`);
+  }
+
+  // 수집한 날이 확인일이다. 임포트 시각을 쓰면 몇 주 전 표에 오늘 날짜가 붙는다.
+  const collectedAt = dump.collectedAt;
+  if (!collectedAt) {
+    console.error(`${regionId}: 덤프에 collectedAt이 없다 — 수집 스크립트를 다시 돌려라`);
+    failed.push(regionId);
+    continue;
   }
 
   const grouped = new Map<string, BulkyWasteFee[]>();
@@ -195,7 +204,7 @@ for (const regionId of targets) {
   built.push({
     regionId,
     regionName: region.name,
-    checkedAt: today,
+    checkedAt: collectedAt,
     applicationUrl: region.bulkyWaste.applicationUrl,
     feeUrl: region.bulkyWaste.feeUrl,
     phone: region.bulkyWaste.phone,
@@ -203,7 +212,7 @@ for (const regionId of targets) {
       title: `${region.name} 대형폐기물 수수료표`,
       url: dump.url,
       sourceType: "local_guidance",
-      checkedAt: today,
+      checkedAt: collectedAt,
       basis: `${region.name} 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 ${dump.rows.length}행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.`,
       note: "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다.",
     },

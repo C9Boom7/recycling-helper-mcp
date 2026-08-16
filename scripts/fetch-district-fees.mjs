@@ -118,14 +118,27 @@ function parseSmartclean(html) {
   const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
   const biggest = scripts.sort((a, b) => b.length - a.length)[0] ?? "";
   const rows = [];
+  // `"code":`가 붙은 품목 객체가 몇 개인지 먼저 센다. 아래 상세 패턴이 놓친 행을
+  // 알아채려는 것이다 — 규격이 null이거나 금액이 숫자 리터럴이 아니면 조용히
+  // 빠지고, 전부 빠졌을 때(0행)만 실패로 잡히면 부분 누락을 못 본다.
+  const objectCount = (biggest.match(/\{"code":\d+,"name":/g) ?? []).length;
   const pattern =
-    /\{"code":\d+,"name":"((?:[^"\\]|\\.)*)","standard":"((?:[^"\\]|\\.)*)","price":([\d.]+),"deleted":(true|false)[^}]*?"active":(true|false)/g;
+    /\{"code":\d+,"name":"((?:[^"\\]|\\.)*)","standard":("((?:[^"\\]|\\.)*)"|null),"price":([\d.]+),"deleted":(true|false)[^}]*?"active":(true|false)/g;
+  let dropped = 0;
   for (const match of biggest.matchAll(pattern)) {
     const unescape = (value) => JSON.parse(`"${value}"`);
-    if (match[4] === "true" || match[5] === "false") continue;
-    rows.push({ itemName: unescape(match[1]), spec: unescape(match[2]), feeKrw: Number(match[3]) });
+    if (match[5] === "true" || match[6] === "false") {
+      dropped += 1;
+      continue;
+    }
+    rows.push({
+      itemName: unescape(match[1]),
+      spec: match[2] === "null" ? "" : unescape(match[3]),
+      feeKrw: Number(match[4]),
+    });
   }
-  return rows;
+  const unmatched = objectCount - rows.length - dropped;
+  return { rows, warnings: unmatched > 0 ? [`품목 객체 ${objectCount}개 중 ${unmatched}개를 패턴이 못 읽었다`] : [] };
 }
 
 /** 서대문 「폐기물명 | 폐기물규격 | 부과금액(원)」. */
@@ -140,7 +153,7 @@ function parseSdmTable(html) {
     const spec = cells[1] === "." ? "" : cells[1];
     rows.push({ itemName: cells[0], spec, feeKrw: fee });
   }
-  return rows;
+  return { rows, warnings: [] };
 }
 
 /**
@@ -154,6 +167,7 @@ function parseSdmTable(html) {
  */
 function parseSdPopup(html) {
   const rows = [];
+  const warnings = [];
   for (const row of html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
     const cells = [...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => cell[1]);
     if (cells.length < 2) continue;
@@ -163,11 +177,17 @@ function parseSdPopup(html) {
       for (const listItem of cell.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)) {
         const text = cellText(listItem[1]);
         if (text.length < 2) continue;
-        rows.push({ ...splitTrailingSpec(text), feeKrw: fee });
+        const parsed = splitTrailingSpec(text);
+        // 무상수거를 가리키는 안내가 붙은 행은 금액을 싣지 않는다.
+        if (parsed.freePickupNotice) {
+          warnings.push(`무상수거 안내가 붙어 제외: ${text.slice(0, 40)}`);
+          continue;
+        }
+        rows.push({ itemName: parsed.itemName, spec: parsed.spec, feeKrw: fee });
       }
     }
   }
-  return rows;
+  return { rows, warnings };
 }
 
 /**
@@ -179,22 +199,35 @@ function parseSdPopup(html) {
  * 문장으로 끝나거나 전화번호가 든 괄호는 규격이 아니다.
  */
 const NOTICE_LIKE = /☎|바랍니다|하십시오|하세요|주시기|문의|바로가기|\d{3,4}-\d{4}/;
+/** 안내문이 "무상수거를 쓰라"고 말하는 경우. 금액을 실으면 안 되는 행이다. */
+const FREE_PICKUP_NOTICE = /무상|무료/;
 
 function splitTrailingSpec(text) {
   const match = text.match(/^(.*?)\s*[(（]([^)）]*)[)）]\s*$/);
   if (!match || !match[1].trim()) return { itemName: text, spec: "" };
   const spec = match[2].trim();
-  if (NOTICE_LIKE.test(spec)) return { itemName: match[1].trim(), spec: "" };
-  return { itemName: match[1].trim(), spec };
+  if (!NOTICE_LIKE.test(spec)) return { itemName: match[1].trim(), spec };
+  // 괄호를 그냥 버리면 규격이 비고, 인제스트가 그걸 「모든 규격」으로 채워 "모든
+  // 규격 1,000원"이라 단정한다. 안내문이 무상수거를 가리키는 행은 **금액을 싣지
+  // 않는 것**이 맞다 — "무료로 내면 되는 물건에 수수료를 답한다"가 이 트랙이
+  // 막으려는 실패다.
+  if (FREE_PICKUP_NOTICE.test(spec)) return { itemName: match[1].trim(), spec: "", freePickupNotice: true };
+  return { itemName: match[1].trim(), spec: "" };
 }
 
 /** 구로 처리비용. 「번호 | 종류 | 품목 | 규격 | 부과금액」이고 분류별로 페이지가 갈린다. */
+const GURO_PAGE_SIZE = 500;
+
 async function fetchGuro(baseUrl) {
   const rows = [];
+  const warnings = [];
   // category_code는 화면의 분류 탭이다. 1~7 밖은 빈 표가 온다.
   for (const category of [1, 2, 3, 4, 5, 6, 7]) {
-    const url = `${baseUrl}&currentPage=0&seq_no=0&menu_code=notice&category_code=${category}&search_input=&pageSize=500`;
+    const url = `${baseUrl}&currentPage=0&seq_no=0&menu_code=notice&category_code=${category}&search_input=&pageSize=${GURO_PAGE_SIZE}`;
+    // 한 분류라도 실패하면 세운다. 앞 분류에서 모은 행만 남겨 "수집 성공"으로
+    // 넘기면 그 지역 데이터가 조용히 반쪽이 된다.
     const html = await fetchText(url);
+    const before = rows.length;
     for (const cells of tableRows(html)) {
       if (cells.length < 5) continue;
       const fee = toKrw(cells[4]);
@@ -202,10 +235,15 @@ async function fetchGuro(baseUrl) {
       if (/품목|부과금액/.test(cells[2])) continue;
       rows.push({ itemName: cells[2], spec: cells[3] === "전체" ? "" : cells[3], feeKrw: fee });
     }
+    // 한 페이지에 상한만큼 꽉 찼다면 뒤가 잘렸을 수 있다.
+    if (rows.length - before >= GURO_PAGE_SIZE) {
+      warnings.push(`분류 ${category}가 ${GURO_PAGE_SIZE}행으로 꽉 찼다 — 뒤가 잘렸을 수 있다`);
+    }
     await sleep(REQUEST_DELAY_MS);
   }
   // 분류 탭이 겹쳐 같은 행이 두 번 오는 경우가 있다.
-  return [...new Map(rows.map((row) => [`${row.itemName}|${row.spec}|${row.feeKrw}`, row])).values()];
+  const unique = [...new Map(rows.map((row) => [`${row.itemName}|${row.spec}|${row.feeKrw}`, row])).values()];
+  return { rows: unique, warnings };
 }
 
 async function collect(target) {
@@ -229,28 +267,47 @@ async function main() {
 
   mkdirSync(OUTPUT_DIR, { recursive: true });
   const targets = requested.length > 0 ? TARGETS.filter((target) => requested.includes(target.regionId)) : TARGETS;
-  let failed = 0;
+  const failures = [];
 
   for (const target of targets) {
     process.stdout.write(`${target.regionId} (${target.name}) ... `);
-    const result = { regionId: target.regionId, name: target.name, kind: target.kind, url: target.url, rows: [], errors: [] };
     try {
-      result.rows = await collect(target);
+      const { rows, warnings } = await collect(target);
       // 빈 결과를 성공으로 넘기지 않는다. 조용한 실패는 "그 지역엔 표가 없다"는
       // 커버리지 착시를 만든다 — 조례 트랙에서 실제로 겪었다.
-      if (result.rows.length === 0) throw new Error("행을 하나도 못 뽑았다 (페이지 구조가 바뀌었을 수 있다)");
-      const items = new Set(result.rows.map((row) => row.itemName)).size;
-      console.log(`${result.rows.length}행 / 품명 ${items}종`);
+      if (rows.length === 0) throw new Error("행을 하나도 못 뽑았다 (페이지 구조가 바뀌었을 수 있다)");
+      const result = {
+        regionId: target.regionId,
+        name: target.name,
+        kind: target.kind,
+        url: target.url,
+        // 인제스트가 `checkedAt`에 쓸 값이다. 임포트 시각을 쓰면 몇 주 전에 받아 둔
+        // 표에 오늘 날짜가 붙어, 확인한 적 없는 확인일이 데이터에 남는다.
+        collectedAt: new Date().toISOString().slice(0, 10),
+        rows,
+        warnings,
+        errors: [],
+      };
+      writeFileSync(`${OUTPUT_DIR}/${target.regionId}.json`, `${JSON.stringify(result, null, 2)}\n`, "utf8");
+      const items = new Set(rows.map((row) => row.itemName)).size;
+      console.log(`${rows.length}행 / 품명 ${items}종${warnings.length ? ` (경고 ${warnings.length}건)` : ""}`);
+      for (const warning of warnings) console.log(`    ! ${warning}`);
     } catch (error) {
-      result.errors.push(error.message);
-      console.log(`실패 — ${error.message}`);
-      failed += 1;
+      // **실패한 덤프를 쓰지 않는다.** 예전엔 rows: []로 덮어써서, 일시적인 5xx 한 번에
+      // 멀쩡히 받아 둔 표가 빈 파일이 됐다. 인제스트가 그걸 "행이 없다"로 읽는다.
+      console.log(`실패 — ${error.message} (기존 덤프를 그대로 둔다)`);
+      failures.push(target.regionId);
     }
-    writeFileSync(`${OUTPUT_DIR}/${target.regionId}.json`, `${JSON.stringify(result, null, 2)}\n`, "utf8");
     await sleep(REQUEST_DELAY_MS);
   }
 
-  console.log(`\n완료 — ${targets.length - failed}/${targets.length}. 결과는 ${OUTPUT_DIR}/ 에 있다.`);
+  console.log(`\n완료 — ${targets.length - failures.length}/${targets.length}. 결과는 ${OUTPUT_DIR}/ 에 있다.`);
+  if (failures.length > 0) {
+    // 실패를 종료 코드로 알린다. `fees:fetch:district && import:district`로 이어 붙였을 때
+    // 조용히 다음 단계로 넘어가면 낡은 덤프가 새 데이터인 척한다.
+    console.error(`수집 실패: ${failures.join(", ")}`);
+    process.exitCode = 1;
+  }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
