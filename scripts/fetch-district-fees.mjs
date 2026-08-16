@@ -94,11 +94,19 @@ function tableRows(html) {
   );
 }
 
-/** "12,000", "12,000원", "12000" → 12000. 금액이 아니면 null. */
+/**
+ * "12,000", "12,000원", "12000" → 12000. 금액이 아니면 null.
+ *
+ * 숫자가 아닌 문자를 전부 지우고 이어붙이면 「1,000원 ~ 2,000원」이 10002000이 되고,
+ * 「5,000원(2개 기준)」이 50002가 된다. 첫 숫자 뭉치만 읽고, 대형폐기물 수수료로
+ * 말이 되는 범위 밖이면 버린다.
+ */
 function toKrw(text) {
-  const cleaned = String(text ?? "").replace(/[^\d]/g, "");
-  if (!cleaned) return null;
-  return Number(cleaned);
+  const match = /(\d[\d,]*)/.exec(String(text ?? ""));
+  if (!match) return null;
+  const value = Number(match[1].replace(/,/g, ""));
+  if (!Number.isFinite(value) || value < 0 || value > 500_000) return null;
+  return value;
 }
 
 /**
@@ -162,11 +170,22 @@ function parseSdPopup(html) {
   return rows;
 }
 
-/** 「거울(높이50cm 미만)」 → 품명 `거울`, 규격 `높이50cm 미만`. 괄호가 없으면 규격은 빈칸이다. */
+/**
+ * 「거울(높이50cm 미만)」 → 품명 `거울`, 규격 `높이50cm 미만`. 괄호가 없으면 규격은 빈칸이다.
+ *
+ * 괄호 안이 규격이 아니라 **안내문**인 칸이 있다 — 성동 「정수만 나오는 정수기(정수기는
+ * 폐가전 무상수거 센터를 이용하여 주시기 바랍니다 ☎1599-0903)」. 그대로 규격으로 떼면
+ * 답변에 "…바랍니다 ☎1599-0903: 1,000원"이 찍혀 무상 안내를 유상으로 읽게 된다.
+ * 문장으로 끝나거나 전화번호가 든 괄호는 규격이 아니다.
+ */
+const NOTICE_LIKE = /☎|바랍니다|하십시오|하세요|주시기|문의|바로가기|\d{3,4}-\d{4}/;
+
 function splitTrailingSpec(text) {
   const match = text.match(/^(.*?)\s*[(（]([^)）]*)[)）]\s*$/);
   if (!match || !match[1].trim()) return { itemName: text, spec: "" };
-  return { itemName: match[1].trim(), spec: match[2].trim() };
+  const spec = match[2].trim();
+  if (NOTICE_LIKE.test(spec)) return { itemName: match[1].trim(), spec: "" };
+  return { itemName: match[1].trim(), spec };
 }
 
 /** 구로 처리비용. 「번호 | 종류 | 품목 | 규격 | 부과금액」이고 분류별로 페이지가 갈린다. */

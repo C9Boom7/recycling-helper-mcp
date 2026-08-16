@@ -49,8 +49,6 @@ type OrdinanceDump = {
 const RAW_DIR = "data/ordinance-raw";
 const FEES_PATH = "src/data/bulky-waste-fees.json";
 const REGIONS_PATH = "src/data/region-policies.json";
-const ITEMS_PATH = "src/data/waste-items.json";
-const GROUPS_PATH = "src/data/disposal-groups.json";
 
 /**
  * (regionId, itemId)당 fee 행 상한. `validate-data.mjs`의 MAX_FEE_ROWS_PER_ITEM,
@@ -71,24 +69,21 @@ const TARGETS = [
   "yeongdeungpo_gu",
   "dongjak_gu",
   "gangdong_gu",
-  // 2026-08-16 서울 나머지 8개 구가 열리며 추가된 대상.
-  "jung_gu",
-  "seongdong_gu",
-  "dongdaemun_gu",
-  "jungnang_gu",
-  "seongbuk_gu",
-  "seodaemun_gu",
-  "yangcheon_gu",
-  "guro_gu",
 ];
 
-
-
-
-
-
-
-
+/**
+ * 서울 신규 8개 구는 **여기 없다.** 한 번 넣었다가 뺐다.
+ *
+ * 성북·중랑·양천·서대문·성동·구로는 구청이 직접 띄운 수수료표가 더 정확해서
+ * `import-district-fees.ts`가 맡는다. 두 트랙이 같은 지역을 관리하면 인자 없는
+ * `pnpm import:ordinance` 한 번에 검수 끝난 행이 조례 행으로 덮인다 — 서대문
+ * 세탁기가 다시 1,000원(고무통 값)이 되고, 조례가 표를 못 뽑는 성동·양천·구로는
+ * 아예 지워진다.
+ *
+ * 중구·동대문구는 구청에 기계로 읽을 표가 없어 조례가 유일한 경로지만, 조례 표에서
+ * 규격 사다리가 이웃 품목으로 넘어오는 문제를 아직 못 고쳤다. 고치기 전에는 넣지
+ * 않는다 — 대상 목록에 두면 전체 배치에서 조용히 들어간다.
+ */
 
 /**
  * 이 행을 근거로 써도 되는가. 조례 표에서만 나오는 두 가지를 막는다.

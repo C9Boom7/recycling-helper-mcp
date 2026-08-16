@@ -19,6 +19,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 import type { BulkyWasteFee, BulkyWasteFeeSchedule, RegionalPolicyData } from "../src/data.js";
+// 대상 목록은 수집 스크립트가 진실이다. 여기에 다시 적으면 두 곳이 어긋난다.
+import { TARGETS as FETCH_TARGETS } from "./fetch-district-fees.mjs";
 import {
   SPLIT_HINTS,
   classifyName,
@@ -45,8 +47,7 @@ const REGIONS_PATH = "src/data/region-policies.json";
 /** `import-ordinance-fees.ts`·`import-bulky-fees.ts`와 같은 값이어야 한다. 근거는 응답 크기다. */
 const MAX_FEE_ROWS = 12;
 
-/** 구청 수수료표를 읽는 지역. `fetch-district-fees.mjs`의 TARGETS와 같아야 한다. */
-const TARGETS = ["seongbuk_gu", "jungnang_gu", "yangcheon_gu", "seodaemun_gu", "seongdong_gu", "guro_gu"];
+const TARGETS = FETCH_TARGETS.map((target) => target.regionId);
 
 /** 금액 분포를 대표하도록 최저·최고를 남기고 그 사이를 고르게 뽑는다. */
 function trimToCap(list: BulkyWasteFee[]): BulkyWasteFee[] {
@@ -86,10 +87,12 @@ for (const regionId of targets) {
     continue;
   }
 
-  // 수집이 실패한 덤프는 건너뛴다. 빈 표를 "그 지역엔 수수료가 없다"로 넘기면
-  // 커버리지 착시가 생긴다 — 조례 트랙에서 실제로 겪은 실패다.
+  // 수집이 실패한 덤프는 건너뛰되 **기존 행은 그대로 둔다.** 네트워크 실패나
+  // 일시적인 5xx로 빈 덤프가 남는 일이 있는데, 그걸 "그 지역엔 수수료가 없다"로
+  // 읽고 검수 끝난 행을 지우면 한 번의 타임아웃이 데이터를 날린다. 페이지 구조가
+  // 정말 바뀐 경우와 구분할 방법이 없으니, 지우는 쪽이 아니라 남기고 알리는 쪽을 고른다.
   if (dump.rows.length === 0) {
-    console.error(`${regionId}: 수집된 행이 없다 (${dump.errors.join(" / ") || "사유 없음"})`);
+    console.error(`${regionId}: 수집된 행이 없다 (${dump.errors.join(" / ") || "사유 없음"}) — 기존 행을 그대로 둔다`);
     failed.push(regionId);
     continue;
   }
@@ -181,6 +184,14 @@ for (const regionId of targets) {
     fees.push(...trimToCap(sorted));
   }
 
+  // 한 행도 안 남았으면 스케줄을 만들지 않는다. 빈 `fees`로 덮으면 검수 끝난 행이
+  // 사라진 뒤에야 validate가 터진다 — charset 회귀로 품명이 전부 깨졌을 때가 그랬다.
+  if (fees.length === 0) {
+    console.error(`${regionId}: 쓸 수 있는 행이 하나도 안 남았다 — 기존 행을 그대로 둔다`);
+    failed.push(regionId);
+    continue;
+  }
+
   built.push({
     regionId,
     regionName: region.name,
@@ -193,7 +204,7 @@ for (const regionId of targets) {
       url: dump.url,
       sourceType: "local_guidance",
       checkedAt: today,
-      basis: `${region.name}이 누리집에 게시한 품목별 수수료표에서 뽑았습니다. 원문 ${dump.rows.length}행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.`,
+      basis: `${region.name} 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 ${dump.rows.length}행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.`,
       note: "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다.",
     },
     fees,
@@ -210,11 +221,10 @@ if (built.length === 0) {
   process.exit(1);
 }
 
-// 다른 트랙이 넣은 지역은 건드리지 않는다. 실패한 지역도 managed에 넣어야
-// 낡은 행이 남지 않는다.
-const managed = new Set([...built.map((schedule) => schedule.regionId), ...failed]);
+// 다른 트랙이 넣은 지역과 이번에 실패한 지역은 건드리지 않는다.
+const managed = new Set(built.map((schedule) => schedule.regionId));
 const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)), ...built];
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((sum, schedule) => sum + schedule.fees.length, 0)}행`);
 if (missing.length > 0) console.log(`표가 없어 건너뛴 지역: ${missing.join(", ")}`);
-if (failed.length > 0) console.log(`수집이 실패해 넣지 않은 지역: ${failed.join(", ")}`);
+if (failed.length > 0) console.log(`이번에 넣지 못해 기존 행을 그대로 둔 지역: ${failed.join(", ")}`);
