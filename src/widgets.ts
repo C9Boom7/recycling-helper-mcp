@@ -150,9 +150,9 @@ export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetP
   const children: WidgetNode[] = [
     { type: "Title", value: item.name },
     caption(disposalGroupLabel(item.disposalType)),
-    // 확신도 문구처럼 아래에 몰아두지 않고 제목 바로 밑에 둔다. 확신도는 "이 답을 한 번
-    // 더 확인하라"지만 이쪽은 "이 카드가 네 물건 이야기가 맞느냐"라, 단계까지 다 읽은
-    // 뒤에 나오면 이미 엉뚱한 품목을 따라 한 뒤가 된다.
+    // 확신도 문구처럼 아래에 몰아두지 않고 배출 그룹 캡션과 결론 사이에 둔다. 확신도는
+    // "이 답을 한 번 더 확인하라"지만 이쪽은 "이 카드가 네 물건 이야기가 맞느냐"라,
+    // 단계까지 다 읽은 뒤에 나오면 이미 엉뚱한 품목을 따라 한 뒤가 된다.
     ...(photoNote ? [caption(photoNote)] : []),
     text(item.summary),
     divider(),
