@@ -5,6 +5,7 @@ import {
   findBulkyWasteFees,
   findNamedSubRegion,
   findRegionItemGuide,
+  formatRegionItemGuide,
   regionalPolicies,
   resolveRegionalPolicy,
   resolveRegionalPolicyIn,
@@ -299,7 +300,19 @@ const nonDistrictRemainders: Array<{ query: string; metroId: string }> = [
 
 for (const { query, metroId } of nonDistrictRemainders) {
   const resolution = resolveRegionalPolicy(query);
-  if (resolution.status !== "match" || resolution.match.region.id !== metroId) continue;
+
+  // 그 광역으로 풀리는 것이 이 케이스의 전제다. 전제가 깨지면 아래 단언은 볼 것이
+  // 없어지는데, 건너뛰면 검사가 사라진 채로 스위트는 그대로 통과한다 — 없는
+  // 검사보다 통과하는 척하는 검사가 나쁘다. 그래서 실패로 남긴다. 착지가
+  // 달라졌다는 사실 자체가 손봐야 할 신호다.
+  if (resolution.status !== "match" || resolution.match.region.id !== metroId) {
+    const landed = resolution.status === "match" ? resolution.match.region.id : resolution.status;
+    failures.push(
+      `"${query}" resolved to ${landed}; expected ${metroId} — 이 케이스는 그 광역으로 풀린다는 전제 위에서만 지목 여부를 볼 수 있다`,
+    );
+    continue;
+  }
+
   const named = findNamedSubRegion(resolution.match.region, query);
   if (named !== undefined) {
     failures.push(`"${query}" named ${named}; 기초자치단체 이름이 아닌 조각은 지목하면 안 된다`);
@@ -379,6 +392,27 @@ for (const testCase of regionEvaluationCases) {
     const fees = findBulkyWasteFees(regionMatch.region, itemMatch.item);
     if (!fees.some((fee) => fee.feeKrw === testCase.expectedFeeKrw)) {
       failures.push(`"${testCase.region}" + "${testCase.query}" bulky waste fees did not include ${testCase.expectedFeeKrw}`);
+    }
+  }
+}
+
+// `namedSubRegion`을 받아도 연락처를 걷어내는 건 metro 티어에서만이라는 것.
+//
+// 지금은 어느 호출부도 district 티어에 이 값을 넘기지 않아 런타임 경로로는 닿지
+// 않는다. 그래서 여기서 직접 부른다 — 이 갈래를 다른 툴로 넓히는 순간(PR 본문에
+// 후속으로 적혀 있다) 문의 전화·인터넷 신청·수수료 조회 URL이 소리 없이 사라지는데,
+// 호출부만 보고 있으면 그 사고를 막을 검사가 아무 데도 없다.
+{
+  const district = resolveRegionalPolicy("서울 종로구");
+  const sofa = findBestWasteItem("소파");
+  if (district.status !== "match" || district.match.region.coverageTier === "metro" || !sofa) {
+    failures.push("district-tier contact guard lost its 종로구/소파 fixture");
+  } else {
+    const kept = formatRegionItemGuide(sofa.item, district.match, { namedSubRegion: "종로구" });
+    for (const marker of ["문의/신청 안내 전화", "인터넷 신청", "수수료 조회"]) {
+      if (!kept.some((line) => line.includes(marker))) {
+        failures.push(`namedSubRegion이 district 티어에서 "${marker}" 줄을 지웠다; 이 갈래는 metro 티어에서만 걷어내야 한다`);
+      }
     }
   }
 }

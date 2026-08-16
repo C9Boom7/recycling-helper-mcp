@@ -1046,6 +1046,9 @@ const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, Reg
  * 없다 — 한국어 주소는 큰 단위부터 적으니 미등록 시·군 이름이 등록된 시 앞에
  * 오지 않는다. 게다가 이 경로는 광역 안에 등록된 하위 지역을 찾는 것이라,
  * 서울 밖에서 그런 하위 지역을 가진 광역은 경기도뿐이다.
+ *
+ * 뒤쪽 논거는 지금 데이터에서만 참이다. 두 번째 도에 상세 데이터를 가진 시·군·구가
+ * 등록되는 순간 "닿을 일이 없다"가 깨지므로, 그때는 이 동작을 다시 봐야 한다.
  */
 function splitLeadingMetro(
   policies: RegionalPolicyData[],
@@ -1403,14 +1406,50 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
 }
 
 /**
- * `namedSubRegion`은 호출부가 이미 그 시·군·구 이름을 불러 준 경우에만 넘긴다.
- * 그때는 "거주 중인 시·군·구를 확인해야" 줄을 빼는데, 사용자가 방금 댄 것을
- * 다시 확인하라고 미루는 줄이라 위 안내와 겹치기만 한다. 안 넘기면 예전 그대로다.
+ * 광역으로 착지했을 때만 질의가 지목한 시·군·구를 되짚는다.
+ *
+ * 세 툴이 저마다 이 갈래를 적으면 한 곳만 빠뜨려도 같은 질의에 다른 답이 나간다.
+ * 실제로 그런 적이 있어서(지역 툴만 고치고 품목 툴은 되묻던 시기) 한곳에 둔다.
  */
+export function findNamedSubRegionForMatch(
+  regionMatch: MatchedRegionPolicy | undefined,
+  region?: string,
+): string | undefined {
+  return regionMatch?.level === "metro" ? findNamedSubRegion(regionMatch.region, region) : undefined;
+}
+
+/**
+ * "청주시 상세 데이터는 아직 없어 충청북도 광역 기준으로 안내합니다."
+ *
+ * 시·군·구를 이미 댔는데 광역으로 착지한 응답은 어느 툴이 답하든 이 문장으로 연다.
+ * 뒤에 무엇을 잇는지는 툴마다 다르다 — 지역 툴은 응답 아래 "공식 확인처"로 넘기고,
+ * 품목 툴에는 그 목록이 없어 시·군·구 공식 안내로 넘긴다. 여는 문장까지 갈리면
+ * 호스트가 어느 툴을 고르느냐에 따라 같은 질문에 다른 답이 나간다.
+ */
+export function formatUnregisteredDistrictScope(metroName: string, namedSubRegion: string): string {
+  return `${namedSubRegion} 상세 데이터는 아직 없어 ${metroName} 광역 기준으로 안내합니다.`;
+}
+
+export type RegionItemGuideOptions = {
+  /**
+   * 질의가 지목한 시·군·구 이름. `findNamedSubRegionForMatch`가 돌려준 값을 그대로 넘긴다.
+   * 넘어오면 "거주 중인 시·군·구를 확인해야" 되묻기를 그 이름을 부르는 줄로 갈아끼운다 —
+   * 방금 들은 것을 다시 묻지 않으면서, 광역 기준으로 답한다는 사실은 그대로 밝힌다.
+   */
+  namedSubRegion?: string;
+  /**
+   * 호출부가 응답 위쪽에서 이미 그 이름을 부르고 범위를 밝혔으면 `true`.
+   * `get_region_disposal_info`가 그렇다 — 한 응답에 같은 말을 두 번 쓰지 않으려고
+   * 그때는 갈아끼우는 대신 지운다. 이건 문장 중복을 피하는 선택일 뿐이라,
+   * 켜고 끄는 것으로 연락처가 사라지는 일은 아래에서 막는다.
+   */
+  subRegionScopeAlreadyShown?: boolean;
+};
+
 export function formatRegionItemGuide(
   item: WasteItem,
   regionMatch?: MatchedRegionPolicy,
-  namedSubRegion?: string,
+  { namedSubRegion, subRegionScopeAlreadyShown }: RegionItemGuideOptions = {},
 ): string[] {
   if (!regionMatch) return [];
 
@@ -1447,7 +1486,19 @@ export function formatRegionItemGuide(
           ? "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
           : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
 
-    const contactLines = namedSubRegion ? [] : formatRegionBulkyContactLines(region);
+    // 되묻기를 걷어내는 건 **metro 티어에서만**이다. 그 티어의 연락처 블록은
+    // "거주 중인 시·군·구를 확인해야" 한 줄이 전부라 갈아끼워도 잃는 URL이 없지만,
+    // district 티어에는 문의 전화·인터넷 신청·수수료 조회가 들어 있다.
+    // `namedSubRegion`이 넘어오는 건 광역 착지 때뿐이라는 호출부 약속에 기대면,
+    // 나중에 다른 툴로 넓히는 순간 그 셋이 소리 없이 사라진다 — 여기서 막는다.
+    const contactLines =
+      namedSubRegion && isMetro
+        ? subRegionScopeAlreadyShown
+          ? []
+          : [
+              `- ${formatUnregisteredDistrictScope(region.name, namedSubRegion)} 대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 공식 안내에서 확인하세요.`,
+            ]
+        : formatRegionBulkyContactLines(region);
     return [bulkyLine, ...contactLines, ...bulkyWasteFeeLines];
   }
 
@@ -1466,9 +1517,12 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   const hasSpecificRegionGuide = Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item));
   const needsCriticalRegionCheck = itemNeedsCriticalRegionCheck(item);
   const needsAdvisoryRegionCheck = itemNeedsRegionCheck(item) && !needsCriticalRegionCheck;
+  // "청주시 사는데 소파 어떻게 버려?"는 지역 툴보다 여기로 더 자주 온다. 지역 툴과
+  // 같은 갈래를 타지 않으면 같은 입력이 호스트의 툴 선택에 따라 다르게 답한다.
+  const namedSubRegion = findNamedSubRegionForMatch(regionMatch, region);
   const regionGuideLines =
     itemNeedsRegionCheck(item) && (hasSpecificRegionGuide || needsCriticalRegionCheck)
-      ? formatRegionItemGuide(item, regionMatch)
+      ? formatRegionItemGuide(item, regionMatch, { namedSubRegion })
       : [];
   const hasRegionGuide = regionGuideLines.length > 0;
   const lines = [

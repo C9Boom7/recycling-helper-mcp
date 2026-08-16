@@ -17,7 +17,7 @@ import {
   findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findMaterialGuideline,
-  findNamedSubRegion,
+  findNamedSubRegionForMatch,
   findRegionalPolicy,
   findRegionItemGuide,
   findRegisteredDistricts,
@@ -26,6 +26,7 @@ import {
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceList,
+  formatUnregisteredDistrictScope,
   inferMaterialCategories,
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
@@ -310,13 +311,18 @@ function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?
  * region-specific guide or the region check is critical. Advisory-only items
  * get no region lines, keeping "no region noise" responses noise-free.
  */
-function buildRegionNotes(item: WasteItem, regionMatch?: MatchedRegionPolicy): string[] | undefined {
+function buildRegionNotes(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined, region?: string): string[] | undefined {
   if (!regionMatch || !itemNeedsRegionCheck(item)) return undefined;
 
   const hasSpecificGuide = Boolean(findRegionItemGuide(regionMatch.region, item));
   if (!hasSpecificGuide && !itemNeedsCriticalRegionCheck(item)) return undefined;
 
-  const lines = formatRegionItemGuide(item, regionMatch);
+  // 지역 툴과 같은 갈래. 시·군·구를 이미 댄 사람에게 되묻는 대신 그 이름을 부른다.
+  // 줄 수는 그대로다 — 되묻기 한 줄이 이름 부르기 한 줄로 바뀔 뿐이라 카드의
+  // 지역 줄 두 개 예산을 밀지 않는다.
+  const lines = formatRegionItemGuide(item, regionMatch, {
+    namedSubRegion: findNamedSubRegionForMatch(regionMatch, region),
+  });
   return lines.length > 0 ? lines : undefined;
 }
 
@@ -606,13 +612,15 @@ function matchedItemWidget(
   item: WasteItem,
   regionMatch: MatchedRegionPolicy | undefined,
   photoNote?: string,
+  /** 사용자가 댄 원본 지역 문자열. 광역으로 착지했을 때 그 사람이 말한 시·군·구를 되부르는 데 쓴다. */
+  region?: string,
 ): DisposalWidgetPayload {
   return buildDisposalWidget({
     item,
     sourceTitle: briefSourceTitle(item),
     sourceCheckedAt: briefSourceCheckedAt(item),
     regionName: regionMatch?.region.name,
-    regionNotes: buildRegionNotes(item, regionMatch),
+    regionNotes: buildRegionNotes(item, regionMatch, region),
     regionFeeLine: buildRegionFeeLine(item, regionMatch),
     photoNote,
   });
@@ -651,7 +659,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // follow-up turn and a card closes the conversation. A confirmed match does
   // not, so it takes the same card get_disposal_steps serves.
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, region), log);
   }
 
   const text = [
@@ -715,12 +723,12 @@ async function handleGetDisposalSteps({
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, photoNote), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, photoNote, region), log);
   }
 
   // Below the widget branch on purpose: the card builds its own region lines
   // (matchedItemWidget), so this is the text path's alone.
-  const regionNotes = buildRegionNotes(item, regionMatch);
+  const regionNotes = buildRegionNotes(item, regionMatch, region);
   // 확인 문구는 안내 위에 둔다. 잘못 알아본 이름이면 아래 내용을 읽을 이유가 없다.
   const text = photoNote ? `${photoNote}\n\n${formatItemGuide(item, region)}` : formatItemGuide(item, region);
   return textResult(
@@ -936,10 +944,13 @@ function metroNarrowingLine(metro: MatchedRegionPolicy): string {
  * 광역 기준으로 간다고 잇는다. 마지막 안내는 아래 "공식 확인처"로 넘긴다.
  * 광역 착지에는 분리배출.kr 지역별 안내와 정부24가 항상 함께 붙어서, 사용자가
  * 자기 시·군·구 기준을 실제로 찾아갈 경로는 거기 있다.
+ *
+ * 여는 문장은 품목 툴과 공유한다(`formatUnregisteredDistrictScope`). 뒤에 붙는
+ * 안내만 이 툴의 "공식 확인처" 목록을 가리킨다 — 품목 툴에는 그 목록이 없다.
  */
 function unregisteredDistrictLine(metro: MatchedRegionPolicy, namedSubRegion: string): string {
   return (
-    `${namedSubRegion} 상세 데이터는 아직 없어 ${metro.region.name} 광역 기준으로 안내합니다. ` +
+    `${formatUnregisteredDistrictScope(metro.region.name, namedSubRegion)} ` +
     `대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 소관이니 아래 공식 확인처에서 확인해 주세요.`
   );
 }
@@ -1012,7 +1023,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   // 사람과 "청주시"라고 말한 사람이 한 칸에 섞여, 다음에 어느 지역 데이터를
   // 채워야 하는지가 집계에서 안 보인다. 값을 `metro`로 시작하지 않게 둔 건
   // 회귀 케이스가 부분 문자열로 대조하기 때문이다.
-  const namedSubRegion = regionMatch?.level === "metro" ? findNamedSubRegion(regionMatch.region, region) : undefined;
+  const namedSubRegion = findNamedSubRegionForMatch(regionMatch, region);
   const regionStatus = regionMatch
     ? namedSubRegion
       ? "unregistered_district"
@@ -1068,7 +1079,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ...specialLines,
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
-    match && regionMatch ? formatRegionItemGuide(match.item, regionMatch, namedSubRegion).join("\n") : undefined,
+    match && regionMatch
+      ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion, subRegionScopeAlreadyShown: true }).join("\n")
+      : undefined,
     "",
     "확인할 정보",
     ...checkList.map((item, index) => `${index + 1}. ${item}`),

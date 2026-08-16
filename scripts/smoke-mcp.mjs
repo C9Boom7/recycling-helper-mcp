@@ -1196,6 +1196,29 @@ async function runWidgetSmoke() {
     assert(classifyRegionalCard.includes("서울 강남구 기준"), "classify regional card is missing the matched region name");
     assert(!classifyRegionalCard.includes("거주 지역 기준 확인 필요"), "classify regional card should not ask for a region the user already gave");
 
+    // 시·군·구를 댔는데 상세 데이터가 없어 광역으로 착지한 경우. 되묻기는
+    // `get_region_disposal_info`에서만 없앴던 시기가 있었는데, 자기 구를 말하는 건
+    // 지역 질문보다 품목 질문 쪽이 더 흔하다("청주시 사는데 소파 어떻게 버려?").
+    // 카드의 지역 줄은 두 개가 상한이라, 되묻기가 이름 부르기로 **바뀌기만** 하고
+    // 줄이 하나 더 늘지는 않아야 배출 절차 줄이 밀려나지 않는다.
+    for (const tool of ["get_disposal_steps", "classify_waste_item"]) {
+      const named = await callTool(baseUrl, tool, { itemName: "소파", region: "청주시" }, requestId);
+      requestId += 1;
+      const namedValues = cardTextValues(parseWidgetPayload(named, `${tool} named-district card`).widget);
+      assert(
+        namedValues.some((value) => value.includes("청주시 상세 데이터는 아직 없어 충청북도 광역 기준으로 안내합니다")),
+        `${tool} card should name the 시·군·구 the user already gave: ${namedValues.join(" | ")}`,
+      );
+      assert(
+        !namedValues.some((value) => value.includes("거주 중인 시·군·구를 확인해야")),
+        `${tool} card asked back for a 시·군·구 the user already gave: ${namedValues.join(" | ")}`,
+      );
+      assert(
+        namedValues.some((value) => value.includes("사전 신청하고 접수증 또는 접수번호를 부착")),
+        `${tool} card lost its disposal line to the region budget: ${namedValues.join(" | ")}`,
+      );
+    }
+
     // PRD phase-3 R5: a widget response has no structuredContent for callStatus()
     // to read, so the handler must log status explicitly or every confirmed
     // match would land in the logs as a plain "ok".
