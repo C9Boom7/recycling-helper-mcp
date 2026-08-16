@@ -53,6 +53,10 @@ for (const r of parsed) {
   src.set(key, (src.get(key) ?? new Set()).add(r.fee));
 }
 const fees = JSON.parse(readFileSync("src/data/bulky-waste-fees.json", "utf8")).find((s) => s.regionId === regionId);
+if (!fees) {
+  console.error(`${regionId}: src/data/bulky-waste-fees.json에 이 지역이 없다`);
+  process.exit(1);
+}
 let ok = 0; const miss = [];
 for (const f of fees.fees) {
   const key = `${f.itemName.replace(/\s+/g, "")}|${f.spec.replace(/\s+/g, "")}`;
@@ -61,3 +65,5 @@ for (const f of fees.fees) {
 }
 console.log(`${regionId}: 원문 ${parsed.length}행(${src.size}종) / 우리 ${fees.fees.length}행 — 일치 ${ok}, 확인 안 됨 ${miss.length}`);
 miss.slice(0, 15).forEach((m) => console.log("  ? " + m));
+// 대조 실패를 종료 코드로 알린다. 0으로 끝나면 이 도구로 아무것도 막을 수 없다.
+if (miss.length > 0) process.exitCode = 1;

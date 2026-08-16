@@ -7882,6 +7882,48 @@
     ]
   },
   {
+    "id": "heater_generic_asks_back",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "히터"
+    },
+    "expectedTextIncludes": [
+      "전기히터",
+      "난로"
+    ]
+  },
+  {
+    "id": "heater_gas_pins_space_heater",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "가스히터"
+    },
+    "expectedTextIncludes": [
+      "난로"
+    ]
+  },
+  {
+    "id": "heater_electric_still_pins",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "전기히터"
+    },
+    "expectedTextIncludes": [
+      "전기히터"
+    ]
+  },
+  {
+    "id": "ordinance_bicycle_excludes_exercise_machine_gangdong",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "자전거",
+      "region": "서울 강동구"
+    },
+    "expectedTextExcludes": [
+      "헬스자전거"
+    ]
+  },
+  {
     "id": "phase7_fee_not_shown_for_styrofoam",
     "tool": "get_disposal_steps",
     "arguments": {
