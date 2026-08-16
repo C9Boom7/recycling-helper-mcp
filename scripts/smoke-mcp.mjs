@@ -943,8 +943,42 @@ async function runWidgetSmoke() {
     assert(!regionalCard.includes("거주 지역 기준 확인 필요"), "regional card should not ask for a region the user already gave");
 
     const regionless = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자" }, requestId);
+    requestId += 1;
     const regionlessCard = JSON.stringify(parseWidgetPayload(regionless, "regionless match").widget);
     assert(regionlessCard.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
+
+    // A text answer is the host's to rewrite and carries no Kakao Tools label,
+    // so a confirmed match must not depend on which of the two item tools the
+    // host picked. The card is built by one shared function — this pins that
+    // the two tools actually reach it with the same inputs.
+    const classified = await callTool(baseUrl, "classify_waste_item", { itemName: "기름 묻은 피자박스" }, requestId);
+    requestId += 1;
+    const classifiedPayload = parseWidgetPayload(classified, "classify confirmed match");
+    assert(classified.structuredContent === undefined, "classify widget response must not carry structuredContent");
+    assert(
+      JSON.stringify(classifiedPayload.widget) === JSON.stringify(payload.widget),
+      "classify and get_disposal_steps should serve the same card for the same match",
+    );
+
+    // R1's line holds on this tool too: the two paths that need a follow-up turn
+    // stay text, because a card closes the conversation.
+    const classifyAmbiguous = await callTool(baseUrl, "classify_waste_item", { itemName: "전구" }, requestId);
+    requestId += 1;
+    assert(classifyAmbiguous.structuredContent?.ambiguous === true, "classify 전구 should still resolve as ambiguous");
+    assertPlainTextResponse(classifyAmbiguous, "classify ambiguous response");
+
+    const classifyNotFound = await callTool(baseUrl, "classify_waste_item", { itemName: "존재하지않는품목zzz" }, requestId);
+    requestId += 1;
+    assert(classifyNotFound.structuredContent?.found === false, "classify unknown item should still resolve as not_found");
+    assertPlainTextResponse(classifyNotFound, "classify not_found response");
+
+    // classify used to echo the raw region string without resolving it, so the
+    // card is the first time this tool has to actually match a 구.
+    const classifyRegional = await callTool(baseUrl, "classify_waste_item", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const classifyRegionalCard = JSON.stringify(parseWidgetPayload(classifyRegional, "classify regional match").widget);
+    assert(classifyRegionalCard.includes("서울 강남구 기준"), "classify regional card is missing the matched region name");
+    assert(!classifyRegionalCard.includes("거주 지역 기준 확인 필요"), "classify regional card should not ask for a region the user already gave");
 
     // PRD phase-3 R5: a widget response has no structuredContent for callStatus()
     // to read, so the handler must log status explicitly or every confirmed
@@ -967,6 +1001,25 @@ async function runWidgetSmoke() {
     assert(
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
+    );
+
+    // Same trap on the tool that just gained a widget: no structuredContent for
+    // callStatus() to read means a confirmed match logs as a plain "ok" unless
+    // the handler says otherwise, and the finals-window match rate reads off this.
+    const classifyLog = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"classify_waste_item"'))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
+    assert(classifyLog.length > 0, "no classify_waste_item call was logged");
+    assert(
+      classifyLog[0].status === "match" && classifyLog[0].matchedId === "pizza_box_oily",
+      `classify widget call logged status=${classifyLog[0].status}, matchedId=${classifyLog[0].matchedId}`,
     );
 
     await sweepWidgetCatalogue(baseUrl, requestId + 1);

@@ -24,6 +24,16 @@
 
 - 위젯 사용: `get_disposal_steps` && `resolveWasteItem` 결과가 `match`.
 - 텍스트 유지 (위젯 금지): ambiguous / not_found (되묻기·후속 대화 필요), 나머지 4개 툴 전부.
+
+> **2026-08-16 변경 — `classify_waste_item`도 위젯을 낸다.**
+> 위 규칙에서 툴을 하나로 좁힌 건 Phase 3의 범위를 좁히려던 것이지 나머지 툴에 카드가 맞지 않아서가 아니었다.
+> 그 사이 [Preview 실측](../preview-test-results-2026-08-14.md)에서 두 가지가 확인됐다 — 카카오가 붙이는
+> `Kakao Tools · 재활용척척` 라벨은 위젯 응답에만 나오고, 텍스트로 답하면 ChatGPT가 제 방식으로 다시 쓴다
+> (판단형 발화 4개를 한 메시지로 보냈더니 표 하나로 종합했다). 그러면 호스트가 `classify`를 골랐다는 이유만으로
+> 사용자가 브랜딩도 없고 가공될 수도 있는 답을 받는다.
+> 확정 매칭에만 적용하고 ambiguous·not_found는 이 절의 규칙 그대로 텍스트로 남는다. 되묻기에는 카드가 맞지 않는다.
+> `check_confusing_item`은 품목 3개를 견주는 툴이라 단일 품목용 카드 구조가 안 맞고,
+> `make_cleanup_plan`은 카드 한 장에 안 들어간다. 둘은 그대로 텍스트다.
 - 환경변수 `WIDGET_ENABLED`(기본 true)로 전체 토글 가능하게 — QA 중 문제가 생기면 코드 수정 없이 재배포만으로 끌 수 있는 안전장치.
 - 파싱 규칙은 `process.env.WIDGET_ENABLED !== "false"` 한 줄로 고정한다. 값을 안 주면 켜지고, 정확히 `"false"`일 때만 꺼진다 (QA·smoke가 같은 규칙을 공유해야 하므로 다른 표기를 받아들이지 않는다).
 

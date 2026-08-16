@@ -509,6 +509,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
   return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
 }
 
+/**
+ * The card for a confirmed match, shared by the two tools that resolve a single
+ * item. Kakao renders a widget as-is while a text answer is the host's to
+ * rewrite (Kakao Tools 개발 가이드 §3), and the `Kakao Tools · 재활용척척` label
+ * only rides along on widget responses — so which of the two tools the host
+ * happened to pick should not decide whether the user gets a card.
+ */
+function matchedItemWidget(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined): DisposalWidgetPayload {
+  return buildDisposalWidget({
+    item,
+    sourceTitle: briefSourceTitle(item),
+    sourceCheckedAt: briefSourceCheckedAt(item),
+    regionName: regionMatch?.region.name,
+    regionNotes: buildRegionNotes(item, regionMatch),
+    regionFeeLine: buildRegionFeeLine(item, regionMatch),
+  });
+}
+
 async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return unknownItemResult(itemName);
@@ -516,6 +534,19 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
 
   const { match } = resolved;
   const { item } = match;
+
+  // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
+  // follow-up turn and a card closes the conversation. A confirmed match does
+  // not, so it takes the same card get_disposal_steps serves.
+  if (WIDGET_ENABLED) {
+    const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+    return widgetResult(matchedItemWidget(item, regionMatch), {
+      matchedId: item.id,
+      score: match.score,
+      matchedRegion: regionMatch?.region.name,
+    });
+  }
+
   const text = [
     `분류 결과: ${item.name}`,
     `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
@@ -565,17 +596,7 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(
-      buildDisposalWidget({
-        item,
-        sourceTitle: briefSourceTitle(item),
-        sourceCheckedAt: briefSourceCheckedAt(item),
-        regionName: regionMatch?.region.name,
-        regionNotes,
-        regionFeeLine: buildRegionFeeLine(item, regionMatch),
-      }),
-      log,
-    );
+    return widgetResult(matchedItemWidget(item, regionMatch), log);
   }
 
   const text = formatItemGuide(item, region);

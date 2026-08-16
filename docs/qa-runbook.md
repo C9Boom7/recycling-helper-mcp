@@ -187,7 +187,8 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 
 ## 4. 위젯이 문제일 때 — `WIDGET_ENABLED`
 
-확정 매칭 응답은 위젯 카드 JSON으로 나간다. 카드 렌더링 자체가 깨지면 환경변수로 텍스트 응답으로 되돌릴 수 있다.
+`get_disposal_steps`와 `classify_waste_item`의 확정 매칭 응답은 위젯 카드 JSON으로 나간다. 두 툴은 같은 카드를 낸다.
+카드 렌더링 자체가 깨지면 환경변수로 텍스트 응답으로 되돌릴 수 있고, 스위치 하나가 두 툴을 함께 되돌린다.
 
 ```bash
 WIDGET_ENABLED=false
