@@ -39,6 +39,10 @@ const REQUIRED_TOOL_ANNOTATION_FIELDS = [
   "openWorldHint",
   "idempotentHint",
 ];
+// 본선 규격의 하드 한도 (docs/prd/phase-0-compliance.md R3, docs/prd/README.md
+// "본선 규격 요약"). 넘기면 재등록에서 툴이 거부되거나 description이 잘리는데,
+// 잘려나가는 꼬리가 하필 맨 뒤에 새로 붙인 문장이라 조용히 효과만 사라진다.
+const MAX_TOOL_DESCRIPTION_LENGTH = 1024;
 // PRD phase-0 R5: per-tool structuredContent whitelists. Every answer case
 // runs through this, so a handler emitting a field outside its contract fails
 // the smoke suite instead of silently regrowing the payload.
@@ -407,6 +411,10 @@ function assertToolMetadata(tool, context) {
     typeof tool.description === "string" && tool.description.trim().length > 0,
     `${context} ${tool.name} was missing description`,
   );
+  assert(
+    tool.description.length <= MAX_TOOL_DESCRIPTION_LENGTH,
+    `${context} ${tool.name} description is ${tool.description.length} chars, over the ${MAX_TOOL_DESCRIPTION_LENGTH} limit`,
+  );
   assert(isPlainObject(tool.inputSchema), `${context} ${tool.name} was missing inputSchema`);
   assert(tool.inputSchema.type === "object", `${context} ${tool.name} inputSchema.type must be object`);
   assert(isPlainObject(tool.inputSchema.properties), `${context} ${tool.name} inputSchema.properties must be an object`);
@@ -728,7 +736,7 @@ async function runSmoke() {
     );
     requestId += 1;
     assert(
-      resultText(photoText).startsWith('사진 속 물건을 "기름 묻은 피자박스"로 봤습니다.'),
+      resultText(photoText).startsWith('사진 속 물건은 "기름 묻은 피자박스" 품목 기준으로 안내합니다.'),
       `photo-sourced text answer should open with the confirmation line:\n${resultText(photoText).slice(0, 120)}`,
     );
 
@@ -737,6 +745,21 @@ async function runSmoke() {
     assert(
       !resultText(typedText).includes("사진 속 물건"),
       "a typed item name must not be answered as if it came from a photo",
+    );
+
+    // inputSource는 로그 필드 하나일 뿐이라, 호스트가 "image"처럼 다른 말을 얹었다고
+    // 배출 안내까지 잃으면 손익이 안 맞는다. 이 파라미터가 없던 때처럼 조용히 무시하고
+    // 답은 그대로 나가야 한다 (mcpRequest는 -32602를 받으면 throw한다).
+    const oddSourceText = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "기름 묻은 피자박스", inputSource: "image" },
+      requestId,
+    );
+    requestId += 1;
+    assert(
+      resultText(oddSourceText) === resultText(typedText),
+      "an unrecognized inputSource should be ignored, not answered differently",
     );
 
     // 사진에서 알아본 이름일수록 카탈로그에 없는 말로 나오기 쉬워서, 확정된 호출만 세면
@@ -753,8 +776,10 @@ async function runSmoke() {
           return [];
         }
       });
+    // 개수는 세지 않는다. 위 파서는 stdout/stderr가 한 버퍼에 섞여 조각난 줄을 조용히
+    // 버리고, getOutput()은 응답 직후에 읽는다 — 로그 한 줄이 늦게 도착하기만 해도
+    // 정확한 개수 단언은 깨진다. 두 갈래가 각각 찍혔는지만 본다.
     const photoLogs = disposalLogs.filter((entry) => entry.inputSource === "photo");
-    assert(photoLogs.length === 2, `expected 2 photo-sourced calls in the log, got ${photoLogs.length}`);
     assert(
       photoLogs.some((entry) => entry.status === "match"),
       "a photo-sourced confirmed match should be logged as such",
