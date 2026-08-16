@@ -833,6 +833,28 @@ async function runWidgetBuilderCases() {
   const shortCopy = buildDisposalWidget({ item: oneStep, sourceTitle: "테스트 출처" }).copy_text.split("\n");
   assert(shortCopy.length >= 3, `single-step copy_text is ${shortCopy.length} lines, under the 3-line floor`);
   assert(shortCopy.includes(oneStep.summary), "single-step copy_text should carry the conclusion");
+
+  // The caveat the card shows on a non-high item has to ride along on the share.
+  // copy_text is all the recipient of a 카톡 forward sees, so leaving it off the
+  // share hands them a medium verdict dressed as a settled one.
+  const uncertain = items.find((item) => item.confidence !== "high");
+  const certain = items.find((item) => item.confidence === "high");
+  assert(uncertain && certain, "widget builder cases are missing their confidence fixtures");
+  const copyOf = (item) => buildDisposalWidget({ item, sourceTitle: "테스트 출처" }).copy_text;
+  assert(copyOf(uncertain).includes("분류가 갈릴 수 있"), "a non-high item's copy_text must carry the confidence caveat");
+  assert(!copyOf(certain).includes("분류가 갈릴 수 있"), "a high-confidence item's copy_text must not hedge");
+
+  // That caveat costs a line, so the steps have to give one back. No catalogue
+  // item is both non-high and long enough to prove it today, so the fixture is
+  // built — the budget has to hold the day one of them is.
+  const longest = items.reduce((worst, item) => (item.steps.length > worst.steps.length ? item : worst), items[0]);
+  const uncertainLong = copyOf({ ...longest, confidence: "medium" }).split("\n");
+  assert(
+    uncertainLong.length >= 3 && uncertainLong.length <= 6,
+    `a ${longest.steps.length}-step medium item shares as ${uncertainLong.length} lines, outside the 3~6 budget`,
+  );
+  assert(uncertainLong.at(-1).startsWith("(남은 "), "the caveat must not push steps out silently");
+  assert(uncertainLong.some((line) => line.includes("분류가 갈릴 수 있")), "the caveat is what the extra line was spent on");
 }
 
 /**
@@ -976,17 +998,18 @@ async function runWidgetSmoke() {
 
     // 위젯 응답에는 structuredContent가 없어(R4) 텍스트 경로가 싣던 "확신도: 보통"이 통째로
     // 빠졌다. 324개 중 75개가 medium이라, 그 줄이 없으면 한 번 더 확인해야 할 답이 확정된
-    // 답으로 나간다. high 249개는 종전대로 아무 말도 덧붙이지 않는다.
+    // 답으로 나간다. high 249개는 종전대로 아무 말도 덧붙이지 않는다. 문구는 분류 이야기만
+    // 한다 — 지역을 다시 확인하라는 말은 지역 줄이 이미 자기 조건에 맞게 하고 있다.
     assert(mediumItem.confidence === "medium" && pizzaBox.confidence === "high", "confidence-note case lost its high/medium pair");
     const mediumMatch = await callTool(baseUrl, "get_disposal_steps", { itemName: mediumItem.name }, requestId);
     requestId += 1;
     const mediumValues = cardTextValues(parseWidgetPayload(mediumMatch, "medium confidence card").widget);
     assert(
-      mediumValues.some((value) => value.includes("한 번 더 확인")),
-      `medium-confidence card should tell the user to double-check: ${mediumValues.join(" | ")}`,
+      mediumValues.some((value) => value.includes("분류가 갈릴 수 있")),
+      `medium-confidence card should flag that the classification may go either way: ${mediumValues.join(" | ")}`,
     );
     assert(
-      !cardTextValues(payload.widget).some((value) => value.includes("한 번 더 확인")),
+      !cardTextValues(payload.widget).some((value) => value.includes("분류가 갈릴 수 있")),
       "high-confidence card should not hedge a verdict it is sure of",
     );
 

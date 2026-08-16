@@ -21,13 +21,13 @@ const WIDGET_NAME = "disposal_steps";
 const SERVICE_LABEL = "재활용척척";
 const MAX_CARD_CAUTIONS = 2;
 const MAX_CARD_REGION_NOTES = 2;
-// Title line + steps must stay within the 3~6 line copy_text budget, so a 7-step
-// item shares its first 5 steps and leaves the rest to the card.
-const MAX_COPY_TEXT_STEPS = 5;
-// When steps are cut, one line of that budget buys the "there is more" marker.
-// Silent truncation reads as a complete procedure to whoever receives the share.
-const MAX_COPY_TEXT_STEPS_WHEN_TRUNCATED = MAX_COPY_TEXT_STEPS - 1;
-// R3's floor. 11 items resolve to a single step, and a two-line share is a title
+// R3's 3~6 line copy_text budget. Everything else about the share is derived
+// from it rather than pinned separately: the title always takes a line, the
+// confidence note takes one when the item has it, and the steps get what is
+// left — so adding a line above the steps narrows the steps instead of pushing
+// the share past 6 lines.
+const MAX_COPY_TEXT_LINES = 6;
+// The floor. 11 items resolve to a single step, and a two-line share is a title
 // plus one instruction with no verdict attached.
 const MIN_COPY_TEXT_LINES = 3;
 // The data has no severity field, so injury/fire wording is the only signal that
@@ -37,7 +37,13 @@ const SAFETY_CAUTION_PATTERN = /다치|감싸|감쌉|위험|폭발|인화|화재
 // 324개 중 75개가 medium이다. 텍스트 경로는 "확신도: 보통"을 실어 보냈지만 위젯 응답에는
 // structuredContent도 없어(R4), 카드만 받는 사용자는 한 번 더 확인해야 할 답을 확정된 답으로
 // 읽는다. 등급 이름을 옮겨 적는 대신 할 일로 쓴다 — "보통"은 그래서 뭘 하라는 건지 알려주지 않는다.
-const UNCERTAIN_CONFIDENCE_NOTE = "안내가 갈릴 수 있는 품목이니 배출 전에 거주지 지자체 안내를 한 번 더 확인하세요.";
+//
+// 확신도는 "분류가 덜 확실하다"는 뜻이지 "지역마다 갈린다"는 뜻이 아니다. 지역을 다시 확인하라는
+// 말은 regionNodes가 자기 조건에 맞게 이미 하고 있고, medium 75개 중 40개가 지역 확인 필수라
+// 두 줄이 같은 말이 된다. 그래서 이 줄은 분류 이야기만 한다.
+const UNCERTAIN_CONFIDENCE_NOTE = "품목 상태나 재질에 따라 분류가 갈릴 수 있으니 아래 근거를 함께 확인하세요.";
+// 공유본에는 근거 줄이 없고 한 줄이 길면 그만큼 단계가 밀린다. 같은 이야기를 짧게 줄인 판이다.
+const UNCERTAIN_CONFIDENCE_SHARE_NOTE = "※ 상태나 재질에 따라 분류가 갈릴 수 있는 품목입니다.";
 
 type WidgetNode = Record<string, unknown>;
 
@@ -159,13 +165,22 @@ export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetP
  * unsupported by 카톡 share and would render as raw characters.
  */
 export function buildCopyText(item: WasteItem): string {
-  const truncated = item.steps.length > MAX_COPY_TEXT_STEPS;
-  const steps = item.steps.slice(0, truncated ? MAX_COPY_TEXT_STEPS_WHEN_TRUNCATED : MAX_COPY_TEXT_STEPS);
+  // The card's caveat has to ride along: shared to 카톡 this is everything the
+  // recipient sees, so without it a medium item arrives as a settled verdict.
+  const note = item.confidence === "high" ? [] : [UNCERTAIN_CONFIDENCE_SHARE_NOTE];
+  // Title plus the note, if there is one — the steps get the rest of the budget.
+  const stepBudget = MAX_COPY_TEXT_LINES - 1 - note.length;
+  const truncated = item.steps.length > stepBudget;
+  // When steps are cut, one line of that budget buys the "there is more" marker.
+  // Silent truncation reads as a complete procedure to whoever receives the share.
+  const steps = item.steps.slice(0, truncated ? stepBudget - 1 : stepBudget);
   // Title + steps can fall under the floor on a one-step item. The conclusion is
-  // what the recipient is missing there, so it fills the gap rather than padding.
-  const lead = steps.length + 1 < MIN_COPY_TEXT_LINES ? [item.summary] : [];
+  // what the recipient is missing there, so it fills the gap rather than padding
+  // — and the caveat cannot stand in for it, which is why it is not counted here.
+  const lead = 1 + steps.length < MIN_COPY_TEXT_LINES ? [item.summary] : [];
   return [
     `**${item.name} 버리는 법** — ${SERVICE_LABEL}`,
+    ...note,
     ...lead,
     ...steps.map((step, index) => `${index + 1}. ${step}`),
     ...(truncated ? [`(남은 ${item.steps.length - steps.length}단계는 카드에서 확인하세요)`] : []),

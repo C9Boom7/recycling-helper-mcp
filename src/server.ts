@@ -148,7 +148,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): answers which bucket the item goes in (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), what the verdict rests on, and — when a region is given — that municipality's rule and bulky-waste fee for it. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): answers which bucket the item goes in (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨) and what the verdict rests on. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -600,13 +600,15 @@ async function handleGetDisposalSteps({ itemName, region }: { itemName: string; 
   const { match } = resolved;
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const regionNotes = buildRegionNotes(item, regionMatch);
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
 
   if (WIDGET_ENABLED) {
     return widgetResult(matchedItemWidget(item, regionMatch), log);
   }
 
+  // Below the widget branch on purpose: the card builds its own region lines
+  // (matchedItemWidget), so this is the text path's alone.
+  const regionNotes = buildRegionNotes(item, regionMatch);
   const text = formatItemGuide(item, region);
   return textResult(
     text,
