@@ -483,5 +483,105 @@
     "region": "부산 해운대구",
     "expectedRegionId": "busan",
     "expectedLevel": "metro"
+  },
+  {
+    "region": "성남시",
+    "expectedRegionId": "seongnam_si",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "분당구",
+    "expectedRegionId": "seongnam_si",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "수원시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "용인시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "고양시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "안산시",
+    "expectedRegionId": "gyeonggi",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "청주시 흥덕구",
+    "expectedRegionId": "chungbuk",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "천안시",
+    "expectedRegionId": "chungnam",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "창원시",
+    "expectedRegionId": "gyeongnam",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "포항시",
+    "expectedRegionId": "gyeongbuk",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "전주시",
+    "expectedRegionId": "jeonbuk",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "여수시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "춘천시",
+    "expectedRegionId": "gangwon",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "서귀포시",
+    "expectedRegionId": "jeju",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "해운대구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "수성구",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "부평구",
+    "expectedRegionId": "incheon",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "유성구",
+    "expectedRegionId": "daejeon",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "광산구",
+    "expectedRegionId": "gwangju",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "울주군",
+    "expectedRegionId": "ulsan",
+    "expectedLevel": "metro"
   }
 ]

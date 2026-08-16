@@ -186,6 +186,26 @@ for (const query of nationallyAmbiguousDistrictQueries) {
   }
 }
 
+/**
+ * 광역 별칭 쪽의 같은 함정. 미등록 시·군 이름을 광역 별칭으로 달아 폴백을 열어줄 때,
+ * **광역이 유일하게 정해지는 이름만** 달 수 있다. 아래 이름들은 그 조건을 못 채운다 —
+ * 고성군은 강원과 경남에 하나씩 있고, 광주시는 경기도의 시이면서 광주광역시와 같은 표기다.
+ * 어느 한쪽에 달면 다른 쪽 주민이 남의 광역 안내를 조용히 받는다. 확정만 안 하면
+ * 되묻기든 전국 폴백이든 상관없다.
+ */
+const metroAmbiguousNames = ["고성군", "고성", "광주시"];
+
+for (const query of metroAmbiguousNames) {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status !== "match") continue;
+  // 광주광역시는 자기 이름으로 확정되는 게 맞다. 막아야 하는 건 경기도가 가져가는 쪽이다.
+  if (query === "광주시" && resolution.match.region.id === "gwangju") continue;
+  failures.push(
+    `"${query}" confidently resolved to ${resolution.match.region.id}; ` +
+      "이 이름은 광역이 유일하게 정해지지 않아 광역 별칭으로 달면 안 된다",
+  );
+}
+
 for (const testCase of regionEvaluationCases) {
   const resolution = resolveRegionalPolicy(testCase.region);
 

@@ -6535,13 +6535,34 @@
     ]
   },
   {
+    "id": "region_metro_fallback_suwon",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "수원시"
+    },
+    "expectedTextIncludes": [
+      "경기도 지역 확인 안내",
+      "경기도 광역 기준 안내입니다",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedTextExcludes": [
+      "아직 상세 지역 데이터가 없습니다",
+      "문의/신청 안내 전화"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"수원시\"",
+      "\"matchedRegion\":\"경기도\"",
+      "\"regionStatus\":\"metro\""
+    ]
+  },
+  {
     "id": "region_unregistered_fallback",
     "tool": "get_region_disposal_info",
     "arguments": {
-      "region": "청주시 흥덕구"
+      "region": "흥덕구"
     },
     "expectedTextIncludes": [
-      "청주시 흥덕구 지역 확인 안내",
+      "흥덕구 지역 확인 안내",
       "아직 상세 지역 데이터가 없습니다",
       "생활폐기물 분리배출 누리집 지역별 안내",
       "정부24 민원 신청: https://plus.gov.kr/minwon/"
