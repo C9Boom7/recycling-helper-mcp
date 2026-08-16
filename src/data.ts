@@ -340,6 +340,21 @@ function isMaterialOnlyQuery(query: string): boolean {
   return MATERIAL_ONLY_QUERIES.has(normalizeText(query));
 }
 
+/**
+ * These are distinct household fixtures whose names begin with "가스레인지".
+ * Until each has an official disposal record of its own, never let the
+ * gas-range item win only because its name is a prefix. A conservative
+ * not_found is safer than instructions to disconnect gas equipment for a
+ * hood or a stand.
+ */
+const GAS_RANGE_NONMATCH_COMPOUNDS = new Set(
+  ["가스레인지대", "가스레인지받침대", "가스레인지후드", "레인지후드"].map(normalizeText),
+);
+
+function isGasRangeNonmatchCompound(query: string): boolean {
+  return GAS_RANGE_NONMATCH_COMPOUNDS.has(normalizeText(query));
+}
+
 /** 예약어 목록. validate가 품목명·별칭과의 충돌을 막는 데 쓴다. */
 export const reservedQueryWords: string[] = [...DISPOSAL_CATEGORY_QUERIES, ...MATERIAL_ONLY_QUERIES.keys()];
 
@@ -799,6 +814,10 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   // 그 툴에서는 **정확히 원하는 동작**이다. 헷갈리는 품목을 보여 달라는 툴이니까.
   // 잘못된 건 그 목록의 첫 줄을 답으로 확정하는 것이지 목록 자체가 아니다.
   if (isMaterialOnlyQuery(query)) {
+    return { status: "not_found" };
+  }
+
+  if (isGasRangeNonmatchCompound(query)) {
     return { status: "not_found" };
   }
 
