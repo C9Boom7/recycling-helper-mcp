@@ -73,6 +73,8 @@ export type BulkyWasteFeeSchedule = {
   phone: string;
   source: WasteSource;
   fees: BulkyWasteFee[];
+  /** Original rows retained by the importer before its per-item display cap. */
+  feeRowCountByItemId?: Record<string, number>;
 };
 
 /**
@@ -1208,6 +1210,9 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
 
   return [
     `- ${region.name} 대형생활폐기물 수수료 후보:`,
+    ...(schedule.feeRowCountByItemId?.[item.id]
+      ? [`  - 전체 ${schedule.feeRowCountByItemId[item.id]}개 규격 중 대표 ${fees.length}개만 표시합니다. 전체 표는 수수료 출처에서 확인하세요.`]
+      : []),
     ...fees.map((fee) => `  - ${fee.itemName} ${fee.spec}: ${formatKrw(fee.feeKrw)}`),
     `- 신청 URL: ${schedule.applicationUrl}`,
     `- 수수료 출처: ${schedule.feeUrl}`,

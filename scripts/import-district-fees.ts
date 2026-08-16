@@ -164,6 +164,7 @@ for (const regionId of targets) {
   }
 
   const fees: BulkyWasteFee[] = [];
+  const feeRowCountByItemId: Record<string, number> = {};
   const trimmed: string[] = [];
   const conflicts: string[] = [];
   for (const [itemId, group] of grouped) {
@@ -189,7 +190,10 @@ for (const regionId of targets) {
     }
 
     const sorted = kept.sort((a, b) => a.feeKrw - b.feeKrw);
-    if (sorted.length > MAX_FEE_ROWS) trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+    if (sorted.length > MAX_FEE_ROWS) {
+      trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+      feeRowCountByItemId[itemId] = sorted.length;
+    }
     fees.push(...trimToCap(sorted));
   }
 
@@ -207,6 +211,7 @@ for (const regionId of targets) {
     checkedAt: collectedAt,
     applicationUrl: region.bulkyWaste.applicationUrl,
     feeUrl: region.bulkyWaste.feeUrl,
+    ...(Object.keys(feeRowCountByItemId).length > 0 ? { feeRowCountByItemId } : {}),
     phone: region.bulkyWaste.phone,
     source: {
       title: `${region.name} 대형폐기물 수수료표`,
