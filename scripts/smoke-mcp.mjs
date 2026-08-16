@@ -721,6 +721,15 @@ function assertPlainTextResponse(result, context) {
 // fallback, and that only shows up in Preview — a push + redeploy away.
 const ALLOWED_WIDGET_NODE_TYPES = new Set(["Card", "Title", "Text", "Caption", "Divider"]);
 
+/** 카드 안의 모든 텍스트 값을 트리 순서대로 펼친다. 어느 줄이 무엇을 싣는지 보는 케이스는
+ * 카드 전체를 JSON.stringify로 훑으면 이웃 줄의 문자열까지 같이 걸려서 통과해버린다. */
+function cardTextValues(node) {
+  if (!isPlainObject(node)) return [];
+  const own = typeof node.value === "string" ? [node.value] : [];
+  const children = Array.isArray(node.children) ? node.children.flatMap(cardTextValues) : [];
+  return [...own, ...children];
+}
+
 function assertWidgetNode(node, context) {
   assert(isPlainObject(node), `${context} is not a widget node`);
   assert(ALLOWED_WIDGET_NODE_TYPES.has(node.type), `${context} uses unsupported node type ${JSON.stringify(node.type)}`);
@@ -882,9 +891,11 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
 async function runWidgetSmoke() {
   const port = await getFreePort();
   const baseUrl = `http://${HOST}:${port}`;
-  const { wasteItems } = await import("../dist/data.js");
+  const { wasteItems, bulkyWasteFeeSchedules } = await import("../dist/data.js");
   const pizzaBox = wasteItems.find((item) => item.id === "pizza_box_oily");
-  assert(pizzaBox, "widget smoke is missing its confirmed-match fixture");
+  const chair = wasteItems.find((item) => item.id === "chair");
+  const mediumItem = wasteItems.find((item) => item.id === "spring_notebook");
+  assert(pizzaBox && chair && mediumItem, "widget smoke is missing its confirmed-match fixtures");
   const { server, getOutput } = startServer(port, { widgets: true });
 
   const stopServer = () => {
@@ -946,6 +957,38 @@ async function runWidgetSmoke() {
     requestId += 1;
     const regionlessCard = JSON.stringify(parseWidgetPayload(regionless, "regionless match").widget);
     assert(regionlessCard.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");
+
+    // 수수료는 품목이 아니라 지역 고시에서 오고 확인일도 따로 붙는데, 카드에서 그 줄 바로 아래가
+    // sources[0] 날짜를 실은 근거 줄이다. 용산구는 두 날짜가 8개월 벌어져 있어(수수료 2025-11-03,
+    // 의자 출처 2026-07-02) 근거 줄 날짜를 수수료로 읽는 회귀가 여기서 걸린다.
+    const feeSchedule = bulkyWasteFeeSchedules.find((schedule) => schedule.regionId === "yongsan_gu");
+    assert(feeSchedule, "fee-date case is missing its 용산구 fee schedule");
+    assert(
+      feeSchedule.checkedAt !== chair.sources[0].checkedAt,
+      `fee-date case needs a region whose fee date differs from the item source date (both are ${feeSchedule.checkedAt})`,
+    );
+    const feeDated = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자", region: "서울 용산구" }, requestId);
+    requestId += 1;
+    const feeLine = cardTextValues(parseWidgetPayload(feeDated, "용산구 fee card").widget).find((value) => value.startsWith("수수료 "));
+    assert(feeLine, "용산구 card is missing its fee line");
+    assert(feeLine.includes(`${feeSchedule.checkedAt} 확인`), `fee line should carry the fee schedule's own date, got: ${feeLine}`);
+    assert(!feeLine.includes(chair.sources[0].checkedAt), `fee line is dated with the item source date instead: ${feeLine}`);
+
+    // 위젯 응답에는 structuredContent가 없어(R4) 텍스트 경로가 싣던 "확신도: 보통"이 통째로
+    // 빠졌다. 324개 중 75개가 medium이라, 그 줄이 없으면 한 번 더 확인해야 할 답이 확정된
+    // 답으로 나간다. high 249개는 종전대로 아무 말도 덧붙이지 않는다.
+    assert(mediumItem.confidence === "medium" && pizzaBox.confidence === "high", "confidence-note case lost its high/medium pair");
+    const mediumMatch = await callTool(baseUrl, "get_disposal_steps", { itemName: mediumItem.name }, requestId);
+    requestId += 1;
+    const mediumValues = cardTextValues(parseWidgetPayload(mediumMatch, "medium confidence card").widget);
+    assert(
+      mediumValues.some((value) => value.includes("한 번 더 확인")),
+      `medium-confidence card should tell the user to double-check: ${mediumValues.join(" | ")}`,
+    );
+    assert(
+      !cardTextValues(payload.widget).some((value) => value.includes("한 번 더 확인")),
+      "high-confidence card should not hedge a verdict it is sure of",
+    );
 
     // A text answer is the host's to rewrite and carries no Kakao Tools label,
     // so a confirmed match must not depend on which of the two item tools the

@@ -34,6 +34,10 @@ const MIN_COPY_TEXT_LINES = 3;
 // a caution must not be the one MAX_CARD_CAUTIONS drops. Ordering, not filtering:
 // nothing is removed that the cap would have kept.
 const SAFETY_CAUTION_PATTERN = /다치|감싸|감쌉|위험|폭발|인화|화재|날카|베임|감전|누출|밀봉|뾰족/;
+// 324개 중 75개가 medium이다. 텍스트 경로는 "확신도: 보통"을 실어 보냈지만 위젯 응답에는
+// structuredContent도 없어(R4), 카드만 받는 사용자는 한 번 더 확인해야 할 답을 확정된 답으로
+// 읽는다. 등급 이름을 옮겨 적는 대신 할 일로 쓴다 — "보통"은 그래서 뭘 하라는 건지 알려주지 않는다.
+const UNCERTAIN_CONFIDENCE_NOTE = "안내가 갈릴 수 있는 품목이니 배출 전에 거주지 지자체 안내를 한 번 더 확인하세요.";
 
 type WidgetNode = Record<string, unknown>;
 
@@ -139,6 +143,7 @@ export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetP
     ...item.steps.map((step, index) => text(`${index + 1}. ${step}`)),
     ...(cautions.length > 0 ? [divider(), ...cautions.map((line) => caption(`주의: ${line}`))] : []),
     ...(region.length > 0 ? [divider(), ...region] : []),
+    ...(item.confidence === "high" ? [] : [caption(UNCERTAIN_CONFIDENCE_NOTE)]),
     caption(sourceCheckedAt ? `근거: ${sourceTitle} · ${sourceCheckedAt} 확인` : `근거: ${sourceTitle}`),
   ];
 

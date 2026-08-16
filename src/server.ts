@@ -13,6 +13,7 @@ import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteI
 import {
   confidenceLabel,
   disposalGroupLabel,
+  findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findMaterialGuideline,
   findRegionalPolicy,
@@ -147,7 +148,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "classify_waste_item",
     title: "Classify Waste Item",
     description:
-      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): returns the disposal category (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), confidence, and whether local municipality rules matter. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
+      "Quickly classifies a Korean household waste item with RecyclingHelper(재활용척척): answers which bucket the item goes in (재활용/일반쓰레기/음식물쓰레기/소형가전/불연성 폐기물/대형폐기물/특수·유해폐기물 — 재질이나 크기로 갈리는 품목은 '일반쓰레기/대형폐기물'처럼 주 배출로를 앞에 둔 복합 라벨), what the verdict rests on, and — when a region is given — that municipality's rule and bulky-waste fee for it. Use when the question is which bucket ONE item belongs in and a yes/no or a category name answers it — e.g. '피자박스 재활용 돼?', '종이컵은 일반쓰레기야?', '아이스팩 재활용 되는 품목이야?'. If the user asks how to throw it away, prefer get_disposal_steps; if they are weighing two items against each other, prefer check_confusing_item.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -279,10 +280,17 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   const min = Math.min(...amounts);
   const max = Math.max(...amounts);
 
+  // 수수료는 품목이 아니라 지역 고시에서 오고, 확인일도 거기 따로 붙어 있다(2025-11-03 ~
+  // 2026-08-16으로 흩어져 있다). 카드 맨 아래 근거 줄은 sources[0]의 날짜라, 이 줄에 날짜가
+  // 없으면 바로 위에 놓인 수수료가 품목 출처를 확인한 날에 확인된 값으로 읽힌다.
+  // 스케줄이 없으면 날짜 없이 둔다 — 추측한 확인일은 없는 것보다 나쁘다.
+  const checkedAt = findBulkyWasteFeeSchedule(regionMatch.region)?.checkedAt;
+  const paren = (detail: string) => (checkedAt ? `(${detail}, ${checkedAt} 확인)` : `(${detail})`);
+
   // A single tier can name itself; several tiers become a range, because listing
   // four specs would blow the card and picking one for the user would be a guess.
-  if (fees.length === 1) return `수수료 ${krw(min)} (${fees[0].spec})`;
-  return `수수료 ${krw(min)}~${krw(max)} (규격 ${fees.length}종)`;
+  if (fees.length === 1) return `수수료 ${krw(min)} ${paren(fees[0].spec)}`;
+  return `수수료 ${krw(min)}~${krw(max)} ${paren(`규격 ${fees.length}종`)}`;
 }
 
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
