@@ -8545,5 +8545,128 @@
     "expectedTextExcludes": [
       "031-5191-3249"
     ]
+  },
+  {
+    "id": "gas_range_stand_does_not_confirm_gas_range",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스레인지 받침대",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다"
+    ],
+    "expectedTextExcludes": [
+      "## 가스레인지",
+      "가스 밸브를 잠그고",
+      "연결 호스를 분리",
+      "대형생활폐기물 수수료 후보"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "gas_range_hood_does_not_confirm_gas_range",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스레인지 후드",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다"
+    ],
+    "expectedTextExcludes": [
+      "## 가스레인지",
+      "가스 밸브를 잠그고",
+      "연결 호스를 분리",
+      "대형생활폐기물 수수료 후보"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "gas_range_hood_colloquial_spelling_does_not_confirm",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스렌지 후드",
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다"
+    ],
+    "expectedTextExcludes": [
+      "## 가스레인지",
+      "가스 밸브를 잠그고",
+      "연결 호스를 분리",
+      "대형생활폐기물 수수료 후보"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "gas_range_stand_short_form_does_not_confirm",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "가스레인지대"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다"
+    ],
+    "expectedTextExcludes": [
+      "가스레인지는 폐가전 무상방문수거로"
+    ],
+    "expectedStructuredExcludes": [
+      "\"matchedItem\":\"가스레인지\""
+    ]
+  },
+  {
+    "id": "gas_range_hood_with_modifier_does_not_confirm",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "빌트인 가스레인지 후드"
+    },
+    "expectedTextIncludes": [
+      "확실히 찾지 못했습니다"
+    ],
+    "expectedTextExcludes": [
+      "가스 밸브를 잠그고",
+      "연결 호스를 분리"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "gas_range_colloquial_spelling_still_confirms",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가스렌지",
+      "region": "서울 강서구"
+    },
+    "expectedTextIncludes": [
+      "## 가스레인지",
+      "가스 밸브를 잠그고",
+      "가스레인지 2구: 3,000원"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"gas_range\""
+    ]
+  },
+  {
+    "id": "microwave_not_eaten_by_gas_range_gate",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전자레인지"
+    },
+    "expectedTextIncludes": [
+      "## 전자레인지",
+      "1599-0903"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"microwave\""
+    ]
   }
 ]

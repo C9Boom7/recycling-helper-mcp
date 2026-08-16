@@ -13,7 +13,7 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { normalizeText, reservedQueryWords, resolveWasteItem, wasteItems } from "../src/data.js";
+import { isReservedQuery, resolveWasteItem, wasteItems } from "../src/data.js";
 
 type EvaluationCase = {
   query: string;
@@ -79,15 +79,15 @@ for (const testCase of evaluationCases) {
   }
 }
 
-// 예약어(카테고리어·재질 이름)는 `findWasteItems` 맨 앞에서 질의를 끊는다. 품목명이나
-// 별칭이 예약어와 같아지면 그 품목은 exact 매칭에 닿기도 전에 잘려 **모든 툴에서
-// 사라진다.** 데이터만 봐서는 드러나지 않는 결합이라 여기서 막는다.
-const reserved = new Set(reservedQueryWords);
+// 예약어(카테고리어·재질 이름·가스레인지 비매칭 복합어)는 매칭 맨 앞에서 질의를 끊는다.
+// 품목명이나 별칭이 예약어에 걸리면 그 품목은 exact 매칭에 닿기도 전에 잘려 **확정될 수
+// 없다**(카테고리어는 아예 검색에서 사라진다). 데이터만 봐서는 드러나지 않는 결합이라
+// 여기서 막는다. 가스레인지 후드·받침장을 나중에 별도 품목으로 세우면 여기서 걸린다.
 for (const item of wasteItems) {
   for (const label of [item.name, ...(item.aliases ?? [])]) {
-    if (reserved.has(normalizeText(label))) {
+    if (isReservedQuery(label)) {
       failures.push(
-        `${item.id}의 "${label}"이(가) 예약어와 같습니다 — 이 품목은 검색에서 통째로 사라집니다. 별칭을 바꾸거나 예약어에서 빼세요.`,
+        `${item.id}의 "${label}"이(가) 예약어 게이트에 걸립니다 — 이 품목은 검색에서 확정될 수 없습니다. 별칭을 바꾸거나 게이트에서 빼세요.`,
       );
     }
   }

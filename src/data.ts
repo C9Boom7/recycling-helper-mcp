@@ -340,8 +340,56 @@ function isMaterialOnlyQuery(query: string): boolean {
   return MATERIAL_ONLY_QUERIES.has(normalizeText(query));
 }
 
-/** 예약어 목록. validate가 품목명·별칭과의 충돌을 막는 데 쓴다. */
-export const reservedQueryWords: string[] = [...DISPOSAL_CATEGORY_QUERIES, ...MATERIAL_ONLY_QUERIES.keys()];
+/**
+ * 이름이 "가스레인지"로 시작할 뿐 실제로는 다른 물건인 붙박이 살림들. 후드와 받침장이
+ * 각자 공식 근거를 갖춘 품목으로 서기 전까지는, **이름이 접두어로 겹친다는 이유만으로**
+ * `gas_range`가 이기게 두지 않는다. 받침장을 물은 사람에게 "가스 밸브를 잠그고 연결
+ * 호스를 분리" 절차와 가스레인지 수수료가 나가느니 not_found로 되묻는 편이 안전하다.
+ *
+ * 정확히 일치하는 낱말 몇 개만 막으면 거의 다 새어 나간다 — `가스렌지 후드`(`가스렌지`는
+ * `gas_range`의 실제 별칭이고 구어에서 더 흔하다), `가스레인지 받침`, `가스레인지 후드
+ * 필터`, `빌트인 가스레인지 후드`가 전부 98점 단독 확정으로 돌아왔다. 그래서 표기를
+ * `렌지`→`레인지`로 모은 뒤 **포함 여부**로 본다.
+ *
+ * `상판`은 일부러 뺐다. 가스레인지 상판은 가스레인지의 일부라 같은 안내가 크게 어긋나지
+ * 않는다. 여기 넣는 기준은 "이름이 겹치는가"가 아니라 **"다른 물건인가"**다.
+ */
+const GAS_RANGE_NONMATCH_PARTS = ["후드", "받침"];
+
+/** `가스렌지`·`렌지후드` 표기를 하나로 모은다. 이 게이트 안에서만 쓰는 정규화다. */
+function normalizeRangeSpelling(query: string): string {
+  return normalizeText(query).replace(/렌지/g, "레인지");
+}
+
+function isGasRangeNonmatchCompound(query: string): boolean {
+  const normalized = normalizeRangeSpelling(query);
+  // 전자레인지 계열까지 끌고 가지 않게 가스레인지에만 건다. 다만 `레인지후드`는 앞에
+  // "가스"가 없어도 후드 하나를 가리키는 낱말이라 함께 받는다.
+  const isGasRangeCompound = normalized.includes("가스레인지");
+  const isBareRangeHood = normalized.includes("레인지후드") && !normalized.includes("전자레인지");
+  if (!isGasRangeCompound && !isBareRangeHood) {
+    return false;
+  }
+
+  if (GAS_RANGE_NONMATCH_PARTS.some((part) => normalized.includes(part))) {
+    return true;
+  }
+
+  // 받침장은 `가스레인지대`로도 부른다. `대`는 포함 검사에 쓰기엔 너무 짧아
+  // (`가스레인지 2대`) 끝자리로만 본다.
+  return normalized.endsWith("레인지대");
+}
+
+/**
+ * 확정 게이트에 걸리는 질의인지. validate가 품목명·별칭과의 충돌을 막는 데 쓴다.
+ *
+ * 낱말 목록이 아니라 함수인 이유가 있다 — 게이트 셋 중 하나는 정확 일치가 아니라 포함
+ * 규칙이라 목록으로 펼칠 수가 없다. 목록을 따로 두면 규칙이 늘 때마다 검사가 조용히
+ * 뒤처지는데, 그 어긋남이 정확히 이 검사가 막으려는 사고다.
+ */
+export function isReservedQuery(query: string): boolean {
+  return isDisposalCategoryQuery(query) || isMaterialOnlyQuery(query) || isGasRangeNonmatchCompound(query);
+}
 
 const SHORT_ALIAS_MAX_LENGTH = 2;
 // 짧은 별칭이 독립 낱말로 걸렸을 때의 점수 = 이 값 + 별칭 길이. 길이를 더하는 건
@@ -799,6 +847,10 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   // 그 툴에서는 **정확히 원하는 동작**이다. 헷갈리는 품목을 보여 달라는 툴이니까.
   // 잘못된 건 그 목록의 첫 줄을 답으로 확정하는 것이지 목록 자체가 아니다.
   if (isMaterialOnlyQuery(query)) {
+    return { status: "not_found" };
+  }
+
+  if (isGasRangeNonmatchCompound(query)) {
     return { status: "not_found" };
   }
 
