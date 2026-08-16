@@ -633,6 +633,41 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
         errors.push(`${prefix}.fees has ${count} rows for item ${itemId}; the cap is ${MAX_FEE_ROWS_PER_ITEM}`);
       }
     }
+
+    // 상한에 걸린 품목은 잘리기 전 행 수를 함께 싣는다. 이 숫자는 그대로 사용자에게
+    // "확인된 N개 규격 중 대표 12개"로 나가므로, 행을 손으로 지우면 남은 행보다 큰
+    // 값만 덩그러니 남아 없는 규격을 있다고 말하게 된다. 임포터를 안 거치는 수정을
+    // 여기서 잡는다.
+    const preCapCounts = schedule.preCapFeeRowCountByItemId;
+    if (preCapCounts !== undefined) {
+      if (typeof preCapCounts !== "object" || preCapCounts === null || Array.isArray(preCapCounts)) {
+        errors.push(`${prefix}.preCapFeeRowCountByItemId must be an object keyed by item id`);
+      } else {
+        for (const [itemId, total] of Object.entries(preCapCounts)) {
+          const entryPrefix = `${prefix}.preCapFeeRowCountByItemId.${itemId}`;
+          const rows = feeRowsByItemId[itemId] ?? 0;
+          if (!ids.has(itemId)) {
+            errors.push(`${entryPrefix} references unknown item ${itemId}`);
+          } else if (rows === 0) {
+            errors.push(`${entryPrefix} has no matching row in ${prefix}.fees`);
+          } else if (!Number.isInteger(total) || total <= rows) {
+            errors.push(`${entryPrefix} must be an integer greater than the ${rows} loaded rows (got ${JSON.stringify(total)})`);
+          } else if (rows < MAX_FEE_ROWS_PER_ITEM) {
+            errors.push(`${entryPrefix} claims a trim to ${rows} rows, below the ${MAX_FEE_ROWS_PER_ITEM} cap; drop the entry or restore the rows`);
+          }
+        }
+      }
+    }
+
+    // 반대쪽 — 상한에 걸렸는데 행 수를 안 남긴 품목. 답변에는 12개가 전부인 것처럼
+    // 나간다. 임포터를 다시 돌리면 채워지므로 error가 아니라 warning으로 남긴다.
+    for (const [itemId, count] of Object.entries(feeRowsByItemId)) {
+      if (count === MAX_FEE_ROWS_PER_ITEM && preCapCounts?.[itemId] === undefined) {
+        warnings.push(
+          `${prefix}.fees sits at the ${MAX_FEE_ROWS_PER_ITEM}-row cap for item ${itemId} without preCapFeeRowCountByItemId; re-run the importer so the answer can disclose the trim`,
+        );
+      }
+    }
   }
 
   if (Array.isArray(schedule.fees) && schedule.fees.length > 0) {

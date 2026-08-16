@@ -119,6 +119,7 @@ for (const [gu, regionId, regionName] of TARGETS) {
   }
 
   const fees: BulkyWasteFee[] = [];
+  const preCapFeeRowCountByItemId: Record<string, number> = {};
   const trimmed: string[] = [];
   for (const [itemId, group] of grouped) {
     const unique = new Map<string, BulkyWasteFee>();
@@ -137,7 +138,10 @@ for (const [gu, regionId, regionName] of TARGETS) {
       }
     }
     const sorted = [...unique.values()].sort((a, b) => a.feeKrw - b.feeKrw);
-    if (sorted.length > MAX_FEE_ROWS) trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+    if (sorted.length > MAX_FEE_ROWS) {
+      trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+      preCapFeeRowCountByItemId[itemId] = sorted.length;
+    }
     fees.push(...trimToCap(sorted));
   }
 
@@ -156,6 +160,7 @@ for (const [gu, regionId, regionName] of TARGETS) {
       basis: `${regionName}에서 제출한 대형폐기물 수수료 고시 ${regionRows.length}행 중 품목이 확정되는 행만 반영했습니다. 기준일은 지자체 제출일(CRTR_YMD)입니다.`,
       note: "오타 매칭·역방향 포함 매칭·수식어 위치 매칭·복수 품목 표기·옵션 요금 행은 제외했습니다.",
     },
+    ...(Object.keys(preCapFeeRowCountByItemId).length > 0 ? { preCapFeeRowCountByItemId } : {}),
     fees,
   });
 

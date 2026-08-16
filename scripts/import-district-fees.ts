@@ -164,6 +164,7 @@ for (const regionId of targets) {
   }
 
   const fees: BulkyWasteFee[] = [];
+  const preCapFeeRowCountByItemId: Record<string, number> = {};
   const trimmed: string[] = [];
   const conflicts: string[] = [];
   for (const [itemId, group] of grouped) {
@@ -189,7 +190,10 @@ for (const regionId of targets) {
     }
 
     const sorted = kept.sort((a, b) => a.feeKrw - b.feeKrw);
-    if (sorted.length > MAX_FEE_ROWS) trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+    if (sorted.length > MAX_FEE_ROWS) {
+      trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
+      preCapFeeRowCountByItemId[itemId] = sorted.length;
+    }
     fees.push(...trimToCap(sorted));
   }
 
@@ -216,6 +220,7 @@ for (const regionId of targets) {
       basis: `${region.name} 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 ${dump.rows.length}행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.`,
       note: "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다.",
     },
+    ...(Object.keys(preCapFeeRowCountByItemId).length > 0 ? { preCapFeeRowCountByItemId } : {}),
     fees,
   });
 

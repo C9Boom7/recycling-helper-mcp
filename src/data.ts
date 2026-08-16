@@ -73,6 +73,13 @@ export type BulkyWasteFeeSchedule = {
   phone: string;
   source: WasteSource;
   fees: BulkyWasteFee[];
+  /**
+   * 임포터가 품목당 표시 상한을 걸기 전 행 수. 상한에 걸린 품목만 담는다 —
+   * 안 걸린 품목까지 넣으면 `fees`를 세면 나오는 값이 그대로 중복된다.
+   * 손으로 넣은 행은 임포터를 거치지 않으므로 `validate-data.mjs`가 실제 행 수와
+   * 대조한다.
+   */
+  preCapFeeRowCountByItemId?: Record<string, number>;
 };
 
 /**
@@ -1247,6 +1254,19 @@ export function findBulkyWasteFees(region: RegionalPolicyData, item: WasteItem):
   return findBulkyWasteFeeSchedule(region)?.fees.filter((fee) => fee.itemId === item.id) ?? [];
 }
 
+/**
+ * 상한에 걸려 잘린 품목이면 잘리기 전 행 수를 준다. 수수료가 나가는 자리가 셋이고
+ * (수수료 줄 목록·카드 한 줄·지역 체크리스트) 셋이 같은 숫자를 말해야 해서 여기 모은다.
+ *
+ * 메타데이터가 없으면 `undefined`다. 행 수가 상한과 같다는 것만으로 잘렸다고 보면
+ * 마침 규격이 12종인 품목까지 "더 있다"고 말하게 된다 — 임포터가 남긴 값만 믿는다.
+ */
+export function findBulkyWasteFeeRowTotal(region: RegionalPolicyData, item: WasteItem): number | undefined {
+  const total = findBulkyWasteFeeSchedule(region)?.preCapFeeRowCountByItemId?.[item.id];
+  if (total === undefined) return undefined;
+  return total > findBulkyWasteFees(region, item).length ? total : undefined;
+}
+
 function formatKrw(value: number): string {
   return `${value.toLocaleString("ko-KR")}원`;
 }
@@ -1258,8 +1278,15 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
   const fees = findBulkyWasteFees(region, item);
   if (fees.length === 0) return [];
 
+  // "전체 N개"라고 쓰면 안 된다. N은 임포터가 품목 확정·중복 제거·충돌 제거를 마치고
+  // 남긴 행 수지 고시에 실린 규격 수가 아니다(제외 기준은 source.note에 적혀 있다).
+  const rowTotal = findBulkyWasteFeeRowTotal(region, item);
+
   return [
     `- ${region.name} 대형생활폐기물 수수료 후보:`,
+    ...(rowTotal
+      ? [`  - 확인된 ${rowTotal}개 규격 중 대표 ${fees.length}개만 추렸습니다. 전체 표는 수수료 출처에서 확인하세요.`]
+      : []),
     ...fees.map((fee) => `  - ${fee.itemName} ${fee.spec}: ${formatKrw(fee.feeKrw)}`),
     `- 신청 URL: ${schedule.applicationUrl}`,
     `- 수수료 출처: ${schedule.feeUrl}`,
