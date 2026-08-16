@@ -354,7 +354,7 @@ for (const regionId of targets) {
   }
 
   const fees: BulkyWasteFee[] = [];
-  const feeRowCountByItemId: Record<string, number> = {};
+  const preCapFeeRowCountByItemId: Record<string, number> = {};
   const trimmed: string[] = [];
   const conflicts: string[] = [];
   for (const [itemId, group] of grouped) {
@@ -385,7 +385,7 @@ for (const regionId of targets) {
     const sorted = kept.sort((a, b) => a.feeKrw - b.feeKrw);
     if (sorted.length > MAX_FEE_ROWS) {
       trimmed.push(`${itemId} ${sorted.length}→${MAX_FEE_ROWS}`);
-      feeRowCountByItemId[itemId] = sorted.length;
+      preCapFeeRowCountByItemId[itemId] = sorted.length;
     }
     fees.push(...trimToCap(sorted));
   }
@@ -397,7 +397,6 @@ for (const regionId of targets) {
     checkedAt: dump.collectedAt,
     applicationUrl: region.bulkyWaste.applicationUrl,
     feeUrl: region.bulkyWaste.feeUrl,
-    ...(Object.keys(feeRowCountByItemId).length > 0 ? { feeRowCountByItemId } : {}),
     phone: region.bulkyWaste.phone,
     source: {
       title: `${dump.law.name} ${dump.attachment.title}`,
@@ -409,6 +408,7 @@ for (const regionId of targets) {
       basis: `${dump.law.kind} 「${dump.law.name}」(시행 ${effectiveDate}) ${dump.attachment.title} "${dump.attachment.header}"에서 뽑았습니다. 조례 원문 ${dump.rows.length}행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.`,
       note: "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다.",
     },
+    ...(Object.keys(preCapFeeRowCountByItemId).length > 0 ? { preCapFeeRowCountByItemId } : {}),
     fees,
   });
 

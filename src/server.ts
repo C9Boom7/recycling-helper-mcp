@@ -13,6 +13,7 @@ import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteI
 import {
   confidenceLabel,
   disposalGroupLabel,
+  findBulkyWasteFeeRowTotal,
   findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findMaterialGuideline,
@@ -290,7 +291,14 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   // A single tier can name itself; several tiers become a range, because listing
   // four specs would blow the card and picking one for the user would be a guess.
   if (fees.length === 1) return `수수료 ${krw(min)} ${paren(fees[0].spec)}`;
-  return `수수료 ${krw(min)}~${krw(max)} ${paren(`규격 ${fees.length}종`)}`;
+
+  // 상한에 걸린 품목은 `fees.length`가 우리가 들고 있는 행 수지 규격 수가 아니다.
+  // 그냥 "규격 12종"이라고 쓰면 텍스트 답변은 "대표 12개만"이라고 밝히는데 카드만
+  // 12종이 전부인 척한다. 최저~최고 범위는 그대로 참이다 — 임포터가 잘라낼 때
+  // 양 끝 행을 남긴다.
+  const rowTotal = findBulkyWasteFeeRowTotal(regionMatch.region, item);
+  const specDetail = rowTotal ? `규격 ${rowTotal}종 중 대표 ${fees.length}종` : `규격 ${fees.length}종`;
+  return `수수료 ${krw(min)}~${krw(max)} ${paren(specDetail)}`;
 }
 
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {
@@ -505,10 +513,16 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
   if (!item) return generalRegionCheckList(region);
 
   const guide = findRegionItemGuide(region.region, item);
+  const feeRows = findBulkyWasteFees(region.region, item);
+  // 이 체크리스트도 수수료 행을 전부 펼친다. 상한에 걸린 품목이면 여기서도 잘리므로
+  // 잘렸다는 사실을 같이 내보낸다. 출처 URL은 바로 위 `formatRegionBulkyContactLines`가
+  // "수수료 조회"로 이미 찍는다 — 체크 항목은 한 줄짜리라 주소까지 넣지 않는다.
+  const feeRowTotal = findBulkyWasteFeeRowTotal(region.region, item);
   const checks = [
     ...(item.regionPolicy?.checkItems ?? []),
     ...(guide ? guide.steps : []),
-    ...findBulkyWasteFees(region.region, item).map((fee) => `${fee.itemName} ${fee.spec} 수수료 ${fee.feeKrw.toLocaleString("ko-KR")}원`),
+    ...feeRows.map((fee) => `${fee.itemName} ${fee.spec} 수수료 ${fee.feeKrw.toLocaleString("ko-KR")}원`),
+    ...(feeRowTotal ? [`확인된 ${feeRowTotal}개 규격 중 대표 ${feeRows.length}개만 옮겼습니다 — 나머지 규격은 수수료 조회 페이지에서 확인`] : []),
   ].filter(Boolean);
 
   if (checks.length > 0) return Array.from(new Set(checks));
