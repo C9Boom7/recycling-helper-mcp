@@ -1053,7 +1053,12 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   // 광역의 대형폐기물 줄은 "거주 중인 시·군·구를 확인해야 한다"가 전부라,
   // 시·군·구를 이미 댄 사람에게는 바로 위 문구를 한 번 더 쓴 것에 지나지 않는다.
   // 그쪽 문구가 그 이름까지 부르니 여기서는 뺀다 — 줄 수도 두 줄 줄어든다.
-  const bulkyLines = regionMatch && !namedSubRegion ? formatRegionBulkyContactLines(regionMatch.region) : [];
+  //
+  // 광역일 때로 한정하는 이유는 formatRegionItemGuide가 같은 자리에서 막는 이유와 같다.
+  // district 티어의 그 블록에는 문의 전화·인터넷 신청·수수료 조회 URL이 들어 있어서,
+  // `namedSubRegion`이 광역 착지 때만 온다는 호출부 약속에 기대면 그 셋이 소리 없이 사라진다.
+  const dropsOnlyTheReAsk = Boolean(namedSubRegion) && regionMatch?.level === "metro";
+  const bulkyLines = regionMatch && !dropsOnlyTheReAsk ? formatRegionBulkyContactLines(regionMatch.region) : [];
   const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
   const hasSchedule = Boolean(regionMatch?.region.generalWaste && regionMatch.region.recycling);
 
