@@ -178,12 +178,46 @@ const nationallyAmbiguousDistrictQueries = [
 
 for (const query of nationallyAmbiguousDistrictQueries) {
   const resolution = resolveRegionalPolicy(query);
-  if (resolution.status === "match" && resolution.match.level === "district") {
+  // level을 district로 좁혀 보면 안 된다. 광역 별칭에 `서구`를 달면 metro 강도로
+  // 확정되는데, 그때도 다른 광역 주민이 남의 안내를 받는 것은 똑같다. 확정 자체를 막는다.
+  if (resolution.status === "match") {
     failures.push(
-      `"${query}" confidently resolved to district ${resolution.match.region.id}; ` +
-        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다",
+      `"${query}" confidently resolved to ${resolution.match.region.id} (level: ${resolution.match.level}); ` +
+        "이 이름은 여러 광역시에 있어 광역 접두어 없이 확정하면 안 된다 — 자치구든 광역 별칭이든 마찬가지다",
     );
   }
+}
+
+/**
+ * 광역 별칭 쪽의 같은 함정. 미등록 시·군 이름을 광역 별칭으로 달아 폴백을 열어줄 때,
+ * **광역이 유일하게 정해지는 이름만** 달 수 있다. 아래 이름들은 그 조건을 못 채운다 —
+ * 고성군은 강원과 경남에 하나씩 있고, 광주시는 경기도의 시이면서 광주광역시와 같은 표기다.
+ * 어느 한쪽에 달면 다른 쪽 주민이 남의 광역 안내를 조용히 받는다. 확정만 안 하면
+ * 되묻기든 전국 폴백이든 상관없다.
+ */
+const metroAmbiguousNames = ["고성군", "고성"];
+
+// `광주시`는 위 목록에 넣어봐야 검사가 되지 않는다 — 광주광역시가 원래 이 이름을
+// 별칭으로 갖고 있어 항상 확정되고, 예외 처리를 달면 어떤 경우에도 실패하지 않는
+// 빈 검사가 된다. 대신 **경기도가 이 이름을 가져가지 않았는지**만 직접 본다.
+{
+  const resolution = resolveRegionalPolicy("광주시");
+  const owner = resolution.status === "match" ? resolution.match.region.id : `(${resolution.status})`;
+  if (owner !== "gwangju") {
+    failures.push(
+      `"광주시"가 ${owner}로 갔다. 이 이름은 광주광역시가 원래 갖고 있고 경기도 광주시와 표기가 같다 — ` +
+        "경기도 별칭에 더하면 두 광역이 같은 이름을 물어 되묻기로 빠진다",
+    );
+  }
+}
+
+for (const query of metroAmbiguousNames) {
+  const resolution = resolveRegionalPolicy(query);
+  if (resolution.status !== "match") continue;
+  failures.push(
+    `"${query}" confidently resolved to ${resolution.match.region.id}; ` +
+      "이 이름은 광역이 유일하게 정해지지 않아 광역 별칭으로 달면 안 된다",
+  );
 }
 
 for (const testCase of regionEvaluationCases) {
