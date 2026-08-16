@@ -3606,7 +3606,9 @@
       "부산",
       "부산시",
       "부산광역시",
-      "busan",
+      "busan"
+    ],
+    "districtAliases": [
       "영도구",
       "부산진구",
       "동래구",
@@ -3638,7 +3640,9 @@
       "대구",
       "대구시",
       "대구광역시",
-      "daegu",
+      "daegu"
+    ],
+    "districtAliases": [
       "수성구",
       "달서구",
       "달성군",
@@ -3664,7 +3668,9 @@
       "인천",
       "인천시",
       "인천광역시",
-      "incheon",
+      "incheon"
+    ],
+    "districtAliases": [
       "미추홀구",
       "연수구",
       "남동구",
@@ -3693,7 +3699,9 @@
       "광주",
       "광주시",
       "광주광역시",
-      "gwangju",
+      "gwangju"
+    ],
+    "districtAliases": [
       "광산구"
     ],
     "coverageTier": "metro",
@@ -3716,7 +3724,9 @@
       "대전",
       "대전시",
       "대전광역시",
-      "daejeon",
+      "daejeon"
+    ],
+    "districtAliases": [
       "유성구",
       "대덕구"
     ],
@@ -3740,7 +3750,9 @@
       "울산",
       "울산시",
       "울산광역시",
-      "ulsan",
+      "ulsan"
+    ],
+    "districtAliases": [
       "울주군"
     ],
     "coverageTier": "metro",
@@ -3784,7 +3796,9 @@
     "aliases": [
       "경기",
       "경기도",
-      "gyeonggi",
+      "gyeonggi"
+    ],
+    "districtAliases": [
       "안산시",
       "안양시",
       "평택시",
@@ -3829,7 +3843,9 @@
       "강원",
       "강원도",
       "강원특별자치도",
-      "gangwon",
+      "gangwon"
+    ],
+    "districtAliases": [
       "춘천시",
       "원주시",
       "강릉시",
@@ -3867,7 +3883,9 @@
     "aliases": [
       "충남",
       "충청남도",
-      "chungnam",
+      "chungnam"
+    ],
+    "districtAliases": [
       "천안시",
       "공주시",
       "보령시",
@@ -3903,7 +3921,9 @@
     "aliases": [
       "경북",
       "경상북도",
-      "gyeongbuk",
+      "gyeongbuk"
+    ],
+    "districtAliases": [
       "포항시",
       "경주시",
       "김천시",
@@ -3947,7 +3967,9 @@
       "제주",
       "제주도",
       "제주특별자치도",
-      "jeju",
+      "jeju"
+    ],
+    "districtAliases": [
       "제주시",
       "서귀포시"
     ],
@@ -3970,7 +3992,9 @@
     "aliases": [
       "충북",
       "충청북도",
-      "chungbuk",
+      "chungbuk"
+    ],
+    "districtAliases": [
       "청주시",
       "충주시",
       "제천시",
@@ -4002,7 +4026,9 @@
     "aliases": [
       "전북",
       "전북특별자치도",
-      "jeonbuk",
+      "jeonbuk"
+    ],
+    "districtAliases": [
       "전주시",
       "군산시",
       "익산시",
@@ -4037,7 +4063,9 @@
     "aliases": [
       "전남",
       "전라남도",
-      "jeonnam",
+      "jeonnam"
+    ],
+    "districtAliases": [
       "목포시",
       "여수시",
       "순천시",
@@ -4080,7 +4108,9 @@
     "aliases": [
       "경남",
       "경상남도",
-      "gyeongnam",
+      "gyeongnam"
+    ],
+    "districtAliases": [
       "창원시",
       "진주시",
       "통영시",

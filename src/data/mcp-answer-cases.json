@@ -6476,8 +6476,8 @@
     },
     "expectedTextIncludes": [
       "부산광역시 지역 확인 안내",
-      "부산광역시 광역 기준 안내입니다",
-      "시·군·구를 알려주시면",
+      "해운대구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 해운대구 소관이니",
       "품목: 건전지",
       "전용 수거함 위치",
       "지정 수거처",
@@ -6489,12 +6489,14 @@
       "강남구 기본 배출 기준",
       "서울 강남구 공식 출처",
       "수거함 주소",
-      "문의/신청 안내 전화"
+      "문의/신청 안내 전화",
+      "시·군·구를 알려주시면",
+      "거주 중인 시·군·구를 확인해야"
     ],
     "expectedStructuredIncludes": [
       "\"region\":\"부산 해운대구\"",
       "\"matchedRegion\":\"부산광역시\"",
-      "\"regionStatus\":\"metro\"",
+      "\"regionStatus\":\"unregistered_district\"",
       "\"item\":\"건전지\""
     ]
   },
@@ -6545,19 +6547,95 @@
     },
     "expectedTextIncludes": [
       "경기도 지역 확인 안내",
-      "경기도 광역 기준 안내입니다",
-      "시·군·구를 알려주시면",
+      "안산시 상세 데이터는 아직 없어 경기도 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 안산시 소관이니 아래 공식 확인처에서 확인해 주세요",
       "생활폐기물 분리배출 누리집 지역별 안내",
       "정부24 민원 신청"
     ],
     "expectedTextExcludes": [
       "아직 상세 지역 데이터가 없습니다",
-      "문의/신청 안내 전화"
+      "문의/신청 안내 전화",
+      "시·군·구를 알려주시면",
+      "거주 중인 시·군·구를 확인해야",
+      "경기도 대형폐기물"
     ],
     "expectedStructuredIncludes": [
       "\"region\":\"안산시\"",
       "\"matchedRegion\":\"경기도\"",
-      "\"regionStatus\":\"metro\""
+      "\"regionStatus\":\"unregistered_district\""
+    ]
+  },
+  {
+    "id": "region_metro_names_the_district_cheongju",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "청주시"
+    },
+    "expectedTextIncludes": [
+      "충청북도 지역 확인 안내",
+      "청주시 상세 데이터는 아직 없어 충청북도 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 청주시 소관이니 아래 공식 확인처에서 확인해 주세요",
+      "생활폐기물 분리배출 누리집 지역별 안내",
+      "정부24 민원 신청"
+    ],
+    "expectedTextExcludes": [
+      "거주 중인 시·군·구를 알려주시면",
+      "거주 중인 시·군·구를 확인해야",
+      "충청북도 대형폐기물",
+      "아직 상세 지역 데이터가 없습니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"청주시\"",
+      "\"matchedRegion\":\"충청북도\"",
+      "\"regionStatus\":\"unregistered_district\"",
+      "\"coverageTier\":\"metro\""
+    ]
+  },
+  {
+    "id": "region_metro_named_district_bulky_item_cheongju",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "청주시",
+      "itemName": "책상의자"
+    },
+    "expectedTextIncludes": [
+      "품목: 의자",
+      "청주시 상세 데이터는 아직 없어 충청북도 광역 기준으로 안내합니다",
+      "품목별 충청북도 안내",
+      "대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다"
+    ],
+    "expectedTextExcludes": [
+      "거주 중인 시·군·구를 확인해야",
+      "거주 중인 시·군·구를 알려주시면",
+      "배출 3일 전"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"충청북도\"",
+      "\"regionStatus\":\"unregistered_district\"",
+      "\"item\":\"의자\""
+    ]
+  },
+  {
+    "id": "region_metro_without_district_still_asks_chungbuk",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "충북"
+    },
+    "expectedTextIncludes": [
+      "충청북도 지역 확인 안내",
+      "충청북도 광역 기준 안내입니다",
+      "거주 중인 시·군·구를 알려주시면 더 정확히 안내할 수 있습니다",
+      "충청북도 대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "소관이니 아래 공식 확인처에서"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"충북\"",
+      "\"matchedRegion\":\"충청북도\"",
+      "\"regionStatus\":\"metro\"",
+      "\"coverageTier\":\"metro\""
     ]
   },
   {

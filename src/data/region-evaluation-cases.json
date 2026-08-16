@@ -122,87 +122,104 @@
   {
     "region": "서울",
     "expectedRegionId": "seoul",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "부산",
     "expectedRegionId": "busan",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "대구",
     "expectedRegionId": "daegu",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "인천",
     "expectedRegionId": "incheon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "광주",
     "expectedRegionId": "gwangju",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "대전",
     "expectedRegionId": "daejeon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "울산",
     "expectedRegionId": "ulsan",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "세종",
     "expectedRegionId": "sejong",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "경기",
     "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "강원",
     "expectedRegionId": "gangwon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "충남",
     "expectedRegionId": "chungnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "경북",
     "expectedRegionId": "gyeongbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "제주",
     "expectedRegionId": "jeju",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "충북",
     "expectedRegionId": "chungbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "전북",
     "expectedRegionId": "jeonbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "전남",
     "expectedRegionId": "jeonnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "경남",
     "expectedRegionId": "gyeongnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": null
   },
   {
     "region": "서울 종로구",
@@ -348,12 +365,14 @@
   {
     "region": "경기도 평택시",
     "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "평택시"
   },
   {
     "region": "부산 해운대구",
     "expectedRegionId": "busan",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "해운대구"
   },
   {
     "region": "분당구",
@@ -378,77 +397,104 @@
   {
     "region": "안산시",
     "expectedRegionId": "gyeonggi",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "안산시"
+  },
+  {
+    "region": "청주시",
+    "expectedRegionId": "chungbuk",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "청주시"
+  },
+  {
+    "region": "청주",
+    "expectedRegionId": "chungbuk",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "청주시"
   },
   {
     "region": "청주시 흥덕구",
     "expectedRegionId": "chungbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "청주시"
   },
   {
     "region": "천안시",
     "expectedRegionId": "chungnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "천안시"
   },
   {
     "region": "창원시",
     "expectedRegionId": "gyeongnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "창원시"
   },
   {
     "region": "포항시",
     "expectedRegionId": "gyeongbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "포항시"
   },
   {
     "region": "전주시",
     "expectedRegionId": "jeonbuk",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "전주시"
   },
   {
     "region": "여수시",
     "expectedRegionId": "jeonnam",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "여수시"
   },
   {
     "region": "춘천시",
     "expectedRegionId": "gangwon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "춘천시"
   },
   {
     "region": "서귀포시",
     "expectedRegionId": "jeju",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "서귀포시"
   },
   {
     "region": "해운대구",
     "expectedRegionId": "busan",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "해운대구"
   },
   {
     "region": "수성구",
     "expectedRegionId": "daegu",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "수성구"
   },
   {
     "region": "부평구",
     "expectedRegionId": "incheon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "부평구"
   },
   {
     "region": "유성구",
     "expectedRegionId": "daejeon",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "유성구"
   },
   {
     "region": "광산구",
     "expectedRegionId": "gwangju",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "광산구"
   },
   {
     "region": "울주군",
     "expectedRegionId": "ulsan",
-    "expectedLevel": "metro"
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "울주군"
   },
   {
     "region": "경기 수원시",

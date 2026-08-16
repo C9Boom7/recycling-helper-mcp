@@ -433,6 +433,7 @@ function collectionMethodIsFilled(collection) {
 }
 
 const regionIds = new Set();
+const districtAliasOwners = new Map();
 for (const [index, region] of regionalPolicies.entries()) {
   const prefix = `region[${index}]${region?.id ? `(${region.id})` : ""}`;
   const tier = region.coverageTier;
@@ -441,6 +442,33 @@ for (const [index, region] of regionalPolicies.entries()) {
   if (!isNonEmptyString(region.id)) errors.push(`${prefix}.id must be a non-empty string`);
   if (!isNonEmptyString(region.name)) errors.push(`${prefix}.name must be a non-empty string`);
   if (!Array.isArray(region.aliases) || region.aliases.length === 0) errors.push(`${prefix}.aliases must not be empty`);
+
+  // 광역이 대신 받는 시·군·구 이름. `aliases`와 갈라 두는 게 요점이라, 다시 섞이면
+  // 응답이 그 이름을 부를 근거를 잃는다 — 겹치는 순간 에러로 잡는다.
+  if (region.districtAliases !== undefined) {
+    if (!Array.isArray(region.districtAliases) || region.districtAliases.length === 0) {
+      errors.push(`${prefix}.districtAliases must be a non-empty array when present`);
+    } else {
+      const ownNames = new Set([region.name, ...(Array.isArray(region.aliases) ? region.aliases : [])]);
+      const seen = new Set();
+      for (const [aliasIndex, alias] of region.districtAliases.entries()) {
+        const aliasPrefix = `${prefix}.districtAliases[${aliasIndex}]`;
+        if (!isNonEmptyString(alias)) {
+          errors.push(`${aliasPrefix} must be a non-empty string`);
+          continue;
+        }
+        if (ownNames.has(alias)) errors.push(`${aliasPrefix} "${alias}" also appears in name/aliases; keep the two lists apart`);
+        if (seen.has(alias)) errors.push(`${aliasPrefix} "${alias}" is duplicated`);
+        seen.add(alias);
+        const owner = districtAliasOwners.get(alias);
+        if (owner) {
+          errors.push(`${aliasPrefix} "${alias}" is already a district alias of ${owner}; a name in two metros must not resolve to either`);
+        } else {
+          districtAliasOwners.set(alias, region.id);
+        }
+      }
+    }
+  }
   if (!isoDate.test(region.checkedAt ?? "")) errors.push(`${prefix}.checkedAt must be YYYY-MM-DD`);
   if (!isNonEmptyString(region.summary)) errors.push(`${prefix}.summary must be a non-empty string`);
   if (!regionCoverageTiers.has(tier)) {
@@ -462,6 +490,9 @@ for (const [index, region] of regionalPolicies.entries()) {
       errors.push(`${prefix}.bulkyWaste must not be set on a metro region; bulky waste intake belongs to the district level`);
     }
   } else {
+    if (region.districtAliases !== undefined) {
+      errors.push(`${prefix}.districtAliases must not be set on a district-level region; it lists 시·군·구 that fall back to a metro`);
+    }
     if (!isNonEmptyString(region.metroId)) errors.push(`${prefix}.metroId is required for district-level regions`);
     else if (!metroRegionIds.has(region.metroId)) errors.push(`${prefix}.metroId references unknown metro region ${region.metroId}`);
   }

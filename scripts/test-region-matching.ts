@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   findBestWasteItem,
   findBulkyWasteFees,
+  findNamedSubRegion,
   findRegionItemGuide,
   regionalPolicies,
   resolveRegionalPolicy,
@@ -21,6 +22,12 @@ type RegionEvaluationCase = {
   expectedItemId?: string;
   expectedGuideContains?: string;
   expectedFeeKrw?: number;
+  /**
+   * 광역으로 착지했을 때 응답이 불러야 할 시·군·구 이름. 지목하지 않은 질의는
+   * `null`로 적어 "되묻는 게 맞는 쪽"을 함께 고정한다. 필드를 뺀 케이스는 이
+   * 갈래를 보지 않는다.
+   */
+  expectedNamedSubRegion?: string | null;
 };
 
 const regionEvaluationCases = JSON.parse(
@@ -139,7 +146,7 @@ for (const expectation of expectations) {
 // 확정되거나 최소한 되묻기 후보에는 들어가야 한다. 어느 쪽도 아니면 그 별칭은
 // 다른 지역에 뺏긴 것이고, 사용자에게는 조용히 틀린 지역 안내가 나간다.
 for (const region of regionalPolicies) {
-  for (const alias of [region.name, ...region.aliases]) {
+  for (const alias of [region.name, ...region.aliases, ...(region.districtAliases ?? [])]) {
     const resolution = resolveRegionalPolicy(alias);
     if (resolution.status === "match" && resolution.match.region.id === region.id) continue;
     if (resolution.status === "ambiguous" && resolution.candidates.some((candidate) => candidate.region.id === region.id)) continue;
@@ -252,6 +259,15 @@ for (const testCase of regionEvaluationCases) {
 
   if (testCase.expectedLevel !== undefined && regionMatch.level !== testCase.expectedLevel) {
     failures.push(`region "${testCase.region}" resolved at the ${regionMatch.level} level; expected ${testCase.expectedLevel}`);
+  }
+
+  if (testCase.expectedNamedSubRegion !== undefined) {
+    const named = findNamedSubRegion(regionMatch.region, testCase.region) ?? null;
+    if (named !== testCase.expectedNamedSubRegion) {
+      failures.push(
+        `region "${testCase.region}" named sub-region was ${named ?? "(none)"}; expected ${testCase.expectedNamedSubRegion ?? "(none)"}`,
+      );
+    }
   }
 
   // 표준 티어는 필드가 얕아 케이스도 얕게 간다 — 신청 경로가 실제로 노출되는지만 본다.
