@@ -130,6 +130,8 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 | `score` | 매칭 점수. 88 미만이면 폴백 티어에서 걸린 것 |
 | `matched` / `total` | 후보 수. `ambiguous`의 후보 폭을 본다 |
 | `fallbackTier` | `not_found`가 착지한 곳. 재질 id면 추정이 먹힌 것, `menu`면 단서가 없어 재질 메뉴만 편 것 |
+| `regionStatus` | 지역이 어디까지 좁혀졌는지. `district`(자치구 확정) / `unregistered_district`(시·군·구를 댔지만 상세 데이터 없음) / `metro`(광역만 지목) / `ambiguous` / `unknown` |
+| `inputSource` | `photo`면 품목명이 사진에서 온 것. 없으면 사용자가 직접 친 것 |
 | `errorName` / `errorAt` | `error`일 때만. 예외 클래스 이름과 스택 맨 윗줄(파일:라인) |
 | `ms` | 서버 처리 시간. 한 자릿수가 정상이다 |
 

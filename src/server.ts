@@ -1206,6 +1206,7 @@ function withCallLog(
           status: _log?.status ?? callStatus(result),
           matchedId: _log?.matchedId,
           matchedRegion: _log?.matchedRegion,
+          regionStatus: _log?.regionStatus,
           score: _log?.score,
           matched: _log?.matched,
           total: _log?.total,
