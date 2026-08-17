@@ -1176,6 +1176,20 @@ async function runWidgetSmoke() {
       "classify and get_disposal_steps should serve the same card for the same match",
     );
 
+    // 같은 단언을 지역을 준 채로 한 번 더. 위 케이스는 지역이 없어 두 툴이 카드 빌더에
+    // 넘기는 선택 인자가 전부 비어 있고, 그래서 인자를 서로 바꿔 넣어도 통과한다 —
+    // 실제로 사진 경로와 지역 되부르기를 합치다 region이 photoNote 자리로 들어가
+    // 카드에 지역 문자열이 캡션으로 뜰 뻔했고, 이 줄이 없으면 그게 그대로 나갔다.
+    const classifiedRegional = await callTool(baseUrl, "classify_waste_item", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    const stepsRegional = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자", region: "서울 강남구" }, requestId);
+    requestId += 1;
+    assert(
+      JSON.stringify(parseWidgetPayload(classifiedRegional, "classify regional card").widget) ===
+        JSON.stringify(parseWidgetPayload(stepsRegional, "steps regional card").widget),
+      "classify and get_disposal_steps should serve the same card when a region is given too",
+    );
+
     // R1's line holds on this tool too: the two paths that need a follow-up turn
     // stay text, because a card closes the conversation.
     const classifyAmbiguous = await callTool(baseUrl, "classify_waste_item", { itemName: "전구" }, requestId);

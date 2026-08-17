@@ -611,18 +611,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
 function matchedItemWidget(
   item: WasteItem,
   regionMatch: MatchedRegionPolicy | undefined,
-  photoNote?: string,
-  /** 사용자가 댄 원본 지역 문자열. 광역으로 착지했을 때 그 사람이 말한 시·군·구를 되부르는 데 쓴다. */
-  region?: string,
+  // 이름으로 받는다. 둘 다 optional string이라 자리로 넘기면 서로 바꿔 넣어도 타입이
+  // 잡아주지 않는다 — 실제로 사진 경로와 지역 되부르기를 합치다 region이 photoNote
+  // 자리로 들어가 카드에 지역 문자열이 캡션으로 뜰 뻔했다.
+  extras: {
+    /** 사진에서 알아본 이름을 되비추는 확인 문구. 사진으로 들어온 호출에만 있다. */
+    photoNote?: string;
+    /** 사용자가 댄 원본 지역 문자열. 광역으로 착지했을 때 그 사람이 말한 시·군·구를 되부르는 데 쓴다. */
+    region?: string;
+  } = {},
 ): DisposalWidgetPayload {
   return buildDisposalWidget({
     item,
     sourceTitle: briefSourceTitle(item),
     sourceCheckedAt: briefSourceCheckedAt(item),
     regionName: regionMatch?.region.name,
-    regionNotes: buildRegionNotes(item, regionMatch, region),
+    regionNotes: buildRegionNotes(item, regionMatch, extras.region),
     regionFeeLine: buildRegionFeeLine(item, regionMatch),
-    photoNote,
+    photoNote: extras.photoNote,
   });
 }
 
@@ -659,7 +665,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // follow-up turn and a card closes the conversation. A confirmed match does
   // not, so it takes the same card get_disposal_steps serves.
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, region), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { region }), log);
   }
 
   const text = [
@@ -723,7 +729,7 @@ async function handleGetDisposalSteps({
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, photoNote, region), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);
   }
 
   // Below the widget branch on purpose: the card builds its own region lines
