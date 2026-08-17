@@ -73,6 +73,12 @@ export type DisposalWidgetInput = {
    * `regionNotes` on purpose — see regionNodes() for why it needs its own slot.
    */
   regionFeeLine?: string;
+  /**
+   * 사진으로 들어온 요청에 붙는 확인 문구. 문장은 핸들러가 만들어 넘긴다 — 카드는
+   * 다시 만들지 않는다. `copy_text`에는 싣지 않는다: 공유받는 사람은 사진을 보낸
+   * 적이 없어서 "사진 속 물건" 이야기가 맥락 없이 뜬금없다.
+   */
+  photoNote?: string;
 };
 
 function text(value: string): WidgetNode {
@@ -137,13 +143,17 @@ function orderCautions(cautions: string[]): string[] {
 }
 
 export function buildDisposalWidget(input: DisposalWidgetInput): DisposalWidgetPayload {
-  const { item, sourceTitle, sourceCheckedAt } = input;
+  const { item, sourceTitle, sourceCheckedAt, photoNote } = input;
   const cautions = orderCautions(item.cautions).slice(0, MAX_CARD_CAUTIONS);
   const region = regionNodes(input);
 
   const children: WidgetNode[] = [
     { type: "Title", value: item.name },
     caption(disposalGroupLabel(item.disposalType)),
+    // 확신도 문구처럼 아래에 몰아두지 않고 배출 그룹 캡션과 결론 사이에 둔다. 확신도는
+    // "이 답을 한 번 더 확인하라"지만 이쪽은 "이 카드가 네 물건 이야기가 맞느냐"라,
+    // 단계까지 다 읽은 뒤에 나오면 이미 엉뚱한 품목을 따라 한 뒤가 된다.
+    ...(photoNote ? [caption(photoNote)] : []),
     text(item.summary),
     divider(),
     ...item.steps.map((step, index) => text(`${index + 1}. ${step}`)),

@@ -39,6 +39,10 @@ const REQUIRED_TOOL_ANNOTATION_FIELDS = [
   "openWorldHint",
   "idempotentHint",
 ];
+// 본선 규격의 하드 한도 (docs/prd/phase-0-compliance.md R3, docs/prd/README.md
+// "본선 규격 요약"). 넘기면 재등록에서 툴이 거부되거나 description이 잘리는데,
+// 잘려나가는 꼬리가 하필 맨 뒤에 새로 붙인 문장이라 조용히 효과만 사라진다.
+const MAX_TOOL_DESCRIPTION_LENGTH = 1024;
 // PRD phase-0 R5: per-tool structuredContent whitelists. Every answer case
 // runs through this, so a handler emitting a field outside its contract fails
 // the smoke suite instead of silently regrowing the payload.
@@ -407,6 +411,10 @@ function assertToolMetadata(tool, context) {
     typeof tool.description === "string" && tool.description.trim().length > 0,
     `${context} ${tool.name} was missing description`,
   );
+  assert(
+    tool.description.length <= MAX_TOOL_DESCRIPTION_LENGTH,
+    `${context} ${tool.name} description is ${tool.description.length} chars, over the ${MAX_TOOL_DESCRIPTION_LENGTH} limit`,
+  );
   assert(isPlainObject(tool.inputSchema), `${context} ${tool.name} was missing inputSchema`);
   assert(tool.inputSchema.type === "object", `${context} ${tool.name} inputSchema.type must be object`);
   assert(isPlainObject(tool.inputSchema.properties), `${context} ${tool.name} inputSchema.properties must be an object`);
@@ -612,6 +620,25 @@ async function runSmoke() {
     const getDiscovery = await mcpGetDiscovery(baseUrl);
     assertToolList(getDiscovery, "GET discovery");
 
+    // 사진 경로는 description으로 안내하고 `inputSource`로 신호를 받는다. description만
+    // 고치고 파라미터가 스키마에 안 실리면 호스트는 보낼 방법이 없으므로 여기서 잡는다.
+    const disposalTool = toolsList.tools.find((tool) => tool.name === "get_disposal_steps");
+    assert(disposalTool, "tools/list is missing get_disposal_steps");
+    const inputSourceSchema = disposalTool.inputSchema.properties.inputSource;
+    assert(isPlainObject(inputSourceSchema), "get_disposal_steps inputSchema is missing inputSource");
+    assert(
+      JSON.stringify(inputSourceSchema.enum) === JSON.stringify(["photo"]),
+      `inputSource should accept only "photo", got ${JSON.stringify(inputSourceSchema)}`,
+    );
+    assert(
+      !(disposalTool.inputSchema.required ?? []).includes("inputSource"),
+      "inputSource must stay optional — a typed item name carries no source",
+    );
+    assert(
+      disposalTool.description.includes("make_cleanup_plan"),
+      "get_disposal_steps description should send multi-item photos to make_cleanup_plan",
+    );
+
     let requestId = 6;
 
     // A JSON-only client (Accept: application/json without text/event-stream)
@@ -697,6 +724,74 @@ async function runSmoke() {
     );
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
     requestId += 1;
+
+    // 사진 경로의 텍스트 분기. 서버는 이미지를 받지 않고 호스트가 알아본 이름만 넘어오므로,
+    // 잘못 알아본 이름도 확정 매칭으로 착지한다. 무엇으로 봤는지 되비추는 줄이 답 맨 앞에
+    // 붙어야 사용자가 바로 잡을 수 있다.
+    const photoText = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "기름 묻은 피자박스", inputSource: "photo" },
+      requestId,
+    );
+    requestId += 1;
+    assert(
+      resultText(photoText).startsWith('사진 속 물건은 "기름 묻은 피자박스" 품목 기준으로 안내합니다.'),
+      `photo-sourced text answer should open with the confirmation line:\n${resultText(photoText).slice(0, 120)}`,
+    );
+
+    const typedText = await callTool(baseUrl, "get_disposal_steps", { itemName: "기름 묻은 피자박스" }, requestId);
+    requestId += 1;
+    assert(
+      !resultText(typedText).includes("사진 속 물건"),
+      "a typed item name must not be answered as if it came from a photo",
+    );
+
+    // inputSource는 로그 필드 하나일 뿐이라, 호스트가 "image"처럼 다른 말을 얹었다고
+    // 배출 안내까지 잃으면 손익이 안 맞는다. 이 파라미터가 없던 때처럼 조용히 무시하고
+    // 답은 그대로 나가야 한다 (mcpRequest는 -32602를 받으면 throw한다).
+    const oddSourceText = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "기름 묻은 피자박스", inputSource: "image" },
+      requestId,
+    );
+    requestId += 1;
+    assert(
+      resultText(oddSourceText) === resultText(typedText),
+      "an unrecognized inputSource should be ignored, not answered differently",
+    );
+
+    // 사진에서 알아본 이름일수록 카탈로그에 없는 말로 나오기 쉬워서, 확정된 호출만 세면
+    // 정작 궁금한 쪽(사진을 보냈는데 답을 못 준 경우)이 로그에서 통째로 빠진다.
+    await callTool(baseUrl, "get_disposal_steps", { itemName: "존재하지않는품목zzz", inputSource: "photo" }, requestId);
+    requestId += 1;
+    const disposalLogs = getOutput()
+      .split("\n")
+      .filter((line) => line.includes('"tool":"get_disposal_steps"'))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
+    // 개수는 세지 않는다. 위 파서는 stdout/stderr가 한 버퍼에 섞여 조각난 줄을 조용히
+    // 버리고, getOutput()은 응답 직후에 읽는다 — 로그 한 줄이 늦게 도착하기만 해도
+    // 정확한 개수 단언은 깨진다. 두 갈래가 각각 찍혔는지만 본다.
+    const photoLogs = disposalLogs.filter((entry) => entry.inputSource === "photo");
+    assert(
+      photoLogs.some((entry) => entry.status === "match"),
+      "a photo-sourced confirmed match should be logged as such",
+    );
+    assert(
+      photoLogs.some((entry) => entry.status === "not_found"),
+      "a photo-sourced miss should be logged too, or the photo path can only be counted when it works",
+    );
+    assert(
+      disposalLogs.some((entry) => entry.inputSource === undefined),
+      "typed calls must not carry an inputSource",
+    );
 
     // WIDGET_ENABLED is a rendering rollback, so it must not move the telemetry
     // the finals-window 지역 해상도 numbers are read off. This server runs with
@@ -1040,6 +1135,34 @@ async function runWidgetSmoke() {
       "high-confidence card should not hedge a verdict it is sure of",
     );
 
+    // 사진 경로. 서버로 이미지가 오지는 않고 호스트가 알아본 이름만 문자열로 넘어오므로,
+    // 잘못 알아본 이름도 확정 매칭으로 착지해 카드가 된다. 무엇으로 봤는지 카드에 되비춘다.
+    const photoMatch = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "기름 묻은 피자박스", inputSource: "photo" },
+      requestId,
+    );
+    requestId += 1;
+    const photoPayload = parseWidgetPayload(photoMatch, "photo-sourced match");
+    assertWidgetNode(photoPayload.widget, "photo-sourced match widget");
+    const photoValues = cardTextValues(photoPayload.widget);
+    assert(
+      photoValues.some((value) => value.includes("사진 속 물건") && value.includes(pizzaBox.name)),
+      `photo-sourced card should name what it took the photo to be: ${photoValues.join(" | ")}`,
+    );
+    assert(
+      !cardTextValues(payload.widget).some((value) => value.includes("사진 속 물건")),
+      "a typed item name must not be answered as if it came from a photo",
+    );
+    // 공유본은 사진을 보낸 적 없는 사람이 받는다. "사진 속 물건" 이야기가 거기 실리면
+    // 맥락 없이 뜬금없고, 3~6줄 예산에서 단계 한 줄을 밀어내기까지 한다.
+    assert(!photoPayload.copy_text.includes("사진 속 물건"), "copy_text must not carry the photo confirmation line");
+    assert(
+      photoPayload.copy_text === payload.copy_text,
+      "photo input must not change the share text at all",
+    );
+
     // A text answer is the host's to rewrite and carries no Kakao Tools label,
     // so a confirmed match must not depend on which of the two item tools the
     // host picked. The card is built by one shared function — this pins that
@@ -1094,6 +1217,11 @@ async function runWidgetSmoke() {
     assert(
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
+    );
+    // `_log`에 담아도 withCallLog가 출력에서 빼면 셀 수 없다 — regionStatus가 그렇게 빠져 있다.
+    assert(
+      logLines.some((line) => line.inputSource === "photo"),
+      "the photo-sourced call should reach the log output, not just the handler's _log",
     );
 
     // Same trap on the tool that just gained a widget: no structuredContent for
