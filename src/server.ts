@@ -17,6 +17,7 @@ import {
   findBulkyWasteFeeSchedule,
   findBulkyWasteFees,
   findMaterialGuideline,
+  findNamedSubRegionForMatch,
   findRegionalPolicy,
   findRegionItemGuide,
   findRegisteredDistricts,
@@ -25,6 +26,7 @@ import {
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceList,
+  formatUnregisteredDistrictScope,
   inferMaterialCategories,
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
@@ -134,7 +136,12 @@ const READ_ONLY_ANNOTATIONS = {
 type ToolLogMeta = {
   matchedId?: string;
   matchedRegion?: string;
-  /** 지역 해상도 — R7 측정이 자치구 확정/광역 폴백/전국 폴백을 이 필드로 센다. */
+  /**
+   * 지역 해상도 — R7 측정이 자치구 확정/광역 폴백/전국 폴백을 이 필드로 센다.
+   * `district` | `metro` | `unregistered_district` | `ambiguous` | `unknown`.
+   * `unregistered_district`는 사용자가 시·군·구를 댔는데 그 상세 데이터가 없어
+   * 광역으로 착지한 경우다. 다음에 어느 지역을 채울지가 이 칸에서 보인다.
+   */
   regionStatus?: string;
   score?: number;
   status?: string;
@@ -304,13 +311,18 @@ function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?
  * region-specific guide or the region check is critical. Advisory-only items
  * get no region lines, keeping "no region noise" responses noise-free.
  */
-function buildRegionNotes(item: WasteItem, regionMatch?: MatchedRegionPolicy): string[] | undefined {
+function buildRegionNotes(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined, region?: string): string[] | undefined {
   if (!regionMatch || !itemNeedsRegionCheck(item)) return undefined;
 
   const hasSpecificGuide = Boolean(findRegionItemGuide(regionMatch.region, item));
   if (!hasSpecificGuide && !itemNeedsCriticalRegionCheck(item)) return undefined;
 
-  const lines = formatRegionItemGuide(item, regionMatch);
+  // 지역 툴과 같은 갈래. 시·군·구를 이미 댄 사람에게 되묻는 대신 그 이름을 부른다.
+  // 줄 수는 그대로다 — 되묻기 한 줄이 이름 부르기 한 줄로 바뀔 뿐이라 카드의
+  // 지역 줄 두 개 예산을 밀지 않는다.
+  const lines = formatRegionItemGuide(item, regionMatch, {
+    namedSubRegion: findNamedSubRegionForMatch(regionMatch, region),
+  });
   return lines.length > 0 ? lines : undefined;
 }
 
@@ -599,16 +611,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
 function matchedItemWidget(
   item: WasteItem,
   regionMatch: MatchedRegionPolicy | undefined,
-  photoNote?: string,
+  // 이름으로 받는다. 둘 다 optional string이라 자리로 넘기면 서로 바꿔 넣어도 타입이
+  // 잡아주지 않는다 — 실제로 사진 경로와 지역 되부르기를 합치다 region이 photoNote
+  // 자리로 들어가 카드에 지역 문자열이 캡션으로 뜰 뻔했다.
+  extras: {
+    /** 사진에서 알아본 이름을 되비추는 확인 문구. 사진으로 들어온 호출에만 있다. */
+    photoNote?: string;
+    /** 사용자가 댄 원본 지역 문자열. 광역으로 착지했을 때 그 사람이 말한 시·군·구를 되부르는 데 쓴다. */
+    region?: string;
+  } = {},
 ): DisposalWidgetPayload {
   return buildDisposalWidget({
     item,
     sourceTitle: briefSourceTitle(item),
     sourceCheckedAt: briefSourceCheckedAt(item),
     regionName: regionMatch?.region.name,
-    regionNotes: buildRegionNotes(item, regionMatch),
+    regionNotes: buildRegionNotes(item, regionMatch, extras.region),
     regionFeeLine: buildRegionFeeLine(item, regionMatch),
-    photoNote,
+    photoNote: extras.photoNote,
   });
 }
 
@@ -645,7 +665,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // follow-up turn and a card closes the conversation. A confirmed match does
   // not, so it takes the same card get_disposal_steps serves.
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { region }), log);
   }
 
   const text = [
@@ -709,12 +729,12 @@ async function handleGetDisposalSteps({
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
 
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, photoNote), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);
   }
 
   // Below the widget branch on purpose: the card builds its own region lines
   // (matchedItemWidget), so this is the text path's alone.
-  const regionNotes = buildRegionNotes(item, regionMatch);
+  const regionNotes = buildRegionNotes(item, regionMatch, region);
   // 확인 문구는 안내 위에 둔다. 잘못 알아본 이름이면 아래 내용을 읽을 이유가 없다.
   const text = photoNote ? `${photoNote}\n\n${formatItemGuide(item, region)}` : formatItemGuide(item, region);
   return textResult(
@@ -921,9 +941,31 @@ function metroNarrowingLine(metro: MatchedRegionPolicy): string {
   return `${metro.region.name} 광역 기준 안내입니다. 시·군·구를 알려주시면 그 기준으로 좁혀드립니다. (상세 안내 보유: ${listed.join(", ")}${rest > 0 ? ` 외 ${rest}곳` : ""})`;
 }
 
+/**
+ * 사용자가 이미 시·군·구를 댔는데 상세 데이터가 없어 광역으로 착지한 경우.
+ *
+ * 여기서 되묻기 문구를 그대로 쓰면 방금 들은 것을 다시 묻는 셈이라, 자기 말이
+ * 무시된 것으로 읽힌다. 그렇다고 없는 데이터를 있는 척할 수는 없으므로 순서를
+ * 셋으로 고정한다 — 그 이름을 부르고, 상세 데이터가 없다고 밝히고, 그래서
+ * 광역 기준으로 간다고 잇는다. 마지막 안내는 아래 "공식 확인처"로 넘긴다.
+ * 광역 착지에는 분리배출.kr 지역별 안내와 정부24가 항상 함께 붙어서, 사용자가
+ * 자기 시·군·구 기준을 실제로 찾아갈 경로는 거기 있다.
+ *
+ * 여는 문장은 품목 툴과 공유한다(`formatUnregisteredDistrictScope`). 뒤에 붙는
+ * 안내만 이 툴의 "공식 확인처" 목록을 가리킨다 — 품목 툴에는 그 목록이 없다.
+ */
+function unregisteredDistrictLine(metro: MatchedRegionPolicy, namedSubRegion: string): string {
+  return (
+    `${formatUnregisteredDistrictScope(metro.region.name, namedSubRegion)} ` +
+    `대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 소관이니 아래 공식 확인처에서 확인해 주세요.`
+  );
+}
+
 /** 얕은 티어를 full 티어처럼 보이게 하지 않는다 — 확정되지 않은 범위를 밝힌다. */
-function regionCoverageNote(regionMatch: MatchedRegionPolicy): string | undefined {
-  if (regionMatch.level === "metro") return metroNarrowingLine(regionMatch);
+function regionCoverageNote(regionMatch: MatchedRegionPolicy, namedSubRegion?: string): string | undefined {
+  if (regionMatch.level === "metro") {
+    return namedSubRegion ? unregisteredDistrictLine(regionMatch, namedSubRegion) : metroNarrowingLine(regionMatch);
+  }
   if (regionMatch.region.coverageTier === "standard") {
     return `${regionMatch.region.name} 기준으로 대형폐기물 신청 경로와 수거함 안내까지 확인했습니다. 배출 요일과 시간은 같은 지역 안에서도 동·주택 유형별로 갈려 확정 안내에 넣지 않았습니다.`;
   }
@@ -982,6 +1024,20 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const regionCandidates = regionResolution.status === "ambiguous" ? regionResolution.candidates.map((candidate) => candidate.region.name) : undefined;
   const checkList = itemRegionCheckList(regionMatch, match?.item);
 
+  // 광역으로 착지했더라도 질의가 시·군·구를 지목했는지는 갈라 본다. 응답 문구도
+  // 로그 집계도 이 한 갈래에서 갈린다 — `metro`로 뭉뚱그리면 "충북"이라고 말한
+  // 사람과 "청주시"라고 말한 사람이 한 칸에 섞여, 다음에 어느 지역 데이터를
+  // 채워야 하는지가 집계에서 안 보인다. 값을 `metro`로 시작하지 않게 둔 건
+  // 회귀 케이스가 부분 문자열로 대조하기 때문이다.
+  const namedSubRegion = findNamedSubRegionForMatch(regionMatch, region);
+  const regionStatus = regionMatch
+    ? namedSubRegion
+      ? "unregistered_district"
+      : regionMatch.level
+    : regionCandidates
+      ? "ambiguous"
+      : "unknown";
+
   const itemLine = match
     ? `품목: ${match.item.name}`
     : ambiguousCandidates
@@ -1000,7 +1056,15 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ? `지역 요약: ${regionMatch.region.summary}`
     : `"${region}"은(는) 아직 상세 지역 데이터가 없습니다. 아래 공식 경로에서 거주 지자체 기준을 바로 확인할 수 있습니다.`;
 
-  const bulkyLines = regionMatch ? formatRegionBulkyContactLines(regionMatch.region) : [];
+  // 광역의 대형폐기물 줄은 "거주 중인 시·군·구를 확인해야 한다"가 전부라,
+  // 시·군·구를 이미 댄 사람에게는 바로 위 문구를 한 번 더 쓴 것에 지나지 않는다.
+  // 그쪽 문구가 그 이름까지 부르니 여기서는 뺀다 — 줄 수도 두 줄 줄어든다.
+  //
+  // 광역일 때로 한정하는 이유는 formatRegionItemGuide가 같은 자리에서 막는 이유와 같다.
+  // district 티어의 그 블록에는 문의 전화·인터넷 신청·수수료 조회 URL이 들어 있어서,
+  // `namedSubRegion`이 광역 착지 때만 온다는 호출부 약속에 기대면 그 셋이 소리 없이 사라진다.
+  const dropsOnlyTheReAsk = Boolean(namedSubRegion) && regionMatch?.level === "metro";
+  const bulkyLines = regionMatch && !dropsOnlyTheReAsk ? formatRegionBulkyContactLines(regionMatch.region) : [];
   const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
   const hasSchedule = Boolean(regionMatch?.region.generalWaste && regionMatch.region.recycling);
 
@@ -1011,7 +1075,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match ? `기본 판단: ${match.item.summary}` : undefined,
     match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
     regionLine,
-    regionMatch ? regionCoverageNote(regionMatch) : undefined,
+    regionMatch ? regionCoverageNote(regionMatch, namedSubRegion) : undefined,
     hasSchedule ? "" : undefined,
     hasSchedule ? `${regionMatch?.region.name} 기본 배출 기준` : undefined,
     hasSchedule ? `- 일반쓰레기: ${regionMatch?.region.generalWaste?.time}, ${regionMatch?.region.generalWaste?.place}` : undefined,
@@ -1026,7 +1090,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ...specialLines,
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
-    match && regionMatch ? formatRegionItemGuide(match.item, regionMatch).join("\n") : undefined,
+    match && regionMatch
+      ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion, subRegionScopeAlreadyShown: true }).join("\n")
+      : undefined,
     "",
     "확인할 정보",
     ...checkList.map((item, index) => `${index + 1}. ${item}`),
@@ -1053,7 +1119,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     {
       region,
       matchedRegion: regionMatch?.region.name,
-      regionStatus: regionMatch ? regionMatch.level : regionCandidates ? "ambiguous" : "unknown",
+      regionStatus,
       regionCandidates,
       coverageTier: regionMatch?.region.coverageTier,
       item: match?.item.name,
@@ -1082,7 +1148,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       matchedId: match?.item.id,
       score: match?.score,
       matchedRegion: regionMatch?.region.name,
-      regionStatus: regionMatch ? regionMatch.level : regionCandidates ? "ambiguous" : "unknown",
+      regionStatus,
     },
   );
 }

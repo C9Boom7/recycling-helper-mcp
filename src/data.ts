@@ -105,6 +105,31 @@ export type RegionalPolicyData = {
   id: string;
   name: string;
   aliases: string[];
+  /**
+   * 상세 데이터가 아직 없어 이 광역으로 받아 넘기는 시·군·구 이름들. `metro`
+   * 항목에만 둔다.
+   *
+   * 매칭에서는 `aliases`와 똑같이 쓰이지만 **뜻이 다르다** — `aliases`는 광역
+   * 자신을 부르는 여러 표기이고, 이쪽은 사용자가 실제로 지목한 기초자치단체다.
+   * 한 배열에 섞어 두면 "청주시"로 착지한 응답이 "거주 중인 시·군·구를
+   * 알려주세요"라고 되물어, 방금 들은 것을 다시 묻는 꼴이 된다. 갈라 두면
+   * 응답이 그 이름을 그대로 부를 수 있다.
+   */
+  districtAliases?: string[];
+  /**
+   * 같은 자리의 시·군·구지만 **이름만으로는 광역이 안 정해지는** 것들. 중구·동구·
+   * 서구·남구·북구·강서구는 광역시 여섯 곳에 흩어져 있고, 고성군은 강원과 경남에
+   * 하나씩, 광주시는 광주광역시와 표기가 겹친다.
+   *
+   * 그래서 `districtAliases`와 달리 **매칭에는 절대 쓰지 않는다**(`regionMatchNames`
+   * 참조). 맨 "중구"는 지금처럼 되물어야 한다 — 어느 광역인지 모르는 채로 상세
+   * 데이터가 없다고 답하면 없는 확신을 파는 것이다.
+   *
+   * 쓰이는 데는 한 곳뿐이다. 질의 앞에 이 광역의 표기가 실제로 붙어 있어서 광역이
+   * 이미 확정된 경우(`부산 중구`), 남은 조각을 지목한 이름으로 부를 수 있게 한다.
+   * `metro` 항목에만 둔다.
+   */
+  prefixOnlyDistrictAliases?: string[];
   coverageTier: RegionCoverageTier;
   /** 자치구·시가 속한 광역시도의 region id. `metro` 항목에는 없다. */
   metroId?: string;
@@ -946,6 +971,18 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
   return 0;
 }
 
+/**
+ * 이 지역으로 착지시킬 수 있는 모든 표기. 광역 자신의 이름과, 상세 데이터가
+ * 없어 이 광역이 대신 받는 시·군·구 이름을 함께 본다 — 둘을 갈라 저장할 뿐
+ * 여기서는 빠지지 않는다.
+ *
+ * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
+ * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
+ */
+function regionMatchNames(policy: RegionalPolicyData): string[] {
+  return [policy.name, ...policy.aliases, ...(policy.districtAliases ?? [])];
+}
+
 /** 한 레벨에서 주어진 강도로 매칭되는 지역들. 같은 지역이 여러 별칭으로 걸리면 하나로 접는다. */
 function regionCandidatesAt(
   policies: RegionalPolicyData[],
@@ -959,7 +996,7 @@ function regionCandidatesAt(
     if (regionMatchLevel(policy) !== level) continue;
     if (byRegionId.has(policy.id)) continue;
 
-    for (const name of [policy.name, ...policy.aliases]) {
+    for (const name of regionMatchNames(policy)) {
       if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
       byRegionId.set(policy.id, { region: policy, matchedBy: name, level });
       break;
@@ -999,6 +1036,19 @@ const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, Reg
  * "경기도 분당구"에서 `경기`가 아니라 `경기도`가 떨어진다.
  *
  * 질의가 통째로 광역명이면 떼지 않는다 — 그건 광역 참조다.
+ *
+ * 여기서는 `districtAliases`를 보지 않는다. 떼려는 건 광역 표기이지 그 밑의
+ * 시·군·구 이름이 아니다.
+ *
+ * 이 한 줄이 이 함수의 유일한 동작 변화다. 예전에는 시·군·구 이름도 `aliases`에
+ * 섞여 있어 접두어로 떨어졌고, 그래서 "안산시 성남시" 꼴이면 앞의 안산시를 떼고
+ * 뒤의 성남시로 착지했다. 이제는 경기도로 착지한다. 실사용 질의로는 나올 일이
+ * 없다 — 한국어 주소는 큰 단위부터 적으니 미등록 시·군 이름이 등록된 시 앞에
+ * 오지 않는다. 게다가 이 경로는 광역 안에 등록된 하위 지역을 찾는 것이라,
+ * 서울 밖에서 그런 하위 지역을 가진 광역은 경기도뿐이다.
+ *
+ * 뒤쪽 논거는 지금 데이터에서만 참이다. 두 번째 도에 상세 데이터를 가진 시·군·구가
+ * 등록되는 순간 "닿을 일이 없다"가 깨지므로, 그때는 이 동작을 다시 봐야 한다.
  */
 function splitLeadingMetro(
   policies: RegionalPolicyData[],
@@ -1079,6 +1129,68 @@ export function resolveRegionalPolicy(region?: string): RegionResolution {
 export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undefined {
   const resolved = resolveRegionalPolicy(region);
   return resolved.status === "match" ? resolved.match : undefined;
+}
+
+/**
+ * 광역으로 착지했지만 질의가 특정 시·군·구를 지목했다면 그 이름.
+ *
+ * 전국 기초자치단체는 226곳인데 상세 데이터는 32곳뿐이라 대부분은 광역으로
+ * 내려앉는다. 착지 자체는 의도한 설계지만, `matchedBy`만 봐서는 "청주시"라고
+ * 말한 사람과 "충북"이라고 말한 사람을 가르지 못한다. 앞사람에게까지 "거주
+ * 중인 시·군·구를 알려주세요"라고 되물으면 방금 들은 것을 다시 묻는 셈이다.
+ *
+ * `matchedBy`를 그대로 쓰지 않는 이유는 "부산 해운대구"다 — 이건 광역 접두
+ * 강도로 걸려 `matchedBy`가 "부산"이 된다. 그래서 질의에서 광역 표기를 뗀
+ * 나머지도 함께 본다.
+ *
+ * 뗀 나머지에서만 `prefixOnlyDistrictAliases`까지 본다. "부산 중구"는 앞의
+ * "부산"이 이미 광역을 확정했으므로 남은 "중구"를 지목하는 데 위험이 없지만,
+ * 맨 "중구"는 어느 광역인지 모른 채 답하는 것이라 되물어야 한다.
+ */
+export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): string | undefined {
+  const districtAliases = metro.districtAliases ?? [];
+  const prefixOnlyAliases = metro.prefixOnlyDistrictAliases ?? [];
+  if ((districtAliases.length === 0 && prefixOnlyAliases.length === 0) || !region) return undefined;
+
+  const normalizedQuery = normalizeText(region);
+  if (!normalizedQuery) return undefined;
+
+  const ownNames = new Set([metro.name, ...metro.aliases].map((name) => normalizeText(name)).filter(Boolean));
+
+  // 이 광역의 표기를 실제로 떼어낸 조각들. "떼어낸 게 있다" 자체가 뒤에서 근거로
+  // 쓰이므로 질의 전체와 갈라 둔다.
+  const strippedTargets: string[] = [];
+  for (const name of ownNames) {
+    if (normalizedQuery === name || !normalizedQuery.startsWith(name)) continue;
+    const rest = normalizedQuery.slice(name.length);
+    if (rest) strippedTargets.push(rest);
+  }
+
+  // 강도 기준은 지역 매칭과 같다. 앞부분으로만 겹치게 두어야 "부산 사상구"의
+  // 뒷조각이 엉뚱한 이름에 걸리지 않는다. 목록에 있는 이름에만 걸리므로
+  // "부산 어쩌구"의 "어쩌구"는 아무것도 지목하지 못한다.
+  //
+  // 광역 자신을 부르는 표기는 아예 후보에서 뺀다. 안 그러면 "제주"가 접두
+  // 조각으로 "제주시"에 걸려, 도 전체를 물은 사람에게 시 하나를 지목했다고
+  // 답한다. 광역명으로 말한 사람에게는 되묻는 쪽이 맞다.
+  let best: { alias: string; strength: RegionMatchStrength } | undefined;
+  const consider = (target: string, aliases: string[]): void => {
+    if (ownNames.has(target)) return;
+    for (const alias of aliases) {
+      const strength = regionMatchStrength(target, normalizeText(alias));
+      if (!strength) continue;
+      if (!best || strength > best.strength) best = { alias, strength };
+    }
+  };
+
+  for (const target of [normalizedQuery, ...strippedTargets]) consider(target, districtAliases);
+
+  // 이름만으로 광역이 안 정해지는 쪽은 **떼어낸 조각에만** 건다. 광역 표기가
+  // 앞에 붙어 있었다는 게 곧 광역이 확정됐다는 뜻이라, 남은 "중구"를 지목하는 데
+  // 위험이 없다. 맨 "중구"는 여기 닿지 않아 예전처럼 되묻는다.
+  for (const target of strippedTargets) consider(target, prefixOnlyAliases);
+
+  return best?.alias;
 }
 
 /** 광역 안내로 착지했을 때 "어느 구인지" 좁히도록 되짚어줄 등록된 자치구들. */
@@ -1293,7 +1405,52 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
   ];
 }
 
-export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegionPolicy): string[] {
+/**
+ * 광역으로 착지했을 때만 질의가 지목한 시·군·구를 되짚는다.
+ *
+ * 세 툴이 저마다 이 갈래를 적으면 한 곳만 빠뜨려도 같은 질의에 다른 답이 나간다.
+ * 실제로 그런 적이 있어서(지역 툴만 고치고 품목 툴은 되묻던 시기) 한곳에 둔다.
+ */
+export function findNamedSubRegionForMatch(
+  regionMatch: MatchedRegionPolicy | undefined,
+  region?: string,
+): string | undefined {
+  return regionMatch?.level === "metro" ? findNamedSubRegion(regionMatch.region, region) : undefined;
+}
+
+/**
+ * "청주시 상세 데이터는 아직 없어 충청북도 광역 기준으로 안내합니다."
+ *
+ * 시·군·구를 이미 댔는데 광역으로 착지한 응답은 어느 툴이 답하든 이 문장으로 연다.
+ * 뒤에 무엇을 잇는지는 툴마다 다르다 — 지역 툴은 응답 아래 "공식 확인처"로 넘기고,
+ * 품목 툴에는 그 목록이 없어 시·군·구 공식 안내로 넘긴다. 여는 문장까지 갈리면
+ * 호스트가 어느 툴을 고르느냐에 따라 같은 질문에 다른 답이 나간다.
+ */
+export function formatUnregisteredDistrictScope(metroName: string, namedSubRegion: string): string {
+  return `${namedSubRegion} 상세 데이터는 아직 없어 ${metroName} 광역 기준으로 안내합니다.`;
+}
+
+export type RegionItemGuideOptions = {
+  /**
+   * 질의가 지목한 시·군·구 이름. `findNamedSubRegionForMatch`가 돌려준 값을 그대로 넘긴다.
+   * 넘어오면 "거주 중인 시·군·구를 확인해야" 되묻기를 그 이름을 부르는 줄로 갈아끼운다 —
+   * 방금 들은 것을 다시 묻지 않으면서, 광역 기준으로 답한다는 사실은 그대로 밝힌다.
+   */
+  namedSubRegion?: string;
+  /**
+   * 호출부가 응답 위쪽에서 이미 그 이름을 부르고 범위를 밝혔으면 `true`.
+   * `get_region_disposal_info`가 그렇다 — 한 응답에 같은 말을 두 번 쓰지 않으려고
+   * 그때는 갈아끼우는 대신 지운다. 이건 문장 중복을 피하는 선택일 뿐이라,
+   * 켜고 끄는 것으로 연락처가 사라지는 일은 아래에서 막는다.
+   */
+  subRegionScopeAlreadyShown?: boolean;
+};
+
+export function formatRegionItemGuide(
+  item: WasteItem,
+  regionMatch?: MatchedRegionPolicy,
+  { namedSubRegion, subRegionScopeAlreadyShown }: RegionItemGuideOptions = {},
+): string[] {
   if (!regionMatch) return [];
 
   const { region } = regionMatch;
@@ -1329,7 +1486,20 @@ export function formatRegionItemGuide(item: WasteItem, regionMatch?: MatchedRegi
           ? "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
           : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
 
-    return [bulkyLine, ...formatRegionBulkyContactLines(region), ...bulkyWasteFeeLines];
+    // 되묻기를 걷어내는 건 **metro 티어에서만**이다. 그 티어의 연락처 블록은
+    // "거주 중인 시·군·구를 확인해야" 한 줄이 전부라 갈아끼워도 잃는 URL이 없지만,
+    // district 티어에는 문의 전화·인터넷 신청·수수료 조회가 들어 있다.
+    // `namedSubRegion`이 넘어오는 건 광역 착지 때뿐이라는 호출부 약속에 기대면,
+    // 나중에 다른 툴로 넓히는 순간 그 셋이 소리 없이 사라진다 — 여기서 막는다.
+    const contactLines =
+      namedSubRegion && isMetro
+        ? subRegionScopeAlreadyShown
+          ? []
+          : [
+              `- ${formatUnregisteredDistrictScope(region.name, namedSubRegion)} 대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 공식 안내에서 확인하세요.`,
+            ]
+        : formatRegionBulkyContactLines(region);
+    return [bulkyLine, ...contactLines, ...bulkyWasteFeeLines];
   }
 
   if (item.disposalType.includes("special_collection")) {
@@ -1347,9 +1517,12 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   const hasSpecificRegionGuide = Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item));
   const needsCriticalRegionCheck = itemNeedsCriticalRegionCheck(item);
   const needsAdvisoryRegionCheck = itemNeedsRegionCheck(item) && !needsCriticalRegionCheck;
+  // "청주시 사는데 소파 어떻게 버려?"는 지역 툴보다 여기로 더 자주 온다. 지역 툴과
+  // 같은 갈래를 타지 않으면 같은 입력이 호스트의 툴 선택에 따라 다르게 답한다.
+  const namedSubRegion = findNamedSubRegionForMatch(regionMatch, region);
   const regionGuideLines =
     itemNeedsRegionCheck(item) && (hasSpecificRegionGuide || needsCriticalRegionCheck)
-      ? formatRegionItemGuide(item, regionMatch)
+      ? formatRegionItemGuide(item, regionMatch, { namedSubRegion })
       : [];
   const hasRegionGuide = regionGuideLines.length > 0;
   const lines = [

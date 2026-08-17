@@ -3606,7 +3606,9 @@
       "부산",
       "부산시",
       "부산광역시",
-      "busan",
+      "busan"
+    ],
+    "districtAliases": [
       "영도구",
       "부산진구",
       "동래구",
@@ -3617,6 +3619,14 @@
       "수영구",
       "사상구",
       "기장군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "중구",
+      "서구",
+      "동구",
+      "남구",
+      "북구",
+      "강서구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3638,11 +3648,20 @@
       "대구",
       "대구시",
       "대구광역시",
-      "daegu",
+      "daegu"
+    ],
+    "districtAliases": [
       "수성구",
       "달서구",
       "달성군",
       "군위군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "중구",
+      "동구",
+      "서구",
+      "남구",
+      "북구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3664,7 +3683,9 @@
       "인천",
       "인천시",
       "인천광역시",
-      "incheon",
+      "incheon"
+    ],
+    "districtAliases": [
       "미추홀구",
       "연수구",
       "남동구",
@@ -3672,6 +3693,11 @@
       "계양구",
       "강화군",
       "옹진군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "중구",
+      "동구",
+      "서구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3693,8 +3719,16 @@
       "광주",
       "광주시",
       "광주광역시",
-      "gwangju",
+      "gwangju"
+    ],
+    "districtAliases": [
       "광산구"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "동구",
+      "서구",
+      "남구",
+      "북구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3716,9 +3750,16 @@
       "대전",
       "대전시",
       "대전광역시",
-      "daejeon",
+      "daejeon"
+    ],
+    "districtAliases": [
       "유성구",
       "대덕구"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "동구",
+      "중구",
+      "서구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3740,8 +3781,16 @@
       "울산",
       "울산시",
       "울산광역시",
-      "ulsan",
+      "ulsan"
+    ],
+    "districtAliases": [
       "울주군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "중구",
+      "남구",
+      "동구",
+      "북구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3784,7 +3833,9 @@
     "aliases": [
       "경기",
       "경기도",
-      "gyeonggi",
+      "gyeonggi"
+    ],
+    "districtAliases": [
       "안산시",
       "안양시",
       "평택시",
@@ -3809,6 +3860,9 @@
       "가평군",
       "연천군"
     ],
+    "prefixOnlyDistrictAliases": [
+      "광주시"
+    ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
     "summary": "경기도는 수도권 생활폐기물 직매립 금지에 맞춰 분리배출 인프라 확충과 다회용기 생활화, 수거보상제 확대, 처리시설 현대화를 축으로 생활폐기물 감량을 추진합니다. 도 누리집이 도 차원의 안내를 제공하지만 거점배출시설 설치처럼 실행은 시군 단위로 진행됩니다. 배출 요일과 시간, 수수료, 대형폐기물 신청 경로는 31개 시군이 각각 정하므로 거주 시군에서 확인해야 합니다.",
@@ -3829,7 +3883,9 @@
       "강원",
       "강원도",
       "강원특별자치도",
-      "gangwon",
+      "gangwon"
+    ],
+    "districtAliases": [
       "춘천시",
       "원주시",
       "강릉시",
@@ -3847,6 +3903,9 @@
       "양구군",
       "인제군",
       "양양군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "고성군"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3867,7 +3926,9 @@
     "aliases": [
       "충남",
       "충청남도",
-      "chungnam",
+      "chungnam"
+    ],
+    "districtAliases": [
       "천안시",
       "공주시",
       "보령시",
@@ -3903,7 +3964,9 @@
     "aliases": [
       "경북",
       "경상북도",
-      "gyeongbuk",
+      "gyeongbuk"
+    ],
+    "districtAliases": [
       "포항시",
       "경주시",
       "김천시",
@@ -3947,7 +4010,9 @@
       "제주",
       "제주도",
       "제주특별자치도",
-      "jeju",
+      "jeju"
+    ],
+    "districtAliases": [
       "제주시",
       "서귀포시"
     ],
@@ -3970,7 +4035,9 @@
     "aliases": [
       "충북",
       "충청북도",
-      "chungbuk",
+      "chungbuk"
+    ],
+    "districtAliases": [
       "청주시",
       "충주시",
       "제천시",
@@ -4002,7 +4069,9 @@
     "aliases": [
       "전북",
       "전북특별자치도",
-      "jeonbuk",
+      "jeonbuk"
+    ],
+    "districtAliases": [
       "전주시",
       "군산시",
       "익산시",
@@ -4037,7 +4106,9 @@
     "aliases": [
       "전남",
       "전라남도",
-      "jeonnam",
+      "jeonnam"
+    ],
+    "districtAliases": [
       "목포시",
       "여수시",
       "순천시",
@@ -4080,7 +4151,9 @@
     "aliases": [
       "경남",
       "경상남도",
-      "gyeongnam",
+      "gyeongnam"
+    ],
+    "districtAliases": [
       "창원시",
       "진주시",
       "통영시",
@@ -4098,6 +4171,9 @@
       "함양군",
       "거창군",
       "합천군"
+    ],
+    "prefixOnlyDistrictAliases": [
+      "고성군"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
