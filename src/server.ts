@@ -602,6 +602,52 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
 }
 
 /**
+ * 지역 해상도 한 낱말, 품목 툴 쪽. 세 툴이 같은 어휘로 남겨야 집계가 한 축으로 서는데
+ * 지역 툴만 값을 남기고 있었다 — 사용자가 자기 구를 말하는 건 오히려 품목 질문 쪽이 더
+ * 흔하다("청주시 사는데 소파 어떻게 버려?").
+ *
+ * `unknown`은 "찾아봤는데 없더라"만 뜻한다. 찾아본 적 없는 호출까지 거기 뭉치면 이 필드가
+ * 재려는 미등록 지역 수요가 통째로 부풀려진다.
+ */
+function regionStatusFor(region: string | undefined): string | undefined {
+  // 안 물었으면 이 축에 셀 것이 없다. 공백만 넣은 것도 안 물은 것으로 본다 —
+  // `optionalRegionParam`에 `.min(1)`도 trim도 없어서 `" "`가 그대로 들어오고,
+  // 그대로 조회하면 `unknown`이 되어 "찾아봤는데 없더라" 칸을 오염시킨다.
+  if (!region?.trim()) return undefined;
+  const resolved = resolveRegionalPolicy(region);
+  if (resolved.status === "match") {
+    return findNamedSubRegionForMatch(resolved.match, region) ? "unregistered_district" : resolved.match.level;
+  }
+  // 되묻기 갈래를 살려둔다. `findRegionalPolicy`는 그 상태를 버리고 undefined만
+  // 돌려주므로, 그것만 보면 같은 질의가 지역 툴에서는 `ambiguous`, 품목 툴에서는
+  // `unknown`으로 갈려 세 툴을 한 축으로 못 센다.
+  return resolved.status === "ambiguous" ? "ambiguous" : "unknown";
+}
+
+/**
+ * 품목이 확정됐을 때의 지역 해상도. 지역을 물었어도 그 품목은 지역이 답을 바꾸지 않아
+ * 조회 자체를 안 한 경우가 있다 — 두 핸들러가 `itemNeedsRegionCheck`로 막고, 324개 중
+ * 224개가 여기 해당한다. 그 호출까지 `unknown`으로 세면 미등록 지역 수요가 부풀려진다.
+ *
+ * 값은 `regionStatusFor`가 다시 계산한다. `regionMatch`를 넘겨받아 아끼는 대신 한 곳에서만
+ * 정의되게 뒀다 — 어휘가 갈리면 집계가 조용히 어긋나는 쪽이 더 비싸다.
+ */
+function itemRegionStatus(region: string | undefined, item: WasteItem): string | undefined {
+  return itemNeedsRegionCheck(item) ? regionStatusFor(region) : undefined;
+}
+
+/**
+ * 품목을 못 찾았거나 되물어야 하는 갈래에도 지역 해상도를 남긴다. 두 핸들러가 그 갈래에서
+ * 먼저 return하는 바람에, 지역을 댔는데도 로그에는 안 물은 것처럼 남았다.
+ * **하필 이쪽이 이 필드가 재려는 수요 그 자체다** — 미등록 지역 사람이 카탈로그에 없는
+ * 품목을 묻는 경우라, 빠지면 "그 지역을 채워야 한다"는 신호가 가장 센 표본을 놓친다.
+ */
+function withRegionStatusLog(result: LoggedToolResult, region: string | undefined): LoggedToolResult {
+  const regionStatus = regionStatusFor(region);
+  return regionStatus ? { ...result, _log: { ...result._log, regionStatus } } : result;
+}
+
+/**
  * The card for a confirmed match, shared by the two tools that resolve a single
  * item. Kakao renders a widget as-is while a text answer is the host's to
  * rewrite (Kakao Tools 개발 가이드 §3), and the `Kakao Tools · 재활용척척` label
@@ -648,8 +694,10 @@ function photoConfirmLine(item: WasteItem): string {
 
 async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
   const resolved = resolveWasteItem(itemName);
-  if (resolved.status === "not_found") return unknownItemResult(itemName);
-  if (resolved.status === "ambiguous") return ambiguousItemResult(itemName, resolved.candidates);
+  if (resolved.status === "not_found") return withRegionStatusLog(unknownItemResult(itemName), region);
+  if (resolved.status === "ambiguous") {
+    return withRegionStatusLog(ambiguousItemResult(itemName, resolved.candidates), region);
+  }
 
   const { match } = resolved;
   const { item } = match;
@@ -659,7 +707,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // widget branch, flipping it off would also drop `matchedRegion` from the
   // logs, and the finals-window 지역 해상도 numbers are read off those.
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item) };
 
   // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
   // follow-up turn and a card closes the conversation. A confirmed match does
@@ -717,16 +765,18 @@ async function handleGetDisposalSteps({
   const resolved = resolveWasteItem(itemName);
   // 되묻는 두 갈래는 이미 "이게 맞냐"고 묻고 있어서 확인 문구를 겹쳐 붙일 자리가 없다.
   // 사진에서 왔다는 표시만 로그에 남긴다.
-  if (resolved.status === "not_found") return withInputSourceLog(unknownItemResult(itemName), inputSource);
+  if (resolved.status === "not_found") {
+    return withRegionStatusLog(withInputSourceLog(unknownItemResult(itemName), inputSource), region);
+  }
   if (resolved.status === "ambiguous") {
-    return withInputSourceLog(ambiguousItemResult(itemName, resolved.candidates), inputSource);
+    return withRegionStatusLog(withInputSourceLog(ambiguousItemResult(itemName, resolved.candidates), inputSource), region);
   }
 
   const { match } = resolved;
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const photoNote = inputSource === "photo" ? photoConfirmLine(item) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item), inputSource };
 
   if (WIDGET_ENABLED) {
     return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);
@@ -1206,6 +1256,7 @@ function withCallLog(
           status: _log?.status ?? callStatus(result),
           matchedId: _log?.matchedId,
           matchedRegion: _log?.matchedRegion,
+          regionStatus: _log?.regionStatus,
           score: _log?.score,
           matched: _log?.matched,
           total: _log?.total,

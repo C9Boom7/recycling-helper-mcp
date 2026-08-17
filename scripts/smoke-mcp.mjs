@@ -20,6 +20,9 @@ const PLAYMCP_ORIGINS = [
   "https://tools.kakao.com",
 ];
 const STARTUP_TIMEOUT_MS = 15_000;
+// 응답이 돌아온 뒤 그 호출의 로그 줄이 stdout 파이프를 건너오기까지 기다리는 상한.
+// 한 번 읽고 단언하면 맞는 코드에서도 이따금 실패한다.
+const LOG_FLUSH_TIMEOUT_MS = 2_000;
 const EXPECTED_PROTOCOL_VERSION = "2025-03-26";
 const EXPECTED_SERVER_INFO = {
   name: "recycling-helper",
@@ -816,10 +819,108 @@ async function runSmoke() {
       `classify text path logged matchedRegion=${classifyTextLog.matchedRegion}, expected it to match the widget path`,
     );
 
+    // `regionStatus`는 지역 해상도(자치구 확정 / 광역 폴백 / 미등록 시·군·구)를 세는
+    // 필드인데, 핸들러가 `_log`에 담고도 `withCallLog`가 찍지 않아 운영 로그에서 아예
+    // 읽을 수 없었다. `structuredContent` 사본만 살아남았고 그건 응답이지 로그가 아니다.
+    // 값이 하나뿐이면 상수를 찍어도 통과하므로 서로 다른 갈래 셋을 함께 본다.
+    const regionStatusExpectations = [
+      { region: "서울 강남구", matchedRegion: "서울 강남구", expected: "district" },
+      { region: "청주시", matchedRegion: "충청북도", expected: "unregistered_district" },
+      { region: "충북", matchedRegion: "충청북도", expected: "metro" },
+    ];
+    for (const { region, matchedRegion, expected } of regionStatusExpectations) {
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_region_disposal_info",
+        // 지역 원문은 로그에 없으니(개인정보) `matchedRegion`과 짝지어 찾는다 — 청주시와
+        // 충북은 같은 광역으로 착지하므로 그 짝이 있어야 두 갈래가 갈린다.
+        seen: (entry) => entry.matchedRegion === matchedRegion && entry.regionStatus === expected,
+        call: () => callTool(baseUrl, "get_region_disposal_info", { region }, requestId++),
+        what: `${region} → matchedRegion=${matchedRegion}, regionStatus=${expected}`,
+      });
+    }
+
+    // 품목 툴도 같은 어휘로 남겨야 집계가 한 축으로 선다 — 사용자가 자기 구를 말하는 건
+    // 오히려 이쪽이 더 흔하다. 지역을 안 물은 호출은 값이 없어야 한다. "안 물었다"와
+    // "물었는데 못 찾았다"가 같은 값으로 뭉치면 미등록 지역 수요가 부풀려진다.
+    const itemRegionExpectations = [
+      { id: "sofa", args: { itemName: "소파", region: "청주시" }, expected: "unregistered_district" },
+      { id: "sofa", args: { itemName: "소파", region: "서울 강남구" }, expected: "district" },
+      { id: "sofa", args: { itemName: "소파" }, expected: undefined },
+      // 되묻기 갈래. `findRegionalPolicy`가 그 상태를 버리므로 한 번 더 보지 않으면
+      // 지역 툴은 `ambiguous`, 품목 툴은 `unknown`으로 갈린다. 로마자 접두어가
+      // 여러 지역에 걸리는 실제 입력이다.
+      { id: "sofa", args: { itemName: "소파", region: "seong" }, expected: "ambiguous" },
+      // 지역을 물었지만 이 품목은 조회 자체를 안 한다(324개 중 224개). 여기에 `unknown`을
+      // 남기면 미등록 지역 수요가 통째로 부풀려진다 — 값이 아예 없어야 한다.
+      { id: "pizza_box_oily", args: { itemName: "기름 묻은 피자박스", region: "서울 강남구" }, expected: undefined },
+      // 공백만 넣은 것도 안 물은 것이다. `optionalRegionParam`에 min(1)도 trim도 없어서
+      // 그대로 들어오는데, 조회하면 `unknown`이 되어 "찾아봤는데 없더라" 칸을 오염시킨다.
+      { id: "sofa", args: { itemName: "소파", region: "   " }, expected: undefined },
+    ];
+    for (const { id, args, expected } of itemRegionExpectations) {
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_disposal_steps",
+        seen: (entry) => entry.matchedId === id && entry.regionStatus === expected,
+        call: () => callTool(baseUrl, "get_disposal_steps", args, requestId++),
+        what: `${args.itemName} + region=${args.region ?? "(none)"} → regionStatus=${expected}`,
+      });
+    }
+
+    // 품목을 못 찾은 갈래에도 지역 해상도가 남아야 한다. **하필 이쪽이 이 필드가 재려는
+    // 수요 그 자체다** — 미등록 지역 사람이 카탈로그에 없는 품목을 묻는 경우라, 빠지면
+    // "그 지역을 채워야 한다"는 신호가 가장 센 표본을 놓친다. 두 핸들러가 이 갈래에서
+    // 먼저 return해서 실제로 빠져 있었다.
+    for (const status of ["not_found", "ambiguous"]) {
+      const itemName = status === "not_found" ? "존재하지않는품목zzz" : "전구";
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_disposal_steps",
+        seen: (entry) => entry.status === status && entry.regionStatus === "unregistered_district",
+        call: () => callTool(baseUrl, "get_disposal_steps", { itemName, region: "청주시" }, requestId++),
+        what: `${status} + region=청주시 → regionStatus=unregistered_district`,
+      });
+    }
+
     console.log(`MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases)`);
   } finally {
     stopServer();
   }
+}
+
+/**
+ * 한 번의 툴 호출이 남긴 로그 줄만 보고 단언한다. 이 자리에서 두 번 틀렸다.
+ *
+ * 1. 응답이 돌아와도 그 호출의 로그 줄은 아직 stdout 파이프에 있을 수 있다.
+ *    한 번 읽고 단언하면 맞는 코드에서도 이따금 실패한다 — 그래서 기다린다.
+ * 2. 그렇다고 전체 출력을 `.some()`으로 뒤지면 앞선 answer case가 남긴 줄에 걸려
+ *    통과한다. 실제로 `pizza_box_oily`는 지역 없이 부르는 케이스가 많아, 검사가
+ *    보려던 갈래를 지워도 초록불이 떴다.
+ *
+ * 그래서 호출 직전 길이를 재고 그 뒤에 붙은 줄만 본다.
+ */
+async function awaitLoggedCall({ getOutput, tool, seen, call, what }) {
+  const offset = getOutput().length;
+  await call();
+  const fresh = () =>
+    getOutput()
+      .slice(offset)
+      .split("\n")
+      .filter((line) => line.includes(`"tool":"${tool}"`))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
+
+  const startedAt = Date.now();
+  while (!fresh().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  assert(fresh().some(seen), `${tool} call did not log ${what} (saw: ${JSON.stringify(fresh())})`);
 }
 
 function parseWidgetPayload(result, context) {
@@ -1255,7 +1356,9 @@ async function runWidgetSmoke() {
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
     );
-    // `_log`에 담아도 withCallLog가 출력에서 빼면 셀 수 없다 — regionStatus가 그렇게 빠져 있다.
+    // `_log`에 담아도 withCallLog가 출력에서 빼면 셀 수 없다. regionStatus가 실제로 그렇게
+    // 빠져 있었고, 응답의 structuredContent 사본만 남아 로그로는 집계가 불가능했다.
+    // 그래서 필드마다 "줄에 실제로 나오는지"를 이렇게 따로 고정한다.
     assert(
       logLines.some((line) => line.inputSource === "photo"),
       "the photo-sourced call should reach the log output, not just the handler's _log",

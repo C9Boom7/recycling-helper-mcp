@@ -130,6 +130,8 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 | `score` | 매칭 점수. 88 미만이면 폴백 티어에서 걸린 것 |
 | `matched` / `total` | 후보 수. `ambiguous`의 후보 폭을 본다 |
 | `fallbackTier` | `not_found`가 착지한 곳. 재질 id면 추정이 먹힌 것, `menu`면 단서가 없어 재질 메뉴만 편 것 |
+| `regionStatus` | 지역이 어디까지 좁혀졌는지. `district`(자치구 확정) / `unregistered_district`(시·군·구를 댔지만 상세 데이터 없음) / `metro`(광역만 지목) / `ambiguous`(후보가 여럿이라 되물음) / `unknown`(찾아봤는데 없음). **값이 없으면 지역을 안 봤다는 뜻이다** — 지역을 안 물었거나(공백만 넣은 것도 포함), 물었어도 그 품목은 지역이 답을 바꾸지 않아 조회하지 않은 경우다. `unknown`과 뭉치지 않는다 |
+| `inputSource` | `photo`면 품목명이 사진에서 온 것. **없다고 직접 친 것은 아니다** — `get_disposal_steps`에만 있는 파라미터라 `classify_waste_item`이나 `make_cleanup_plan`으로 간 사진은 안 잡히고, 호스트가 `"image"` 같은 다른 값을 보내면 조용히 무시된다. 사진 트래픽의 하한으로만 읽는다 |
 | `errorName` / `errorAt` | `error`일 때만. 예외 클래스 이름과 스택 맨 윗줄(파일:라인) |
 | `ms` | 서버 처리 시간. 한 자릿수가 정상이다 |
 
