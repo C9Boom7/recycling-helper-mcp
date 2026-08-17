@@ -854,6 +854,9 @@ async function runSmoke() {
       // 지역을 물었지만 이 품목은 조회 자체를 안 한다(324개 중 224개). 여기에 `unknown`을
       // 남기면 미등록 지역 수요가 통째로 부풀려진다 — 값이 아예 없어야 한다.
       { id: "pizza_box_oily", args: { itemName: "기름 묻은 피자박스", region: "서울 강남구" }, expected: undefined },
+      // 공백만 넣은 것도 안 물은 것이다. `optionalRegionParam`에 min(1)도 trim도 없어서
+      // 그대로 들어오는데, 조회하면 `unknown`이 되어 "찾아봤는데 없더라" 칸을 오염시킨다.
+      { id: "sofa", args: { itemName: "소파", region: "   " }, expected: undefined },
     ];
     for (const { id, args, expected } of itemRegionExpectations) {
       await awaitLoggedCall({
@@ -862,6 +865,21 @@ async function runSmoke() {
         seen: (entry) => entry.matchedId === id && entry.regionStatus === expected,
         call: () => callTool(baseUrl, "get_disposal_steps", args, requestId++),
         what: `${args.itemName} + region=${args.region ?? "(none)"} → regionStatus=${expected}`,
+      });
+    }
+
+    // 품목을 못 찾은 갈래에도 지역 해상도가 남아야 한다. **하필 이쪽이 이 필드가 재려는
+    // 수요 그 자체다** — 미등록 지역 사람이 카탈로그에 없는 품목을 묻는 경우라, 빠지면
+    // "그 지역을 채워야 한다"는 신호가 가장 센 표본을 놓친다. 두 핸들러가 이 갈래에서
+    // 먼저 return해서 실제로 빠져 있었다.
+    for (const status of ["not_found", "ambiguous"]) {
+      const itemName = status === "not_found" ? "존재하지않는품목zzz" : "전구";
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_disposal_steps",
+        seen: (entry) => entry.status === status && entry.regionStatus === "unregistered_district",
+        call: () => callTool(baseUrl, "get_disposal_steps", { itemName, region: "청주시" }, requestId++),
+        what: `${status} + region=청주시 → regionStatus=unregistered_district`,
       });
     }
 
