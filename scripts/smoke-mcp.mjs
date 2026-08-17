@@ -20,6 +20,9 @@ const PLAYMCP_ORIGINS = [
   "https://tools.kakao.com",
 ];
 const STARTUP_TIMEOUT_MS = 15_000;
+// 응답이 돌아온 뒤 그 호출의 로그 줄이 stdout 파이프를 건너오기까지 기다리는 상한.
+// 한 번 읽고 단언하면 맞는 코드에서도 이따금 실패한다.
+const LOG_FLUSH_TIMEOUT_MS = 2_000;
 const EXPECTED_PROTOCOL_VERSION = "2025-03-26";
 const EXPECTED_SERVER_INFO = {
   name: "recycling-helper",
@@ -829,24 +832,64 @@ async function runSmoke() {
       await callTool(baseUrl, "get_region_disposal_info", { region }, requestId);
       requestId += 1;
     }
-    // 줄 순서에 기대지 않는다. 로그는 stdout/stderr가 한 버퍼에 섞이고 응답 직후에는
-    // 아직 안 실린 줄이 있어서, `.at(-1)`로 잡으면 앞선 answer case의 줄을 읽는다.
+    // 줄 순서에 기대지 않는다 — 응답이 돌아온 뒤에도 그 호출의 로그 줄은 아직
+    // stdout 파이프에 남아 있을 수 있다. 마지막 줄을 집으면 앞선 answer case의 줄을
+    // 읽고, 한 번 읽고 단언하면 맞는 코드에서도 실패한다. 그래서 나타날 때까지 기다린다.
     // 지역 원문은 로그에 없으니(개인정보) `matchedRegion`과 짝지어 찾는다 — 청주시와
     // 충북은 같은 광역으로 착지하므로 그 짝이 있어야 두 갈래가 갈린다.
-    const regionLogs = getOutput()
-      .split("\n")
-      .filter((line) => line.includes('"tool":"get_region_disposal_info"'))
-      .flatMap((line) => {
-        try {
-          return [JSON.parse(line)];
-        } catch {
-          return [];
-        }
-      });
+    const regionLogEntries = () =>
+      getOutput()
+        .split("\n")
+        .filter((line) => line.includes('"tool":"get_region_disposal_info"'))
+        .flatMap((line) => {
+          try {
+            return [JSON.parse(line)];
+          } catch {
+            return [];
+          }
+        });
     for (const { region, matchedRegion, expected } of regionStatusExpectations) {
+      const seen = (entry) => entry.matchedRegion === matchedRegion && entry.regionStatus === expected;
+      const startedAt = Date.now();
+      while (!regionLogEntries().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
       assert(
-        regionLogs.some((entry) => entry.matchedRegion === matchedRegion && entry.regionStatus === expected),
+        regionLogEntries().some(seen),
         `no log line for ${region} carried matchedRegion=${matchedRegion} with regionStatus=${expected}`,
+      );
+    }
+
+    // 품목 툴도 같은 어휘로 남겨야 집계가 한 축으로 선다 — 사용자가 자기 구를 말하는 건
+    // 오히려 이쪽이 더 흔하다. 지역을 안 물은 호출은 값이 없어야 한다. "안 물었다"와
+    // "물었는데 못 찾았다"가 같은 값으로 뭉치면 미등록 지역 수요가 부풀려진다.
+    const itemRegionExpectations = [
+      { args: { itemName: "소파", region: "청주시" }, expected: "unregistered_district" },
+      { args: { itemName: "소파", region: "서울 강남구" }, expected: "district" },
+      { args: { itemName: "소파" }, expected: undefined },
+    ];
+    for (const { args, expected } of itemRegionExpectations) {
+      await callTool(baseUrl, "get_disposal_steps", args, requestId);
+      requestId += 1;
+      const seen = (entry) => entry.matchedId === "sofa" && entry.regionStatus === expected;
+      const entries = () =>
+        getOutput()
+          .split("\n")
+          .filter((line) => line.includes('"tool":"get_disposal_steps"'))
+          .flatMap((line) => {
+            try {
+              return [JSON.parse(line)];
+            } catch {
+              return [];
+            }
+          });
+      const startedAt = Date.now();
+      while (!entries().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      assert(
+        entries().some(seen),
+        `get_disposal_steps with region=${args.region ?? "(none)"} should log regionStatus=${expected}`,
       );
     }
 
@@ -1289,7 +1332,9 @@ async function runWidgetSmoke() {
       logLines[0].status === "match" && logLines[0].matchedId === "pizza_box_oily",
       `widget call logged status=${logLines[0].status}, matchedId=${logLines[0].matchedId}`,
     );
-    // `_log`에 담아도 withCallLog가 출력에서 빼면 셀 수 없다 — regionStatus가 그렇게 빠져 있다.
+    // `_log`에 담아도 withCallLog가 출력에서 빼면 셀 수 없다. regionStatus가 실제로 그렇게
+    // 빠져 있었고, 응답의 structuredContent 사본만 남아 로그로는 집계가 불가능했다.
+    // 그래서 필드마다 "줄에 실제로 나오는지"를 이렇게 따로 고정한다.
     assert(
       logLines.some((line) => line.inputSource === "photo"),
       "the photo-sourced call should reach the log output, not just the handler's _log",

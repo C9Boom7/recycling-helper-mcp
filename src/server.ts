@@ -602,6 +602,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
 }
 
 /**
+ * 지역 해상도 한 낱말, 품목 툴 쪽. 세 툴이 같은 어휘로 남겨야 집계가 한 축으로 서는데
+ * 지역 툴만 값을 남기고 있었다 — 사용자가 자기 구를 말하는 건 오히려 품목 질문 쪽이 더
+ * 흔하다("청주시 사는데 소파 어떻게 버려?").
+ *
+ * 지역을 아예 안 물은 호출에는 값을 남기지 않는다. "안 물었다"와 "물었는데 못 찾았다"를
+ * 같은 `unknown`으로 뭉치면 미등록 지역 수요가 실제보다 부풀려진다. 지역 툴은 region이
+ * 필수라 그 구분이 필요 없지만 여기서는 선택 인자다.
+ */
+function itemRegionStatus(
+  region: string | undefined,
+  regionMatch: MatchedRegionPolicy | undefined,
+): string | undefined {
+  if (!region) return undefined;
+  if (!regionMatch) return "unknown";
+  return findNamedSubRegionForMatch(regionMatch, region) ? "unregistered_district" : regionMatch.level;
+}
+
+/**
  * The card for a confirmed match, shared by the two tools that resolve a single
  * item. Kakao renders a widget as-is while a text answer is the host's to
  * rewrite (Kakao Tools 개발 가이드 §3), and the `Kakao Tools · 재활용척척` label
@@ -659,7 +677,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // widget branch, flipping it off would also drop `matchedRegion` from the
   // logs, and the finals-window 지역 해상도 numbers are read off those.
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, regionMatch) };
 
   // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
   // follow-up turn and a card closes the conversation. A confirmed match does
@@ -726,7 +744,7 @@ async function handleGetDisposalSteps({
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const photoNote = inputSource === "photo" ? photoConfirmLine(item) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, inputSource };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, regionMatch), inputSource };
 
   if (WIDGET_ENABLED) {
     return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);
