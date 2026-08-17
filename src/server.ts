@@ -606,17 +606,24 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
  * 지역 툴만 값을 남기고 있었다 — 사용자가 자기 구를 말하는 건 오히려 품목 질문 쪽이 더
  * 흔하다("청주시 사는데 소파 어떻게 버려?").
  *
- * 지역을 아예 안 물은 호출에는 값을 남기지 않는다. "안 물었다"와 "물었는데 못 찾았다"를
- * 같은 `unknown`으로 뭉치면 미등록 지역 수요가 실제보다 부풀려진다. 지역 툴은 region이
- * 필수라 그 구분이 필요 없지만 여기서는 선택 인자다.
+ * `unknown`은 "찾아봤는데 없더라"만 뜻한다. 찾아본 적 없는 호출까지 거기 뭉치면 이 필드가
+ * 재려는 미등록 지역 수요가 통째로 부풀려진다.
  */
 function itemRegionStatus(
   region: string | undefined,
+  item: WasteItem,
   regionMatch: MatchedRegionPolicy | undefined,
 ): string | undefined {
+  // 안 물었으면 이 축에 셀 것이 없다.
   if (!region) return undefined;
-  if (!regionMatch) return "unknown";
-  return findNamedSubRegionForMatch(regionMatch, region) ? "unregistered_district" : regionMatch.level;
+  // 물었어도 이 품목은 지역이 답을 바꾸지 않아 애초에 조회하지 않았다 — 두 핸들러가
+  // `itemNeedsRegionCheck`로 조회 자체를 막고, 324개 중 224개가 여기 해당한다.
+  if (!itemNeedsRegionCheck(item)) return undefined;
+  if (regionMatch) return findNamedSubRegionForMatch(regionMatch, region) ? "unregistered_district" : regionMatch.level;
+  // `findRegionalPolicy`는 되묻기 갈래를 버리고 undefined만 돌려준다. 여기서 한 번 더 보지
+  // 않으면 같은 질의가 지역 툴에서는 `ambiguous`, 품목 툴에서는 `unknown`으로 갈려
+  // 세 툴을 한 축으로 못 센다.
+  return resolveRegionalPolicy(region).status === "ambiguous" ? "ambiguous" : "unknown";
 }
 
 /**
@@ -677,7 +684,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   // widget branch, flipping it off would also drop `matchedRegion` from the
   // logs, and the finals-window 지역 해상도 numbers are read off those.
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, regionMatch) };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item, regionMatch) };
 
   // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
   // follow-up turn and a card closes the conversation. A confirmed match does
@@ -744,7 +751,7 @@ async function handleGetDisposalSteps({
   const { item } = match;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const photoNote = inputSource === "photo" ? photoConfirmLine(item) : undefined;
-  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, regionMatch), inputSource };
+  const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item, regionMatch), inputSource };
 
   if (WIDGET_ENABLED) {
     return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);

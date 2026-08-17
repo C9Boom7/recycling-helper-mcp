@@ -828,75 +828,81 @@ async function runSmoke() {
       { region: "청주시", matchedRegion: "충청북도", expected: "unregistered_district" },
       { region: "충북", matchedRegion: "충청북도", expected: "metro" },
     ];
-    for (const { region } of regionStatusExpectations) {
-      await callTool(baseUrl, "get_region_disposal_info", { region }, requestId);
-      requestId += 1;
-    }
-    // 줄 순서에 기대지 않는다 — 응답이 돌아온 뒤에도 그 호출의 로그 줄은 아직
-    // stdout 파이프에 남아 있을 수 있다. 마지막 줄을 집으면 앞선 answer case의 줄을
-    // 읽고, 한 번 읽고 단언하면 맞는 코드에서도 실패한다. 그래서 나타날 때까지 기다린다.
-    // 지역 원문은 로그에 없으니(개인정보) `matchedRegion`과 짝지어 찾는다 — 청주시와
-    // 충북은 같은 광역으로 착지하므로 그 짝이 있어야 두 갈래가 갈린다.
-    const regionLogEntries = () =>
-      getOutput()
-        .split("\n")
-        .filter((line) => line.includes('"tool":"get_region_disposal_info"'))
-        .flatMap((line) => {
-          try {
-            return [JSON.parse(line)];
-          } catch {
-            return [];
-          }
-        });
     for (const { region, matchedRegion, expected } of regionStatusExpectations) {
-      const seen = (entry) => entry.matchedRegion === matchedRegion && entry.regionStatus === expected;
-      const startedAt = Date.now();
-      while (!regionLogEntries().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-      assert(
-        regionLogEntries().some(seen),
-        `no log line for ${region} carried matchedRegion=${matchedRegion} with regionStatus=${expected}`,
-      );
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_region_disposal_info",
+        // 지역 원문은 로그에 없으니(개인정보) `matchedRegion`과 짝지어 찾는다 — 청주시와
+        // 충북은 같은 광역으로 착지하므로 그 짝이 있어야 두 갈래가 갈린다.
+        seen: (entry) => entry.matchedRegion === matchedRegion && entry.regionStatus === expected,
+        call: () => callTool(baseUrl, "get_region_disposal_info", { region }, requestId++),
+        what: `${region} → matchedRegion=${matchedRegion}, regionStatus=${expected}`,
+      });
     }
 
     // 품목 툴도 같은 어휘로 남겨야 집계가 한 축으로 선다 — 사용자가 자기 구를 말하는 건
     // 오히려 이쪽이 더 흔하다. 지역을 안 물은 호출은 값이 없어야 한다. "안 물었다"와
     // "물었는데 못 찾았다"가 같은 값으로 뭉치면 미등록 지역 수요가 부풀려진다.
     const itemRegionExpectations = [
-      { args: { itemName: "소파", region: "청주시" }, expected: "unregistered_district" },
-      { args: { itemName: "소파", region: "서울 강남구" }, expected: "district" },
-      { args: { itemName: "소파" }, expected: undefined },
+      { id: "sofa", args: { itemName: "소파", region: "청주시" }, expected: "unregistered_district" },
+      { id: "sofa", args: { itemName: "소파", region: "서울 강남구" }, expected: "district" },
+      { id: "sofa", args: { itemName: "소파" }, expected: undefined },
+      // 되묻기 갈래. `findRegionalPolicy`가 그 상태를 버리므로 한 번 더 보지 않으면
+      // 지역 툴은 `ambiguous`, 품목 툴은 `unknown`으로 갈린다. 로마자 접두어가
+      // 여러 지역에 걸리는 실제 입력이다.
+      { id: "sofa", args: { itemName: "소파", region: "seong" }, expected: "ambiguous" },
+      // 지역을 물었지만 이 품목은 조회 자체를 안 한다(324개 중 224개). 여기에 `unknown`을
+      // 남기면 미등록 지역 수요가 통째로 부풀려진다 — 값이 아예 없어야 한다.
+      { id: "pizza_box_oily", args: { itemName: "기름 묻은 피자박스", region: "서울 강남구" }, expected: undefined },
     ];
-    for (const { args, expected } of itemRegionExpectations) {
-      await callTool(baseUrl, "get_disposal_steps", args, requestId);
-      requestId += 1;
-      const seen = (entry) => entry.matchedId === "sofa" && entry.regionStatus === expected;
-      const entries = () =>
-        getOutput()
-          .split("\n")
-          .filter((line) => line.includes('"tool":"get_disposal_steps"'))
-          .flatMap((line) => {
-            try {
-              return [JSON.parse(line)];
-            } catch {
-              return [];
-            }
-          });
-      const startedAt = Date.now();
-      while (!entries().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-      assert(
-        entries().some(seen),
-        `get_disposal_steps with region=${args.region ?? "(none)"} should log regionStatus=${expected}`,
-      );
+    for (const { id, args, expected } of itemRegionExpectations) {
+      await awaitLoggedCall({
+        getOutput,
+        tool: "get_disposal_steps",
+        seen: (entry) => entry.matchedId === id && entry.regionStatus === expected,
+        call: () => callTool(baseUrl, "get_disposal_steps", args, requestId++),
+        what: `${args.itemName} + region=${args.region ?? "(none)"} → regionStatus=${expected}`,
+      });
     }
 
     console.log(`MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases)`);
   } finally {
     stopServer();
   }
+}
+
+/**
+ * 한 번의 툴 호출이 남긴 로그 줄만 보고 단언한다. 이 자리에서 두 번 틀렸다.
+ *
+ * 1. 응답이 돌아와도 그 호출의 로그 줄은 아직 stdout 파이프에 있을 수 있다.
+ *    한 번 읽고 단언하면 맞는 코드에서도 이따금 실패한다 — 그래서 기다린다.
+ * 2. 그렇다고 전체 출력을 `.some()`으로 뒤지면 앞선 answer case가 남긴 줄에 걸려
+ *    통과한다. 실제로 `pizza_box_oily`는 지역 없이 부르는 케이스가 많아, 검사가
+ *    보려던 갈래를 지워도 초록불이 떴다.
+ *
+ * 그래서 호출 직전 길이를 재고 그 뒤에 붙은 줄만 본다.
+ */
+async function awaitLoggedCall({ getOutput, tool, seen, call, what }) {
+  const offset = getOutput().length;
+  await call();
+  const fresh = () =>
+    getOutput()
+      .slice(offset)
+      .split("\n")
+      .filter((line) => line.includes(`"tool":"${tool}"`))
+      .flatMap((line) => {
+        try {
+          return [JSON.parse(line)];
+        } catch {
+          return [];
+        }
+      });
+
+  const startedAt = Date.now();
+  while (!fresh().some(seen) && Date.now() - startedAt < LOG_FLUSH_TIMEOUT_MS) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  assert(fresh().some(seen), `${tool} call did not log ${what} (saw: ${JSON.stringify(fresh())})`);
 }
 
 function parseWidgetPayload(result, context) {
