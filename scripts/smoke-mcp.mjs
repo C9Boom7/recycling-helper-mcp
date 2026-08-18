@@ -77,6 +77,7 @@ const STRUCTURED_KEY_WHITELIST = {
     "summary",
     "steps",
     "cautions",
+    "confidence",
     "review",
     "region",
     "regionCheckLevel",
@@ -1196,6 +1197,12 @@ async function runWidgetSmoke() {
       JSON.stringify(match.structuredContent.steps) === JSON.stringify(pizzaBox.steps),
       "widget structuredContent should carry the same steps the text path serves",
     );
+    // 확신도 등급 원문이 나가는 경로는 structuredContent뿐이다. 카드는 medium일 때
+    // 할 일 한 줄로 접어 싣고 등급 이름은 버리므로, 여기서 빠지면 티 없이 사라진다.
+    assert(
+      match.structuredContent.confidence === pizzaBox.confidence,
+      `widget structuredContent lost the confidence grade: ${match.structuredContent.confidence}`,
+    );
     assert(
       JSON.stringify(payload.widget).includes("깨끗한 부분과 오염된 부분을 분리합니다."),
       "widget card is missing the disposal steps",
@@ -1372,9 +1379,12 @@ async function runWidgetSmoke() {
       );
     }
 
-    // PRD phase-3 R5. 위젯 응답에도 structuredContent가 실리면서 callStatus()가
-    // 추론할 수는 있게 됐지만, 본선 집계가 읽는 status는 응답 모양에 얹혀 가면
-    // 응답을 고칠 때 조용히 어긋난다 — 핸들러가 명시한 값이 로그에 나오는지 고정.
+    // PRD phase-3 R5. 본선 매칭률 집계가 읽는 건 로그 줄의 status라, 위젯 응답에서도
+    // status=match와 matchedId가 실제로 찍히는지 여기서 고정한다. 그 값이 핸들러의
+    // 명시적 `_log.status`에서 왔는지까지는 못 잡는다 — 위젯 응답도 structuredContent를
+    // 싣게 되면서 callStatus()가 스스로 match를 뽑아내므로, 명시를 지워도 이 단언은
+    // 통과한다. 명시를 남겨두는 건 구조가 롤백될 때를 대비한 이중 안전장치다
+    // (server.ts widgetResult 주석 참고).
     const logLines = getOutput()
       .split("\n")
       .filter((line) => line.includes('"tool":"get_disposal_steps"'))
@@ -1402,9 +1412,8 @@ async function runWidgetSmoke() {
       "the photo-sourced call should reach the log output, not just the handler's _log",
     );
 
-    // Same pin on the tool that just gained a widget: the finals-window match
-    // rate reads off the logged status, so it must come from the handler's
-    // explicit value rather than whatever shape the response happens to have.
+    // 위젯이 막 붙은 툴에도 같은 고정. 여기서도 잡는 건 로그 줄에 남은 최종
+    // status·matchedId지 그 값의 출처가 아니다 (바로 위 주석과 같은 이유).
     const classifyLog = getOutput()
       .split("\n")
       .filter((line) => line.includes('"tool":"classify_waste_item"'))

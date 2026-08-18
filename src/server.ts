@@ -798,6 +798,9 @@ async function handleGetDisposalSteps({
     summary: item.summary,
     steps: item.steps,
     cautions: item.cautions,
+    // 카드는 medium일 때 "근거를 함께 보라"는 한 줄로 접어 싣고 등급 이름은 버린다.
+    // 등급 원문이 모델에 닿는 경로는 여기뿐이다 — `review`는 검수 status만 담는다.
+    confidence: item.confidence,
     review: publicReviewMetadata(item),
     region,
     regionCheckLevel: itemRegionCheckLabel(item),
