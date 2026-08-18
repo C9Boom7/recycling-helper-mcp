@@ -1138,6 +1138,11 @@ async function runWidgetBuilderCases() {
  * this keeps the whole catalogue on the real path. Structure only, no wording:
  * the answer cases already own what the text says.
  */
+// 표시명으로 물어도 ambiguous로 갈리는 품목이 몇 개는 남는다(그건 설계대로 텍스트
+// 경로다). 다만 그런 품목이 카탈로그의 10%나 될 이유는 없으니, 그보다 커지면
+// 판별이 망가진 쪽을 의심한다.
+const MAX_SWEEP_SKIP_RATIO = 0.1;
+
 async function sweepWidgetCatalogue(baseUrl, startRequestId) {
   const { wasteItems, itemNeedsCriticalRegionCheck } = await import("../dist/data.js");
   let requestId = startRequestId;
@@ -1176,6 +1181,21 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
     );
     validated += 1;
   }
+
+  // 판별을 `found` 값에 맡긴 대가로, 필드 이름이 바뀌거나 한쪽 분기에서
+  // structuredContent가 빠지면 324개가 전부 skipped로 흘러 "0/324 validated"로
+  // 조용히 통과한다. 아래 세 줄이 그 바닥이다 — 합계가 맞는지, 한 장이라도
+  // 실제로 검사했는지, skipped가 설명 가능한 규모인지.
+  assert(
+    validated + skipped.length === wasteItems.length,
+    `catalogue sweep accounted for ${validated + skipped.length} of ${wasteItems.length} items`,
+  );
+  assert(validated > 0, "catalogue sweep validated no cards at all — the widget/text discriminator is broken");
+  const skipCap = Math.floor(wasteItems.length * MAX_SWEEP_SKIP_RATIO);
+  assert(
+    skipped.length <= skipCap,
+    `catalogue sweep skipped ${skipped.length} of ${wasteItems.length} items (cap ${skipCap}): ${skipped.join(", ")}`,
+  );
 
   const skipNote = skipped.length > 0 ? ` (skipped as non-match: ${skipped.join(", ")})` : "";
   console.log(`Widget catalogue sweep: ${validated}/${wasteItems.length} cards validated${skipNote}`);

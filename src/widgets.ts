@@ -34,9 +34,10 @@ const MIN_COPY_TEXT_LINES = 3;
 // a caution must not be the one MAX_CARD_CAUTIONS drops. Ordering, not filtering:
 // nothing is removed that the cap would have kept.
 const SAFETY_CAUTION_PATTERN = /다치|감싸|감쌉|위험|폭발|인화|화재|날카|베임|감전|누출|밀봉|뾰족/;
-// 324개 중 75개가 medium이다. 텍스트 경로는 "확신도: 보통"을 실어 보냈지만 위젯 응답에는
-// structuredContent도 없어(R4), 카드만 받는 사용자는 한 번 더 확인해야 할 답을 확정된 답으로
-// 읽는다. 등급 이름을 옮겨 적는 대신 할 일로 쓴다 — "보통"은 그래서 뭘 하라는 건지 알려주지 않는다.
+// 324개 중 75개가 medium이다. 2026-08-18 결정 변경(phase-3 PRD "R4 결정 변경")으로 위젯 응답도
+// structuredContent에 confidence를 실어 보내지만, 그건 모델이 읽는 값이다. 카드만 눈으로 보는
+// 사용자는 여전히 한 번 더 확인해야 할 답을 확정된 답으로 읽으므로 이 줄은 카드에 남는다.
+// 등급 이름을 옮겨 적는 대신 할 일로 쓴다 — "보통"은 그래서 뭘 하라는 건지 알려주지 않는다.
 //
 // 확신도는 "분류가 덜 확실하다"는 뜻이지 "지역마다 갈린다"는 뜻이 아니다. 지역을 다시 확인하라는
 // 말은 regionNodes가 자기 조건에 맞게 이미 하고 있고, medium 75개 중 40개가 지역 확인 필수라
@@ -116,8 +117,11 @@ function regionNodes({ item, regionName, regionNotes, regionFeeLine }: DisposalW
 
   // The fee is the one number the user came for. formatRegionItemGuide emits it
   // last, behind the generic 사전 신청 boilerplate, so slicing regionNotes to two
-  // lines always ate it — and with no structuredContent on a widget response it
-  // was unrecoverable in that turn. It gets its own line outside that budget.
+  // lines always ate it. Since 2026-08-18 a widget response carries the text
+  // path's structuredContent too (phase-3 PRD "R4 결정 변경"), so the model can
+  // recover the dropped lines from the uncut `regionNotes` — but the user reading
+  // the card cannot, and the fee is what they asked for. It keeps its own line
+  // outside that budget.
   const fee = regionFeeLine ? [text(regionFeeLine)] : [];
 
   if (regionNotes && regionNotes.length > 0) {
