@@ -85,7 +85,7 @@ const STRUCTURED_KEY_WHITELIST = {
     "sources",
   ],
   check_confusing_item: ["found", "matches"],
-  make_cleanup_plan: ["region", "items"],
+  make_cleanup_plan: ["region", "items", "nextTool"],
   get_region_disposal_info: [
     "region",
     "matchedRegion",
@@ -777,6 +777,94 @@ async function runSmoke() {
       requestId,
     );
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
+    // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
+    // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다.
+    assert(
+      resultText(cleanup).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      "critical-item plan with a region should end with the follow-up line",
+    );
+    assert(
+      !resultText(cleanup).includes("get_region_disposal_info"),
+      "the tool name must never appear in user-facing text",
+    );
+    assert(
+      cleanup.structuredContent?.nextTool?.name === "get_region_disposal_info" &&
+        cleanup.structuredContent.nextTool.arguments?.region === "서울 강남구",
+      `plan structuredContent lost its nextTool hint: ${JSON.stringify(cleanup.structuredContent?.nextTool)}`,
+    );
+    requestId += 1;
+
+    // 지역 없이 부른 필수 품목 플랜: 문장은 지역을 청하고, 인자를 완성할 수 없으니
+    // nextTool은 없다.
+    const cleanupNoRegion = await callTool(baseUrl, "make_cleanup_plan", { items: ["책상의자"] }, requestId);
+    assert(
+      resultText(cleanupNoRegion).includes(
+        "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다.",
+      ),
+      "critical-item plan without a region should ask for one in the follow-up line",
+    );
+    assert(cleanupNoRegion.structuredContent?.nextTool === undefined, "nextTool must not ship without a region to fill its arguments");
+    requestId += 1;
+
+    // 수수료가 없는 필수 품목. 건전지는 전용 수거함이 답이라, 힌트가 수수료만 약속하면
+    // 없는 요금을 예고하는 셈이 된다.
+    const cleanupFree = await callTool(baseUrl, "make_cleanup_plan", { items: ["건전지"], region: "서울 강남구" }, requestId);
+    assert(
+      resultText(cleanupFree).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      "a fee-free critical item must still be covered by the follow-up line",
+    );
+    assert(
+      cleanupFree.structuredContent?.nextTool?.arguments?.region === "서울 강남구",
+      `fee-free critical plan lost its nextTool hint: ${JSON.stringify(cleanupFree.structuredContent?.nextTool)}`,
+    );
+    requestId += 1;
+
+    // 데이터에 없는 지역. 문장은 그 지역 안내를 아는 척하지 않고 낮춰 잡되, 지역 툴은
+    // 공식 확인 경로를 주므로 후속 호출은 그대로 이어 준다.
+    const cleanupUnknownRegion = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["책상의자"], region: "봉담읍" },
+      requestId,
+    );
+    assert(
+      resultText(cleanupUnknownRegion).includes("봉담읍 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다."),
+      "an unregistered region should get the softer follow-up line",
+    );
+    assert(
+      !resultText(cleanupUnknownRegion).includes("이어서 안내할 수 있습니다"),
+      "an unregistered region must not be promised fee and collection-point details",
+    );
+    assert(
+      cleanupUnknownRegion.structuredContent?.nextTool?.arguments?.region === "봉담읍",
+      `unregistered-region plan should still carry nextTool: ${JSON.stringify(cleanupUnknownRegion.structuredContent?.nextTool)}`,
+    );
+    requestId += 1;
+
+    // 앞뒤 공백이 붙은 지역. 문장에도 후속 호출 인자에도 다듬은 이름만 나가야 한다.
+    const cleanupPaddedRegion = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["책상의자"], region: " 서울 강남구 " },
+      requestId,
+    );
+    assert(
+      resultText(cleanupPaddedRegion).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      "a padded region must be trimmed before it lands in the follow-up line",
+    );
+    assert(
+      cleanupPaddedRegion.structuredContent?.nextTool?.arguments?.region === "서울 강남구",
+      `padded region leaked into nextTool arguments: ${JSON.stringify(cleanupPaddedRegion.structuredContent?.nextTool)}`,
+    );
+    requestId += 1;
+
+    // 지역이 답을 바꾸지 않는 플랜(참고 이하뿐): 힌트 줄 자체가 없다 — 지역 줄
+    // 소음 금지 원칙 그대로.
+    const cleanupNoCritical = await callTool(baseUrl, "make_cleanup_plan", { items: ["페트병"], region: "서울 강남구" }, requestId);
+    assert(
+      !resultText(cleanupNoCritical).includes("이어서 안내할 수 있습니다") && cleanupNoCritical.structuredContent?.nextTool === undefined,
+      "a plan with no region-critical items must not carry the follow-up hint",
+    );
     requestId += 1;
 
     // 사진 경로의 텍스트 분기. 서버는 이미지를 받지 않고 호스트가 알아본 이름만 넘어오므로,
