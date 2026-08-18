@@ -48,7 +48,7 @@ Card 하나로 구성 (ListView 남용 금지 — 답변은 목록이 아니라 
 4. 배출 방법: `steps`를 번호 리스트로
 5. 주의: caution 1~2개. **데이터 순서가 아니라 안전 문구 우선**으로 고른다 — 272개 중 53개가 caution 3개 이상이라 상한에서 잘리는데, 순서대로 자르면 "날카롭게 부러진 젓가락은 수거 작업자가 다치지 않게 감싸서 배출하세요" 같은 부상 경고가 정보성 문구에 밀린다. 부상·화재·누출 어휘가 있는 caution을 앞으로 당기고(제거가 아니라 정렬), 나머지는 원래 순서를 지킨다.
 6. 지역 관련: 아래 R2-1 규칙에 따라 최대 4줄 (지역명 캡션 + 수수료 1줄 + 안내 2줄)
-7. 확신도가 `high`가 아닐 때만 한 줄: 품목 상태나 재질에 따라 분류가 갈릴 수 있으니 근거를 함께 보라는 안내. 텍스트 경로는 `확신도: 보통`을 실어 보냈지만 위젯 응답에는 structuredContent도 없어(R4) 카드만 받는 사용자에게는 그 신호가 통째로 사라졌다 — 324개 중 75개가 medium이다. 등급 이름을 옮겨 적지 않고 할 일로 쓴다. `high` 249개는 아무것도 덧붙이지 않는다.
+7. 확신도가 `high`가 아닐 때만 한 줄: 품목 상태나 재질에 따라 분류가 갈릴 수 있으니 근거를 함께 보라는 안내. 텍스트 경로는 `확신도: 보통`을 실어 보냈지만 위젯 응답에는 structuredContent도 없어(R4, 작성 당시. 2026-08-18부터 실린다 — "R4 결정 변경" 참고) 카드만 받는 사용자에게는 그 신호가 통째로 사라졌다 — 324개 중 75개가 medium이다. 등급 이름을 옮겨 적지 않고 할 일로 쓴다. `high` 249개는 아무것도 덧붙이지 않는다.
    - **지역을 다시 확인하라는 말은 쓰지 않는다.** 확신도는 분류가 덜 확실하다는 뜻이지 지역마다 갈린다는 뜻이 아니다. medium 75개 중 40개가 지역 확인 필수 품목이라, 지역 이야기를 섞으면 바로 위 6번 줄과 같은 말이 되거나(지역 미입력) 방금 준 지자체 기준을 스스로 무르는 것처럼 읽힌다(지역 입력).
 8. 하단 캡션: 대표 근거 출처 title 1개
 
@@ -69,7 +69,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 | 지역 없음 + `regionCheckLevel` 참고 | 지역 줄을 넣지 않는다 |
 
 - **지역 미입력 시의 분기는 `itemNeedsRegionCheck`가 아니라 `itemNeedsCriticalRegionCheck`로 가른다.** 전자는 참고 등급까지 참이라 272개 중 42개(페트병·우유팩·빨대·스티로폼 등)에 불필요한 요구가 붙는다. 텍스트 경로(`formatItemGuide`)도 참고 등급에는 지역 섹션을 붙이지 않으므로 두 경로의 기준을 맞춘다.
-- **대형폐기물 수수료는 `regionNotes` 2줄 상한 밖에 따로 1줄로 싣는다.** `formatRegionItemGuide`는 일반 안내를 앞에, 수수료표를 맨 뒤에 놓아서 앞 2줄만 자르면 사용자가 구를 말한 이유인 수수료가 항상 잘린다. 위젯 응답에는 structuredContent도 없어 그 턴에서 복구할 방법이 없다. 규격이 여러 개면 `수수료 2,000원~5,000원 (규격 4종, 2025-11-03 확인)`처럼 범위로 접는다 — 4종을 다 실으면 카드가 넘치고, 하나를 골라주면 추측이 된다. **확인일은 수수료 고시 자신의 것을 쓴다.** 카드 맨 아래 근거 줄은 `sources[0]`의 날짜라, 수수료 줄에 날짜가 없으면 바로 아래 날짜가 수수료 확인일로 읽힌다 (용산구 수수료는 2025-11-03 확인인데 의자 출처는 2026-07-02이다). 고시에 확인일이 없으면 날짜 없이 둔다.
+- **대형폐기물 수수료는 `regionNotes` 2줄 상한 밖에 따로 1줄로 싣는다.** `formatRegionItemGuide`는 일반 안내를 앞에, 수수료표를 맨 뒤에 놓아서 앞 2줄만 자르면 사용자가 구를 말한 이유인 수수료가 항상 잘린다. 위젯 응답에는 structuredContent도 없어 그 턴에서 복구할 방법이 없다 (작성 당시. 2026-08-18부터 structuredContent가 실려 잘린 줄도 모델에는 간다 — "R4 결정 변경" 참고). 규격이 여러 개면 `수수료 2,000원~5,000원 (규격 4종, 2025-11-03 확인)`처럼 범위로 접는다 — 4종을 다 실으면 카드가 넘치고, 하나를 골라주면 추측이 된다. **확인일은 수수료 고시 자신의 것을 쓴다.** 카드 맨 아래 근거 줄은 `sources[0]`의 날짜라, 수수료 줄에 날짜가 없으면 바로 아래 날짜가 수수료 확인일로 읽힌다 (용산구 수수료는 2025-11-03 확인인데 의자 출처는 2026-07-02이다). 고시에 확인일이 없으면 날짜 없이 둔다.
 - `regionNotes`는 품목·지역에 따라 3줄을 넘길 수 있다. 카드는 2줄에서 자르고 나머지는 텍스트 대화에 맡긴다 (카드가 길어지면 결론이 묻힌다).
 - 지역명은 `regionMatch.region.name`을 쓴다. 사용자가 입력한 원문(`region` 인자)이 아니라 매칭된 정식 지역명이어야 오인식이 드러난다.
 
@@ -94,8 +94,17 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 - [src/server.ts](../../src/server.ts)의 `get_disposal_steps` 핸들러에서, match 확정 시 `buildDisposalWidget(item, ...)` 결과를 `textResult` 대신 반환.
 - 위젯 빌더는 `src/widgets.ts`로 분리 (server.ts 비대화 방지).
-- 위젯 응답에는 structuredContent를 넣지 않는다 (위젯이 곧 최종 답변 — result 최소화 원칙).
+- ~~위젯 응답에는 structuredContent를 넣지 않는다 (위젯이 곧 최종 답변 — result 최소화 원칙).~~ — **2026-08-18 결정 변경.** 아래 "R4 결정 변경" 참고.
 - 위젯 JSON 생성 함수에 단위 성격의 smoke 케이스 추가: JSON.parse 가능, `widget` 래핑 존재, `status` 부재, `copy_text` 존재.
+
+### R4 결정 변경 (2026-08-18) — 위젯 응답에도 structuredContent를 싣는다
+
+외부 리뷰 지적을 받아들였다: 카드 JSON을 text 콘텐츠로만 보내면 호스트 모델이 데이터가 아니라 UI 마크업을 읽고 답을 재구성해야 한다. 렌더링용(카드)과 모델 추론용(structuredContent)을 분리하는 게 MCP 스펙에도 맞고, 이 문서가 R2 7번·R2-1에서 이미 기록해 둔 손실 — medium 확신도 신호가 카드 밖으로 안 나가는 것, 카드 2줄 예산에 잘린 지역 안내를 그 턴에서 복구할 수 없는 것 — 도 함께 해소된다.
+
+- 위젯 분기와 텍스트 분기가 **같은 structuredContent 객체를 공유한다** (핸들러에서 분기 전에 한 번 생성). 두 모드가 따로 만들면 필드 수정이 한쪽만 반영된다.
+- 확정 매칭 응답 크기는 카드만 실을 때보다 늘어난다 (피자박스 기준 약 1.3KB → 약 2.2KB). 모델이 인용할 근거·단계·확신도가 실리는 대가로 받아들인다.
+- `_log`의 명시적 `status: "match"`는 유지한다. `callStatus()`가 추론할 수 있게 됐지만, 집계 어휘가 응답 모양에 얹혀 가면 응답 수정이 로그를 조용히 바꾼다.
+- smoke는 부재 단언을 병행 단언으로 뒤집었다: 위젯 응답의 `found === true`, 텍스트 경로와 같은 `steps`, 두 툴의 `confidence` 원문 유지. 카탈로그 sweep의 위젯/텍스트 판별은 structuredContent 유무 대신 `found` 값으로 바꿨다.
 
 ### R4-1. 기존 smoke 하니스와의 충돌 해소
 
@@ -103,7 +112,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 - `startServer()`가 서버를 띄울 때 `WIDGET_ENABLED: "false"`를 **env에 직접 고정**한다. 현재는 `...process.env`를 그대로 물려주므로, 셸 환경에 따라 결과가 갈린다. 실행하는 사람과 무관하게 같은 결과가 나와야 한다.
 - 그 위에 위젯을 켠 통합 케이스를 별도로 추가한다. 빌더 함수 단위 검증만으로는 server.ts의 분기 배선(match일 때만 위젯, ambiguous·not_found는 텍스트)이 사각지대로 남는다. 최소 3케이스:
-  1. 확정 매칭 → `content[0].text`가 JSON으로 파싱되고 `widget` 래핑·`copy_text`가 있으며 `status` 키는 없다. 응답에 structuredContent가 없다.
+  1. 확정 매칭 → `content[0].text`가 JSON으로 파싱되고 `widget` 래핑·`copy_text`가 있으며 `status` 키는 없다. ~~응답에 structuredContent가 없다.~~ — 2026-08-18 결정 변경으로 부재 단언은 병행 단언으로 뒤집혔다 ("R4 결정 변경" 참고).
   2. ambiguous 발화 → 위젯이 아니라 기존 텍스트 응답 그대로다.
   3. region 인자를 준 확정 매칭 → 카드에 매칭된 지역명이 들어간다 (R2-1 회귀 방지).
 
@@ -117,7 +126,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 ### R5. 호출 로그의 status 보존
 
-위젯 응답은 structuredContent가 없다. [src/server.ts](../../src/server.ts)의 `callStatus()`는 `found`/`ambiguous`로 상태를 추론하므로, 그대로 두면 확정 매칭인데도 로그에 `"ok"`로 남아 본선 기간 매칭률 집계가 왜곡된다.
+위젯 응답은 structuredContent가 없다(작성 당시 — 2026-08-18부터는 실린다. 위 "R4 결정 변경" 참고. 명시적 status를 유지하는 이유도 거기 있다). [src/server.ts](../../src/server.ts)의 `callStatus()`는 `found`/`ambiguous`로 상태를 추론하므로, 그대로 두면 확정 매칭인데도 로그에 `"ok"`로 남아 본선 기간 매칭률 집계가 왜곡된다.
 
 - 다행히 배선은 이미 있다. `ToolLogMeta`에 `status` 필드가 있고 `withCallLog`가 `_log?.status ?? callStatus(result)` 순으로 참조한다. **위젯 경로에서 `_log.status`를 `"match"`로 명시**하면 끝이고, `callStatus()`는 손대지 않는다.
 - 위젯 응답도 `matchedId`, `score`를 기존과 동일하게 `_log`에 실어, 텍스트 경로와 로그 스키마가 갈라지지 않게 한다.
@@ -148,7 +157,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 - [x] R1 분기 + WIDGET_ENABLED — match만 위젯, ambiguous/not_found는 텍스트 유지. `process.env.WIDGET_ENABLED !== "false"`
 - [x] R2 카드 + R2-1 지역 안내 분기 — Card/Title/Text/Caption/Divider만 사용 (Badge는 Preview 통과 후 검토). 지역 5분기 + 대형폐기물 수수료 전용 줄 + 안전 caution 우선 정렬
 - [x] R3 copy_text — 6줄 예산에서 제목 1줄과 확신도 1줄(medium만)을 뺀 만큼이 steps 몫, 잘리면 한 줄 더 내주고 남은 단계 안내, 1단계 품목은 결론 1줄 추가. 최장 품목(비닐류 포장재, 7 steps) 6줄 / 최단 품목 3줄
-- [x] R4 widgets.ts + 구조 smoke — `buildDisposalWidget` 순수 함수, structuredContent 미포함
+- [x] R4 widgets.ts + 구조 smoke — `buildDisposalWidget` 순수 함수, ~~structuredContent 미포함~~ (작성 당시. 2026-08-18부터 위젯 응답도 structuredContent를 싣는다 — "R4 결정 변경" 참고)
 - [x] R4-1 smoke 하니스 WIDGET_ENABLED 고정 + 위젯 통합 케이스 — 기존 303케이스는 `false` 고정 서버, 위젯은 별도 인스턴스에서 5케이스
 - [x] R4-2 전 품목 sweep — 위젯 켠 서버에 272개 품목 통과, 구조 불변식만 검증
 - [x] R5 호출 로그 status="match" — `_log.status` 명시, smoke가 stdout 로그 라인으로 검증

@@ -207,7 +207,7 @@ WIDGET_ENABLED=false
 
 **두 툴의 되돌아가는 자리가 다르다.** `get_disposal_steps`는 내용이 같고 렌더링만 바뀐다. `classify_waste_item`은 답의 성격이 바뀐다 — 카드는 배출 단계와 지역 수수료까지 싣지만, 텍스트 분기는 원래의 분류 요약(갈래·확신도·판단 범위·대표 근거)이다. 로그의 `matchedRegion`은 스위치와 무관하게 양쪽에서 남는다.
 
-**되돌리기 전에 알아둘 것**: 텍스트 폴백은 응답이 커진다(노원구 매트리스 기준 5.7KB). 원인은 수수료가 아니라 지역 안내가 text와 structuredContent에 두 번 실리는 것이고, 본선 실사용 경로가 위젯이라 지금은 손대지 않았다. 자세한 분해는 [post-finals-backlog.md](post-finals-backlog.md) 1번에 있다.
+**되돌리기 전에 알아둘 것**: 텍스트 폴백은 응답이 조금 더 커진다. 노원구 매트리스 기준 폴백 5.7KB, 위젯 4.1KB로 예전만큼 벌어지지 않는다 — 2026-08-18부터 위젯 응답도 structuredContent를 함께 싣기 때문이다. 원인은 수수료가 아니라 지역 안내가 text와 structuredContent에 두 번 실리는 것인데, 이제 폴백만의 특성이 아니라 양쪽 경로가 같이 안고 있다. 크기만 놓고 롤백을 망설일 이유는 없다는 뜻이다. 자세한 분해는 [post-finals-backlog.md](post-finals-backlog.md) 1번에 있다.
 
 ## 5. 수정하고 내보내는 절차
 

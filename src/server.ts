@@ -373,14 +373,22 @@ function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogM
 }
 
 /**
- * PRD phase-3 R4. The widget is the whole answer, so no structuredContent rides
- * along. `status` in `_log` is mandatory here: callStatus() infers the status
- * from structuredContent, which a widget response does not have, and without it
- * every confirmed match would be logged as a plain "ok".
+ * 위젯 응답에도 텍스트 경로와 같은 structuredContent를 싣는다(phase-3 R4 결정 변경,
+ * 2026-08-18). 카드는 렌더링용이고 모델이 추론·인용할 데이터는 structuredContent 쪽이다 —
+ * 카드만 보내면 호스트 모델이 UI 마크업을 읽고 답을 재구성해야 하고, 확신도처럼 카드가
+ * 줄 수 예산 때문에 접어둔 신호는 그 턴에서 복구할 길이 없었다.
+ *
+ * `_log`의 status는 그대로 명시한다. callStatus()가 structuredContent에서 추론할 수
+ * 있게 됐지만, 이 값이 응답 모양에 딸려가면 응답을 고치다 본선 집계가 조용히 어긋난다.
  */
-function widgetResult(payload: DisposalWidgetPayload, log: ToolLogMeta): LoggedToolResult {
+function widgetResult(
+  payload: DisposalWidgetPayload,
+  structuredContent: ToolResult,
+  log: ToolLogMeta,
+): LoggedToolResult {
   return {
     content: [{ type: "text", text: JSON.stringify(payload) }],
+    structuredContent,
     _log: { ...log, status: "match" },
   };
 }
@@ -709,11 +717,26 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item) };
 
+  // 두 렌더링 모드가 같은 데이터를 실어야 한다. 분기 안에서 따로 만들면 필드를
+  // 고칠 때 한쪽만 고쳐져 위젯을 껐다 켤 때 모델이 받는 데이터가 달라진다.
+  const structured = {
+    found: true,
+    matchedItem: item.name,
+    matchedBy: match.matchedBy,
+    disposalGroup: disposalGroupLabel(item.disposalType),
+    disposalType: item.disposalType,
+    summary: item.summary,
+    confidence: item.confidence,
+    regionCheckLevel: itemRegionCheckLabel(item),
+    regionGuidance: itemRegionGuidance(item),
+    primarySource: itemTopSources(item, 1)[0] ?? { title: "재활용척척 보수 안내 정책" },
+  };
+
   // PRD phase-3 R1 keeps ambiguous·not_found on text — those two need a
   // follow-up turn and a card closes the conversation. A confirmed match does
   // not, so it takes the same card get_disposal_steps serves.
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, { region }), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { region }), structured, log);
   }
 
   const text = [
@@ -735,22 +758,7 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     .filter(Boolean)
     .join("\n");
 
-  return textResult(
-    text,
-    {
-      found: true,
-      matchedItem: item.name,
-      matchedBy: match.matchedBy,
-      disposalGroup: disposalGroupLabel(item.disposalType),
-      disposalType: item.disposalType,
-      summary: item.summary,
-      confidence: item.confidence,
-      regionCheckLevel: itemRegionCheckLabel(item),
-      regionGuidance: itemRegionGuidance(item),
-      primarySource: itemTopSources(item, 1)[0] ?? { title: "재활용척척 보수 안내 정책" },
-    },
-    log,
-  );
+  return textResult(text, structured, log);
 }
 
 async function handleGetDisposalSteps({
@@ -778,34 +786,35 @@ async function handleGetDisposalSteps({
   const photoNote = inputSource === "photo" ? photoConfirmLine(item) : undefined;
   const log = { matchedId: item.id, score: match.score, matchedRegion: regionMatch?.region.name, regionStatus: itemRegionStatus(region, item), inputSource };
 
+  // 카드는 지역 줄을 스스로 만들지만(matchedItemWidget), structuredContent는 두
+  // 렌더링 모드가 같은 것을 실어야 하므로 분기 밖에서 한 번 만든다.
+  const regionNotes = buildRegionNotes(item, regionMatch, region);
+  const structured = {
+    found: true,
+    id: item.id,
+    itemName: item.name,
+    matchedBy: match.matchedBy,
+    disposalGroup: disposalGroupLabel(item.disposalType),
+    summary: item.summary,
+    steps: item.steps,
+    cautions: item.cautions,
+    // 카드는 medium일 때 "근거를 함께 보라"는 한 줄로 접어 싣고 등급 이름은 버린다.
+    // 등급 원문이 모델에 닿는 경로는 여기뿐이다 — `review`는 검수 status만 담는다.
+    confidence: item.confidence,
+    review: publicReviewMetadata(item),
+    region,
+    regionCheckLevel: itemRegionCheckLabel(item),
+    ...(regionNotes ? { regionNotes } : {}),
+    sources: itemTopSources(item),
+  };
+
   if (WIDGET_ENABLED) {
-    return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), log);
+    return widgetResult(matchedItemWidget(item, regionMatch, { photoNote, region }), structured, log);
   }
 
-  // Below the widget branch on purpose: the card builds its own region lines
-  // (matchedItemWidget), so this is the text path's alone.
-  const regionNotes = buildRegionNotes(item, regionMatch, region);
   // 확인 문구는 안내 위에 둔다. 잘못 알아본 이름이면 아래 내용을 읽을 이유가 없다.
   const text = photoNote ? `${photoNote}\n\n${formatItemGuide(item, region)}` : formatItemGuide(item, region);
-  return textResult(
-    text,
-    {
-      found: true,
-      id: item.id,
-      itemName: item.name,
-      matchedBy: match.matchedBy,
-      disposalGroup: disposalGroupLabel(item.disposalType),
-      summary: item.summary,
-      steps: item.steps,
-      cautions: item.cautions,
-      review: publicReviewMetadata(item),
-      region,
-      regionCheckLevel: itemRegionCheckLabel(item),
-      ...(regionNotes ? { regionNotes } : {}),
-      sources: itemTopSources(item),
-    },
-    log,
-  );
+  return textResult(text, structured, log);
 }
 
 async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<LoggedToolResult> {
@@ -1417,6 +1426,32 @@ function jsonRpcError(id: JsonRpcId | undefined, code: number, message: string):
 }
 
 /**
+ * -32602에 실을 필드별 복구 안내. 에러 메시지를 읽는 건 사용자가 아니라 호스트
+ * 모델이라, 무엇이 틀렸는지에서 끝내지 않고 다음 호출을 어떻게 고치면 되는지까지
+ * 잇는다. 여기 없는 필드는 이유 문장만 나간다. 키는 최상위 필드명이다 —
+ * items.1처럼 원소를 가리키는 이슈도 고칠 곳은 결국 items라서 같은 안내를 쓴다.
+ */
+const ARGUMENT_RECOVERY_HINTS: Record<string, string> = {
+  itemName: '버릴 품목명을 한국어로 전달하세요 (예: "기름 묻은 피자박스")',
+  region: '한국 지역명을 전달하세요 (예: "서울 강남구")',
+  items: '버릴 품목명 1~30개를 문자열 배열로 전달하세요 (예: ["침대", "화분"])',
+};
+
+function describeArgumentIssue(issue: z.ZodIssue): string {
+  const field = issue.path.length > 0 ? issue.path.join(".") : "arguments";
+  const hint = issue.path.length > 0 ? ARGUMENT_RECOVERY_HINTS[String(issue.path[0])] : undefined;
+  const reason =
+    issue.code === "invalid_type" && issue.received === "undefined"
+      ? `${field}은(는) 필수 항목입니다`
+      : issue.code === "too_small"
+        ? `${field}이(가) 비어 있습니다`
+        : issue.code === "too_big"
+          ? `${field}이(가) 허용 크기(${issue.maximum}${issue.type === "array" ? "개" : "자"})를 넘습니다`
+          : `${field} 값이 올바르지 않습니다 (${issue.message})`;
+  return hint ? `${reason} — ${hint}.` : `${reason}.`;
+}
+
+/**
  * Runs a tools/call for clients that accept only application/json. The SDK
  * transport rejects POSTs whose Accept header lacks text/event-stream with a
  * 406, so without this path a JSON-only client could list tools but never
@@ -1433,7 +1468,10 @@ async function handleJsonOnlyToolCall(body: JsonRpcBody, res: Response): Promise
 
   const parsed = z.object(registered.def.inputShape).safeParse(params.arguments ?? {});
   if (!parsed.success) {
-    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${parsed.error.message}`));
+    // 자연어 안내가 앞, Zod 원문이 뒤. 모델은 첫 문장만으로 다음 호출을 고칠 수
+    // 있고, 원문은 안내문이 뭉갠 세부(경로·코드)를 디버깅용으로 보존한다.
+    const guidance = parsed.error.issues.map(describeArgumentIssue).join(" ");
+    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${guidance}\n상세: ${parsed.error.message}`));
     return;
   }
 
