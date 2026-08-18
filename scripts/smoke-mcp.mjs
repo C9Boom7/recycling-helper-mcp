@@ -791,16 +791,19 @@ async function runSmoke() {
     );
     // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
     // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다. 예고는 지역 툴이
-    // 실제로 내놓는 것까지만이다 — 규격별 표를 통째로 주는 경로는 없으므로 "전체 표"를
-    // 약속하면 못 지킬 말이 된다.
+    // 실제로 내놓는 것까지만이다 — 규격별 표를 통째로 주는 경로도, 신청·수수료 URL을 지역
+    // 개요로 내보내는 경로도 없다(그 주소는 bulky-waste-fees.json에 있고 개요 경로는 그
+    // 파일을 안 읽는다).
     assert(
-      resultText(cleanup).includes("서울 강남구의 신고 신청 주소와 수수료 조회처, 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      resultText(cleanup).includes("서울 강남구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
       "critical-item plan with a region should end with the follow-up line",
     );
-    assert(
-      !resultText(cleanup).includes("전체 표"),
-      `the plan must not promise a full fee table it cannot deliver: ${resultText(cleanup)}`,
-    );
+    for (const forbidden of ["전체 표", "신청 주소", "수수료 조회처"]) {
+      assert(
+        !resultText(cleanup).includes(forbidden),
+        `the plan must not promise "${forbidden}" — no region-overview path delivers it`,
+      );
+    }
     assert(
       !resultText(cleanup).includes("get_region_disposal_info"),
       "the tool name must never appear in user-facing text",
@@ -811,6 +814,33 @@ async function runSmoke() {
       `plan structuredContent lost its nextTool hint: ${JSON.stringify(cleanup.structuredContent?.nextTool)}`,
     );
     requestId += 1;
+
+    // 예고를 지키는지는 **강남구로 재면 안 된다.** 강남구는 지역 출처 목록에 마침
+    // clean.gangnam.go.kr가 들어 있어서, 못 지킬 문장을 걸어도 화면상 URL이 있는 것처럼
+    // 보인다. 서초구는 수수료 고시는 가졌는데 개요 응답에 신청·수수료 주소가 하나도 없다 —
+    // 예고가 과했는지는 이쪽에서만 드러난다.
+    const cleanupSeocho = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["책상의자"], region: "서울 서초구" },
+      requestId,
+    );
+    assert(
+      resultText(cleanupSeocho).includes("서울 서초구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
+      `fee-bearing plan in 서초구 lost the follow-up line: ${resultText(cleanupSeocho)}`,
+    );
+    const seochoRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 서초구" }, requestId + 1);
+    for (const promised of ["신청 주소", "수수료 조회처", "전체 표"]) {
+      assert(
+        !resultText(cleanupSeocho).includes(promised),
+        `서초구 plan promises "${promised}" but its region overview has no such URL`,
+      );
+    }
+    assert(
+      !/clean\.|biwa/.test(resultText(seochoRegion)),
+      "서초구 fixture assumes no bulky application/fee URL in the overview — refresh this guard if the data gained one",
+    );
+    requestId += 2;
 
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 강남구 고시에는 의자 행은 있고 옷장
     // 행은 없는데, 예전에는 "금액이 하나라도 있으면" 수수료 확인 문구가 통째로 사라져
@@ -898,7 +928,7 @@ async function runSmoke() {
       requestId,
     );
     assert(
-      resultText(cleanupPaddedRegion).includes("서울 강남구의 신고 신청 주소와 수수료 조회처, 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      resultText(cleanupPaddedRegion).includes("서울 강남구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
       "a padded region must be trimmed before it lands in the follow-up line",
     );
     assert(
