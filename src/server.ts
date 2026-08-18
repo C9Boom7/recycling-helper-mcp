@@ -28,6 +28,8 @@ import {
   formatRegionSourceList,
   formatUnregisteredDistrictScope,
   inferMaterialCategories,
+  isBulkySecondaryRoute,
+  itemHasBulkyRoute,
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
@@ -904,6 +906,9 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
     }
 
     const { match } = resolved;
+    // 카드와 같은 빌더를 쓴다. 플랜만 따로 포맷을 만들면 같은 품목·같은 지역인데
+    // 카드와 플랜이 다른 금액 문장을 내놓는 순간 어느 쪽이 맞는지 알 수 없게 된다.
+    const feeLine = buildRegionFeeLine(match.item, regionMatch);
     return {
       input: rawName,
       found: true as const,
@@ -913,9 +918,16 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
       summary: match.item.summary,
       regionCheckLevel: itemRegionCheckLabel(match.item),
       sourceRef: briefSourceTitle(match.item),
-      // 카드와 같은 빌더를 쓴다. 플랜만 따로 포맷을 만들면 같은 품목·같은 지역인데
-      // 카드와 플랜이 다른 금액 문장을 내놓는 순간 어느 쪽이 맞는지 알 수 없게 된다.
-      feeLine: buildRegionFeeLine(match.item, regionMatch),
+      // 대형폐기물이 보조 배출로인 품목에는 카드가 다는 단서를 여기서도 단다. 이게
+      // 없으면 작은 플라스틱 화분에도 "수수료 1,000원~2,000원"이 조건 없이 찍혀,
+      // 같은 품목·같은 지역인데 `get_disposal_steps`와 플랜이 서로 다른 말을 한다.
+      feeLine:
+        feeLine && isBulkySecondaryRoute(match.item)
+          ? `대형폐기물에 해당할 때만 ${feeLine}. 그 외에는 위 배출 방법을 따릅니다.`
+          : feeLine,
+      // 대형폐기물 경로를 타는 품목인지. 금액이 붙었는지와는 다른 축이고, 마무리
+      // 문장이 그 둘을 갈라 봐야 한다(바로 아래 hasFeeUnknownBulky).
+      bulkyRoute: itemHasBulkyRoute(match.item),
     };
   });
 
@@ -929,6 +941,16 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   // 한 품목이라도 금액이 나갔는지. 마무리 문장이 "수수료는 확인이 필요하다"고 말할지
   // 말지가 여기서 갈린다 — 방금 금액을 적어 놓고 같은 화면에서 없다고 하면 안 된다.
   const hasFeeLine = planned.some((entry) => entry.found && entry.feeLine);
+  /**
+   * 대형폐기물로 나가는데 그 지역 고시에서 행을 못 찾은 품목이 섞여 있는지. 한 품목의
+   * 금액이 플랜 전체를 덮으면 안 된다 — 강남구에 "책상의자, 옷장"을 넣으면 의자 금액만
+   * 찍히고 고시에 행이 없는 옷장은 수수료를 확인하라는 말조차 사라졌다.
+   *
+   * 가르는 축은 "금액이 있나"가 아니라 "대형폐기물 경로인데 우리가 그 지역 행을 못
+   * 가졌나"다. 금액 없음만 보면 건전지에서 틀린다 — 답이 전용 수거함이라 수수료라는 게
+   * 애초에 없는 품목에 "수수료를 확인하세요"를 붙이면 없는 요금을 예고하는 셈이다.
+   */
+  const hasFeeUnknownBulky = planned.some((entry) => entry.found && entry.bulkyRoute && !entry.feeLine);
   /**
    * 그 지역 데이터를 가진 경우에만 신고 방법·수수료·수거함 위치까지 약속한다. 미등록이거나
    * 되물어야 하는 지역에 같은 문장을 붙이면 없는 안내를 있다고 말하는 셈이다.
@@ -965,25 +987,29 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
       "",
     ]),
     // 금액을 적어 보냈으면 "수수료도 확인이 필요하다"는 말을 뺀다. 남는 건 신고 절차와
-    // 수거처인데, 그건 우리가 대신 해줄 수 없는 게 맞다. 금액이 안 나간 호출에서는
-    // 예전 문장 그대로다 — 수수료 표를 못 가진 지역이 아직 많다.
+    // 수거처인데, 그건 우리가 대신 해줄 수 없는 게 맞다. 다만 금액을 못 채운 대형폐기물이
+    // 함께 있으면 그 품목 몫의 수수료 확인은 도로 살린다. 금액이 한 줄도 안 나간
+    // 호출에서는 예전 문장 그대로다 — 수수료 표를 못 가진 지역이 아직 많다.
     hasCriticalItem
       ? hasFeeLine
-        ? "위 수수료는 규격별 후보이고, 실제 금액은 신고할 때 고르는 규격에서 정해집니다. 전용 수거함과 지정 수거처, 신고 절차는 지역 공식 안내를 확인하세요."
+        ? hasFeeUnknownBulky
+          ? "위 수수료는 규격별 후보이고, 실제 금액은 신고할 때 고르는 규격에서 정해집니다. 금액을 적지 못한 대형폐기물 품목의 수수료와 전용 수거함·지정 수거처, 신고 절차는 지역 공식 안내를 확인하세요."
+          : "위 수수료는 규격별 후보이고, 실제 금액은 신고할 때 고르는 규격에서 정해집니다. 전용 수거함과 지정 수거처, 신고 절차는 지역 공식 안내를 확인하세요."
         : "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
       : undefined,
     planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
       ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
       : undefined,
-    // 다음 걸음 안내. 플랜은 품목당 한두 줄이라 수수료도 규격 범위까지만 싣는다 — 규격별
-    // 전체 표와 신청 URL은 지역 툴 몫이고, 그 사실을 문장으로 남긴다. 필수 품목에는 수수료를
-    // 내는 대형폐기물만 있는 게 아니라 건전지·폐의약품처럼 전용 수거함이 답인 것도 있어서,
-    // 바로 위 마무리 줄처럼 두 갈래를 함께 부른다.
+    // 다음 걸음 안내. 예고는 그 후속 호출이 실제로 내놓는 것에만 건다 — 지역 툴은 신청
+    // URL과 수수료 조회처, 수거함 위치를 주지 규격별 표를 통째로 주지는 않는다(품목을
+    // 넘겨도 대표 N종에서 끊긴다). 필수 품목에는 수수료를 내는 대형폐기물만 있는 게 아니라
+    // 건전지·폐의약품처럼 전용 수거함이 답인 것도 있어서, 바로 위 마무리 줄처럼 두 갈래를
+    // 함께 부른다.
     hasCriticalItem
       ? hintRegion
         ? hintRegionKnown
           ? hasFeeLine
-            ? `${hintRegion}의 규격별 수수료 전체 표와 신고 신청 주소, 전용 수거함 위치도 이어서 안내할 수 있습니다.`
+            ? `${hintRegion}의 신고 신청 주소와 수수료 조회처, 전용 수거함 위치도 이어서 안내할 수 있습니다.`
             : `${hintRegion}의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다.`
           : `${hintRegion} 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다.`
         : "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다."

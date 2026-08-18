@@ -72,7 +72,7 @@
 - `classify_waste_item`: `found, matchedItem, matchedBy, disposalGroup, disposalType, summary, confidence, regionCheckLevel, regionGuidance, primarySource{title,url}`
 - `get_disposal_steps`: `found, id, itemName, matchedBy, disposalGroup, summary, steps, cautions, review{status}, region(입력 시), regionCheckLevel, regionNotes(지역 안내 줄 배열, 있을 때만), sources(최대 2개 {title,url})`
 - `check_confusing_item`: matches 배열 항목당 `itemName, summary, confidence, regionCheckLevel` + 첫 caution 1개
-- `make_cleanup_plan`: items 항목당 `input, found, group, itemName?, summary, regionCheckLevel?, candidates?` — `groups` 중복 맵 제거 (text에 이미 그룹핑이 있음)
+- `make_cleanup_plan`: items 항목당 `input, found, group, itemName?, summary, regionCheckLevel?, candidates?, fee?` — `groups` 중복 맵 제거 (text에 이미 그룹핑이 있음). `fee`는 그 지역 고시에서 품목 행을 찾았을 때만 붙는 수수료 한 줄이다
 - `get_region_disposal_info`: `region, matchedRegion, item, ambiguousCandidates?, defaultSummary, checkList, officialSources(최대 3개 {title,url}, 미매칭 지역도 동일 형태)` — `regionalPolicy` 전체 객체 제거
 - ambiguous/not_found 응답: 현행 유지 (이미 작음). `candidateDetails`의 `score`는 제거.
 

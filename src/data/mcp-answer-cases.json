@@ -4212,6 +4212,31 @@
     ]
   },
   {
+    "id": "cleanup_plan_gangnam_fee_lines",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": [
+        "책상의자",
+        "화분"
+      ],
+      "region": "서울 강남구"
+    },
+    "expectedTextIncludes": [
+      "책상의자 -> 의자",
+      "화분 -> 화분",
+      "수수료 2,000원~5,000원 (규격 4종, 2026-07-02 확인)",
+      "대형폐기물에 해당할 때만 수수료 1,000원~2,000원 (규격 2종, 2026-07-02 확인). 그 외에는 위 배출 방법을 따릅니다.",
+      "서울 강남구의 신고 신청 주소와 수수료 조회처, 전용 수거함 위치도 이어서 안내할 수 있습니다."
+    ],
+    "expectedTextExcludes": [
+      "전체 표"
+    ],
+    "expectedStructuredIncludes": [
+      "\"fee\":\"수수료 2,000원~5,000원",
+      "\"fee\":\"대형폐기물에 해당할 때만 수수료 1,000원~2,000원"
+    ]
+  },
+  {
     "id": "cleanup_plan_region_impact_advisory_only",
     "tool": "make_cleanup_plan",
     "arguments": {
