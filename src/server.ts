@@ -907,8 +907,19 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
    * 지역을 안 댔으면 nextTool도 없다 — 물어볼 지역이 정해져야 인자가 완성된다.
    */
   const hasCriticalItem = planned.some((entry) => entry.found && entry.regionCheckLevel === "필수");
-  // 공백만 온 지역은 안 온 것으로 본다. regionStatusFor와 같은 이유다.
-  const hintRegion = region?.trim() ? region : undefined;
+  // 공백만 온 지역은 안 온 것으로 본다. regionStatusFor와 같은 이유다. 남는 값도 다듬은
+  // 쪽으로 쓴다 — 앞뒤 공백이 붙은 채로 문장에 박히거나 후속 호출 인자로 넘어간다.
+  const hintRegion = region?.trim() || undefined;
+  /**
+   * 그 지역 데이터를 가진 경우에만 신고 방법·수수료·수거함 위치까지 약속한다. 미등록이거나
+   * 되물어야 하는 지역에 같은 문장을 붙이면 없는 안내를 있다고 말하는 셈이다.
+   *
+   * 그래도 nextTool은 두 갈래 모두 내려보낸다. 미등록 지역이면 지역 툴이 공식 확인 경로를,
+   * 모호한 지역이면 후보를 주므로 후속 호출 자체는 유효하다 — 과했던 건 호출이 아니라 문장의
+   * 약속이었다. 여기서 지역을 다시 묻고 멈추면, 방금 자기 지역을 댄 사람에게 못 들은 척하는
+   * 답이 된다.
+   */
+  const hintRegionKnown = hintRegion !== undefined && resolveRegionalPolicy(hintRegion).status === "match";
 
   const groups = new Map<string, typeof planned>();
   for (const entry of planned) {
@@ -939,12 +950,16 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
     planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
       ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
       : undefined,
-    // 다음 걸음 안내. 플랜은 일부러 컴팩트해서(품목당 요약 한 줄) 신고 경로와
-    // 수수료를 싣지 않는다 — 그 몫이 지역 툴에 있다는 사실을 문장으로 남긴다.
+    // 다음 걸음 안내. 플랜은 일부러 컴팩트해서(품목당 요약 한 줄) 신고 경로와 수수료를
+    // 싣지 않는다 — 그 몫이 지역 툴에 있다는 사실을 문장으로 남긴다. 필수 품목에는 수수료를
+    // 내는 대형폐기물만 있는 게 아니라 건전지·폐의약품처럼 전용 수거함이 답인 것도 있어서,
+    // 바로 위 마무리 줄처럼 두 갈래를 함께 부른다.
     hasCriticalItem
       ? hintRegion
-        ? `${hintRegion}의 대형폐기물 신고 방법과 수수료도 이어서 안내할 수 있습니다.`
-        : "거주 지역을 알려주시면 대형폐기물 신고 방법과 수수료까지 확인해 드릴 수 있습니다."
+        ? hintRegionKnown
+          ? `${hintRegion}의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다.`
+          : `${hintRegion} 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다.`
+        : "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다."
       : undefined,
   ].filter(Boolean);
 
