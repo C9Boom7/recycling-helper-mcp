@@ -141,9 +141,9 @@ function startServer(port, { widgets = false } = {}) {
       HOST,
       PORT: String(port),
       // PRD phase-3 R4-1: pinned, never inherited. The 183 get_disposal_steps
-      // answer cases assert on human-readable text and structuredContent, which
-      // a widget response replaces — so the suite must not depend on whatever
-      // WIDGET_ENABLED happens to be set to in the caller's shell.
+      // answer cases assert on human-readable text, which a widget response
+      // replaces with serialized card JSON — so the suite must not depend on
+      // whatever WIDGET_ENABLED happens to be set to in the caller's shell.
       WIDGET_ENABLED: widgets ? "true" : "false",
       // 같은 이유로 고정한다. 런북 2절이 로컬 QA에 CALL_LOG_DETAILS=true를 권하므로
       // 그 셸에서 그대로 돌리면 서버가 물려받고, 아래 로그 단언이 검사하는 기본
@@ -663,6 +663,31 @@ async function runSmoke() {
     );
     requestId += 1;
 
+    // -32602는 호스트 모델이 읽고 다음 호출을 고치는 복구 프롬프트다. Zod 원문만
+    // 나가던 시기가 있어, 자연어 안내가 앞에 서고 원문이 상세로 남는지 고정한다.
+    const invalidArgsResponse = await fetch(`${baseUrl}/mcp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: requestId,
+        method: "tools/call",
+        params: { name: "get_disposal_steps", arguments: {} },
+      }),
+    });
+    const invalidArgs = JSON.parse(await invalidArgsResponse.text());
+    assert(invalidArgs.error?.code === -32602, `missing itemName should return -32602, got ${JSON.stringify(invalidArgs)}`);
+    assert(
+      invalidArgs.error.message.includes("itemName은(는) 필수 항목입니다") &&
+        invalidArgs.error.message.includes("버릴 품목명을 한국어로 전달하세요"),
+      `-32602 message lost its natural-language recovery line: ${invalidArgs.error.message}`,
+    );
+    assert(
+      invalidArgs.error.message.includes("상세:"),
+      `-32602 message dropped the Zod detail that debugging reads: ${invalidArgs.error.message}`,
+    );
+    requestId += 1;
+
     // Host allowlist checks must use node:http — see rawStatusWithHost.
     for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
       const status = await rawStatusWithHost(port, endpointHost);
@@ -1102,8 +1127,10 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
     const result = await callTool(baseUrl, "get_disposal_steps", args, requestId);
     requestId += 1;
 
-    // A display name can still resolve as ambiguous; that path stays text by design.
-    if (result.structuredContent !== undefined) {
+    // A display name can still resolve as ambiguous; that path stays text by
+    // design. Widget responses now carry structuredContent too, so the
+    // discriminator is the resolution status, not the field's presence.
+    if (result.structuredContent?.found !== true) {
       skipped.push(item.id);
       continue;
     }
@@ -1129,9 +1156,9 @@ async function sweepWidgetCatalogue(baseUrl, startRequestId) {
 }
 
 /**
- * PRD phase-3 R4-1. Widget responses replace both the text body and
- * structuredContent that the 211 answer cases assert on, so they run against
- * their own server instance with WIDGET_ENABLED on.
+ * PRD phase-3 R4-1. Widget responses replace the text body the 211 answer
+ * cases assert on (structuredContent은 이제 두 모드가 같은 것을 싣는다), so they
+ * run against their own server instance with WIDGET_ENABLED on.
  */
 async function runWidgetSmoke() {
   const port = await getFreePort();
@@ -1161,7 +1188,14 @@ async function runWidgetSmoke() {
     assert(Array.isArray(payload.widget.children) && payload.widget.children.length > 0, "widget Card has no children");
     assert(!("status" in payload) && !("status" in payload.widget), "widget response must not define status");
     assert(typeof payload.copy_text === "string" && payload.copy_text.includes("기름 묻은 피자박스"), "copy_text is missing the item name");
-    assert(match.structuredContent === undefined, "widget response must not carry structuredContent");
+    // 카드는 렌더링용, structuredContent는 모델 추론용 — 위젯 응답도 텍스트 경로와
+    // 같은 데이터를 실어야 한다 (R4 결정 변경, 2026-08-18).
+    assert(match.structuredContent?.found === true, "widget response must carry the text path's structuredContent");
+    assert(match.structuredContent.id === "pizza_box_oily", `widget structuredContent matched the wrong item: ${match.structuredContent.id}`);
+    assert(
+      JSON.stringify(match.structuredContent.steps) === JSON.stringify(pizzaBox.steps),
+      "widget structuredContent should carry the same steps the text path serves",
+    );
     assert(
       JSON.stringify(payload.widget).includes("깨끗한 부분과 오염된 부분을 분리합니다."),
       "widget card is missing the disposal steps",
@@ -1219,10 +1253,11 @@ async function runWidgetSmoke() {
     assert(feeLine.includes(`${feeSchedule.checkedAt} 확인`), `fee line should carry the fee schedule's own date, got: ${feeLine}`);
     assert(!feeLine.includes(chair.sources[0].checkedAt), `fee line is dated with the item source date instead: ${feeLine}`);
 
-    // 위젯 응답에는 structuredContent가 없어(R4) 텍스트 경로가 싣던 "확신도: 보통"이 통째로
-    // 빠졌다. 324개 중 75개가 medium이라, 그 줄이 없으면 한 번 더 확인해야 할 답이 확정된
-    // 답으로 나간다. high 249개는 종전대로 아무 말도 덧붙이지 않는다. 문구는 분류 이야기만
-    // 한다 — 지역을 다시 확인하라는 말은 지역 줄이 이미 자기 조건에 맞게 하고 있다.
+    // 확신도 등급 원문은 이제 structuredContent로 모델에 항상 가지만, 카드만 보는
+    // 사용자를 위한 신호는 여전히 이 한 줄뿐이다. 324개 중 75개가 medium이라, 그 줄이
+    // 없으면 한 번 더 확인해야 할 답이 확정된 답으로 나간다. high 249개는 종전대로
+    // 아무 말도 덧붙이지 않는다. 문구는 분류 이야기만 한다 — 지역을 다시 확인하라는
+    // 말은 지역 줄이 이미 자기 조건에 맞게 하고 있다.
     assert(mediumItem.confidence === "medium" && pizzaBox.confidence === "high", "confidence-note case lost its high/medium pair");
     const mediumMatch = await callTool(baseUrl, "get_disposal_steps", { itemName: mediumItem.name }, requestId);
     requestId += 1;
@@ -1271,7 +1306,10 @@ async function runWidgetSmoke() {
     const classified = await callTool(baseUrl, "classify_waste_item", { itemName: "기름 묻은 피자박스" }, requestId);
     requestId += 1;
     const classifiedPayload = parseWidgetPayload(classified, "classify confirmed match");
-    assert(classified.structuredContent === undefined, "classify widget response must not carry structuredContent");
+    // 확신도는 카드가 medium일 때만 한 줄로 접어 싣는다. structuredContent가 함께
+    // 나가면서 등급 원문은 모델이 항상 받는다 — 위젯을 켜도 잃지 않는지 여기서 고정.
+    assert(classified.structuredContent?.matchedItem === pizzaBox.name, "classify widget response must carry the text path's structuredContent");
+    assert(classified.structuredContent.confidence === pizzaBox.confidence, `classify widget structuredContent lost the confidence grade: ${classified.structuredContent.confidence}`);
     assert(
       JSON.stringify(classifiedPayload.widget) === JSON.stringify(payload.widget),
       "classify and get_disposal_steps should serve the same card for the same match",
@@ -1334,9 +1372,9 @@ async function runWidgetSmoke() {
       );
     }
 
-    // PRD phase-3 R5: a widget response has no structuredContent for callStatus()
-    // to read, so the handler must log status explicitly or every confirmed
-    // match would land in the logs as a plain "ok".
+    // PRD phase-3 R5. 위젯 응답에도 structuredContent가 실리면서 callStatus()가
+    // 추론할 수는 있게 됐지만, 본선 집계가 읽는 status는 응답 모양에 얹혀 가면
+    // 응답을 고칠 때 조용히 어긋난다 — 핸들러가 명시한 값이 로그에 나오는지 고정.
     const logLines = getOutput()
       .split("\n")
       .filter((line) => line.includes('"tool":"get_disposal_steps"'))
@@ -1364,9 +1402,9 @@ async function runWidgetSmoke() {
       "the photo-sourced call should reach the log output, not just the handler's _log",
     );
 
-    // Same trap on the tool that just gained a widget: no structuredContent for
-    // callStatus() to read means a confirmed match logs as a plain "ok" unless
-    // the handler says otherwise, and the finals-window match rate reads off this.
+    // Same pin on the tool that just gained a widget: the finals-window match
+    // rate reads off the logged status, so it must come from the handler's
+    // explicit value rather than whatever shape the response happens to have.
     const classifyLog = getOutput()
       .split("\n")
       .filter((line) => line.includes('"tool":"classify_waste_item"'))

@@ -94,8 +94,17 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 - [src/server.ts](../../src/server.ts)의 `get_disposal_steps` 핸들러에서, match 확정 시 `buildDisposalWidget(item, ...)` 결과를 `textResult` 대신 반환.
 - 위젯 빌더는 `src/widgets.ts`로 분리 (server.ts 비대화 방지).
-- 위젯 응답에는 structuredContent를 넣지 않는다 (위젯이 곧 최종 답변 — result 최소화 원칙).
+- ~~위젯 응답에는 structuredContent를 넣지 않는다 (위젯이 곧 최종 답변 — result 최소화 원칙).~~ — **2026-08-18 결정 변경.** 아래 "R4 결정 변경" 참고.
 - 위젯 JSON 생성 함수에 단위 성격의 smoke 케이스 추가: JSON.parse 가능, `widget` 래핑 존재, `status` 부재, `copy_text` 존재.
+
+### R4 결정 변경 (2026-08-18) — 위젯 응답에도 structuredContent를 싣는다
+
+외부 리뷰 지적을 받아들였다: 카드 JSON을 text 콘텐츠로만 보내면 호스트 모델이 데이터가 아니라 UI 마크업을 읽고 답을 재구성해야 한다. 렌더링용(카드)과 모델 추론용(structuredContent)을 분리하는 게 MCP 스펙에도 맞고, 이 문서가 R2 7번·R2-1에서 이미 기록해 둔 손실 — medium 확신도 신호가 카드 밖으로 안 나가는 것, 카드 2줄 예산에 잘린 지역 안내를 그 턴에서 복구할 수 없는 것 — 도 함께 해소된다.
+
+- 위젯 분기와 텍스트 분기가 **같은 structuredContent 객체를 공유한다** (핸들러에서 분기 전에 한 번 생성). 두 모드가 따로 만들면 필드 수정이 한쪽만 반영된다.
+- 확정 매칭 응답 크기는 카드만 실을 때보다 늘어난다 (피자박스 기준 약 1.3KB → 약 2.5KB). 모델이 인용할 근거·단계·확신도가 실리는 대가로 받아들인다.
+- `_log`의 명시적 `status: "match"`는 유지한다. `callStatus()`가 추론할 수 있게 됐지만, 집계 어휘가 응답 모양에 얹혀 가면 응답 수정이 로그를 조용히 바꾼다.
+- smoke는 부재 단언을 병행 단언으로 뒤집었다: 위젯 응답의 `found === true`, 텍스트 경로와 같은 `steps`, classify의 `confidence` 원문 유지. 카탈로그 sweep의 위젯/텍스트 판별은 structuredContent 유무 대신 `found` 값으로 바꿨다.
 
 ### R4-1. 기존 smoke 하니스와의 충돌 해소
 
@@ -117,7 +126,7 @@ ChatKit 컴포넌트 선택(Text/Title/Caption/Divider/Badge 등)은 구현 시 
 
 ### R5. 호출 로그의 status 보존
 
-위젯 응답은 structuredContent가 없다. [src/server.ts](../../src/server.ts)의 `callStatus()`는 `found`/`ambiguous`로 상태를 추론하므로, 그대로 두면 확정 매칭인데도 로그에 `"ok"`로 남아 본선 기간 매칭률 집계가 왜곡된다.
+위젯 응답은 structuredContent가 없다(작성 당시 — 2026-08-18부터는 실린다. 위 "R4 결정 변경" 참고. 명시적 status를 유지하는 이유도 거기 있다). [src/server.ts](../../src/server.ts)의 `callStatus()`는 `found`/`ambiguous`로 상태를 추론하므로, 그대로 두면 확정 매칭인데도 로그에 `"ok"`로 남아 본선 기간 매칭률 집계가 왜곡된다.
 
 - 다행히 배선은 이미 있다. `ToolLogMeta`에 `status` 필드가 있고 `withCallLog`가 `_log?.status ?? callStatus(result)` 순으로 참조한다. **위젯 경로에서 `_log.status`를 `"match"`로 명시**하면 끝이고, `callStatus()`는 손대지 않는다.
 - 위젯 응답도 `matchedId`, `score`를 기존과 동일하게 `_log`에 실어, 텍스트 경로와 로그 스키마가 갈라지지 않게 한다.
