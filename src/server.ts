@@ -28,6 +28,8 @@ import {
   formatRegionSourceList,
   formatUnregisteredDistrictScope,
   inferMaterialCategories,
+  isBulkySecondaryRoute,
+  itemHasBulkyRoute,
   itemNeedsCriticalRegionCheck,
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
@@ -220,8 +222,8 @@ const TOOL_DEFS: ToolDef[] = [
     // docs/prd/README.md 본선 규격 요약)에 제일 먼저 닿는다. 발화 예시 네 개는 호스트
     // 라우팅의 근거라 그대로 두고 설명 문장을 눌러 담았다. 길이는 스모크가 지킨다.
     description:
-      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. The primary tool whenever a user asks how to throw away, discard, or recycle something — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Use it even when they mention where they live — pass that as region for local rules and the bulky-waste fee — e.g. '강남구 사는데 침대 어떻게 버려?'. Accepts vague or partial names; if ambiguous, the result lists candidates to ask about. " +
-      "When the user sends a photo instead of a name, pass only the object being discarded — not the room, background, or people — as itemName in everyday Korean (foam tray → 스티로폼 용기, snack bag → 과자봉지), adding the material when the object type alone is ambiguous, and set inputSource to \"photo\". For several items in one photo, call make_cleanup_plan with one name each.",
+      "Returns step-by-step disposal instructions for a Korean household waste item from RecyclingHelper(재활용척척): preparation steps, cautions, official sources, and region-specific notes when a region is given. The primary tool when a user asks how to throw away, discard, or recycle ONE thing — e.g. '기름 묻은 피자박스 어떻게 버려?', '깨진 유리컵 버리는 법', '폐건전지 어디다 버려?'. Use it even when they mention where they live — pass that as region for local rules and the bulky-waste fee — e.g. '강남구 사는데 침대 어떻게 버려?'. Accepts vague or partial names; if ambiguous, the result lists candidates to ask about. " +
+      "When the user sends a photo instead of a name, pass only the object being discarded — not the room, background, or people — as itemName in everyday Korean (foam tray → 스티로폼 용기, snack bag → 과자봉지), adding the material when the object type alone is ambiguous, and set inputSource to \"photo\". For two or more items in one message — typed or in a photo — call make_cleanup_plan once instead.",
     inputShape: {
       itemName: itemNameParam,
       region: optionalRegionParam,
@@ -250,8 +252,13 @@ const TOOL_DEFS: ToolDef[] = [
   defineTool({
     name: "make_cleanup_plan",
     title: "Make Cleanup Plan",
+    // 이 툴이 지금껏 안 뽑힌 자리를 그대로 메운 문구다. 예전 설명은 "품목을 배출 그룹으로
+    // 묶어준다"가 골자여서, 모델이 이미 할 수 있다고 느끼면 그냥 자기 지식으로 답하고
+    // 넘어갔다(Preview 측정, 2026-08-18: '강남구에서 이사가면서 침대랑 화분' 미호출).
+    // 그래서 모델이 못 가진 값 — 지자체 고시 수수료 — 을 첫 문장에 세우고, 여러 품목일 때
+    // get_disposal_steps를 반복 호출하지 말라는 경계를 명시한다.
     description:
-      "Groups multiple Korean household waste items into disposal buckets (재활용/일반쓰레기/대형폐기물/특수폐기물) with RecyclingHelper(재활용척척) and returns an organized disposal plan. Use when the user lists two or more items to throw away, or mentions moving out, decluttering, or a big cleanup — e.g. '이사 가는데 침대, 옷, 화분 버려야 해', '대청소했더니 버릴 게 한가득이야'.",
+      "Plans disposal for several Korean household waste items at once with RecyclingHelper(재활용척척): each item's bucket (재활용/일반쓰레기/대형폐기물/특수폐기물) plus that municipality's own bulky-waste fee figures with the date they were verified, when a region is given. The fees come from each 시·군·구 ordinance and are not general knowledge. Call this ONCE with every item in the list — do not call get_disposal_steps repeatedly for each one. Use whenever the user names two or more things to throw away, or mentions moving out, decluttering, or a big cleanup — e.g. '이사 가는데 침대, 옷, 화분 버려야 해', '강남구에서 이사가면서 침대랑 화분 버리려는데 어떻게 버려?', '대청소했더니 버릴 게 한가득이야'. Pass the region whenever the user names where they live.",
     inputShape: {
       items: z
         .array(z.string().min(1).max(80))
@@ -862,6 +869,17 @@ async function handleCheckConfusingItem({ itemName }: { itemName: string }): Pro
 }
 
 async function handleMakeCleanupPlan({ items, region }: { items: string[]; region?: string }): Promise<LoggedToolResult> {
+  // 공백만 온 지역은 안 온 것으로 본다. regionStatusFor와 같은 이유다. 남는 값도 다듬은
+  // 쪽으로 쓴다 — 앞뒤 공백이 붙은 채로 문장에 박히거나 후속 호출 인자로 넘어간다.
+  const hintRegion = region?.trim() || undefined;
+  /**
+   * 지역을 여기서 한 번 확정해 품목별 수수료까지 플랜에 싣는다. 예전에는 이 자리에서
+   * status만 보고 매칭 결과를 버렸고, 그래서 "강남구에서 이사가면서 침대랑 화분 버리는데"
+   * 처럼 수수료가 질문의 핵심인 발화에도 금액이 한 줄도 안 나갔다 — 지역 툴을 한 번 더
+   * 부르라고 미루는 사이 호스트는 그냥 자기 지식으로 답해버린다. 데이터(bulky-waste-fees)는
+   * 이미 있었고 없던 건 배선뿐이다.
+   */
+  const regionMatch = findRegionalPolicy(hintRegion);
   const planned = items.map((rawName) => {
     const resolved = resolveWasteItem(rawName);
     if (resolved.status === "not_found") {
@@ -888,6 +906,9 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
     }
 
     const { match } = resolved;
+    // 카드와 같은 빌더를 쓴다. 플랜만 따로 포맷을 만들면 같은 품목·같은 지역인데
+    // 카드와 플랜이 다른 금액 문장을 내놓는 순간 어느 쪽이 맞는지 알 수 없게 된다.
+    const feeLine = buildRegionFeeLine(match.item, regionMatch);
     return {
       input: rawName,
       found: true as const,
@@ -897,6 +918,21 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
       summary: match.item.summary,
       regionCheckLevel: itemRegionCheckLabel(match.item),
       sourceRef: briefSourceTitle(match.item),
+      // 대형폐기물이 보조 배출로인 품목에는 카드가 다는 단서를 여기서도 단다. 이게
+      // 없으면 작은 플라스틱 화분에도 "수수료 1,000원~2,000원"이 조건 없이 찍혀,
+      // 같은 품목·같은 지역인데 `get_disposal_steps`와 플랜이 서로 다른 말을 한다.
+      feeLine:
+        feeLine && isBulkySecondaryRoute(match.item)
+          ? `대형폐기물에 해당할 때만 ${feeLine}. 그 외에는 위 배출 방법을 따릅니다.`
+          : feeLine,
+      // 대형폐기물 경로를 타는 품목인지. 금액이 붙었는지와는 다른 축이고, 마무리
+      // 문장이 그 둘을 갈라 봐야 한다(바로 아래 hasFeeUnknownBulky).
+      //
+      // 보조 배출로는 여기서 뺀다. 인형처럼 "일반쓰레기/대형폐기물"인 품목은 바로 위에서
+      // "대형폐기물에 해당할 때만"이라는 단서를 달아 놓고선, 마무리 줄에서 "금액을 적지
+      // 못한 대형폐기물 품목의 수수료를 확인하라"고 부르면 같은 함수가 한 화면에서 서로
+      // 반대로 말한다. 조건부인 품목은 조건부라고만 말하고 끝낸다.
+      bulkyRoute: itemHasBulkyRoute(match.item) && !isBulkySecondaryRoute(match.item),
     };
   });
 
@@ -907,9 +943,19 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
    * 지역을 안 댔으면 nextTool도 없다 — 물어볼 지역이 정해져야 인자가 완성된다.
    */
   const hasCriticalItem = planned.some((entry) => entry.found && entry.regionCheckLevel === "필수");
-  // 공백만 온 지역은 안 온 것으로 본다. regionStatusFor와 같은 이유다. 남는 값도 다듬은
-  // 쪽으로 쓴다 — 앞뒤 공백이 붙은 채로 문장에 박히거나 후속 호출 인자로 넘어간다.
-  const hintRegion = region?.trim() || undefined;
+  // 한 품목이라도 금액이 나갔는지. 마무리 문장이 "수수료는 확인이 필요하다"고 말할지
+  // 말지가 여기서 갈린다 — 방금 금액을 적어 놓고 같은 화면에서 없다고 하면 안 된다.
+  const hasFeeLine = planned.some((entry) => entry.found && entry.feeLine);
+  /**
+   * 대형폐기물로 나가는데 그 지역 고시에서 행을 못 찾은 품목이 섞여 있는지. 한 품목의
+   * 금액이 플랜 전체를 덮으면 안 된다 — 강남구에 "책상의자, 옷장"을 넣으면 의자 금액만
+   * 찍히고 고시에 행이 없는 옷장은 수수료를 확인하라는 말조차 사라졌다.
+   *
+   * 가르는 축은 "금액이 있나"가 아니라 "대형폐기물 경로인데 우리가 그 지역 행을 못
+   * 가졌나"다. 금액 없음만 보면 건전지에서 틀린다 — 답이 전용 수거함이라 수수료라는 게
+   * 애초에 없는 품목에 "수수료를 확인하세요"를 붙이면 없는 요금을 예고하는 셈이다.
+   */
+  const hasFeeUnknownBulky = planned.some((entry) => entry.found && entry.bulkyRoute && !entry.feeLine);
   /**
    * 그 지역 데이터를 가진 경우에만 신고 방법·수수료·수거함 위치까지 약속한다. 미등록이거나
    * 되물어야 하는 지역에 같은 문장을 붙이면 없는 안내를 있다고 말하는 셈이다.
@@ -919,7 +965,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
    * 약속이었다. 여기서 지역을 다시 묻고 멈추면, 방금 자기 지역을 댄 사람에게 못 들은 척하는
    * 답이 된다.
    */
-  const hintRegionKnown = hintRegion !== undefined && resolveRegionalPolicy(hintRegion).status === "match";
+  const hintRegionKnown = regionMatch !== undefined;
 
   const groups = new Map<string, typeof planned>();
   for (const entry of planned) {
@@ -939,25 +985,42 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
         const regionImpact = entry.found ? ` (지역 영향: ${entry.regionCheckLevel})` : "";
         return [
           `- ${label}: ${entry.summary}${regionImpact}`,
+          entry.found && entry.feeLine ? `  - ${entry.feeLine}` : undefined,
           entry.found ? `  - 대표 근거: ${entry.sourceRef}` : undefined,
         ].filter((line): line is string => line !== undefined);
       }),
       "",
     ]),
+    // 금액을 적어 보냈으면 "수수료도 확인이 필요하다"는 말을 뺀다. 남는 건 신고 절차와
+    // 수거처인데, 그건 우리가 대신 해줄 수 없는 게 맞다. 다만 금액을 못 채운 대형폐기물이
+    // 함께 있으면 그 품목 몫의 수수료 확인은 도로 살린다. 금액이 한 줄도 안 나간
+    // 호출에서는 예전 문장 그대로다 — 수수료 표를 못 가진 지역이 아직 많다.
     hasCriticalItem
-      ? "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
+      ? hasFeeLine
+        ? hasFeeUnknownBulky
+          ? "위 수수료는 규격별 후보이고, 실제 금액은 신고할 때 고르는 규격에서 정해집니다. 금액을 적지 못한 대형폐기물 품목의 수수료와 전용 수거함·지정 수거처, 신고 절차는 지역 공식 안내를 확인하세요."
+          : "위 수수료는 규격별 후보이고, 실제 금액은 신고할 때 고르는 규격에서 정해집니다. 전용 수거함과 지정 수거처, 신고 절차는 지역 공식 안내를 확인하세요."
+        : "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
       : undefined,
     planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
       ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
       : undefined,
-    // 다음 걸음 안내. 플랜은 일부러 컴팩트해서(품목당 요약 한 줄) 신고 경로와 수수료를
-    // 싣지 않는다 — 그 몫이 지역 툴에 있다는 사실을 문장으로 남긴다. 필수 품목에는 수수료를
-    // 내는 대형폐기물만 있는 게 아니라 건전지·폐의약품처럼 전용 수거함이 답인 것도 있어서,
-    // 바로 위 마무리 줄처럼 두 갈래를 함께 부른다.
+    // 다음 걸음 안내. 예고는 그 후속 호출이 **어느 지역에서나** 내놓는 것에만 건다.
+    // 여기서 두 번 미끄러졌다 — 처음엔 "규격별 수수료 전체 표"를 걸었는데 품목을 넘겨도
+    // 대표 N종에서 끊기고, 다음엔 "신청 주소와 수수료 조회처"로 낮췄는데 그것도 못 준다.
+    // 신청·수수료 URL은 bulky-waste-fees.json에 있고 지역 개요 경로는 그 파일을 안 읽는다.
+    // 강남구가 통과한 건 마침 지역 출처 목록에 clean.gangnam.go.kr가 들어 있어서지 경로가
+    // 있어서가 아니다 — 서초구는 같은 문장에서 줄 게 하나도 없다. 그래서 지역 데이터만으로
+    // 늘 나가는 것(신고 절차 체크 항목, 수거함 안내, 공식 확인처)까지만 예고한다.
+    //
+    // 필수 품목에는 수수료를 내는 대형폐기물만 있는 게 아니라 건전지·폐의약품처럼 전용
+    // 수거함이 답인 것도 있어서, 바로 위 마무리 줄처럼 두 갈래를 함께 부른다.
     hasCriticalItem
       ? hintRegion
         ? hintRegionKnown
-          ? `${hintRegion}의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다.`
+          ? hasFeeLine
+            ? `${hintRegion}의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다.`
+            : `${hintRegion}의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다.`
           : `${hintRegion} 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다.`
         : "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다."
       : undefined,
@@ -972,6 +1035,9 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
           itemName: entry.itemName,
           summary: entry.summary,
           regionCheckLevel: entry.regionCheckLevel,
+          // text에만 있고 structuredContent에 없으면, 구조화 응답만 읽는 호스트에서
+          // 금액이 통째로 사라진다. 배선을 넣은 이유가 그 경로라 둘 다 실어야 한다.
+          ...(entry.feeLine ? { fee: entry.feeLine } : {}),
         }
       : {
           input: entry.input,

@@ -105,7 +105,7 @@ const NESTED_KEY_WHITELIST = {
   check_confusing_item: { field: "matches", keys: ["itemName", "summary", "caution", "confidence", "regionCheckLevel"] },
   make_cleanup_plan: {
     field: "items",
-    keys: ["input", "found", "group", "itemName", "summary", "regionCheckLevel", "candidates"],
+    keys: ["input", "found", "group", "itemName", "summary", "regionCheckLevel", "candidates", "fee"],
   },
 };
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
@@ -777,12 +777,33 @@ async function runSmoke() {
       requestId,
     );
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
-    // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
-    // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다.
+    // 플랜이 금액을 직접 싣는지. 이걸 지역 툴에 미루던 시절, 호스트는 두 번째 호출을 하는
+    // 대신 자기 지식으로 답해버렸다(Preview 측정 2026-08-18). 수수료는 이 툴이 부를 값을
+    // 갖는 유일한 이유라 text와 structuredContent 양쪽에서 지킨다.
     assert(
-      resultText(cleanup).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      /수수료 [\d,]+원/.test(resultText(cleanup)),
+      `plan with a fee-bearing item must carry the amount: ${resultText(cleanup)}`,
+    );
+    const cleanupChair = cleanup.structuredContent?.items?.find((entry) => entry.input === "책상의자");
+    assert(
+      typeof cleanupChair?.fee === "string" && /[\d,]+원/.test(cleanupChair.fee),
+      `plan structuredContent lost the fee: ${JSON.stringify(cleanupChair)}`,
+    );
+    // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
+    // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다. 예고는 지역 툴이
+    // 실제로 내놓는 것까지만이다 — 규격별 표를 통째로 주는 경로도, 신청·수수료 URL을 지역
+    // 개요로 내보내는 경로도 없다(그 주소는 bulky-waste-fees.json에 있고 개요 경로는 그
+    // 파일을 안 읽는다).
+    assert(
+      resultText(cleanup).includes("서울 강남구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
       "critical-item plan with a region should end with the follow-up line",
     );
+    for (const forbidden of ["전체 표", "신청 주소", "수수료 조회처"]) {
+      assert(
+        !resultText(cleanup).includes(forbidden),
+        `the plan must not promise "${forbidden}" — no region-overview path delivers it`,
+      );
+    }
     assert(
       !resultText(cleanup).includes("get_region_disposal_info"),
       "the tool name must never appear in user-facing text",
@@ -791,6 +812,64 @@ async function runSmoke() {
       cleanup.structuredContent?.nextTool?.name === "get_region_disposal_info" &&
         cleanup.structuredContent.nextTool.arguments?.region === "서울 강남구",
       `plan structuredContent lost its nextTool hint: ${JSON.stringify(cleanup.structuredContent?.nextTool)}`,
+    );
+    requestId += 1;
+
+    // 예고를 지키는지는 **강남구로 재면 안 된다.** 강남구는 지역 출처 목록에 마침
+    // clean.gangnam.go.kr가 들어 있어서, 못 지킬 문장을 걸어도 화면상 URL이 있는 것처럼
+    // 보인다. 서초구는 수수료 고시는 가졌는데 개요 응답에 신청·수수료 주소가 하나도 없다 —
+    // 예고가 과했는지는 이쪽에서만 드러난다.
+    const cleanupSeocho = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["책상의자"], region: "서울 서초구" },
+      requestId,
+    );
+    assert(
+      resultText(cleanupSeocho).includes("서울 서초구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
+      `fee-bearing plan in 서초구 lost the follow-up line: ${resultText(cleanupSeocho)}`,
+    );
+    const seochoRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 서초구" }, requestId + 1);
+    for (const promised of ["신청 주소", "수수료 조회처", "전체 표"]) {
+      assert(
+        !resultText(cleanupSeocho).includes(promised),
+        `서초구 plan promises "${promised}" but its region overview has no such URL`,
+      );
+    }
+    assert(
+      !/clean\.|biwa/.test(resultText(seochoRegion)),
+      "서초구 fixture assumes no bulky application/fee URL in the overview — refresh this guard if the data gained one",
+    );
+    requestId += 2;
+
+    // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 강남구 고시에는 의자 행은 있고 옷장
+    // 행은 없는데, 예전에는 "금액이 하나라도 있으면" 수수료 확인 문구가 통째로 사라져
+    // 옷장까지 값이 확인된 것처럼 읽혔다.
+    const cleanupPartialFee = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["책상의자", "옷장"], region: "서울 강남구" },
+      requestId,
+    );
+    assert(
+      resultText(cleanupPartialFee).includes("금액을 적지 못한 대형폐기물 품목의 수수료"),
+      `a bulky item with no fee row must keep its fee-check instruction: ${resultText(cleanupPartialFee)}`,
+    );
+    requestId += 1;
+
+    // 대형폐기물이 보조 배출로일 뿐인 품목. 작은 플라스틱 화분은 그냥 재활용이라
+    // 수수료가 안 드는데, 조건 없이 금액만 찍으면 같은 품목·같은 지역에서 카드와
+    // 플랜이 서로 다른 말을 하게 된다.
+    const cleanupSecondaryRoute = await callTool(
+      baseUrl,
+      "make_cleanup_plan",
+      { items: ["화분"], region: "서울 강남구" },
+      requestId,
+    );
+    const cleanupPot = cleanupSecondaryRoute.structuredContent?.items?.find((entry) => entry.input === "화분");
+    assert(
+      typeof cleanupPot?.fee === "string" && cleanupPot.fee.startsWith("대형폐기물에 해당할 때만"),
+      `a secondary-route item must carry the card's caveat with its fee: ${JSON.stringify(cleanupPot)}`,
     );
     requestId += 1;
 
@@ -849,7 +928,7 @@ async function runSmoke() {
       requestId,
     );
     assert(
-      resultText(cleanupPaddedRegion).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      resultText(cleanupPaddedRegion).includes("서울 강남구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."),
       "a padded region must be trimmed before it lands in the follow-up line",
     );
     assert(

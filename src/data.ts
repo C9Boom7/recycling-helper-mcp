@@ -1357,7 +1357,7 @@ export function findBulkyWasteFeeSchedule(region: RegionalPolicyData): BulkyWast
  * 배출 그룹 라벨에 대형폐기물이 들어가는지로 거른다 — disposalType 문자열을 부분
  * 일치로 보면 새 값이 조용히 새므로 `disposal-groups.json`의 명시 매핑을 그대로 쓴다.
  */
-function itemHasBulkyRoute(item: WasteItem): boolean {
+export function itemHasBulkyRoute(item: WasteItem): boolean {
   return disposalGroupLabel(item.disposalType).includes("대형폐기물");
 }
 
@@ -1586,8 +1586,14 @@ export function disposalGroupLabel(disposalType: string): string {
   return disposalGroups[disposalType] ?? "확인 필요";
 }
 
-/** 대형폐기물이 보조 배출로일 뿐인지 — 주 배출로는 종량제봉투·소형가전 수거함 등. */
-function isBulkySecondaryRoute(item: WasteItem): boolean {
+/**
+ * 대형폐기물이 보조 배출로일 뿐인지 — 주 배출로는 종량제봉투·소형가전 수거함 등.
+ *
+ * 카드와 플랜이 함께 쓴다. 같은 판단을 서버에서 다시 짜면 한쪽만 조건을 붙이게 되고,
+ * 실제로 그렇게 어긋난 적이 있다 — 카드는 "대형폐기물에 해당할 때만"을 달았는데 플랜은
+ * 작은 플라스틱 화분에도 수수료를 조건 없이 찍었다.
+ */
+export function isBulkySecondaryRoute(item: WasteItem): boolean {
   const label = disposalGroupLabel(item.disposalType);
   return label.includes("대형폐기물") && !label.startsWith("대형폐기물");
 }
