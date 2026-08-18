@@ -1428,7 +1428,8 @@ function jsonRpcError(id: JsonRpcId | undefined, code: number, message: string):
 /**
  * -32602에 실을 필드별 복구 안내. 에러 메시지를 읽는 건 사용자가 아니라 호스트
  * 모델이라, 무엇이 틀렸는지에서 끝내지 않고 다음 호출을 어떻게 고치면 되는지까지
- * 잇는다. 여기 없는 필드는 이유 문장만 나간다.
+ * 잇는다. 여기 없는 필드는 이유 문장만 나간다. 키는 최상위 필드명이다 —
+ * items.1처럼 원소를 가리키는 이슈도 고칠 곳은 결국 items라서 같은 안내를 쓴다.
  */
 const ARGUMENT_RECOVERY_HINTS: Record<string, string> = {
   itemName: '버릴 품목명을 한국어로 전달하세요 (예: "기름 묻은 피자박스")',
@@ -1438,7 +1439,7 @@ const ARGUMENT_RECOVERY_HINTS: Record<string, string> = {
 
 function describeArgumentIssue(issue: z.ZodIssue): string {
   const field = issue.path.length > 0 ? issue.path.join(".") : "arguments";
-  const hint = ARGUMENT_RECOVERY_HINTS[field];
+  const hint = issue.path.length > 0 ? ARGUMENT_RECOVERY_HINTS[String(issue.path[0])] : undefined;
   const reason =
     issue.code === "invalid_type" && issue.received === "undefined"
       ? `${field}은(는) 필수 항목입니다`

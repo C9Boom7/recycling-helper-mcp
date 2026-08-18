@@ -689,6 +689,31 @@ async function runSmoke() {
     );
     requestId += 1;
 
+    // 배열 원소가 걸린 이슈는 경로가 items.1로 나온다. 라벨은 그대로 두되 안내는
+    // 최상위 필드(items)에서 찾아야 한다 — 경로 전체로 찾던 때는 어디가 틀렸는지만
+    // 알려주고 정작 어떻게 고치는지가 빠졌다.
+    const emptyElementResponse = await fetch(`${baseUrl}/mcp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: requestId,
+        method: "tools/call",
+        params: { name: "make_cleanup_plan", arguments: { items: ["침대", ""] } },
+      }),
+    });
+    const emptyElement = JSON.parse(await emptyElementResponse.text());
+    assert(
+      emptyElement.error?.code === -32602,
+      `an empty items element should return -32602, got ${JSON.stringify(emptyElement)}`,
+    );
+    assert(
+      emptyElement.error.message.includes("items.1이(가) 비어 있습니다") &&
+        emptyElement.error.message.includes("버릴 품목명 1~30개"),
+      `-32602 for an array element lost its recovery hint: ${emptyElement.error.message}`,
+    );
+    requestId += 1;
+
     // Host allowlist checks must use node:http — see rawStatusWithHost.
     for (const endpointHost of PLAYMCP_ENDPOINT_HOSTS) {
       const status = await rawStatusWithHost(port, endpointHost);
