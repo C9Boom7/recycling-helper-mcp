@@ -777,10 +777,23 @@ async function runSmoke() {
       requestId,
     );
     assert(resultText(cleanup).includes("의자"), "make_cleanup_plan did not include chair");
-    // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
-    // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다.
+    // 플랜이 금액을 직접 싣는지. 이걸 지역 툴에 미루던 시절, 호스트는 두 번째 호출을 하는
+    // 대신 자기 지식으로 답해버렸다(Preview 측정 2026-08-18). 수수료는 이 툴이 부를 값을
+    // 갖는 유일한 이유라 text와 structuredContent 양쪽에서 지킨다.
     assert(
-      resultText(cleanup).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      /수수료 [\d,]+원/.test(resultText(cleanup)),
+      `plan with a fee-bearing item must carry the amount: ${resultText(cleanup)}`,
+    );
+    const cleanupChair = cleanup.structuredContent?.items?.find((entry) => entry.input === "책상의자");
+    assert(
+      typeof cleanupChair?.fee === "string" && /[\d,]+원/.test(cleanupChair.fee),
+      `plan structuredContent lost the fee: ${JSON.stringify(cleanupChair)}`,
+    );
+    // 다음 툴 힌트. 텍스트에는 자연어만(호스트가 사용자에게 그대로 인용할 수 있다),
+    // 호출에 필요한 툴 이름·인자는 structuredContent.nextTool로만 나간다. 금액을 이미
+    // 실어 보낸 호출은 남은 몫(규격별 전체 표·신청 주소)만 예고한다.
+    assert(
+      resultText(cleanup).includes("서울 강남구의 규격별 수수료 전체 표와 신고 신청 주소, 전용 수거함 위치도 이어서 안내할 수 있습니다."),
       "critical-item plan with a region should end with the follow-up line",
     );
     assert(
@@ -849,7 +862,7 @@ async function runSmoke() {
       requestId,
     );
     assert(
-      resultText(cleanupPaddedRegion).includes("서울 강남구의 대형폐기물 신고 방법·수수료나 전용 수거함 위치도 이어서 안내할 수 있습니다."),
+      resultText(cleanupPaddedRegion).includes("서울 강남구의 규격별 수수료 전체 표와 신고 신청 주소, 전용 수거함 위치도 이어서 안내할 수 있습니다."),
       "a padded region must be trimmed before it lands in the follow-up line",
     );
     assert(
