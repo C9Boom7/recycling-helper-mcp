@@ -1,155 +1,5 @@
 [
   {
-    "regionId": "gangnam_gu",
-    "regionName": "서울 강남구",
-    "checkedAt": "2026-07-02",
-    "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02010000.do",
-    "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
-    "phone": "1522-3833",
-    "source": {
-      "title": "강남구 자원순환 종합포털 대형생활폐기물 안내",
-      "url": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
-      "sourceType": "local_guidance",
-      "checkedAt": "2026-07-02",
-      "basis": "대형생활폐기물 수거대상 물품/수수료 표에서 Top 50 관련 대형폐기물 품목과 사용자 질문의 리빙박스·플라스틱 수납함, 요가매트, 빨래건조대, 화분, 장난감, 인형 관련 수수료 후보를 확인했습니다. 신청 URL은 현재 휴대폰 인증 신청 화면으로 연결되는 경로를 사용합니다."
-    },
-    "fees": [
-      {
-        "itemId": "chair",
-        "category": "가구류",
-        "itemName": "의자",
-        "spec": "1인용",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "chair",
-        "category": "가구류",
-        "itemName": "의자",
-        "spec": "장의자",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "chair",
-        "category": "가구류",
-        "itemName": "의자",
-        "spec": "바퀴달린의자(일반)",
-        "feeKrw": 4000
-      },
-      {
-        "itemId": "chair",
-        "category": "가구류",
-        "itemName": "의자",
-        "spec": "바퀴달린의자(대형)",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "mattress",
-        "category": "가구류",
-        "itemName": "침대",
-        "spec": "1인용(매트리스)",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "mattress",
-        "category": "가구류",
-        "itemName": "침대",
-        "spec": "2인용(매트리스)",
-        "feeKrw": 8000
-      },
-      {
-        "itemId": "blanket",
-        "category": "기타생활용품",
-        "itemName": "이불",
-        "spec": "모든규격",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "기타생활용품",
-        "itemName": "돗자리(대자리/놀이매트)",
-        "spec": "1㎡당",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "mirror",
-        "category": "기타생활용품",
-        "itemName": "유리(거울/판유리)",
-        "spec": "1㎡당",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "plastic_storage_box",
-        "category": "기타생활용품",
-        "itemName": "기타 프라스틱류",
-        "spec": "5kg 당",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "plastic_storage_box",
-        "category": "가구류",
-        "itemName": "서랍장",
-        "spec": "4단 이하",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "plastic_storage_box",
-        "category": "가구류",
-        "itemName": "서랍장",
-        "spec": "5단 이상",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "drying_rack",
-        "category": "기타생활용품",
-        "itemName": "빨래건조대",
-        "spec": "모든 규격",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "flower_pot",
-        "category": "기타생활용품",
-        "itemName": "화분",
-        "spec": "높이 50cm이상",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "flower_pot",
-        "category": "기타생활용품",
-        "itemName": "화분",
-        "spec": "높이 50cm미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "toy",
-        "category": "기타생활용품",
-        "itemName": "인형/ 장난감류",
-        "spec": "대형(미끄럼틀/ 놀이집 등)",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "toy",
-        "category": "기타생활용품",
-        "itemName": "인형/ 장난감류",
-        "spec": "소형(3kg당)",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "stuffed_toy",
-        "category": "기타생활용품",
-        "itemName": "인형/ 장난감류",
-        "spec": "대형(미끄럼틀/ 놀이집 등)",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "stuffed_toy",
-        "category": "기타생활용품",
-        "itemName": "인형/ 장난감류",
-        "spec": "소형(3kg당)",
-        "feeKrw": 1000
-      }
-    ]
-  },
-  {
     "regionId": "seocho_gu",
     "regionName": "서울 서초구",
     "checkedAt": "2026-07-02",
@@ -23259,6 +23109,990 @@
         "category": "pressurized_bulky_hazardous",
         "itemName": "소화기",
         "spec": "3.3㎏이하 축압식 분말",
+        "feeKrw": 2000
+      }
+    ]
+  },
+  {
+    "regionId": "gangnam_gu",
+    "regionName": "서울 강남구",
+    "checkedAt": "2026-08-18",
+    "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02010000.do",
+    "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
+    "phone": "1522-3833",
+    "source": {
+      "title": "서울 강남구 대형폐기물 수수료표",
+      "url": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
+      "sourceType": "local_guidance",
+      "checkedAt": "2026-08-18",
+      "basis": "서울 강남구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 213행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
+      "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
+    },
+    "fees": [
+      {
+        "itemId": "wardrobe",
+        "category": "bulky",
+        "itemName": "비키니 옷장",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "wardrobe",
+        "category": "bulky",
+        "itemName": "장롱",
+        "spec": "100cm미만 1쪽",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "wardrobe",
+        "category": "bulky",
+        "itemName": "장롱",
+        "spec": "100cm이상 1쪽",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "display_cabinet",
+        "category": "furniture",
+        "itemName": "장식장",
+        "spec": "100cm 미만",
+        "feeKrw": 6000
+      },
+      {
+        "itemId": "display_cabinet",
+        "category": "furniture",
+        "itemName": "장식장",
+        "spec": "100cm 이상",
+        "feeKrw": 9000
+      },
+      {
+        "itemId": "low_chest",
+        "category": "furniture",
+        "itemName": "문갑",
+        "spec": "100cm 미만",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "low_chest",
+        "category": "furniture",
+        "itemName": "문갑",
+        "spec": "100cm 이상",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "drawer_chest",
+        "category": "bulky",
+        "itemName": "서랍장",
+        "spec": "4단 이하",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "drawer_chest",
+        "category": "bulky",
+        "itemName": "서랍장",
+        "spec": "5단 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "sofa",
+        "category": "bulky",
+        "itemName": "쇼파",
+        "spec": "1인용",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "sofa",
+        "category": "bulky",
+        "itemName": "쇼파",
+        "spec": "2인용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "sofa",
+        "category": "bulky",
+        "itemName": "쇼파",
+        "spec": "3인용",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "sofa",
+        "category": "bulky",
+        "itemName": "쇼파",
+        "spec": "4인용 이상",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "밥상",
+        "spec": "3인 이하",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "식탁(테이블)",
+        "spec": "3인용 이하",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "밥상",
+        "spec": "4인 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "식탁(테이블)",
+        "spec": "4인용 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "식탁(테이블)",
+        "spec": "4인용 이하(대리석)",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "dining_table",
+        "category": "bulky",
+        "itemName": "식탁(테이블)",
+        "spec": "5인용 이상(대리석)",
+        "feeKrw": 12000
+      },
+      {
+        "itemId": "sink_unit",
+        "category": "bathroom_fixture",
+        "itemName": "싱크대",
+        "spec": "60cm 1짝당",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "desk",
+        "category": "bulky",
+        "itemName": "책상",
+        "spec": "컴퓨터용 책상/ 서랍없음",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "desk",
+        "category": "bulky",
+        "itemName": "책상",
+        "spec": "편수책상",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "desk",
+        "category": "bulky",
+        "itemName": "책상",
+        "spec": "양수책상",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "bookshelf",
+        "category": "bulky",
+        "itemName": "책꽂이",
+        "spec": "2단 이하",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "bookshelf",
+        "category": "bulky",
+        "itemName": "책꽂이",
+        "spec": "4단 이하",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "bookshelf",
+        "category": "bulky",
+        "itemName": "책장",
+        "spec": "100cm 미만",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "bookshelf",
+        "category": "bulky",
+        "itemName": "책장",
+        "spec": "100cm 이상",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "토퍼",
+        "spec": "1인용",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "1인용(매트리스)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "토퍼",
+        "spec": "2인용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용(매트리스)",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "1인용 세트 (매트리스1개+틀)",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용 세트 (매트리스1개+틀)",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "유아용 침대",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "1인용(틀)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용(틀)",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "어린이 2층 침대",
+        "feeKrw": 20000
+      },
+      {
+        "itemId": "stone_bed",
+        "category": "bulky_household",
+        "itemName": "침대",
+        "spec": "1인용 돌침대 세트",
+        "feeKrw": 25000
+      },
+      {
+        "itemId": "stone_bed",
+        "category": "bulky_household",
+        "itemName": "침대",
+        "spec": "2인용 돌침대 세트",
+        "feeKrw": 30000
+      },
+      {
+        "itemId": "chair",
+        "category": "bulky",
+        "itemName": "의자",
+        "spec": "1인용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "chair",
+        "category": "bulky",
+        "itemName": "의자",
+        "spec": "장의자",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "chair",
+        "category": "bulky",
+        "itemName": "의자",
+        "spec": "바퀴달린의자(일반)",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "chair",
+        "category": "bulky",
+        "itemName": "의자",
+        "spec": "바퀴달린의자(대형)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "vanity_table",
+        "category": "furniture",
+        "itemName": "화장대",
+        "spec": "모든규격",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "shoe_rack",
+        "category": "furniture",
+        "itemName": "신발장",
+        "spec": "1m미만",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "shoe_rack",
+        "category": "furniture",
+        "itemName": "신발장",
+        "spec": "1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "door_panel",
+        "category": "bulky",
+        "itemName": "문짝",
+        "spec": "목재류",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "side_table",
+        "category": "furniture",
+        "itemName": "회의용 탁자",
+        "spec": "8인용 미만",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "side_table",
+        "category": "furniture",
+        "itemName": "회의용 탁자",
+        "spec": "8인용 이상",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "side_table",
+        "category": "furniture",
+        "itemName": "회의용 탁자",
+        "spec": "12인용 이상",
+        "feeKrw": 9000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "김치냉장고",
+        "spec": "130ℓ 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "냉장고",
+        "spec": "300ℓ미만",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "김치냉장고",
+        "spec": "130ℓ 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "냉장고",
+        "spec": "300ℓ이상",
+        "feeKrw": 6000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "냉장고",
+        "spec": "500ℓ이상",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "냉장고",
+        "spec": "양문형 냉장고(600ℓ이상)",
+        "feeKrw": 12000
+      },
+      {
+        "itemId": "refrigerator",
+        "category": "electronics_appliance",
+        "itemName": "냉장고",
+        "spec": "양문형 냉장고(700ℓ이상)",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "television",
+        "category": "electronics_appliance",
+        "itemName": "텔레비전",
+        "spec": "25인치 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "television",
+        "category": "electronics_appliance",
+        "itemName": "텔레비전",
+        "spec": "25인치 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "television",
+        "category": "electronics_appliance",
+        "itemName": "텔레비전",
+        "spec": "42인치 이상",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "television",
+        "category": "electronics_appliance",
+        "itemName": "텔레비전",
+        "spec": "TV받침일체형(40인치 미만)",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "washing_machine",
+        "category": "electronics_appliance",
+        "itemName": "세탁기",
+        "spec": "10kg 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "washing_machine",
+        "category": "electronics_appliance",
+        "itemName": "세탁기",
+        "spec": "10kg 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "gas_oven_range",
+        "category": "electronics_appliance",
+        "itemName": "가스오븐렌지",
+        "spec": "높이 1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "audio_system",
+        "category": "electronics_appliance",
+        "itemName": "오디오",
+        "spec": "스피커(높이 1m 이상)",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "air_conditioner",
+        "category": "electronics_appliance",
+        "itemName": "에어컨",
+        "spec": "66㎡미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "air_conditioner",
+        "category": "electronics_appliance",
+        "itemName": "에어컨",
+        "spec": "66㎡이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "air_conditioner",
+        "category": "electronics_appliance",
+        "itemName": "에어컨",
+        "spec": "264㎡이상",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "air_purifier",
+        "category": "electronics",
+        "itemName": "공기청정기",
+        "spec": "높이 1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "space_heater",
+        "category": "electronics_appliance",
+        "itemName": "난로",
+        "spec": "석유난로",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "water_purifier",
+        "category": "electronics_appliance",
+        "itemName": "정수기",
+        "spec": "높이 1m이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "boiler",
+        "category": "bulky_household",
+        "itemName": "보일러",
+        "spec": "16000cal/h미만",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "boiler",
+        "category": "bulky_household",
+        "itemName": "보일러",
+        "spec": "16000cal/h이상",
+        "feeKrw": 12000
+      },
+      {
+        "itemId": "vending_machine",
+        "category": "bulky_household",
+        "itemName": "자동판매기",
+        "spec": "자가/ 소형",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "vending_machine",
+        "category": "bulky_household",
+        "itemName": "자동판매기",
+        "spec": "음료/ 담배 등",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "electric_fan",
+        "category": "electronics_appliance",
+        "itemName": "선풍기",
+        "spec": "업소용(대형)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "piano",
+        "category": "bulky_household",
+        "itemName": "피아노",
+        "spec": "디지털(오르간 포함)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "piano",
+        "category": "bulky_household",
+        "itemName": "피아노",
+        "spec": "일반",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "rice_container",
+        "category": "bulky_household",
+        "itemName": "쌀통",
+        "spec": "모든규격",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "vinyl_flooring",
+        "category": "pvc_flooring",
+        "itemName": "장판",
+        "spec": "3.3㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "carpet",
+        "category": "textile_or_bulky",
+        "itemName": "카페트",
+        "spec": "3.3㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "blanket",
+        "category": "textile_or_bulky",
+        "itemName": "이불",
+        "spec": "모든규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "fish_tank",
+        "category": "glass",
+        "itemName": "어항",
+        "spec": "1m 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "fish_tank",
+        "category": "glass",
+        "itemName": "어항",
+        "spec": "1m 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "fish_tank",
+        "category": "glass",
+        "itemName": "어항",
+        "spec": "2m 이상",
+        "feeKrw": 9000
+      },
+      {
+        "itemId": "toilet_bowl",
+        "category": "bathroom_fixture",
+        "itemName": "변기",
+        "spec": "좌변기",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "toilet_bowl",
+        "category": "bathroom_fixture",
+        "itemName": "변기",
+        "spec": "양변기",
+        "feeKrw": 8000
+      },
+      {
+        "itemId": "washbasin",
+        "category": "bathroom_fixture",
+        "itemName": "세면대",
+        "spec": "모든 규격",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bathtub",
+        "category": "bathroom_fixture",
+        "itemName": "욕조",
+        "spec": "유아용",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bathtub",
+        "category": "bathroom_fixture",
+        "itemName": "욕조",
+        "spec": "일반용",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "mirror",
+        "category": "glass_mixed",
+        "itemName": "유리(거울/판유리)",
+        "spec": "1㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "plastic_storage_box",
+        "category": "large_plastic_or_bulky_household",
+        "itemName": "기타 프라스틱류",
+        "spec": "5kg 당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "container_by_material",
+        "itemName": "화분",
+        "spec": "높이 50cm미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "flower_pot",
+        "category": "container_by_material",
+        "itemName": "화분",
+        "spec": "높이 50cm이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "stroller",
+        "category": "bulky",
+        "itemName": "유모차(보행기)",
+        "spec": "모든규격",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bicycle",
+        "category": "vehicle_part",
+        "itemName": "자전거",
+        "spec": "아동용(3륜)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "bicycle",
+        "category": "vehicle_part",
+        "itemName": "자전거",
+        "spec": "성인용",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bicycle",
+        "category": "vehicle_part",
+        "itemName": "자전거",
+        "spec": "아동용(2륜)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "large_jar",
+        "category": "ceramic",
+        "itemName": "항아리",
+        "spec": "30ℓ 미만(소형)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "large_jar",
+        "category": "ceramic",
+        "itemName": "항아리",
+        "spec": "100ℓ 미만(중형)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "large_jar",
+        "category": "ceramic",
+        "itemName": "항아리",
+        "spec": "100ℓ 이상(대형)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "large_trash_bin",
+        "category": "bulky_household",
+        "itemName": "쓰레기통",
+        "spec": "가정용",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "large_trash_bin",
+        "category": "bulky_household",
+        "itemName": "쓰레기통",
+        "spec": "사무실용/ 옥외용",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "sewing_machine",
+        "category": "electronics_appliance",
+        "itemName": "재봉틀",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "rubber_tub",
+        "category": "bulky_household",
+        "itemName": "고무통",
+        "spec": "지름50cm미만",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "rubber_tub",
+        "category": "bulky_household",
+        "itemName": "고무통",
+        "spec": "지름50cm이상",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "rubber_tub",
+        "category": "bulky_household",
+        "itemName": "고무통",
+        "spec": "지름100cm이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "folding_screen",
+        "category": "furniture",
+        "itemName": "병풍",
+        "spec": "2폭당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "exercise_machine",
+        "category": "electronics_appliance",
+        "itemName": "헬스기구",
+        "spec": "스텝퍼",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "exercise_machine",
+        "category": "electronics_appliance",
+        "itemName": "러닝머신",
+        "spec": "모든 규격",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "drying_rack",
+        "category": "household_bulky_mixed",
+        "itemName": "빨래건조대",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "jade_mat",
+        "category": "bulky_household",
+        "itemName": "옥매트",
+        "spec": "1인용",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "jade_mat",
+        "category": "bulky_household",
+        "itemName": "옥매트",
+        "spec": "2인용",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "cooler_box",
+        "category": "mixed_material",
+        "itemName": "아이스박스",
+        "spec": "소형",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "cooler_box",
+        "category": "mixed_material",
+        "itemName": "아이스박스",
+        "spec": "대형",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "massage_chair",
+        "category": "electronics_appliance",
+        "itemName": "안마의자",
+        "spec": "모든 규격",
+        "feeKrw": 20000
+      },
+      {
+        "itemId": "fire_extinguisher",
+        "category": "pressurized_bulky_hazardous",
+        "itemName": "소화기",
+        "spec": "3.3kg이하",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "fire_extinguisher",
+        "category": "pressurized_bulky_hazardous",
+        "itemName": "소화기",
+        "spec": "3.3kg~5kg",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "fire_extinguisher",
+        "category": "pressurized_bulky_hazardous",
+        "itemName": "소화기",
+        "spec": "5kg~10kg",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "fire_extinguisher",
+        "category": "pressurized_bulky_hazardous",
+        "itemName": "소화기",
+        "spec": "10kg~15kg",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "fire_extinguisher",
+        "category": "pressurized_bulky_hazardous",
+        "itemName": "소화기",
+        "spec": "15kg이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "picnic_mat",
+        "category": "mixed_material",
+        "itemName": "돗자리(대자리/놀이매트)",
+        "spec": "1㎡당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "돗자리(대자리/놀이매트)",
+        "spec": "1㎡당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "mannequin",
+        "category": "bulky_household",
+        "itemName": "마네킹",
+        "spec": "1m 미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "mannequin",
+        "category": "bulky_household",
+        "itemName": "마네킹",
+        "spec": "1m 이상",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "blind",
+        "category": "household_bulky_mixed",
+        "itemName": "블라인드",
+        "spec": "1㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "partition",
+        "category": "furniture",
+        "itemName": "파티션",
+        "spec": "1㎡당",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "curtain",
+        "category": "textile_mixed",
+        "itemName": "커튼",
+        "spec": "2m 미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "curtain",
+        "category": "textile_mixed",
+        "itemName": "커튼",
+        "spec": "2m 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "standing_clothes_hanger",
+        "category": "household_bulky_mixed",
+        "itemName": "행거",
+        "spec": "1단 행거",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "standing_clothes_hanger",
+        "category": "household_bulky_mixed",
+        "itemName": "행거",
+        "spec": "2단 행거",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "car_seat",
+        "category": "bulky",
+        "itemName": "카시트",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "paper_shredder",
+        "category": "electronics",
+        "itemName": "세단기(종이세절)",
+        "spec": "모든 규격",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "cat_tower",
+        "category": "household_bulky_mixed",
+        "itemName": "캣타워",
+        "spec": "높이 1.5m 미만",
+        "feeKrw": 4000
+      },
+      {
+        "itemId": "cat_tower",
+        "category": "household_bulky_mixed",
+        "itemName": "캣타워",
+        "spec": "높이 1.5m 이상",
+        "feeKrw": 6000
+      },
+      {
+        "itemId": "lighting_fixture",
+        "category": "electronics_appliance",
+        "itemName": "조명기구",
+        "spec": "폭/높이 1m 미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "lighting_fixture",
+        "category": "electronics_appliance",
+        "itemName": "조명기구",
+        "spec": "샹드레아",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "lighting_fixture",
+        "category": "electronics_appliance",
+        "itemName": "조명기구",
+        "spec": "폭/높이 1m 이상",
         "feeKrw": 2000
       }
     ]

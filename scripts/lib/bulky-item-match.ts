@@ -99,7 +99,67 @@ export function cleanLabel(text: string): string {
 
 export type Verdict = { ok: true; itemId: string } | { ok: false; reason: string };
 
+/**
+ * 상위 재질어 + 괄호 안 실제 품목. 괄호를 떼면 재질어만 남아 `ambiguous`로 버려지는데,
+ * 그 모호함은 일부러 남긴 것이다 — 「유리」는 확정하지 말고 되묻는 편이 낫다는 결정이
+ * 이미 있다. 그렇다고 행을 버리면 금액이 사라진다. 강남 「유리(거울/판유리) / 1㎡당 /
+ * 2,000원」이 그 경우고, 구청 표로 갈아타며 실제로 빠져 `gangnam_mirror_fee` 회귀
+ * 케이스가 잡아냈다.
+ *
+ * 「괄호 안 첫 품목을 택한다」는 일반 규칙은 쓰지 않는다. 괄호가 품목이 아니라 재질
+ * 열거인 경우가 섞여 있어서다 — 「침대(흙,돌,황토,의료)」를 그렇게 읽으면 흙으로 간다.
+ * SPLIT_HINTS와 같은 원칙으로, 근거를 확인한 쌍만 적는다.
+ */
+// 키는 `normalizeText`를 거친 형태로 담는다. 원문 표기를 그대로 키로 쓰면 괄호·슬래시가
+// 정규화에서 사라져 영원히 안 맞는다 — 실제로 처음 그렇게 넣었다가 조용히 통과했다.
+const LABEL_PICKS = new Map<string, string>(
+  (
+    [
+      ["유리(거울/판유리)", "mirror"],
+      // 강남 표에는 리빙박스 행이 없고, 무게로 매기는 이 줄이 그 자리를 맡는다. 수기
+      // 데이터가 그렇게 이어 놨고 `gangnam_large_plastic_storage_box_size_split` 회귀
+      // 케이스가 그 결정을 붙들고 있다 — 자동 판정만으로는 상위어라 거부된다.
+      ["기타 프라스틱류", "plastic_storage_box"],
+    ] as const
+  ).map(([label, itemId]) => [normalizeText(label), itemId]),
+);
+
+/**
+ * 한 줄이 두 품목을 겸하는 경우. 고시·구청 표는 우리 품목 둘을 한 칸에 묶어 적기도
+ * 하고(「인형/ 장난감류」), 우리 품목 하나에만 해당하는 줄이 다른 품목의 유일한 후보이기도
+ * 하다(강남 표에 요가매트 행이 없어서 「돗자리(대자리/놀이매트) 1㎡당」이 그 자리를 맡는다).
+ *
+ * 하나만 고르면 나머지 품목은 금액을 통째로 잃는다. 수기 데이터는 같은 줄을 두 품목에
+ * 각각 달아 뒀고, `gangnam_yoga_mat_not_blanket`·`gangnam_toy_fee` 계열 회귀 케이스가
+ * 그 결정을 붙들고 있다. 그래서 표를 따로 두고 임포터가 품목마다 한 행씩 만든다.
+ *
+ * 여기 적는 값은 `classifyName`이 이미 확정한 품목에 **더하는** 것이다. 확정 자체를
+ * 바꾸지 않으므로, 이 표를 지우면 동작이 예전으로 돌아갈 뿐 엉뚱한 품목이 생기지 않는다.
+ */
+const ALSO_ITEM_IDS = new Map<string, readonly string[]>(
+  (
+    [
+      ["인형/ 장난감류", ["toy", "stuffed_toy"]],
+      ["돗자리(대자리/놀이매트)", ["yoga_mat"]],
+    ] as const
+  ).map(([label, ids]) => [normalizeText(label), ids]),
+);
+
+/**
+ * 이 라벨이 겸하는 **추가** 품목. 확정 품목은 포함하지 않는다.
+ * 임포터가 확정 행을 만든 뒤 같은 금액으로 한 행씩 더 만드는 데 쓴다.
+ */
+export function alsoItemIds(rawName: string, decidedItemId: string): readonly string[] {
+  const extra = ALSO_ITEM_IDS.get(normalizeText(rawName));
+  if (!extra) return [];
+  return extra.filter((itemId) => itemId !== decidedItemId);
+}
+
 export function classifyName(rawName: string): Verdict {
+  // 괄호를 떼기 전에 먼저 본다. 떼고 나면 판정 근거가 되는 괄호 내용이 사라진다.
+  const picked = LABEL_PICKS.get(normalizeText(rawName));
+  if (picked) return { ok: true, itemId: picked };
+
   // 밑줄은 「품목_조건」을 가르는 표기다 — 관악구 고시명이 그렇다. 「식탁_유리제외」는
   // 유리를 뺀 식탁이고, 「화장대_거울+의자 제외」는 화장대다. 한국어는 핵심어가 뒤에
   // 온다는 규칙을 그대로 적용하면 뒤쪽 조건이 핵심어로 잡혀 통째로 버려진다 — 실제로

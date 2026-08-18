@@ -35,6 +35,7 @@ const USER_AGENT =
  * - `sdm_table`: 서대문 폐기물 규격 페이지. 서버가 그린 HTML 표.
  * - `sd_popup`: 성동 부과기준표 팝업. **금액이 행 머리**이고 품목이 그 아래 묶인다.
  * - `guro_list`: 구로 처리비용. 분류별로 페이지가 갈리고 서버가 그린 표다.
+ * - `gn_table`: 강남 자원순환 종합포털. 서버가 그린 4열 표이고 셀에 열 이름 접두어가 붙는다.
  */
 export const TARGETS = [
   { regionId: "seongbuk_gu", name: "서울 성북구", kind: "smartclean", url: "https://smartclean.sb.go.kr/online/bulky/item" },
@@ -43,6 +44,10 @@ export const TARGETS = [
   { regionId: "seodaemun_gu", name: "서울 서대문구", kind: "sdm_table", url: "https://www.sdm.go.kr/civil/print/waste/standards.do" },
   { regionId: "seongdong_gu", name: "서울 성동구", kind: "sd_popup", url: "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html" },
   { regionId: "guro_gu", name: "서울 구로구", kind: "guro_list", url: "https://www.guro.go.kr/www/costList.do?key=3412" },
+  // 강남구(2026-08-19). 골든셋 수기 19행을 이 표로 갈아탄다 — 조례 트랙은 좌우 2단
+  // 조판에서 침대 규격을 TV에 붙여 놓고 침대 품목은 한 행도 못 잡았다. `parseGangnamTable`
+  // 주석에 실제로 나온 오행을 적어 뒀다.
+  { regionId: "gangnam_gu", name: "서울 강남구", kind: "gn_table", url: "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do" },
 ];
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -157,6 +162,39 @@ function parseSdmTable(html) {
 }
 
 /**
+ * 강남구 자원순환 종합포털 수수료표. 서버가 그린 `종류|품목|규격|수수료(원)` 4열이다.
+ *
+ * 조례 트랙을 쓰지 않는 이유가 여기 있다. 강남 별표는 좌우 2단 조판이라 순차 텍스트로
+ * 펴면 열이 어긋난다 — 침대 규격이 통째로 TV 품목에 붙어 「텔레비전 / 유아용 침대
+ * 3,000원」·「TV받침일체형 / 2인용 돌침대 세트 30,000원」이 나왔고, 정작 침대 품목은
+ * 한 행도 안 잡혔다. 이 표는 품목·규격이 이미 갈려 있어 그 갈래가 아예 없다.
+ * 「침대 / 1인용(틀) / 5,000원」이 그대로 읽힌다.
+ *
+ * 셀 텍스트가 `품목: 침대`처럼 열 이름을 접두어로 달고 나온다(좁은 화면용 라벨이
+ * 텍스트로 같이 들어온다). 접두어를 떼지 않으면 품명 판정이 통째로 `not_found`가 된다.
+ */
+function parseGangnamTable(html) {
+  const rows = [];
+  const warnings = [];
+  // `품목: 침대` → `침대`. 콜론이 없는 표로 바뀌어도 그대로 통과한다.
+  const strip = (text) => String(text ?? "").replace(/^[^:：]{1,10}[:：]\s*/, "").trim();
+  for (const cells of tableRows(html)) {
+    if (cells.length < 4) continue;
+    const itemName = strip(cells[1]);
+    const spec = strip(cells[2]);
+    const fee = toKrw(strip(cells[3]));
+    // 머리글 행. 접두어를 뗀 뒤에도 열 이름만 남는다.
+    if (/^(품목|종류|규격|수수료)/.test(itemName) || !itemName) continue;
+    if (fee === null) continue;
+    rows.push({ itemName, spec, feeKrw: fee });
+  }
+  // 표가 JS 렌더링으로 바뀌면 0행이 되는데, 그걸 "그 지역엔 쓸 행이 없다"로 읽으면
+  // 커버리지 착시가 된다. 수집 단계에서 경고로 남긴다.
+  if (rows.length === 0) warnings.push("행을 하나도 뽑지 못했다 — 표가 서버 렌더링에서 바뀐 것으로 보인다");
+  return { rows, warnings };
+}
+
+/**
  * 성동은 **금액이 행 머리**고 품목이 그 아래 `<ul class="bu"><li>`로 묶인다.
  * 「3,000원 | <li>난로</li><li>문짝</li>… 」 형태라, 금액을 이어받아 `li` 하나를
  * 한 행으로 편다. 태그를 먼저 지우면 품목이 전부 한 덩어리가 되므로 `li`를
@@ -251,6 +289,7 @@ async function collect(target) {
   const html = await fetchText(target.url);
   if (target.kind === "smartclean") return parseSmartclean(html);
   if (target.kind === "sdm_table") return parseSdmTable(html);
+  if (target.kind === "gn_table") return parseGangnamTable(html);
   if (target.kind === "sd_popup") return parseSdPopup(html);
   throw new Error(`모르는 kind: ${target.kind}`);
 }
