@@ -1131,7 +1131,19 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy, namedSubRegion?: s
   // 요일을 왜 안 싣는지는 여기서 말하지 않는다. 바로 위에 찍히는 `지역 요약`이 자치구
   // 32곳 모두 그 문장으로 끝나서(회귀는 test-region-matching이 잡는다), 여기에 또 쓰면
   // 한 응답에 같은 말이 두 번 나온다.
-  return `${regionMatch.region.name} 기준으로 대형폐기물 신청 경로와 수거함 안내까지 확인했습니다.`;
+  //
+  // 확인했다는 범위는 실제로 들고 있는 것에서 뽑는다. `standard` 티어는 둘 다 있어야
+  // 추가되지만 validate가 `full`에는 같은 요구를 걸지 않아서, 문장을 고정해 두면 수거함
+  // 데이터가 없는 지역이 아래에 없는 블록을 있다고 말하게 된다.
+  const confirmed = [
+    regionMatch.region.bulkyWaste ? "대형폐기물 신청 경로" : undefined,
+    Object.values(regionMatch.region.specialCollections ?? {}).some((entry) => (entry?.method?.length ?? 0) > 0)
+      ? "수거함 안내"
+      : undefined,
+  ].filter((part): part is string => part !== undefined);
+  if (confirmed.length === 0) return undefined;
+
+  return `${regionMatch.region.name} 기준으로 ${confirmed.join("와 ")}까지 확인했습니다.`;
 }
 
 const MEDICINE_ITEM_IDS = new Set(["medicine"]);

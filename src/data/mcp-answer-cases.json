@@ -256,9 +256,15 @@
       "itemName": "투명 페트병",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": [],
+    "expectedTextIncludes": [
+      "## 페트병",
+      "라벨"
+    ],
     "expectedTextExcludes": [
       "목요일"
+    ],
+    "expectedStructuredIncludes": [
+      "\"itemName\":\"페트병\""
     ]
   },
   {
@@ -338,9 +344,14 @@
       "itemName": "우유팩",
       "region": "서울 강남구"
     },
-    "expectedTextIncludes": [],
+    "expectedTextIncludes": [
+      "## 우유팩"
+    ],
     "expectedTextExcludes": [
       "일요일"
+    ],
+    "expectedStructuredIncludes": [
+      "\"itemName\":\"우유팩\""
     ]
   },
   {

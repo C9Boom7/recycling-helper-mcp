@@ -545,6 +545,12 @@ async function runAnswerCase(baseUrl, testCase, id) {
   const text = resultText(result);
   const structured = structuredContentText(result);
 
+  // 부정 단언만 있는 케이스가 14개 있다("이 발화가 에어컨으로 매칭되면 안 된다" 류).
+  // 그 케이스들은 핸들러가 통째로 터져도 통과한다 — 없는 문자열은 오류 응답에도 없으니까.
+  // 케이스마다 긍정 단언을 강제하면 그 갈래의 취지가 흐려지므로, 최소한 답이 나오기는
+  // 했다는 것만 여기서 공통으로 잡는다.
+  assert(result.isError !== true, `${testCase.id} came back as a tool error: ${text.slice(0, 120)}`);
+
   for (const expected of testCase.expectedTextIncludes ?? []) {
     assert(text.includes(expected), `${testCase.id} text did not include "${expected}"`);
   }
