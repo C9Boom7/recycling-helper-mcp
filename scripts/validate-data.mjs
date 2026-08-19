@@ -537,12 +537,8 @@ for (const [index, region] of regionalPolicies.entries()) {
   }
 
   if (tier === "full") {
-    if (!region.generalWaste || !isNonEmptyString(region.generalWaste.time) || !isNonEmptyString(region.generalWaste.place)) {
-      errors.push(`${prefix}.generalWaste must include time and place`);
-    }
-    if (!region.recycling || !isNonEmptyString(region.recycling.vinylAndPetDay) || !isNonEmptyString(region.recycling.otherDays)) {
-      errors.push(`${prefix}.recycling must include vinylAndPetDay and otherDays`);
-    }
+    // 배출 요일·시간 요구(generalWaste/recycling)는 2026-08-19에 걷어냈다. 구 대표값
+    // 하나로 동·주택 유형별 차이를 덮을 수 없어 그 데이터를 아예 두지 않는다.
     if (!region.foodWaste || !Array.isArray(region.foodWaste.generalWasteExceptions)) {
       errors.push(`${prefix}.foodWaste.generalWasteExceptions must be an array`);
     }

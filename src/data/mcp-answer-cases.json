@@ -250,31 +250,39 @@
     ]
   },
   {
-    "id": "gangnam_pet_bottle_thursday",
+    "id": "gangnam_pet_bottle_no_day_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "투명 페트병",
       "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "목요일",
-      "비닐과 함께 별도 배출"
+      "## 페트병",
+      "라벨"
+    ],
+    "expectedTextExcludes": [
+      "목요일"
+    ],
+    "expectedStructuredIncludes": [
+      "\"itemName\":\"페트병\""
     ]
   },
   {
-    "id": "gangnam_snack_bag_thursday",
+    "id": "gangnam_snack_bag_no_day_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "과자봉지",
       "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "비닐류",
+      "비닐류"
+    ],
+    "expectedTextExcludes": [
       "목요일"
     ]
   },
   {
-    "id": "gangnam_parcel_plastic_bag_thursday",
+    "id": "gangnam_parcel_plastic_bag_no_day_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "택배 비닐봉투",
@@ -283,13 +291,14 @@
     "expectedTextIncludes": [
       "비닐류 포장재",
       "송장스티커",
-      "테이프",
-      "목요일",
-      "투명·반투명 봉투"
+      "테이프"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"택배 비닐봉투\""
+    ],
+    "expectedTextExcludes": [
+      "목요일"
     ]
   },
   {
@@ -301,12 +310,13 @@
     },
     "expectedTextIncludes": [
       "고철 수거함",
-      "월·화·수·금·일요일",
       "종량제봉투"
     ],
     "expectedStructuredIncludes": [
-      "\"id\":\"frying_pan\"",
-      "\"regionNotes\""
+      "\"id\":\"frying_pan\""
+    ],
+    "expectedTextExcludes": [
+      "일요일"
     ]
   },
   {
@@ -318,24 +328,30 @@
     },
     "expectedTextIncludes": [
       "고철 수거함",
-      "내열유리",
-      "월·화·수·금·일요일"
+      "내열유리"
     ],
     "expectedStructuredIncludes": [
-      "\"id\":\"cooking_pot\"",
-      "\"regionNotes\""
+      "\"id\":\"cooking_pot\""
+    ],
+    "expectedTextExcludes": [
+      "일요일"
     ]
   },
   {
-    "id": "gangnam_milk_carton_other_days",
+    "id": "gangnam_milk_carton_no_day_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "우유팩",
       "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "월·화·수·금·일요일",
-      "녹색 그물망"
+      "## 우유팩"
+    ],
+    "expectedTextExcludes": [
+      "일요일"
+    ],
+    "expectedStructuredIncludes": [
+      "\"itemName\":\"우유팩\""
     ]
   },
   {
@@ -550,8 +566,7 @@
     "expectedTextIncludes": [
       "도포·첩합",
       "플라스틱",
-      "종량제봉투",
-      "녹색 그물망"
+      "종량제봉투"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toothpaste_tube\"",
@@ -728,13 +743,15 @@
     "expectedTextIncludes": [
       "무색페트병",
       "보증금",
-      "플라스틱",
-      "월·화·수·금·일요일"
+      "플라스틱"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_cup\"",
       "\"matchedBy\":\"플라스틱 컵\"",
       "\"regionNotes\""
+    ],
+    "expectedTextExcludes": [
+      "일요일"
     ]
   },
   {
@@ -747,13 +764,14 @@
     "expectedTextIncludes": [
       "코팅되지 않은 종이",
       "코팅",
-      "종량제봉투",
-      "월·화·수·금·일요일"
+      "종량제봉투"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cup_holder\"",
-      "\"matchedBy\":\"커피 컵홀더\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"커피 컵홀더\""
+    ],
+    "expectedTextExcludes": [
+      "일요일"
     ]
   },
   {
@@ -766,13 +784,14 @@
     "expectedTextIncludes": [
       "PE",
       "PVC",
-      "목요일",
       "종량제봉투"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_wrap\"",
-      "\"matchedBy\":\"비닐랩\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"비닐랩\""
+    ],
+    "expectedTextExcludes": [
+      "목요일"
     ]
   },
   {
@@ -845,13 +864,14 @@
       "내용물",
       "펌프",
       "뚜껑",
-      "월·화·수·금·일요일",
       "종량제봉투"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cosmetic_container\"",
-      "\"matchedBy\":\"화장품 용기\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"화장품 용기\""
+    ],
+    "expectedTextExcludes": [
+      "일요일"
     ]
   },
   {
@@ -1095,8 +1115,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"nail_polish\"",
-      "\"matchedBy\":\"매니큐어 병\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"매니큐어 병\""
     ]
   },
   {
@@ -1115,8 +1134,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"perfume_bottle\"",
-      "\"matchedBy\":\"향수병\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"향수병\""
     ]
   },
   {
@@ -1304,8 +1322,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"candle\"",
-      "\"matchedBy\":\"향초\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"향초\""
     ]
   },
   {
@@ -1325,8 +1342,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"contact_lens\"",
-      "\"matchedBy\":\"콘택트렌즈\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"콘택트렌즈\""
     ]
   },
   {
@@ -1345,8 +1361,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cd_dvd\"",
-      "\"matchedBy\":\"CD\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"CD\""
     ]
   },
   {
@@ -1438,8 +1453,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"disposable_cutlery\"",
-      "\"matchedBy\":\"일회용 숟가락\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"일회용 숟가락\""
     ]
   },
   {
@@ -2085,16 +2099,17 @@
       "리필 파우치",
       "플라스틱 캡",
       "비닐류",
-      "일반쓰레기",
-      "목요일"
+      "일반쓰레기"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
-      "\"matchedBy\":\"샴푸 리필 파우치는 비닐류로 버리면 돼\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"샴푸 리필 파우치는 비닐류로 버리면 돼\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"soap_bar_piece\""
+    ],
+    "expectedTextExcludes": [
+      "목요일"
     ]
   },
   {
@@ -2293,16 +2308,17 @@
       "비닐류",
       "내용물",
       "이물질",
-      "일반쓰레기",
-      "목요일"
+      "일반쓰레기"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
-      "\"matchedBy\":\"배달 음식 소스 작은 비닐팩은 씻어서 비닐류야\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"배달 음식 소스 작은 비닐팩은 씻어서 비닐류야\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
+    ],
+    "expectedTextExcludes": [
+      "목요일"
     ]
   },
   {
@@ -2479,8 +2495,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"perfume_bottle\"",
-      "\"matchedBy\":\"향수 샘플 작은 유리병도 향수병이랑 똑같아\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"향수 샘플 작은 유리병도 향수병이랑 똑같아\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
@@ -2786,8 +2801,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"paper_core\"",
-      "\"matchedBy\":\"쿠킹랩 심지는 종이류야\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"쿠킹랩 심지는 종이류야\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_wrap\""
@@ -2952,8 +2966,7 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
-      "\"matchedBy\":\"샴푸 리필팩 뚜껑만 플라스틱이야\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"샴푸 리필팩 뚜껑만 플라스틱이야\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"glass_bottle\""
@@ -2993,25 +3006,23 @@
     "expectedTextIncludes": [
       "비닐류 포장재",
       "오염 제거가 어렵다면 일반쓰레기",
-      "목요일",
-      "투명·반투명 봉투",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "### 지역 확인 필요",
-      "서울 강남구 공식 출처"
+      "서울 강남구 공식 출처",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"비닐봉지\"",
-      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"used_cooking_oil\""
     ],
     "expectedRegionNotes": {
-      "present": true
+      "present": false
     }
   },
   {
@@ -3023,34 +3034,29 @@
     },
     "expectedTextIncludes": [
       "비닐류 포장재",
-      "오피스텔",
-      "관리사무소",
-      "건물 관리 기준",
-      "목요일",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "오피스텔은 목요일",
       "오피스텔 기준",
       "### 지역 확인 필요",
-      "서울 강남구 공식 출처"
+      "서울 강남구 공식 출처",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"비닐봉지\"",
-      "\"regionNotes\"",
-      "\"regionCheckLevel\":\"참고\"",
-      "관리사무소"
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"blanket\""
     ],
     "expectedRegionNotes": {
-      "present": true
+      "present": false
     }
   },
   {
-    "id": "seocho_pet_bottle_region_schedule",
+    "id": "seocho_pet_bottle_day_question_no_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "서초구에서 투명 페트병은 무슨 요일이야?",
@@ -3058,23 +3064,21 @@
     },
     "expectedTextIncludes": [
       "페트병",
-      "서울 서초구 기준으로 확인된 지역 안내",
-      "폐비닐과 함께 동별 목요일 또는 금요일",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "서울 강남구 공식 출처",
-      "서울 서초구 공식 출처"
+      "서울 서초구 공식 출처",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
-      "\"region\":\"서울 서초구\"",
-      "\"regionNotes\""
+      "\"region\":\"서울 서초구\""
     ]
   },
   {
-    "id": "songpa_pet_bottle_region_schedule_no_seocho_leak",
+    "id": "songpa_pet_bottle_day_question_no_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "송파구에서 투명 페트병은 무슨 요일이야?",
@@ -3082,23 +3086,19 @@
     },
     "expectedTextIncludes": [
       "페트병",
-      "서울 송파구 기준으로 확인된 지역 안내",
-      "송파구 투명페트병",
-      "목요일 배출 동과 금요일 배출 동",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "서울 강남구 공식 출처",
       "서울 서초구 공식 출처",
       "서울 송파구 공식 출처",
-      "서초구에서 투명페트병"
+      "서초구에서 투명페트병",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
-      "\"region\":\"서울 송파구\"",
-      "\"regionNotes\"",
-      "서울 송파구 기준"
+      "\"region\":\"서울 송파구\""
     ]
   },
   {
@@ -3299,18 +3299,17 @@
       "오염이 남으면 일반쓰레기",
       "종이컵 전용 수거함 운영 여부",
       "음수대용 종이컵",
-      "종이류수거함",
-      "월·화·수·금·일요일"
+      "종이류수거함"
     ],
     "expectedTextExcludes": [
       "## 플라스틱 컵",
-      "합성수지 용기류"
+      "합성수지 용기류",
+      "일요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"paper_cup\"",
       "\"matchedBy\":\"종이컵\"",
-      "\"status\":\"region_review_needed\"",
-      "\"regionNotes\""
+      "\"status\":\"region_review_needed\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_cup\""
@@ -3327,13 +3326,14 @@
       "비닐랩",
       "음식물 등으로 오염된 랩",
       "PVC",
-      "종량제봉투",
-      "목요일"
+      "종량제봉투"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"plastic_wrap\"",
-      "\"matchedBy\":\"랩\"",
-      "\"regionNotes\""
+      "\"matchedBy\":\"랩\""
+    ],
+    "expectedTextExcludes": [
+      "목요일"
     ]
   },
   {
@@ -3347,28 +3347,27 @@
       "비닐류 포장재",
       "음식물이나 기름이 묻었다면",
       "오염 제거가 어렵다면 일반쓰레기",
-      "목요일",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "### 지역 확인 필요",
-      "서울 강남구 공식 출처"
+      "서울 강남구 공식 출처",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"냉동식품 포장 비닐\"",
-      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
     ],
     "expectedRegionNotes": {
-      "present": true
+      "present": false
     }
   },
   {
-    "id": "seocho_pet_bottle_explicit_thursday_known_region",
+    "id": "seocho_pet_bottle_explicit_day_no_claim",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "서초구에서 투명 페트병은 목요일에 내놓는 거야?",
@@ -3376,21 +3375,18 @@
     },
     "expectedTextIncludes": [
       "페트병",
-      "서울 서초구 기준으로 확인된 지역 안내",
-      "동별 목요일 또는 금요일",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
       "서울 강남구 공식 출처",
       "서울 서초구 공식 출처",
-      "서울 송파구 공식 출처"
+      "서울 송파구 공식 출처",
+      "목요일"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pet_bottle\"",
       "\"matchedBy\":\"투명 페트병\"",
-      "\"region\":\"서울 서초구\"",
-      "\"regionNotes\"",
-      "서울 서초구 기준"
+      "\"region\":\"서울 서초구\""
     ]
   },
   {
@@ -3982,13 +3978,10 @@
     "expectedTextIncludes": [
       "서울 강남구 지역 확인 안내",
       "품목: 비닐류 포장재",
-      "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
-      "단독주택·빌라·소규모 상가 기준",
       "확인할 정보",
       "비닐류 배출 요일",
       "투명·반투명 봉투 또는 그물망 기준",
-      "오염 비닐 일반쓰레기 전환 기준",
-      "강남구 단독주택·빌라·소규모 상가 기준"
+      "오염 비닐 일반쓰레기 전환 기준"
     ],
     "expectedTextExcludes": [
       "오피스텔은 목요일",
@@ -4079,7 +4072,6 @@
       "비닐류 포장재",
       "음식물이나 기름이 묻었다면",
       "오염 제거가 어렵다면 일반쓰레기",
-      "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
       "### 지역 참고"
     ],
     "expectedTextExcludes": [
@@ -4089,14 +4081,13 @@
     "expectedStructuredIncludes": [
       "\"id\":\"snack_bag\"",
       "\"matchedBy\":\"냉동식품 포장 비닐\"",
-      "\"regionNotes\"",
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
     ],
     "expectedRegionNotes": {
-      "present": true
+      "present": false
     }
   },
   {
@@ -4153,7 +4144,6 @@
       "헷갈림 체크",
       "비닐류 포장재",
       "지역 영향: 참고",
-      "판단 범위: 기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.",
       "대표 근거"
     ],
     "expectedTextExcludes": [
@@ -6621,7 +6611,7 @@
       "인터넷 신청: https://www.jongno.go.kr/waste/mo/web/order/insertAgreeForm.do",
       "수수료 조회: https://www.jongno.go.kr/waste/mo/web/expense/selectExpenseList.do",
       "서울 종로구 수거함 안내",
-      "배출 요일과 시간은 같은 지역 안에서도 동·주택 유형별로 갈려"
+      "배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다."
     ],
     "expectedStructuredIncludes": [
       "\"regionStatus\":\"district\"",

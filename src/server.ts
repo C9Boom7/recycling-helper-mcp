@@ -277,7 +277,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): collection days, bulky-waste application links and fees, and official local sources. Use when the region itself is the question — e.g. '강남구 재활용 무슨 요일에 버려?', '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead. Optional itemName narrows the checklist to that item.",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the answer names the official source to check instead. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead. Optional itemName narrows the checklist to that item.",
     inputShape: {
       region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
@@ -552,20 +552,12 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
   });
 }
 
-function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
-  const { generalWaste, recycling } = region.region;
-
-  // 배출 요일·시간은 full 티어에만 있다. 얕은 티어에서 이 자리를 비우면 확인할
-  // 항목이 통째로 사라지므로, 확정된 값 대신 "직접 확인할 항목"으로 돌려준다.
-  const scheduleChecks = [
-    generalWaste ? `일반쓰레기: ${generalWaste.time}, ${generalWaste.place}` : undefined,
-    recycling ? `재활용품: ${recycling.time}, ${recycling.place}` : undefined,
-    recycling?.vinylAndPetDay,
-    recycling?.otherDays,
-  ].filter((check): check is string => Boolean(check));
-
+function generalRegionCheckList(_region: MatchedRegionPolicy): string[] {
   return [
-    ...(scheduleChecks.length > 0 ? scheduleChecks : ["일반쓰레기·재활용품 배출 요일과 시간 (같은 지역 안에서도 동·주택 유형별로 다를 수 있음)"]),
+    // 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에
+    // 따라 갈리는데 우리가 그 단위까지 확인할 수 없어서, 값 대신 "직접 확인할
+    // 항목"으로만 남긴다.
+    "일반쓰레기·재활용품 배출 요일과 시간 (같은 지역 안에서도 동·주택 유형별로 다를 수 있음)",
     "불연성 폐기물 봉투, 특수마대, PP봉투 등 지역 지정 봉투 기준",
     "음식물류폐기물 전용봉투, RFID, 제외 품목",
     "대형생활폐기물 사전 신청과 수수료",
@@ -1059,7 +1051,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
             nextTool: {
               name: "get_region_disposal_info",
               arguments: { region: hintRegion },
-              when: "사용자가 신고 방법, 수수료, 배출 요일·장소를 물으면",
+              when: "사용자가 신고 방법, 수수료, 전용 수거함 위치를 물으면",
             },
           }
         : {}),
@@ -1132,10 +1124,26 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy, namedSubRegion?: s
   if (regionMatch.level === "metro") {
     return namedSubRegion ? unregisteredDistrictLine(regionMatch, namedSubRegion) : metroNarrowingLine(regionMatch);
   }
-  if (regionMatch.region.coverageTier === "standard") {
-    return `${regionMatch.region.name} 기준으로 대형폐기물 신청 경로와 수거함 안내까지 확인했습니다. 배출 요일과 시간은 같은 지역 안에서도 동·주택 유형별로 갈려 확정 안내에 넣지 않았습니다.`;
-  }
-  return undefined;
+  // 티어를 가리지 않고 같은 문장을 쓴다. 예전에는 `full` 티어 다섯 곳이 배출 요일까지
+  // 들고 있어서 이 안내가 `standard`에만 붙었는데, 그 값을 걷어낸 뒤로는 모든 자치구가
+  // 같은 범위(신청 경로·수거함까지)라 문장이 갈릴 이유가 없다.
+  //
+  // 요일을 왜 안 싣는지는 여기서 말하지 않는다. 바로 위에 찍히는 `지역 요약`이 자치구
+  // 32곳 모두 그 문장으로 끝나서(회귀는 test-region-matching이 잡는다), 여기에 또 쓰면
+  // 한 응답에 같은 말이 두 번 나온다.
+  //
+  // 확인했다는 범위는 실제로 들고 있는 것에서 뽑는다. `standard` 티어는 둘 다 있어야
+  // 추가되지만 validate가 `full`에는 같은 요구를 걸지 않아서, 문장을 고정해 두면 수거함
+  // 데이터가 없는 지역이 아래에 없는 블록을 있다고 말하게 된다.
+  const confirmed = [
+    regionMatch.region.bulkyWaste ? "대형폐기물 신청 경로" : undefined,
+    Object.values(regionMatch.region.specialCollections ?? {}).some((entry) => (entry?.method?.length ?? 0) > 0)
+      ? "수거함 안내"
+      : undefined,
+  ].filter((part): part is string => part !== undefined);
+  if (confirmed.length === 0) return undefined;
+
+  return `${regionMatch.region.name} 기준으로 ${confirmed.join("와 ")}까지 확인했습니다.`;
 }
 
 const MEDICINE_ITEM_IDS = new Set(["medicine"]);
@@ -1232,8 +1240,6 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const dropsOnlyTheReAsk = Boolean(namedSubRegion) && regionMatch?.level === "metro";
   const bulkyLines = regionMatch && !dropsOnlyTheReAsk ? formatRegionBulkyContactLines(regionMatch.region) : [];
   const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
-  const hasSchedule = Boolean(regionMatch?.region.generalWaste && regionMatch.region.recycling);
-
   const lines = [
     `${regionMatch?.region.name ?? region} 지역 확인 안내`,
     "",
@@ -1242,12 +1248,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match ? `판단 범위: ${itemRegionGuidance(match.item)}` : undefined,
     regionLine,
     regionMatch ? regionCoverageNote(regionMatch, namedSubRegion) : undefined,
-    hasSchedule ? "" : undefined,
-    hasSchedule ? `${regionMatch?.region.name} 기본 배출 기준` : undefined,
-    hasSchedule ? `- 일반쓰레기: ${regionMatch?.region.generalWaste?.time}, ${regionMatch?.region.generalWaste?.place}` : undefined,
-    hasSchedule ? `- 재활용품: ${regionMatch?.region.recycling?.time}, ${regionMatch?.region.recycling?.place}` : undefined,
-    hasSchedule ? `- ${regionMatch?.region.recycling?.vinylAndPetDay}` : undefined,
-    hasSchedule ? `- ${regionMatch?.region.recycling?.otherDays}` : undefined,
+    // "기본 배출 기준" 블록이 여기 있었다. 요일·시간을 구 대표값으로 실었는데,
+    // 같은 구 안에서도 동과 주택 유형에 따라 갈리는 값이라 확정 안내로 내보내지
+    // 않는다. 아래 "확인할 정보"가 그 자리를 대신한다.
     bulkyLines.length > 0 ? "" : undefined,
     bulkyLines.length > 0 ? `${regionMatch?.region.name} 대형폐기물` : undefined,
     ...bulkyLines,

@@ -417,6 +417,48 @@ for (const testCase of regionEvaluationCases) {
   }
 }
 
+/**
+ * 배출 요일·시간이 지역 데이터로 다시 스며드는 걸 막는다. 구 대표값 하나로는
+ * 동과 주택 유형에 따라 갈리는 실제 기준을 맞출 수 없어 2026-08-19에 전부
+ * 걷어냈는데, 지역을 새로 추가하다 보면 출처 페이지의 요일표를 그대로 옮겨
+ * 적기 쉽다. 사용자에게 나가는 필드만 본다 — 출처 설명(`sources`)은 "그 페이지에
+ * 요일이 있다"는 안내라 오히려 남겨야 하므로 제외한다.
+ */
+/**
+ * 요일 이름 하나만 찾으면 놓치는 게 많다. 실제 출처는 "오전 5시부터", "월·수·금",
+ * "월~금", "일몰 후"처럼 여러 모양으로 시각과 주기를 적는다. `\d시`는 "24시간"을
+ * 잡지 않도록 뒤에 오는 "간"을 제외한다.
+ */
+const CONCRETE_SCHEDULE =
+  /[월화수목금토일]요일|[월화수목금토일][·~][월화수목금토일]|\d{1,2}:\d{2}|(오전|오후|새벽|밤)\s*\d{1,2}시|\d{1,2}시(?!간)|일몰/;
+for (const region of regionalPolicies) {
+  // 사용자에게 그대로 나가는 필드만 본다. `specialCollections`는 `수거함 안내`
+  // 블록으로 줄줄이 찍히는데(server.ts의 regionSpecialCollectionLines), 여기서
+  // 빠져 있으면 "폐의약품 수거함은 화·목 운영" 같은 줄이 가드를 통과한다.
+  const userFacing = [
+    region.summary,
+    ...(region.itemGuides ?? []).flatMap((guide) => [guide.summary, ...(guide.steps ?? [])]),
+    ...Object.values(region.specialCollections ?? {}).flatMap((entry) => entry?.method ?? []),
+  ].filter((line): line is string => typeof line === "string");
+
+  for (const line of userFacing) {
+    if (CONCRETE_SCHEDULE.test(line)) {
+      failures.push(`${region.name}: 확정 배출 요일·시간이 다시 들어왔다 — "${line.slice(0, 60)}"`);
+    }
+  }
+
+  // 요일을 왜 안 싣는지는 `지역 요약`(summary)만 말한다. regionCoverageNote가 같은
+  // 말을 하지 않는 건 이 문장이 자치구 전부에 있다는 전제 위에 서 있으므로, 지역을
+  // 새로 추가할 때 빠지면 그 지역만 이유 없이 요일이 사라진 답을 받게 된다.
+  //
+  // 앞부분 표현은 지역마다 다르다 — 용인은 "구·지역별로", 남양주는 "권역·주택
+  // 유형별로"가 맞는 말이라 문장을 통일하지 않고, 어느 지역이든 같은 꼬리로 끝나는
+  // 것만 요구한다.
+  if (region.coverageTier !== "metro" && !region.summary.includes("이 데이터에는 넣지 않았습니다")) {
+    failures.push(`${region.name}: summary에 배출 요일을 싣지 않는 이유가 빠졌다 (자치구·시는 모두 있어야 한다)`);
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Region matching test failed (${failures.length}):`);
   for (const failure of failures) console.error(`- ${failure}`);
