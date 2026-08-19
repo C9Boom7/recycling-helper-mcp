@@ -8935,5 +8935,114 @@
     "expectedStructuredIncludes": [
       "\"fee\":\"수수료 3,000원~20,000원"
     ]
+  },
+  {
+    "id": "yongsan_toilet_bowl_no_potty_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기",
+      "region": "서울 용산구"
+    },
+    "expectedTextExcludes": [
+      "유아용 변기"
+    ]
+  },
+  {
+    "id": "nowon_sink_unit_no_toy_kitchen_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 노원구"
+    },
+    "expectedTextExcludes": [
+      "유아용 싱크대"
+    ]
+  },
+  {
+    "id": "dobong_bathtub_no_baby_tub_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 도봉구"
+    },
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ]
+  },
+  {
+    "id": "seongdong_bathtub_no_baby_tub_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 성동구"
+    },
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ]
+  },
+  {
+    "id": "dobong_sink_unit_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 도봉구"
+    },
+    "expectedTextIncludes": [
+      "개수대 개당: 3,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 싱크대"
+    ]
+  },
+  {
+    "id": "seongbuk_sink_unit_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 성북구"
+    },
+    "expectedTextIncludes": [
+      "씽크대 씽크대 60cm당: 5,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 주방씽크대"
+    ]
+  },
+  {
+    "id": "mapo_bathtub_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "욕조 -: 6,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ]
+  },
+  {
+    "id": "nowon_bed_frame_keeps_baby_bed_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 프레임",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "유아용 침대 길이1m이상: 5,000원"
+    ]
+  },
+  {
+    "id": "mapo_sofa_keeps_baby_sofa_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "유아용 소파 1인용: 2,000원",
+      "소파 1인당: 4,000원"
+    ]
   }
 ]
