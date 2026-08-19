@@ -1313,6 +1313,24 @@ export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem)
 }
 
 /**
+ * 배출 요일을 실제로 안내하는 지자체 페이지. 요일 자체는 값으로 싣지 않지만,
+ * "확인할 정보"에서 사용자에게 사는 동을 되묻는 대신 이 링크로 안내를 닫으려면
+ * 어느 페이지가 요일을 다루는지는 알아야 한다.
+ *
+ * 판정은 `basis`로 한다. 출처 설명은 그 페이지에 무엇이 있는지 적는 자리라
+ * 요일을 다루는 페이지만 이 어휘를 갖는다 — 대형폐기물 신청 페이지는 안 걸린다.
+ * 2026-08-19 기준 49곳 중 8곳(강남·서초·송파·마포·성남·용인·부산·제주)만 잡히고,
+ * 나머지는 undefined가 나와 호출부가 전국 지역별 안내로 닫는다.
+ */
+const COLLECTION_DAY_BASIS = /요일|수거일|배출시간|수거시간/;
+
+export function findRegionCollectionDaySource(region: RegionalPolicyData): RegionCollectionSource | undefined {
+  return region.sources.find(
+    (source) => source.sourceType === "local_guidance" && !!source.url && COLLECTION_DAY_BASIS.test(source.basis ?? ""),
+  );
+}
+
+/**
  * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
  * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
  * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.

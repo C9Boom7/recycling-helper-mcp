@@ -848,6 +848,35 @@ async function runSmoke() {
     );
     requestId += 2;
 
+    // 요일 질문은 되묻지 않고 링크로 닫는다. 요일을 값으로 안 주는 건 그대로인데,
+    // **어디서 확인하는지**를 안 적었더니 호스트 모델이 그 빈자리를 "사는 동 이름을
+    // 알려주세요"로 메웠다. 사용자가 동을 답해도 우리가 줄 게 없어서, 그 뒤 후속 턴이
+    // 통째로 웹 검색으로 샜다(2026-08-19 Preview 측정). 세 갈래를 함께 본다 — 지자체
+    // 요일 페이지가 있는 지역, 없는 지역, 지역 자체를 못 찾은 경우.
+    const dayLinkExpectations = [
+      // 요일 출처를 가진 8곳 중 하나. 자기 지자체 페이지로 닫혀야 한다.
+      { region: "성남시", contains: "recycle.seongnam.go.kr" },
+      // 요일 출처가 없는 41곳. 전국 지역별 안내로 닫는다.
+      { region: "서울 종로구", contains: "region.do" },
+      // 동 이름만 온 경우. 되묻기의 결과가 실제로 여기로 떨어진다.
+      { region: "백현동", contains: "region.do" },
+    ];
+    for (const { region, contains } of dayLinkExpectations) {
+      const dayAnswer = resultText(await callTool(baseUrl, "get_region_disposal_info", { region }, requestId++));
+      // `지역 요약`도 요일을 왜 안 싣는지 말하므로 같은 낱말이 걸린다. 링크를 들고 있어야
+      // 하는 건 번호가 붙은 `확인할 정보` 쪽이라 그 모양으로만 잡는다.
+      const dayLine = dayAnswer.split("\n").find((line) => /^\d+\. 일반쓰레기·재활용품 배출 요일과 시간/.test(line));
+      assert(dayLine, `${region}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
+      assert(
+        dayLine.includes("http"),
+        `${region}: 요일 항목에 확인처 링크가 없다 — 이러면 모델이 사용자에게 동을 되묻는다: "${dayLine}"`,
+      );
+      assert(
+        dayLine.includes(contains),
+        `${region}: 요일 확인처가 예상과 다르다 (기대 "${contains}"): "${dayLine}"`,
+      );
+    }
+
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
     // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.
     //
