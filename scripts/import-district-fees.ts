@@ -125,7 +125,7 @@ for (const regionId of targets) {
 
     const itemName = cleanLabel(row.itemName);
     const spec = cleanLabel(row.spec) || "모든 규격";
-    const verdict = classifyName(itemName);
+    const verdict = classifyName(itemName, "whole_cell");
     if (!verdict.ok) {
       note(verdict.reason);
       continue;
@@ -142,7 +142,7 @@ for (const regionId of targets) {
     if (!hint) {
       let stolen = false;
       for (const candidate of specNameCandidates(spec)) {
-        const specVerdict = classifyName(candidate);
+        const specVerdict = classifyName(candidate, "spec_fragment");
         if (specVerdict.ok && specVerdict.itemId !== itemId && hasBulkyRoute(specVerdict.itemId)) {
           stolen = true;
           break;

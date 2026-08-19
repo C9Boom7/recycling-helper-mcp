@@ -8935,5 +8935,261 @@
     "expectedStructuredIncludes": [
       "\"fee\":\"수수료 3,000원~20,000원"
     ]
+  },
+  {
+    "id": "yongsan_toilet_bowl_no_potty_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "## 변기",
+      "문의/신청 안내 전화: 02-2199-7294",
+      "인터넷 신청: https://www.yongsan.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200674",
+      "수수료 조회: https://www.yongsan.go.kr/portal/lifeWaste/wasteStndr/list.do?menuNo=200673"
+    ],
+    "expectedTextExcludes": [
+      "유아용 변기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_bowl\""
+    ]
+  },
+  {
+    "id": "nowon_sink_unit_no_toy_kitchen_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "## 싱크대",
+      "문의/신청 안내 전화: 02-2116-3808",
+      "인터넷 신청: https://smartclean.nowon.kr/online/bulky/request",
+      "수수료 조회: https://smartclean.nowon.kr/online/bulky/item"
+    ],
+    "expectedTextExcludes": [
+      "유아용 싱크대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sink_unit\""
+    ]
+  },
+  {
+    "id": "dobong_bathtub_no_baby_tub_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 도봉구"
+    },
+    "expectedTextIncludes": [
+      "## 욕조",
+      "문의/신청 안내 전화: 02-2091-3266",
+      "인터넷 신청: https://smartclean.dobong.go.kr/online/bulky/request",
+      "수수료 조회: https://smartclean.dobong.go.kr/online/bulky/item"
+    ],
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathtub\""
+    ]
+  },
+  {
+    "id": "seongdong_bathtub_no_baby_tub_fee",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 성동구"
+    },
+    "expectedTextIncludes": [
+      "## 욕조",
+      "문의/신청 안내 전화: 02-2286-5532",
+      "인터넷 신청: https://www.sd.go.kr/main/contents.do?key=1670",
+      "수수료 조회: https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html"
+    ],
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathtub\""
+    ]
+  },
+  {
+    "id": "dobong_sink_unit_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 도봉구"
+    },
+    "expectedTextIncludes": [
+      "개수대 개당: 3,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 싱크대"
+    ]
+  },
+  {
+    "id": "seongbuk_sink_unit_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "싱크대",
+      "region": "서울 성북구"
+    },
+    "expectedTextIncludes": [
+      "씽크대 씽크대 60cm당: 5,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 주방씽크대"
+    ]
+  },
+  {
+    "id": "mapo_bathtub_keeps_real_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "욕조",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "욕조 -: 6,000원"
+    ],
+    "expectedTextExcludes": [
+      "유아용 욕조"
+    ]
+  },
+  {
+    "id": "nowon_bed_frame_keeps_baby_bed_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 프레임",
+      "region": "서울 노원구"
+    },
+    "expectedTextIncludes": [
+      "유아용 침대 길이1m이상: 5,000원"
+    ]
+  },
+  {
+    "id": "mapo_sofa_keeps_baby_sofa_row",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "유아용 소파 1인용: 2,000원",
+      "소파 1인당: 4,000원"
+    ]
+  },
+  {
+    "id": "ordinance_label_stuffed_toy_ryu_stays_out_of_queries",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형류 수납함"
+    },
+    "expectedTextIncludes": [
+      "## 리빙박스·플라스틱 수납함"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"plastic_storage_box\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"stuffed_toy\""
+    ]
+  },
+  {
+    "id": "ordinance_label_stuffed_toy_ryu_not_a_bed_modifier",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형류 침대"
+    },
+    "expectedTextIncludes": [
+      "## 침대 프레임"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bed_frame\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"stuffed_toy\""
+    ]
+  },
+  {
+    "id": "ordinance_label_desk_chair_stays_out_of_queries",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상용의자 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"chair\""
+    ]
+  },
+  {
+    "id": "desk_not_taken_by_ordinance_chair_label",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상"
+    },
+    "expectedTextIncludes": [
+      "## 책상"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"desk\""
+    ]
+  },
+  {
+    "id": "toy_plain_still_toy",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장난감"
+    },
+    "expectedTextIncludes": [
+      "## 장난감"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toy\""
+    ]
+  },
+  {
+    "id": "stuffed_toy_plain_still_stuffed_toy",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형"
+    },
+    "expectedTextIncludes": [
+      "## 인형"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stuffed_toy\""
+    ]
+  },
+  {
+    "id": "jungnang_mattress_excludes_bed_set",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 중랑구"
+    },
+    "expectedTextIncludes": [
+      "침대 1인용 매트리스,라텍스: 7,000원",
+      "침대 2인용 매트리스,라텍스: 9,000원"
+    ],
+    "expectedTextExcludes": [
+      "세트(매트리스,침대틀,침대헤드)"
+    ]
+  },
+  {
+    "id": "jungnang_bed_frame_takes_bed_set",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 프레임",
+      "region": "서울 중랑구"
+    },
+    "expectedTextIncludes": [
+      "침대 1인용 세트(매트리스,침대틀,침대헤드): 14,000원",
+      "침대 2인용 세트(매트리스,침대틀,침대헤드): 20,000원"
+    ]
   }
 ]

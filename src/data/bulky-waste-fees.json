@@ -1527,13 +1527,6 @@
         "feeKrw": 2000
       },
       {
-        "itemId": "toilet_bowl",
-        "category": "기타",
-        "itemName": "유아용 변기",
-        "spec": "모든규격",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "stroller",
         "category": "기타",
         "itemName": "유모차",
@@ -3020,13 +3013,6 @@
         "itemName": "캣타워",
         "spec": "높이1.5m이상",
         "feeKrw": 7000
-      },
-      {
-        "itemId": "sink_unit",
-        "category": "기타",
-        "itemName": "유아용 싱크대",
-        "spec": "모든 규격",
-        "feeKrw": 3000
       },
       {
         "itemId": "tire",
@@ -9105,13 +9091,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "sink_unit",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 싱크대",
-        "spec": "모든 규격",
-        "feeKrw": 3000
-      },
-      {
         "itemId": "cupboard",
         "category": "furniture",
         "itemName": "찬장",
@@ -9138,13 +9117,6 @@
         "itemName": "찬장",
         "spec": "긴 면이 150㎝ 이상",
         "feeKrw": 7000
-      },
-      {
-        "itemId": "bathtub",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 욕조",
-        "spec": "모든 규격",
-        "feeKrw": 2000
       },
       {
         "itemId": "toilet_bowl",
@@ -16013,30 +15985,9 @@
       {
         "itemId": "sink_unit",
         "category": "bathroom_fixture",
-        "itemName": "유아용 주방씽크대",
-        "spec": "유아용 주방씽크대(긴면60cm미만/모형냉장고제외)",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "sink_unit",
-        "category": "bathroom_fixture",
         "itemName": "씽크대",
         "spec": "씽크대 60cm당",
         "feeKrw": 5000
-      },
-      {
-        "itemId": "sink_unit",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 주방씽크대",
-        "spec": "유아용 주방씽크대(긴면80cm미만/모형냉장고제외)",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "sink_unit",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 주방씽크대",
-        "spec": "유아용 주방씽크대(긴면 100cm미만/모형냉장고제외)",
-        "feeKrw": 7000
       },
       {
         "itemId": "massage_chair",
@@ -17723,20 +17674,6 @@
         "feeKrw": 9000
       },
       {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "1인용 세트(매트리스,침대틀,침대헤드)",
-        "feeKrw": 14000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "2인용 세트(매트리스,침대틀,침대헤드)",
-        "feeKrw": 20000
-      },
-      {
         "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대",
@@ -17782,8 +17719,22 @@
         "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대",
+        "spec": "1인용 세트(매트리스,침대틀,침대헤드)",
+        "feeKrw": 14000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
         "spec": "2층 침대",
         "feeKrw": 16000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용 세트(매트리스,침대틀,침대헤드)",
+        "feeKrw": 20000
       },
       {
         "itemId": "stone_bed",
@@ -21053,13 +21004,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "bathtub",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 욕조",
-        "spec": "모든 규격",
-        "feeKrw": 3000
-      },
-      {
         "itemId": "chair",
         "category": "bulky",
         "itemName": "의자",
@@ -23646,13 +23590,6 @@
         "itemName": "변기",
         "spec": "양변기",
         "feeKrw": 5000
-      },
-      {
-        "itemId": "bathtub",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 욕조",
-        "spec": "1인용",
-        "feeKrw": 2000
       },
       {
         "itemId": "bathtub",

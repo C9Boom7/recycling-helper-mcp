@@ -82,7 +82,7 @@ const TARGETS = [
   //   - `chair / 좌식의자, 접의자 / 2,000원`은 `multi_item_name`으로 빠진다.
   //   - 요가매트는 돗자리가 `picnic_mat`으로 제자리를 찾으면서 근거 행을 잃었다.
   //     그 빈자리를 「유아용 놀이매트 2,000원」이 메우고 있었고, 그건 요가매트가
-  //     아니라서 `HEAD_COLLISION_NAMES`로 막았다. 결과적으로 마포 요가매트는 금액이
+  //     아니라서 `HEAD_COLLISION_NAMES_ANY_SPACING`으로 막았다. 결과적으로 마포 요가매트는 금액이
   //     없다 — 조례에 그 품목 행이 없다는 뜻이고, 틀린 값보다는 없는 편이 맞다.
   // R2 검증은 마포 14/14 일치, 불일치 0이었다.
   //
@@ -92,9 +92,10 @@ const TARGETS = [
   //   교체하면 수기로 넣었던 요가매트·리빙박스(플라스틱 수납함) 수수료가 **조용히
   //   사라진다**. 그 둘은 서초 조례 별표에 아예 없고 구청 안내에서 온 값이다.
   //   품목은 10→65개로 늘지만 없어지는 품목이 넷이라, 교체가 아니라 병합이 필요하다.
-  //   덤으로 책상용의자(`ambiguous`)·인형류(`not_found`)·장난감류(`modifier_position`)가
-  //   품명 판정에서 걸려 조례에 있는데도 못 들어온다 — 이건 별칭으로 닫을 수 있고
-  //   고치면 모든 지역이 함께 이득이다.
+  //   품명 판정에 걸리던 책상용의자·인형류·장난감류 3행은 열어 뒀다
+  //   (`bulky-item-match.ts`의 `IMPORT_ONLY_NAMES`). 처음엔 `waste-items.json`
+  //   별칭으로 넣었다가 질의까지 함께 넓어져 「인형류 수납함」이 리빙박스 대신
+  //   인형으로 갔고, 표 한 칸에서만 확정하는 쪽으로 옮겼다. 남은 건 병합뿐이다.
   // - **강남·송파**: 파서가 좌우 2단 조판에서 아직 열을 놓쳐, 골든셋 69행 **바깥**
   //   행의 품명이 어긋난다. 강남은 침대 금액이 「텔레비전 / 유아용 침대 3,000원」처럼
   //   TV에 붙고 정작 침대틀 행은 하나도 안 잡히며, 송파는 「TV / 가스 레인지 = 0」류가
@@ -155,7 +156,7 @@ function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: s
 
   const spec = cleanLabel(row.spec);
   for (const candidate of specNameCandidates(spec)) {
-    const verdict = classifyName(candidate);
+    const verdict = classifyName(candidate, "spec_fragment");
     if (verdict.ok && verdict.itemId !== itemId && hasBulkyRoute(verdict.itemId)) {
       return { ok: false, reason: "spec_names_other_item" };
     }
@@ -164,7 +165,7 @@ function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: s
   if (!row.nameInherited) return { ok: true };
   if (SPEC_LIKE.test(spec)) return { ok: true };
 
-  const specVerdict = classifyName(spec);
+  const specVerdict = classifyName(spec, "whole_cell");
   if (specVerdict.ok && specVerdict.itemId === itemId) return { ok: true };
   return { ok: false, reason: "spec_is_not_a_size" };
 }
@@ -347,7 +348,7 @@ for (const regionId of targets) {
     }
     const itemName = cleanLabel(row.itemName);
     const spec = cleanLabel(row.spec) || "모든 규격";
-    const verdict = classifyName(itemName);
+    const verdict = classifyName(itemName, "whole_cell");
     if (!verdict.ok) {
       note(verdict.reason);
       continue;
