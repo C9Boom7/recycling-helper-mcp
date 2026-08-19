@@ -17674,20 +17674,6 @@
         "feeKrw": 9000
       },
       {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "1인용 세트(매트리스,침대틀,침대헤드)",
-        "feeKrw": 14000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "2인용 세트(매트리스,침대틀,침대헤드)",
-        "feeKrw": 20000
-      },
-      {
         "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대",
@@ -17733,8 +17719,22 @@
         "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대",
+        "spec": "1인용 세트(매트리스,침대틀,침대헤드)",
+        "feeKrw": 14000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
         "spec": "2층 침대",
         "feeKrw": 16000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용 세트(매트리스,침대틀,침대헤드)",
+        "feeKrw": 20000
       },
       {
         "itemId": "stone_bed",

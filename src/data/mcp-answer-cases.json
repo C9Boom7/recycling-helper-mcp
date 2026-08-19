@@ -9122,5 +9122,32 @@
     "expectedStructuredIncludes": [
       "\"id\":\"stuffed_toy\""
     ]
+  },
+  {
+    "id": "jungnang_mattress_excludes_bed_set",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "서울 중랑구"
+    },
+    "expectedTextIncludes": [
+      "침대 1인용 매트리스,라텍스: 7,000원",
+      "침대 2인용 매트리스,라텍스: 9,000원"
+    ],
+    "expectedTextExcludes": [
+      "세트(매트리스,침대틀,침대헤드)"
+    ]
+  },
+  {
+    "id": "jungnang_bed_frame_takes_bed_set",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대 프레임",
+      "region": "서울 중랑구"
+    },
+    "expectedTextIncludes": [
+      "침대 1인용 세트(매트리스,침대틀,침대헤드): 14,000원",
+      "침대 2인용 세트(매트리스,침대틀,침대헤드): 20,000원"
+    ]
   }
 ]
