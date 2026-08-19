@@ -116,7 +116,15 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 
 ## 2. 로그 읽기
 
-서버는 툴 호출마다 stdout에 JSON 한 줄을 찍는다. PlayMCP in KC 콘솔의 로그에서 본다.
+서버는 툴 호출마다 stdout에 JSON 한 줄을 찍는다. **다만 KC 콘솔에는 이 stdout을 보여주는 컨테이너 로그 화면이 없다**
+(2026-08-19 확인 — 모니터링 탭의 Istio 지표뿐이다). 그래서 어디서 무엇을 볼 수 있는지가 갈린다.
+
+- **운영 트래픽의 활동 시간대**: 콘솔 모니터링 탭에서 202 응답이 몰리는 구간으로 MCP 세션이 언제 돌았는지만 교차 확인할 수 있다.
+  응답 코드별 집계라 어느 툴이 불렸는지는 안 나온다.
+- **툴 단위 판정**: Kakao Tools에서 Preview를 만들 때 뜨는 "Kakao Tools 확인 중" 지표로 호출 여부를 잡고,
+  응답에 실린 서버 고유 값(수수료 금액 등)이 데이터와 맞는지 대조한다. 지문만 보고 판정하면 오판한다.
+- **로그 원문**: 로컬에서 띄웠거나 `tools/call`을 직접 쳤을 때만 stdout에 아래 JSON이 그대로 찍힌다.
+  아래 필드 설명은 이 경로에서 본 로그를 읽을 때 쓴다.
 
 ```json
 {"ts":"...","tool":"get_disposal_steps","status":"match","matchedId":"pizza_box_oily","matchedRegion":"서울 강남구","score":100,"matched":1,"total":1,"ms":3}
@@ -180,7 +188,8 @@ CALL_LOG_DETAILS=true pnpm start   # 로컬 전용. 배포 환경변수에는 �
 
 서버 문제가 아닐 가능성이 높다. 호스트 LLM이 툴을 고르지 않은 것이다.
 
-- 로그에 해당 시각의 호출이 없으면 서버까지 오지 않은 것이다.
+- 운영 로그를 직접 볼 수 없으므로(2절) 호출 여부는 우회해서 잡는다. 콘솔 모니터링 탭에 해당 시각의 202 버스트가 없으면
+  서버까지 오지 않은 것이고, Preview에서 재현할 때는 "Kakao Tools 확인 중" 지표가 안 뜨는 것으로 확인한다.
 - description 조정이 유일한 수단이다. **8/21 기능 변경 마감에는 걸리지 않는다** — 마감되는 건 기능이고, description은
   마감 이후에도 허용되는 "문구 수정"이다([phase-4-release.md](prd/phase-4-release.md) R4). 8/27 프리징까지는 고칠 수 있다.
 - 걸리는 건 날짜가 아니라 **등록 갱신**이다. PlayMCP는 툴 목록을 **등록 시점 스냅샷**으로 저장하므로, 서버의 description을
