@@ -19,6 +19,7 @@ import {
   findMaterialGuideline,
   findNamedSubRegionForMatch,
   findRegionalPolicy,
+  findRegionCollectionDaySource,
   findRegionItemGuide,
   findRegisteredDistricts,
   findWasteItems,
@@ -85,6 +86,11 @@ const SERVER_INSTRUCTIONS =
   "Prefer get_disposal_steps whenever the user asks how to throw away, discard, or recycle an item. " +
   "If a result is ambiguous, show the candidates and ask the user about material or usage instead of guessing. " +
   "If the user mentions where they live, pass it as the region argument. " +
+  // 되묻기 금지. 요일은 동·주택 유형별로 갈려 우리가 값으로 주지 않는데, 모델이 그
+  // 빈자리를 "사는 동이 어디세요"로 메우면 사용자가 답해도 줄 게 없다. 그 뒤 후속
+  // 턴이 통째로 웹 검색으로 새는 걸 2026-08-19 Preview 측정에서 확인했다.
+  "Collection days and times are deliberately not returned as values — get_region_disposal_info names the official page to check instead. " +
+  "When the user asks which day to put waste out, call get_region_disposal_info and answer with that link; do NOT ask for their 동/neighborhood or apartment complex. " +
   "Keep answers concise and cite the provided sources; if local rules may differ, say that regional verification is needed.";
 
 type JsonRpcId = string | number | null;
@@ -277,7 +283,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the answer names the official source to check instead. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead. Optional itemName narrows the checklist to that item.",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps returns no day guidance. Optional itemName narrows the checklist to that item.",
     inputShape: {
       region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
@@ -552,12 +558,81 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
   });
 }
 
-function generalRegionCheckList(_region: MatchedRegionPolicy): string[] {
+/**
+ * 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에 따라
+ * 갈리는데 우리가 그 단위까지 확인할 수 없어서다. 문제는 그 다음이었다 — "직접 확인할
+ * 항목"으로만 남기고 **어디서** 확인하는지를 안 적었더니, 호스트 모델이 그 빈자리를
+ * 사용자에게 되묻는 걸로 메웠다("사는 동 이름을 알려주세요"). 그런데 동 이름을 받아도
+ * 우리가 줄 게 없다. 2026-08-19 Preview 측정에서 그 되묻기 뒤 후속 턴이 통째로 웹
+ * 검색으로 샜고, 세 번째 턴은 부동산 커뮤니티 입주민 후기로 답이 나갔다.
+ *
+ * 그래서 못 준다고 말하는 그 자리에서 링크로 닫는다. 되물을 자리를 없애는 게 목적이라,
+ * 지자체 요일 페이지가 있으면 그걸, 없으면 전국 지역별 안내를 붙인다. 어느 쪽이든 이
+ * 줄에는 항상 URL이 하나 들어가야 하고, 그건 `scripts/smoke-mcp.mjs`가 지킨다.
+ * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
+ */
+function collectionDaySourceHint(region?: MatchedRegionPolicy): string {
+  const daySource = region ? findRegionCollectionDaySource(region.region) : undefined;
+
+  if (daySource?.url) {
+    const checkedAt = daySource.checkedAt ? `, 확인일 ${daySource.checkedAt}` : "";
+    return `${daySource.title}에서 확인하세요 (${daySource.url}${checkedAt})`;
+  }
+
+  return `${REGION_SELECT_GUIDE_LINK.title}에서 거주 지역을 선택해 확인하세요 (${REGION_SELECT_GUIDE_LINK.url})`;
+}
+
+function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
+  return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(region)}`;
+}
+
+/**
+ * 품목을 함께 물은 갈래. 체크리스트가 그 품목으로 좁혀지느라 위 요일 줄이 통째로
+ * 빠지는데, 되묻기를 부르는 질문은 오히려 이쪽이 흔하다("강남구 오피스텔은 비닐봉지
+ * 목요일 배출 맞아?"). 좁히기는 그대로 두고, 요일을 말하는 줄에만 확인처를 이어 붙인다.
+ *
+ * 요일 줄이 없으면 아무것도 더하지 않는다. 폐형광등 수거함처럼 요일과 무관한 품목까지
+ * 링크를 달면 안내가 길어지기만 한다. 붙이는 자리는 첫 줄 하나뿐이다 — 같은 주소를
+ * 여러 줄에 반복해 봐야 읽는 쪽이 고를 게 늘지 않는다.
+ */
+function withCollectionDaySource(checks: string[], region?: MatchedRegionPolicy): string[] {
+  const dayIndex = checks.findIndex((check) => mentionsCollectionDay(check) && !check.includes("http"));
+  if (dayIndex < 0) return checks;
+
+  const withSource = [...checks];
+  withSource[dayIndex] = `${withSource[dayIndex]} — ${collectionDaySourceHint(region)}`;
+  return withSource;
+}
+
+/** 요일을 말하는 줄인지. 확인처가 붙은 줄은 이미 닫혀 있으므로 URL 유무로 갈라 본다. */
+function mentionsCollectionDay(text: string): boolean {
+  return text.includes("요일");
+}
+
+/**
+ * 불변식: **응답이 요일을 언급하면 그 응답 어딘가에 요일 확인처가 있어야 한다.**
+ *
+ * 체크 항목만 보고 붙이던 게 화근이었다. 지역 요약은 자치구 48곳 모두 "배출 요일과
+ * 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다"로 끝나는데, 품목이 붙어
+ * 체크리스트가 그 품목으로 좁혀지면(침대처럼 요일과 무관한 대형폐기물이 그렇다) 요일
+ * 줄이 통째로 빠진다. 그러면 응답은 **요일을 못 준다고 말해놓고 어디서 확인하는지는
+ * 안 말하는** 모양이 된다 — 되묻기를 부른 게 바로 그 모양이라, 지역만 물었을 때보다
+ * 오히려 나쁘다.
+ *
+ * 그래서 좁힌 목록에 요일 줄이 있으면 거기에 확인처를 잇고(`withCollectionDaySource`),
+ * 없으면 여기서 요일 확인 항목을 한 줄 더해 닫는다. 일반 체크리스트를 통째로 되살리지는
+ * 않는다 — 좁히기는 의도한 동작이고, 침대를 물은 사람에게 폐형광등 수거함까지 돌려줄
+ * 이유는 없다. 요일을 아무 데서도 말하지 않는 응답에는 아무것도 더하지 않는다.
+ */
+function closeCollectionDayMention(checks: string[], answerText: string, region?: MatchedRegionPolicy): string[] {
+  if (checks.some((check) => mentionsCollectionDay(check) && check.includes("http"))) return checks;
+  if (!mentionsCollectionDay(answerText) && !checks.some(mentionsCollectionDay)) return checks;
+  return [...checks, collectionDayCheckLine(region)];
+}
+
+function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
   return [
-    // 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에
-    // 따라 갈리는데 우리가 그 단위까지 확인할 수 없어서, 값 대신 "직접 확인할
-    // 항목"으로만 남긴다.
-    "일반쓰레기·재활용품 배출 요일과 시간 (같은 지역 안에서도 동·주택 유형별로 다를 수 있음)",
+    collectionDayCheckLine(region),
     "불연성 폐기물 봉투, 특수마대, PP봉투 등 지역 지정 봉투 기준",
     "음식물류폐기물 전용봉투, RFID, 제외 품목",
     "대형생활폐기물 사전 신청과 수수료",
@@ -568,7 +643,10 @@ function generalRegionCheckList(_region: MatchedRegionPolicy): string[] {
 function unknownRegionCheckList(item?: WasteItem): string[] {
   if (!item) {
     return [
-      "재활용품 배출 요일과 시간",
+      // 지역을 못 찾은 자리다. `백현동`처럼 동 이름만 온 경우가 여기로 떨어지는데,
+      // 하필 모델이 되물어서 받아낸 답이 이쪽으로 오기 쉽다. 지자체를 모르니 전국
+      // 지역별 안내로 닫는다.
+      collectionDayCheckLine(),
       "품목별 전용 수거함 위치",
       "대형폐기물 신고 페이지와 수수료",
       "폐건전지, 폐형광등, 폐의약품 등 생활계 유해폐기물 수거 장소",
@@ -577,12 +655,15 @@ function unknownRegionCheckList(item?: WasteItem): string[] {
   }
 
   if (!itemNeedsRegionCheck(item)) {
-    return ["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"];
+    return withCollectionDaySource(["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"]);
   }
 
-  return itemNeedsCriticalRegionCheck(item)
-    ? item.regionPolicy?.checkItems ?? ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"]
-    : item.regionPolicy?.checkItems ?? ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
+  // 지역을 못 찾았어도 요일 줄은 링크로 닫는다. 지자체를 모르니 전국 지역별 안내가 붙는다.
+  return withCollectionDaySource(
+    itemNeedsCriticalRegionCheck(item)
+      ? item.regionPolicy?.checkItems ?? ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"]
+      : item.regionPolicy?.checkItems ?? ["실제 배출 요일·장소나 수거함·회수 가능 여부"],
+  );
 }
 
 function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: WasteItem): string[] {
@@ -602,10 +683,10 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
     ...(feeRowTotal ? [`확인된 ${feeRowTotal}개 규격 중 대표 ${feeRows.length}개만 옮겼습니다 — 나머지 규격은 수수료 조회 페이지에서 확인`] : []),
   ].filter(Boolean);
 
-  if (checks.length > 0) return Array.from(new Set(checks));
-  if (!itemNeedsRegionCheck(item)) return ["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"];
-  if (itemNeedsCriticalRegionCheck(item)) return ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"];
-  return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
+  if (checks.length > 0) return withCollectionDaySource(Array.from(new Set(checks)), region);
+  if (!itemNeedsRegionCheck(item)) return withCollectionDaySource(["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"], region);
+  if (itemNeedsCriticalRegionCheck(item)) return withCollectionDaySource(["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"], region);
+  return withCollectionDaySource(["실제 배출 요일·장소나 수거함·회수 가능 여부"], region);
 }
 
 /**
@@ -1065,16 +1146,23 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
 }
 
 /**
+ * 지역을 골라 들어가는 전국 안내. 미등록 지역 폴백이면서, 지자체 요일 페이지가 없는
+ * 42곳에서 `collectionDayCheckLine`이 요일 질문을 닫는 링크이기도 하다. 두 자리가
+ * 같은 주소를 각자 적고 있으면 한쪽만 고쳐지므로 상수 하나로 묶는다.
+ */
+const REGION_SELECT_GUIDE_LINK = {
+  title: "생활폐기물 분리배출 누리집 지역별 안내",
+  url: "https://www.분리배출.kr/front/region/region.do",
+  basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
+};
+
+/**
  * 미등록 지역에서도 다음 행동이 남아야 한다. "지역번호+120" 대표 민원번호는
  * 연결해도 담당 부서까지 한참 돌아가 안내로서 값이 없으므로 넣지 않는다 —
  * 번호를 준다면 지역 데이터에서 확인한 직통번호여야 하고, 없으면 빼는 쪽이 낫다.
  */
 const NATIONAL_FALLBACK_LINKS = [
-  {
-    title: "생활폐기물 분리배출 누리집 지역별 안내",
-    url: "https://www.분리배출.kr/front/region/region.do",
-    basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
-  },
+  REGION_SELECT_GUIDE_LINK,
   {
     title: "정부24 민원 신청",
     url: "https://plus.gov.kr/minwon/",
@@ -1196,7 +1284,6 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const regionResolution = resolveRegionalPolicy(region);
   const regionMatch = regionResolution.status === "match" ? regionResolution.match : undefined;
   const regionCandidates = regionResolution.status === "ambiguous" ? regionResolution.candidates.map((candidate) => candidate.region.name) : undefined;
-  const checkList = itemRegionCheckList(regionMatch, match?.item);
 
   // 광역으로 착지했더라도 질의가 시·군·구를 지목했는지는 갈라 본다. 응답 문구도
   // 로그 집계도 이 한 갈래에서 갈린다 — `metro`로 뭉뚱그리면 "충북"이라고 말한
@@ -1240,7 +1327,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const dropsOnlyTheReAsk = Boolean(namedSubRegion) && regionMatch?.level === "metro";
   const bulkyLines = regionMatch && !dropsOnlyTheReAsk ? formatRegionBulkyContactLines(regionMatch.region) : [];
   const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
-  const lines = [
+  // "확인할 정보" 위쪽을 먼저 세운다. 요일 확인처를 붙일지가 **이 블록이 요일을
+  // 말하는지**에 달려 있어서다 — 지역 요약이 그 자리다.
+  const answerBodyLines = [
     `${regionMatch?.region.name ?? region} 지역 확인 안내`,
     "",
     itemLine,
@@ -1262,6 +1351,16 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match && regionMatch
       ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion, subRegionScopeAlreadyShown: true }).join("\n")
       : undefined,
+  ].filter(Boolean);
+
+  const checkList = closeCollectionDayMention(
+    itemRegionCheckList(regionMatch, match?.item),
+    answerBodyLines.join("\n"),
+    regionMatch,
+  );
+
+  const lines = [
+    ...answerBodyLines,
     "",
     "확인할 정보",
     ...checkList.map((item, index) => `${index + 1}. ${item}`),

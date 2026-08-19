@@ -1313,6 +1313,46 @@ export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem)
 }
 
 /**
+ * 배출 요일을 실제로 안내하는 지자체 페이지. 요일 자체는 값으로 싣지 않지만,
+ * "확인할 정보"에서 사용자에게 사는 동을 되묻는 대신 이 링크로 안내를 닫으려면
+ * 어느 페이지가 요일을 다루는지는 알아야 한다.
+ *
+ * 1차 판정은 `basis`로 한다. 출처 설명은 그 페이지에 무엇이 있는지 적는 자리라
+ * 요일을 다루는 페이지가 대체로 이 어휘를 갖는다. 다만 어휘만으로는 대형폐기물
+ * 신청 페이지가 걸린다 — 용인시는 이 정규식에 걸리는 출처가 `대형폐기물 배출신청안내`
+ * 하나뿐이라, 요일 질문에 신청 페이지를 확인처로 주고 있었다. 강남구는 두 번째
+ * 매칭이 대형폐기물 포털이라 배열 순서가 바뀌면 확인처가 조용히 그리로 옮겨간다.
+ * 그래서 그 지역의 `bulkyWaste` 신청·수수료 URL과 같은 주소는 후보에서 뺀다.
+ *
+ * 2026-08-19 기준 49곳 중 7곳(강남·서초·송파·마포·성남·부산·제주)만 잡히고,
+ * 나머지는 undefined가 나와 호출부가 전국 지역별 안내로 닫는다. 용인은 요일을
+ * 다루는 페이지가 실제로 없어서 그 폴백이 맞는 답이다.
+ *
+ * 대형폐기물 배제의 한계는 알고 넘어간다. 거르는 건 그 지역의
+ * `bulkyWaste.applicationUrl`·`feeUrl`과 **주소가 정확히 같은** 출처뿐이라,
+ * (1) 그 둘 밖의 대형폐기물 페이지(별도 안내문, 같은 포털의 다른 경로, 쿼리스트링만
+ * 다른 주소)는 그대로 통과하고, (2) `bulkyWaste`가 없는 광역(부산·제주·경기도 등)에는
+ * 아무 효과가 없다. 지금 데이터로는 새는 곳이 없어서 URL 비교 이상으로 복잡하게 만들지
+ * 않았다 — 지역이 늘어 다시 신청 페이지가 확인처로 잡히면 그때 판정 기준을 손본다.
+ * 회귀는 `scripts/smoke-mcp.mjs`가 49곳 전부에 대해 잡는다.
+ */
+const COLLECTION_DAY_BASIS = /요일|수거일|배출시간|수거시간/;
+
+export function findRegionCollectionDaySource(region: RegionalPolicyData): RegionCollectionSource | undefined {
+  const bulkyUrls = new Set(
+    [region.bulkyWaste?.applicationUrl, region.bulkyWaste?.feeUrl].filter((url): url is string => !!url),
+  );
+
+  return region.sources.find(
+    (source) =>
+      source.sourceType === "local_guidance" &&
+      !!source.url &&
+      !bulkyUrls.has(source.url) &&
+      COLLECTION_DAY_BASIS.test(source.basis ?? ""),
+  );
+}
+
+/**
  * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
  * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
  * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.
