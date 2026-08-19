@@ -22132,7 +22132,7 @@
   {
     "regionId": "mapo_gu",
     "regionName": "서울 마포구",
-    "checkedAt": "2026-08-18",
+    "checkedAt": "2026-08-19",
     "applicationUrl": "https://www.mapo.go.kr/site/main/content/mapo05060506",
     "feeUrl": "https://www.mapo.go.kr/site/main/content/mapo05060502",
     "phone": "02-3153-9200",
@@ -22140,7 +22140,7 @@
       "title": "서울특별시 마포구 폐기물관리 조례 [별표1] 대형폐기물 배출수수료 품목별 부과기준",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2097023",
       "sourceType": "law",
-      "checkedAt": "2026-08-18",
+      "checkedAt": "2026-08-19",
       "basis": "조례 「서울특별시 마포구 폐기물관리 조례」(시행 2025-12-26) [별표1] 대형폐기물 배출수수료 품목별 부과기준 \"대형폐기물 배출수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 214행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },

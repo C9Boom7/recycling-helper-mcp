@@ -56,13 +56,6 @@ const REGIONS_PATH = "src/data/region-policies.json";
  */
 const MAX_FEE_ROWS = 12;
 
-/**
- * 조례 원문을 `fees:fetch`가 아니라 `fees:verify`로 받는 지역. 골든셋 목록에 있어서
- * 수집 스크립트의 TARGETS에는 없다. 마포는 여기 데이터를 쓰면서도 대조 기준에서는
- * 빠져 있어(자기 충족을 막으려고) 이 목록으로 따로 표시한다.
- */
-const GOLDEN_SOURCED = new Set(["mapo_gu"]);
-
 /** Phase 6 조례 트랙 10곳 + 마포. 여기 없는 지역은 인자로 줘도 받지 않는다. */
 const TARGETS = [
   "seongnam_si",
@@ -112,8 +105,9 @@ const TARGETS = [
   //   `GOLDEN_TARGETS`에 되돌리면 R2가 헛되이 깨진다. 수기 데이터로 남아 파서를
   //   대조하는 건 **서초·송파뿐**이다(`GOLDEN_TARGETS` 주석 참고).
   //
-  // 원문 갱신은 `fees:fetch`가 아니라 `pnpm fees:verify mapo_gu`로 받는다. 마포는
-  // `fetch-ordinance-fees.mjs`의 `TARGETS`가 아니라 `GOLDEN_TARGETS`에 있다.
+  // 원문은 `pnpm fees:fetch mapo_gu`로 받는다. 골든셋에서 뺐으니 `fees:verify`는
+  // 마포를 인자로 받지 않는다 — 한동안 이 자리에 그 명령이 적혀 있었고, 둘 다 exit 1이라
+  // 140행의 출처를 다시 만들 방법이 없었다.
   "mapo_gu",
 ];
 
@@ -296,11 +290,7 @@ for (const regionId of targets) {
     // 인자 없이 전체를 돌릴 때는 준비된 지역까지 함께 막을 이유가 없다 — 원문은
     // gitignore 대상이라 한 배치씩 받아 넣는 게 정상 흐름이다.
     if (requested.length > 0) {
-      // 골든셋 출신은 `fees:fetch`가 안 받는다(그쪽 TARGETS가 아니라 GOLDEN_TARGETS에
-      // 있다). 되는 명령을 그대로 찍는다 — 안 되는 명령을 안내하면 다음 사람이 그
-      // 오류부터 디버깅한다.
-      const fetchHint = GOLDEN_SOURCED.has(regionId) ? `pnpm fees:verify ${regionId}` : `pnpm fees:fetch ${regionId}`;
-      console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 ${fetchHint}`);
+      console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 pnpm fees:fetch ${regionId}`);
       process.exit(1);
     }
     missing.push(regionId);
