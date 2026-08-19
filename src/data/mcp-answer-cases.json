@@ -8943,8 +8943,17 @@
       "itemName": "변기",
       "region": "서울 용산구"
     },
+    "expectedTextIncludes": [
+      "## 변기",
+      "문의/신청 안내 전화: 02-2199-7294",
+      "인터넷 신청: https://www.yongsan.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200674",
+      "수수료 조회: https://www.yongsan.go.kr/portal/lifeWaste/wasteStndr/list.do?menuNo=200673"
+    ],
     "expectedTextExcludes": [
       "유아용 변기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_bowl\""
     ]
   },
   {
@@ -8954,8 +8963,17 @@
       "itemName": "싱크대",
       "region": "서울 노원구"
     },
+    "expectedTextIncludes": [
+      "## 싱크대",
+      "문의/신청 안내 전화: 02-2116-3808",
+      "인터넷 신청: https://smartclean.nowon.kr/online/bulky/request",
+      "수수료 조회: https://smartclean.nowon.kr/online/bulky/item"
+    ],
     "expectedTextExcludes": [
       "유아용 싱크대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sink_unit\""
     ]
   },
   {
@@ -8965,8 +8983,17 @@
       "itemName": "욕조",
       "region": "서울 도봉구"
     },
+    "expectedTextIncludes": [
+      "## 욕조",
+      "문의/신청 안내 전화: 02-2091-3266",
+      "인터넷 신청: https://smartclean.dobong.go.kr/online/bulky/request",
+      "수수료 조회: https://smartclean.dobong.go.kr/online/bulky/item"
+    ],
     "expectedTextExcludes": [
       "유아용 욕조"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathtub\""
     ]
   },
   {
@@ -8976,8 +9003,17 @@
       "itemName": "욕조",
       "region": "서울 성동구"
     },
+    "expectedTextIncludes": [
+      "## 욕조",
+      "문의/신청 안내 전화: 02-2286-5532",
+      "인터넷 신청: https://www.sd.go.kr/main/contents.do?key=1670",
+      "수수료 조회: https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html"
+    ],
     "expectedTextExcludes": [
       "유아용 욕조"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bathtub\""
     ]
   },
   {
@@ -9046,46 +9082,52 @@
     ]
   },
   {
-    "id": "ordinance_label_stuffed_toy_ryu",
+    "id": "ordinance_label_stuffed_toy_ryu_stays_out_of_queries",
     "tool": "get_disposal_steps",
     "arguments": {
-      "itemName": "인형류"
+      "itemName": "인형류 수납함"
     },
     "expectedTextIncludes": [
-      "## 인형"
+      "## 리빙박스·플라스틱 수납함"
     ],
     "expectedStructuredIncludes": [
+      "\"id\":\"plastic_storage_box\""
+    ],
+    "expectedStructuredExcludes": [
       "\"id\":\"stuffed_toy\""
     ]
   },
   {
-    "id": "ordinance_label_toy_ryu",
+    "id": "ordinance_label_stuffed_toy_ryu_not_a_bed_modifier",
     "tool": "get_disposal_steps",
     "arguments": {
-      "itemName": "장난감류"
+      "itemName": "인형류 침대"
     },
     "expectedTextIncludes": [
-      "## 장난감"
+      "## 침대 프레임"
     ],
     "expectedStructuredIncludes": [
-      "\"id\":\"toy\""
+      "\"id\":\"bed_frame\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"stuffed_toy\""
     ]
   },
   {
-    "id": "ordinance_label_chair_desk_chair",
+    "id": "ordinance_label_desk_chair_stays_out_of_queries",
     "tool": "get_disposal_steps",
     "arguments": {
-      "itemName": "책상용의자"
+      "itemName": "책상용의자 커버"
     },
-    "expectedTextIncludes": [
-      "## 의자"
-    ],
     "expectedStructuredIncludes": [
+      "\"found\":false"
+    ],
+    "expectedStructuredExcludes": [
       "\"id\":\"chair\""
     ]
   },
   {
-    "id": "desk_not_taken_by_desk_chair_alias",
+    "id": "desk_not_taken_by_ordinance_chair_label",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "책상"

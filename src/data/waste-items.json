@@ -3740,8 +3740,7 @@
       "식탁의자",
       "컴퓨터 의자",
       "낡은 의자",
-      "화장대 의자",
-      "책상용의자"
+      "화장대 의자"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -5949,8 +5948,7 @@
       "전동 장난감",
       "전자 장난감",
       "소리나는 장난감",
-      "장난감 피아노",
-      "장난감류"
+      "장난감 피아노"
     ],
     "category": "toy_mixed",
     "disposalType": "general_or_bulky_or_special_collection",
@@ -6037,8 +6035,7 @@
       "대형 인형",
       "캐릭터 인형",
       "쿠션 인형",
-      "동물 인형",
-      "인형류"
+      "동물 인형"
     ],
     "category": "textile_mixed",
     "disposalType": "general_or_bulky",

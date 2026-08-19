@@ -168,6 +168,34 @@ const LABEL_PICKS = new Map<string, string>(
 );
 
 /**
+ * 조례·구청 표가 쓰는 품명 표기 중 **질의 별칭으로는 두면 안 되는** 것들.
+ *
+ * 셋 다 서초 조례에 실제로 있는 품명인데 `resolveWasteItem`이 못 연다 —
+ * 「인형류」는 `not_found`, 「장난감류」는 `modifier_position`, 「책상용의자」는
+ * `ambiguous`다. 그래서 `waste-items.json`에 별칭으로 넣어 봤다가 걷었다.
+ * 별칭은 질의에도 함께 걸리는데, 「인형류」는 세 글자라 짧은 별칭 예외를 못 받고
+ * 96점짜리 접두 매칭(`query_contains_name`) 자리를 차지한다. 한국어는 핵심어가
+ * 뒤에 오므로 앞에 붙은 「인형류」는 수식어일 뿐인데도, 91점인 진짜 핵심어를 이겨
+ * 「인형류 수납함」이 리빙박스 대신 인형으로, 「인형류 옷장」이 옷장 대신 인형으로
+ * 확정됐다. 「책상용의자」는 98점이라 더해서, 「책상용의자 커버」처럼 되물어야 할
+ * 질의까지 의자로 확정했다 — 틀린 카드는 되묻기보다 나쁘다.
+ *
+ * 애초에 필요한 곳은 질의가 아니라 표 한 칸이다. 표의 품명은 칸 전체가 곧 품목이라
+ * 수식어 자리가 없고, 여기서만 확정하면 질의 쪽은 아무것도 바뀌지 않는다.
+ * `LABEL_PICKS`와 나눠 둔 이유는 사연이 달라서다 — 저쪽은 괄호를 떼면 판정 근거가
+ * 사라지는 라벨이고, 이쪽은 표기 자체는 멀쩡한데 질의로 열면 손해가 나는 이름이다.
+ */
+const IMPORT_ONLY_NAMES = new Map<string, string>(
+  (
+    [
+      ["인형류", "stuffed_toy"],
+      ["장난감류", "toy"],
+      ["책상용의자", "chair"],
+    ] as const
+  ).map(([label, itemId]) => [normalizeText(label), itemId]),
+);
+
+/**
  * 한 줄이 두 품목을 겸하는 경우. 고시·구청 표는 우리 품목 둘을 한 칸에 묶어 적기도
  * 하고(「인형/ 장난감류」), 우리 품목 하나에만 해당하는 줄이 다른 품목의 유일한 후보이기도
  * 하다(강남 표에 요가매트 행이 없어서 「돗자리(대자리/놀이매트) 1㎡당」이 그 자리를 맡는다).
@@ -210,7 +238,8 @@ export function alsoItemIds(rawName: string, decidedItemId: string): readonly st
 
 export function classifyName(rawName: string): Verdict {
   // 괄호를 떼기 전에 먼저 본다. 떼고 나면 판정 근거가 되는 괄호 내용이 사라진다.
-  const picked = LABEL_PICKS.get(normalizeText(rawName));
+  const normalizedRaw = normalizeText(rawName);
+  const picked = LABEL_PICKS.get(normalizedRaw) ?? IMPORT_ONLY_NAMES.get(normalizedRaw);
   if (picked) return { ok: true, itemId: picked };
 
   // 밑줄은 「품목_조건」을 가르는 표기다 — 관악구 고시명이 그렇다. 「식탁_유리제외」는
