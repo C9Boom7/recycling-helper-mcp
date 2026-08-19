@@ -903,8 +903,12 @@ async function runSmoke() {
       { region: "서울 강남구", contains: "www.gangnam.go.kr", absent: "clean.gangnam.go.kr" },
       { region: "서울 서초구", contains: "10411010600002018030711.jsp" },
       { region: "서울 송파구", contains: "www.songpa.go.kr", absent: "smartclean.songpa.go.kr" },
-      // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다.
-      { region: "서울 종로구", contains: "region.do" },
+      // 이 PR로 요일 출처를 얻은 지역. 전국 안내가 아니라 자기 지자체 조회 페이지로 닫힌다.
+      { region: "서울 종로구", contains: "jongno.go.kr", absent: "region.do" },
+      // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다. 용인은 시 누리집에 일반
+      // 생활쓰레기 요일 안내가 없다는 걸 2026-08-20에 확인했다 — 검색에 뜨는 구별
+      // 요일(수지 화·금 등)은 대형폐기물 수거 요일이라 여기 쓸 값이 아니다.
+      { region: "용인시", contains: "region.do", absent: "yongin.go.kr" },
       // 지역을 못 찾은 입력. 되묻기의 결과가 실제로 이 갈래로 떨어지므로 여기도 링크로
       // 닫아야 한다. 실재하는 동 이름을 쓰면 그 동이 나중에 alias로 등록될 때 — 그것도
       // 같은 Preview 기록에 대한 정당한 개선이다 — 이 케이스가 막아서게 되니, 지역
