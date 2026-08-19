@@ -571,16 +571,37 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
  * 줄에는 항상 URL이 하나 들어가야 하고, 그건 `scripts/smoke-mcp.mjs`가 지킨다.
  * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
  */
-function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
-  const reason = "일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다.";
+function collectionDaySourceHint(region?: MatchedRegionPolicy): string {
   const daySource = region ? findRegionCollectionDaySource(region.region) : undefined;
 
   if (daySource?.url) {
     const checkedAt = daySource.checkedAt ? `, 확인일 ${daySource.checkedAt}` : "";
-    return `${reason} ${daySource.title}에서 확인하세요 (${daySource.url}${checkedAt})`;
+    return `${daySource.title}에서 확인하세요 (${daySource.url}${checkedAt})`;
   }
 
-  return `${reason} ${REGION_SELECT_GUIDE_LINK.title}에서 거주 지역을 선택해 확인하세요 (${REGION_SELECT_GUIDE_LINK.url})`;
+  return `${REGION_SELECT_GUIDE_LINK.title}에서 거주 지역을 선택해 확인하세요 (${REGION_SELECT_GUIDE_LINK.url})`;
+}
+
+function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
+  return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(region)}`;
+}
+
+/**
+ * 품목을 함께 물은 갈래. 체크리스트가 그 품목으로 좁혀지느라 위 요일 줄이 통째로
+ * 빠지는데, 되묻기를 부르는 질문은 오히려 이쪽이 흔하다("강남구 오피스텔은 비닐봉지
+ * 목요일 배출 맞아?"). 좁히기는 그대로 두고, 요일을 말하는 줄에만 확인처를 이어 붙인다.
+ *
+ * 요일 줄이 없으면 아무것도 더하지 않는다. 폐형광등 수거함처럼 요일과 무관한 품목까지
+ * 링크를 달면 안내가 길어지기만 한다. 붙이는 자리는 첫 줄 하나뿐이다 — 같은 주소를
+ * 여러 줄에 반복해 봐야 읽는 쪽이 고를 게 늘지 않는다.
+ */
+function withCollectionDaySource(checks: string[], region?: MatchedRegionPolicy): string[] {
+  const dayIndex = checks.findIndex((check) => check.includes("요일") && !check.includes("http"));
+  if (dayIndex < 0) return checks;
+
+  const withSource = [...checks];
+  withSource[dayIndex] = `${withSource[dayIndex]} — ${collectionDaySourceHint(region)}`;
+  return withSource;
 }
 
 function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
@@ -608,12 +629,15 @@ function unknownRegionCheckList(item?: WasteItem): string[] {
   }
 
   if (!itemNeedsRegionCheck(item)) {
-    return ["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"];
+    return withCollectionDaySource(["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"]);
   }
 
-  return itemNeedsCriticalRegionCheck(item)
-    ? item.regionPolicy?.checkItems ?? ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"]
-    : item.regionPolicy?.checkItems ?? ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
+  // 지역을 못 찾았어도 요일 줄은 링크로 닫는다. 지자체를 모르니 전국 지역별 안내가 붙는다.
+  return withCollectionDaySource(
+    itemNeedsCriticalRegionCheck(item)
+      ? item.regionPolicy?.checkItems ?? ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"]
+      : item.regionPolicy?.checkItems ?? ["실제 배출 요일·장소나 수거함·회수 가능 여부"],
+  );
 }
 
 function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: WasteItem): string[] {
@@ -633,10 +657,10 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
     ...(feeRowTotal ? [`확인된 ${feeRowTotal}개 규격 중 대표 ${feeRows.length}개만 옮겼습니다 — 나머지 규격은 수수료 조회 페이지에서 확인`] : []),
   ].filter(Boolean);
 
-  if (checks.length > 0) return Array.from(new Set(checks));
-  if (!itemNeedsRegionCheck(item)) return ["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"];
-  if (itemNeedsCriticalRegionCheck(item)) return ["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"];
-  return ["실제 배출 요일·장소나 수거함·회수 가능 여부"];
+  if (checks.length > 0) return withCollectionDaySource(Array.from(new Set(checks)), region);
+  if (!itemNeedsRegionCheck(item)) return withCollectionDaySource(["거주지 종량제봉투 또는 재활용품 배출 요일과 장소"], region);
+  if (itemNeedsCriticalRegionCheck(item)) return withCollectionDaySource(["전용 수거함, 지정 수거처, 신고 또는 수수료 기준"], region);
+  return withCollectionDaySource(["실제 배출 요일·장소나 수거함·회수 가능 여부"], region);
 }
 
 /**

@@ -110,8 +110,10 @@ const NESTED_KEY_WHITELIST = {
 };
 const answerCasesPath = new URL("../dist/data/mcp-answer-cases.json", import.meta.url);
 const wasteItemsPath = new URL("../dist/data/waste-items.json", import.meta.url);
+const regionPoliciesPath = new URL("../dist/data/region-policies.json", import.meta.url);
 const answerCases = JSON.parse(readFileSync(answerCasesPath, "utf8"));
 const wasteItems = JSON.parse(readFileSync(wasteItemsPath, "utf8"));
+const regionPolicies = JSON.parse(readFileSync(regionPoliciesPath, "utf8"));
 
 function assert(condition, message) {
   if (!condition) {
@@ -121,6 +123,12 @@ function assert(condition, message) {
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+// `지역 요약`도 요일을 왜 안 싣는지 말하므로 같은 낱말이 여러 줄에 걸린다. 확인처
+// 링크를 들고 있어야 하는 건 번호가 붙은 `확인할 정보` 쪽이라 그 모양으로만 잡는다.
+function findDayCheckLine(answerText) {
+  return answerText.split("\n").find((line) => /^\d+\. 일반쓰레기·재활용품 배출 요일과 시간/.test(line));
 }
 
 async function getFreePort() {
@@ -853,35 +861,50 @@ async function runSmoke() {
     // 알려주세요"로 메웠다. 사용자가 동을 답해도 우리가 줄 게 없어서, 그 뒤 후속 턴이
     // 통째로 웹 검색으로 샜다(2026-08-19 Preview 측정).
     //
-    // **어느 페이지로** 닫는지까지 고정한다. 출처를 고르는 정규식은 `basis` 어휘만 보므로
-    // 대형폐기물 신청·수수료 페이지도 어휘가 겹치면 걸린다. 그런 지역을 요일 확인처로
-    // 주면 안 되고, 매칭이 여러 개인 지역은 JSON 배열 순서에 답이 매달린다.
+    // 49곳 전부에 같은 불변식을 건다. 확인처가 **그 지역의 대형폐기물 신청·수수료
+    // 페이지면 실패**다 — 출처를 고르는 정규식은 `basis` 어휘만 보는데 신청 페이지
+    // 설명에도 "수거일"이 흔히 적혀 있어, 용인시는 요일 질문에 신청 페이지를 확인처로
+    // 주고 있었다. 특정 지역이 나중에 진짜 요일 페이지를 얻어도 이 단언은 그대로 맞다.
+    for (const policy of regionPolicies) {
+      const dayAnswer = resultText(
+        await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++),
+      );
+      const dayLine = findDayCheckLine(dayAnswer);
+      assert(dayLine, `${policy.name}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
+      assert(
+        dayLine.includes("http"),
+        `${policy.name}: 요일 항목에 확인처 링크가 없다 — 이러면 모델이 사용자에게 동을 되묻는다: "${dayLine}"`,
+      );
+      const bulkyUrl = [policy.bulkyWaste?.applicationUrl, policy.bulkyWaste?.feeUrl]
+        .filter(Boolean)
+        .find((url) => dayLine.includes(url));
+      assert(
+        !bulkyUrl,
+        `${policy.name}: 요일 확인처가 대형폐기물 신청·수수료 페이지다 (${bulkyUrl}) — 요일은 그 페이지에 없다`,
+      );
+    }
+
+    // 어느 페이지로 닫는지까지 고정한다. 매칭이 여럿인 지역은 JSON 배열 순서에 답이
+    // 매달려서, 순서가 바뀌면 확인처가 대형폐기물 포털로 조용히 옮겨간다.
     const dayLinkExpectations = [
       // 매칭이 하나뿐인 지역. 자기 지자체 요일 페이지로 닫힌다.
       { region: "성남시", contains: "recycle.seongnam.go.kr" },
-      // 매칭이 둘 이상인 지역. 순서가 바뀌거나 첫 항목이 빠지면 확인처가 조용히 옮겨간다.
-      // 강남의 두 번째 매칭은 대형폐기물 포털(`clean.gangnam.go.kr`)이라 그쪽이면 실패다.
+      // 매칭이 둘 이상인 지역. 첫 항목이 빠지면 두 번째인 대형폐기물 포털이 올라온다.
       { region: "서울 강남구", contains: "www.gangnam.go.kr", absent: "clean.gangnam.go.kr" },
       { region: "서울 서초구", contains: "10411010600002018030711.jsp" },
       { region: "서울 송파구", contains: "www.songpa.go.kr", absent: "smartclean.songpa.go.kr" },
-      // 어휘에 걸리는 출처가 대형폐기물 신청 페이지 하나뿐인 지역. 요일 페이지가 실제로
-      // 없으므로 신청 페이지를 주지 말고 전국 안내로 내려가야 한다.
-      { region: "용인시", contains: "region.do", absent: "yongin.go.kr" },
-      // 요일 출처가 없는 42곳. 전국 지역별 안내로 닫는다.
+      // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다.
       { region: "서울 종로구", contains: "region.do" },
-      // 동 이름만 온 경우. 되묻기의 결과가 실제로 여기로 떨어진다.
-      { region: "백현동", contains: "region.do" },
+      // 지역을 못 찾은 입력. 되묻기의 결과가 실제로 이 갈래로 떨어지므로 여기도 링크로
+      // 닫아야 한다. 실재하는 동 이름을 쓰면 그 동이 나중에 alias로 등록될 때 — 그것도
+      // 같은 Preview 기록에 대한 정당한 개선이다 — 이 케이스가 막아서게 되니, 지역
+      // 데이터에 오를 리 없는 이름을 쓴다.
+      { region: "스모크테스트미등록지역", contains: "region.do" },
     ];
     for (const { region, contains, absent } of dayLinkExpectations) {
       const dayAnswer = resultText(await callTool(baseUrl, "get_region_disposal_info", { region }, requestId++));
-      // `지역 요약`도 요일을 왜 안 싣는지 말하므로 같은 낱말이 걸린다. 링크를 들고 있어야
-      // 하는 건 번호가 붙은 `확인할 정보` 쪽이라 그 모양으로만 잡는다.
-      const dayLine = dayAnswer.split("\n").find((line) => /^\d+\. 일반쓰레기·재활용품 배출 요일과 시간/.test(line));
+      const dayLine = findDayCheckLine(dayAnswer);
       assert(dayLine, `${region}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
-      assert(
-        dayLine.includes("http"),
-        `${region}: 요일 항목에 확인처 링크가 없다 — 이러면 모델이 사용자에게 동을 되묻는다: "${dayLine}"`,
-      );
       assert(
         dayLine.includes(contains),
         `${region}: 요일 확인처가 예상과 다르다 (기대 "${contains}"): "${dayLine}"`,
@@ -891,6 +914,24 @@ async function runSmoke() {
         `${region}: 요일 확인처로 대형폐기물 페이지("${absent}")가 잡혔다: "${dayLine}"`,
       );
     }
+
+    // 품목이 붙으면 체크리스트가 그 품목으로 좁혀진다. 좁히는 건 의도지만, 되묻기를
+    // 부르는 질문은 오히려 이쪽이 흔하다("강남구 오피스텔은 비닐봉지 목요일 배출 맞아?").
+    // 좁힌 목록에서도 요일을 말하는 줄에는 확인처가 따라붙어야 한다.
+    const itemDayAnswer = resultText(
+      await callTool(
+        baseUrl,
+        "get_region_disposal_info",
+        { region: "서울 강남구", itemName: "강남구 오피스텔은 비닐봉지 목요일 배출 맞아?" },
+        requestId++,
+      ),
+    );
+    const itemDayLine = itemDayAnswer.split("\n").find((line) => /^\d+\. .*요일/.test(line));
+    assert(itemDayLine, "품목 체크리스트에서 요일 줄이 사라졌다 — 되묻기를 막을 자리가 없어진다");
+    assert(
+      itemDayLine.includes("www.gangnam.go.kr"),
+      `품목 체크리스트의 요일 줄에 확인처 링크가 없다 — 지역만 물었을 때와 달리 여기서 되묻기가 샌다: "${itemDayLine}"`,
+    );
 
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
     // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.
