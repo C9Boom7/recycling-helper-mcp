@@ -283,7 +283,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead. Optional itemName narrows the checklist to that item.",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps returns no day guidance. Optional itemName narrows the checklist to that item.",
     inputShape: {
       region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
@@ -596,12 +596,38 @@ function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
  * 여러 줄에 반복해 봐야 읽는 쪽이 고를 게 늘지 않는다.
  */
 function withCollectionDaySource(checks: string[], region?: MatchedRegionPolicy): string[] {
-  const dayIndex = checks.findIndex((check) => check.includes("요일") && !check.includes("http"));
+  const dayIndex = checks.findIndex((check) => mentionsCollectionDay(check) && !check.includes("http"));
   if (dayIndex < 0) return checks;
 
   const withSource = [...checks];
   withSource[dayIndex] = `${withSource[dayIndex]} — ${collectionDaySourceHint(region)}`;
   return withSource;
+}
+
+/** 요일을 말하는 줄인지. 확인처가 붙은 줄은 이미 닫혀 있으므로 URL 유무로 갈라 본다. */
+function mentionsCollectionDay(text: string): boolean {
+  return text.includes("요일");
+}
+
+/**
+ * 불변식: **응답이 요일을 언급하면 그 응답 어딘가에 요일 확인처가 있어야 한다.**
+ *
+ * 체크 항목만 보고 붙이던 게 화근이었다. 지역 요약은 자치구 48곳 모두 "배출 요일과
+ * 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다"로 끝나는데, 품목이 붙어
+ * 체크리스트가 그 품목으로 좁혀지면(침대처럼 요일과 무관한 대형폐기물이 그렇다) 요일
+ * 줄이 통째로 빠진다. 그러면 응답은 **요일을 못 준다고 말해놓고 어디서 확인하는지는
+ * 안 말하는** 모양이 된다 — 되묻기를 부른 게 바로 그 모양이라, 지역만 물었을 때보다
+ * 오히려 나쁘다.
+ *
+ * 그래서 좁힌 목록에 요일 줄이 있으면 거기에 확인처를 잇고(`withCollectionDaySource`),
+ * 없으면 여기서 요일 확인 항목을 한 줄 더해 닫는다. 일반 체크리스트를 통째로 되살리지는
+ * 않는다 — 좁히기는 의도한 동작이고, 침대를 물은 사람에게 폐형광등 수거함까지 돌려줄
+ * 이유는 없다. 요일을 아무 데서도 말하지 않는 응답에는 아무것도 더하지 않는다.
+ */
+function closeCollectionDayMention(checks: string[], answerText: string, region?: MatchedRegionPolicy): string[] {
+  if (checks.some((check) => mentionsCollectionDay(check) && check.includes("http"))) return checks;
+  if (!mentionsCollectionDay(answerText) && !checks.some(mentionsCollectionDay)) return checks;
+  return [...checks, collectionDayCheckLine(region)];
 }
 
 function generalRegionCheckList(region: MatchedRegionPolicy): string[] {
@@ -1258,7 +1284,6 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const regionResolution = resolveRegionalPolicy(region);
   const regionMatch = regionResolution.status === "match" ? regionResolution.match : undefined;
   const regionCandidates = regionResolution.status === "ambiguous" ? regionResolution.candidates.map((candidate) => candidate.region.name) : undefined;
-  const checkList = itemRegionCheckList(regionMatch, match?.item);
 
   // 광역으로 착지했더라도 질의가 시·군·구를 지목했는지는 갈라 본다. 응답 문구도
   // 로그 집계도 이 한 갈래에서 갈린다 — `metro`로 뭉뚱그리면 "충북"이라고 말한
@@ -1302,7 +1327,9 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   const dropsOnlyTheReAsk = Boolean(namedSubRegion) && regionMatch?.level === "metro";
   const bulkyLines = regionMatch && !dropsOnlyTheReAsk ? formatRegionBulkyContactLines(regionMatch.region) : [];
   const specialLines = regionMatch ? regionSpecialCollectionLines(regionMatch.region, match?.item) : [];
-  const lines = [
+  // "확인할 정보" 위쪽을 먼저 세운다. 요일 확인처를 붙일지가 **이 블록이 요일을
+  // 말하는지**에 달려 있어서다 — 지역 요약이 그 자리다.
+  const answerBodyLines = [
     `${regionMatch?.region.name ?? region} 지역 확인 안내`,
     "",
     itemLine,
@@ -1324,6 +1351,16 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match && regionMatch
       ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion, subRegionScopeAlreadyShown: true }).join("\n")
       : undefined,
+  ].filter(Boolean);
+
+  const checkList = closeCollectionDayMention(
+    itemRegionCheckList(regionMatch, match?.item),
+    answerBodyLines.join("\n"),
+    regionMatch,
+  );
+
+  const lines = [
+    ...answerBodyLines,
     "",
     "확인할 정보",
     ...checkList.map((item, index) => `${index + 1}. ${item}`),

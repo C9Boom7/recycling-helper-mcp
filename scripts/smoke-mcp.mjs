@@ -131,6 +131,10 @@ function findDayCheckLine(answerText) {
   return answerText.split("\n").find((line) => /^\d+\. 일반쓰레기·재활용품 배출 요일과 시간/.test(line));
 }
 
+function mentionsDay(answerText) {
+  return answerText.includes("요일");
+}
+
 async function getFreePort() {
   const server = createServer();
   server.listen(0, HOST);
@@ -865,10 +869,16 @@ async function runSmoke() {
     // 페이지면 실패**다 — 출처를 고르는 정규식은 `basis` 어휘만 보는데 신청 페이지
     // 설명에도 "수거일"이 흔히 적혀 있어, 용인시는 요일 질문에 신청 페이지를 확인처로
     // 주고 있었다. 특정 지역이 나중에 진짜 요일 페이지를 얻어도 이 단언은 그대로 맞다.
+    //
+    // 이름이 실제로 그 지역으로 매칭됐는지부터 본다. 광역으로 폴백하거나 되묻기로 빠지면
+    // 다른 지역의 요일 줄을 놓고 아래 단언이 전부 통과해, 49곳을 돈다는 이 루프가 헛돈다.
     for (const policy of regionPolicies) {
-      const dayAnswer = resultText(
-        await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++),
+      const dayResult = await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++);
+      assert(
+        dayResult.structuredContent?.matchedRegion === policy.name,
+        `${policy.name}: 이 이름이 자기 지역으로 안 잡힌다 (matchedRegion=${dayResult.structuredContent?.matchedRegion}) — 아래 요일 단언이 다른 지역 답을 보고 통과한다`,
       );
+      const dayAnswer = resultText(dayResult);
       const dayLine = findDayCheckLine(dayAnswer);
       assert(dayLine, `${policy.name}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
       assert(
@@ -932,6 +942,34 @@ async function runSmoke() {
       itemDayLine.includes("www.gangnam.go.kr"),
       `품목 체크리스트의 요일 줄에 확인처 링크가 없다 — 지역만 물었을 때와 달리 여기서 되묻기가 샌다: "${itemDayLine}"`,
     );
+
+    // 요일과 무관한 품목. 체크리스트는 대형폐기물 신고로 좁혀져 요일 줄이 없는데,
+    // **지역 요약은 여전히 "배출 요일과 시간은 이 데이터에 넣지 않았다"고 말한다.**
+    // 못 준다고 말해놓고 어디서 확인하는지는 안 적으면 그게 되묻기를 부른 그 모양이다.
+    // 불변식은 하나다 — 응답이 요일을 말하면 그 응답 어딘가에 확인처 링크가 있어야 한다.
+    const bulkyDayAnswer = resultText(
+      await callTool(baseUrl, "get_region_disposal_info", { region: "서울 강남구", itemName: "침대" }, requestId++),
+    );
+    assert(
+      mentionsDay(bulkyDayAnswer),
+      "강남구+침대 응답이 요일을 아예 말하지 않는다 — 지역 요약 문구가 바뀌었으면 이 픽스처를 요일을 말하는 지역으로 갈아 끼운다",
+    );
+    const bulkyDayLine = bulkyDayAnswer.split("\n").find((line) => /^\d+\. .*요일/.test(line));
+    assert(
+      bulkyDayLine,
+      "강남구+침대: 요일을 못 준다고 말해놓고 확인할 항목에는 요일 줄이 없다 — 호스트 모델이 그 빈자리를 사용자에게 동을 되묻는 걸로 메운다",
+    );
+    assert(
+      bulkyDayLine.includes("http"),
+      `강남구+침대: 요일 줄에 확인처 링크가 없다: "${bulkyDayLine}"`,
+    );
+    // 좁히기는 그대로여야 한다. 닫는 줄 하나만 더할 뿐, 일반 체크리스트를 되살리지 않는다.
+    for (const general of ["폐건전지, 폐형광등, 폐의약품", "음식물류폐기물 전용봉투"]) {
+      assert(
+        !bulkyDayAnswer.includes(`. ${general}`),
+        `강남구+침대: 요일을 닫으면서 일반 체크리스트("${general}")까지 되살아났다 — 품목 좁히기가 풀린다`,
+      );
+    }
 
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
     // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.
