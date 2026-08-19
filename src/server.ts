@@ -89,8 +89,8 @@ const SERVER_INSTRUCTIONS =
   // 되묻기 금지. 요일은 동·주택 유형별로 갈려 우리가 값으로 주지 않는데, 모델이 그
   // 빈자리를 "사는 동이 어디세요"로 메우면 사용자가 답해도 줄 게 없다. 그 뒤 후속
   // 턴이 통째로 웹 검색으로 새는 걸 2026-08-19 Preview 측정에서 확인했다.
-  "Collection days and times are deliberately not returned as values — the result names the official page to check instead. " +
-  "When the user asks which day to put waste out, answer with that link and do NOT ask for their 동/neighborhood or apartment complex. " +
+  "Collection days and times are deliberately not returned as values — get_region_disposal_info names the official page to check instead. " +
+  "When the user asks which day to put waste out, call get_region_disposal_info and answer with that link; do NOT ask for their 동/neighborhood or apartment complex. " +
   "Keep answers concise and cite the provided sources; if local rules may differ, say that regional verification is needed.";
 
 type JsonRpcId = string | number | null;
@@ -568,7 +568,8 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
  *
  * 그래서 못 준다고 말하는 그 자리에서 링크로 닫는다. 되물을 자리를 없애는 게 목적이라,
  * 지자체 요일 페이지가 있으면 그걸, 없으면 전국 지역별 안내를 붙인다. 어느 쪽이든 이
- * 줄에는 항상 URL이 하나 들어간다(`test-region-matching`이 강제한다).
+ * 줄에는 항상 URL이 하나 들어가야 하고, 그건 `scripts/smoke-mcp.mjs`가 지킨다.
+ * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
  */
 function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
   const reason = "일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다.";
@@ -1095,13 +1096,8 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
 }
 
 /**
- * 미등록 지역에서도 다음 행동이 남아야 한다. "지역번호+120" 대표 민원번호는
- * 연결해도 담당 부서까지 한참 돌아가 안내로서 값이 없으므로 넣지 않는다 —
- * 번호를 준다면 지역 데이터에서 확인한 직통번호여야 하고, 없으면 빼는 쪽이 낫다.
- */
-/**
  * 지역을 골라 들어가는 전국 안내. 미등록 지역 폴백이면서, 지자체 요일 페이지가 없는
- * 41곳에서 `collectionDayCheckLine`이 요일 질문을 닫는 링크이기도 하다. 두 자리가
+ * 42곳에서 `collectionDayCheckLine`이 요일 질문을 닫는 링크이기도 하다. 두 자리가
  * 같은 주소를 각자 적고 있으면 한쪽만 고쳐지므로 상수 하나로 묶는다.
  */
 const REGION_SELECT_GUIDE_LINK = {
@@ -1110,6 +1106,11 @@ const REGION_SELECT_GUIDE_LINK = {
   basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
 };
 
+/**
+ * 미등록 지역에서도 다음 행동이 남아야 한다. "지역번호+120" 대표 민원번호는
+ * 연결해도 담당 부서까지 한참 돌아가 안내로서 값이 없으므로 넣지 않는다 —
+ * 번호를 준다면 지역 데이터에서 확인한 직통번호여야 하고, 없으면 빼는 쪽이 낫다.
+ */
 const NATIONAL_FALLBACK_LINKS = [
   REGION_SELECT_GUIDE_LINK,
   {

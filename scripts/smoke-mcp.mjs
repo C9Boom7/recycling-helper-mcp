@@ -851,17 +851,28 @@ async function runSmoke() {
     // 요일 질문은 되묻지 않고 링크로 닫는다. 요일을 값으로 안 주는 건 그대로인데,
     // **어디서 확인하는지**를 안 적었더니 호스트 모델이 그 빈자리를 "사는 동 이름을
     // 알려주세요"로 메웠다. 사용자가 동을 답해도 우리가 줄 게 없어서, 그 뒤 후속 턴이
-    // 통째로 웹 검색으로 샜다(2026-08-19 Preview 측정). 세 갈래를 함께 본다 — 지자체
-    // 요일 페이지가 있는 지역, 없는 지역, 지역 자체를 못 찾은 경우.
+    // 통째로 웹 검색으로 샜다(2026-08-19 Preview 측정).
+    //
+    // **어느 페이지로** 닫는지까지 고정한다. 출처를 고르는 정규식은 `basis` 어휘만 보므로
+    // 대형폐기물 신청·수수료 페이지도 어휘가 겹치면 걸린다. 그런 지역을 요일 확인처로
+    // 주면 안 되고, 매칭이 여러 개인 지역은 JSON 배열 순서에 답이 매달린다.
     const dayLinkExpectations = [
-      // 요일 출처를 가진 8곳 중 하나. 자기 지자체 페이지로 닫혀야 한다.
+      // 매칭이 하나뿐인 지역. 자기 지자체 요일 페이지로 닫힌다.
       { region: "성남시", contains: "recycle.seongnam.go.kr" },
-      // 요일 출처가 없는 41곳. 전국 지역별 안내로 닫는다.
+      // 매칭이 둘 이상인 지역. 순서가 바뀌거나 첫 항목이 빠지면 확인처가 조용히 옮겨간다.
+      // 강남의 두 번째 매칭은 대형폐기물 포털(`clean.gangnam.go.kr`)이라 그쪽이면 실패다.
+      { region: "서울 강남구", contains: "www.gangnam.go.kr", absent: "clean.gangnam.go.kr" },
+      { region: "서울 서초구", contains: "10411010600002018030711.jsp" },
+      { region: "서울 송파구", contains: "www.songpa.go.kr", absent: "smartclean.songpa.go.kr" },
+      // 어휘에 걸리는 출처가 대형폐기물 신청 페이지 하나뿐인 지역. 요일 페이지가 실제로
+      // 없으므로 신청 페이지를 주지 말고 전국 안내로 내려가야 한다.
+      { region: "용인시", contains: "region.do", absent: "yongin.go.kr" },
+      // 요일 출처가 없는 42곳. 전국 지역별 안내로 닫는다.
       { region: "서울 종로구", contains: "region.do" },
       // 동 이름만 온 경우. 되묻기의 결과가 실제로 여기로 떨어진다.
       { region: "백현동", contains: "region.do" },
     ];
-    for (const { region, contains } of dayLinkExpectations) {
+    for (const { region, contains, absent } of dayLinkExpectations) {
       const dayAnswer = resultText(await callTool(baseUrl, "get_region_disposal_info", { region }, requestId++));
       // `지역 요약`도 요일을 왜 안 싣는지 말하므로 같은 낱말이 걸린다. 링크를 들고 있어야
       // 하는 건 번호가 붙은 `확인할 정보` 쪽이라 그 모양으로만 잡는다.
@@ -874,6 +885,10 @@ async function runSmoke() {
       assert(
         dayLine.includes(contains),
         `${region}: 요일 확인처가 예상과 다르다 (기대 "${contains}"): "${dayLine}"`,
+      );
+      assert(
+        !absent || !dayLine.includes(absent),
+        `${region}: 요일 확인처로 대형폐기물 페이지("${absent}")가 잡혔다: "${dayLine}"`,
       );
     }
 

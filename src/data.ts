@@ -1317,16 +1317,30 @@ export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem)
  * "확인할 정보"에서 사용자에게 사는 동을 되묻는 대신 이 링크로 안내를 닫으려면
  * 어느 페이지가 요일을 다루는지는 알아야 한다.
  *
- * 판정은 `basis`로 한다. 출처 설명은 그 페이지에 무엇이 있는지 적는 자리라
- * 요일을 다루는 페이지만 이 어휘를 갖는다 — 대형폐기물 신청 페이지는 안 걸린다.
- * 2026-08-19 기준 49곳 중 8곳(강남·서초·송파·마포·성남·용인·부산·제주)만 잡히고,
- * 나머지는 undefined가 나와 호출부가 전국 지역별 안내로 닫는다.
+ * 1차 판정은 `basis`로 한다. 출처 설명은 그 페이지에 무엇이 있는지 적는 자리라
+ * 요일을 다루는 페이지가 대체로 이 어휘를 갖는다. 다만 어휘만으로는 대형폐기물
+ * 신청 페이지가 걸린다 — 용인시는 이 정규식에 걸리는 출처가 `대형폐기물 배출신청안내`
+ * 하나뿐이라, 요일 질문에 신청 페이지를 확인처로 주고 있었다. 강남구는 두 번째
+ * 매칭이 대형폐기물 포털이라 배열 순서가 바뀌면 확인처가 조용히 그리로 옮겨간다.
+ * 그래서 그 지역의 `bulkyWaste` 신청·수수료 URL과 같은 주소는 후보에서 뺀다.
+ *
+ * 2026-08-19 기준 49곳 중 7곳(강남·서초·송파·마포·성남·부산·제주)만 잡히고,
+ * 나머지는 undefined가 나와 호출부가 전국 지역별 안내로 닫는다. 용인은 요일을
+ * 다루는 페이지가 실제로 없어서 그 폴백이 맞는 답이다.
  */
 const COLLECTION_DAY_BASIS = /요일|수거일|배출시간|수거시간/;
 
 export function findRegionCollectionDaySource(region: RegionalPolicyData): RegionCollectionSource | undefined {
+  const bulkyUrls = new Set(
+    [region.bulkyWaste?.applicationUrl, region.bulkyWaste?.feeUrl].filter((url): url is string => !!url),
+  );
+
   return region.sources.find(
-    (source) => source.sourceType === "local_guidance" && !!source.url && COLLECTION_DAY_BASIS.test(source.basis ?? ""),
+    (source) =>
+      source.sourceType === "local_guidance" &&
+      !!source.url &&
+      !bulkyUrls.has(source.url) &&
+      COLLECTION_DAY_BASIS.test(source.basis ?? ""),
   );
 }
 
