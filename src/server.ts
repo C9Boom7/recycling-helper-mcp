@@ -20,6 +20,7 @@ import {
   findMaterialGuideline,
   findNamedSubRegionForMatch,
   findRegionalPolicy,
+  findRegionCollectionDaySource,
   findRegionItemGuide,
   findRegisteredDistricts,
   findWasteItems,
@@ -42,6 +43,7 @@ import {
   resolveWasteItem,
   wasteItems,
   withCollectionDaySource,
+  withCollectionDaySourceLine,
   REGION_SELECT_GUIDE_LINK,
 } from "./data.js";
 import type { DisposalWidgetPayload } from "./widgets.js";
@@ -576,8 +578,17 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
  * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
  *
  * 문구를 만드는 `collectionDaySourceHint`와 붙이는 `withCollectionDaySource`는
- * `data.ts`에 있다. `get_disposal_steps`가 쓰는 `formatItemGuide`도 같은 자리에서
- * 요일 줄을 닫아야 해서, 두 툴이 한 구현을 나눠 쓴다.
+ * `data.ts`에 있다. 네 툴이 그 한 구현을 나눠 쓴다 — 판정("이 줄이 요일을 말하나")과
+ * 문구를 호출부마다 다시 쓰면 그게 어긋나는 순간 조용히 새고, 실제로 그렇게 샜다.
+ *
+ * 닫는 자리는 응답을 조립한 뒤가 아니라 **요일을 말하는 문장을 만드는 곳**이다.
+ * 완성된 응답 텍스트에 한 번에 거는 쪽을 먼저 봤는데 두 군데서 막힌다.
+ * 하나, 위젯 응답의 content는 카드 JSON이라 문장을 이어 붙일 자리가 없다 — 텍스트에만
+ * 걸면 카드를 켠 배포에서는 불변식이 통째로 빠진다.
+ * 둘, 텍스트에서도 과녁을 넘는다. `근거`에 찍히는 출처 basis와 품목 주의사항에 "배출
+ * 요일과 장소는 지역별로 확인합니다" 같은 문장이 여럿 있어서, 지역을 묻지도 않은
+ * get_disposal_steps 응답마다 링크가 한 줄씩 따라붙는다.
+ * 그래서 네 지점에서 각각 닫되, 판정과 문구는 한 벌만 둔다.
  */
 function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
   return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(region)}`;
@@ -805,7 +816,12 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     itemNeedsCriticalRegionCheck(item)
       ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
       : itemNeedsRegionCheck(item)
-      ? "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      ? // 이 줄도 요일을 말하므로 확인처까지 함께 낸다. 지역 툴만 닫혀 있어서, 같은
+        // 사람이 툴만 갈아타면 되묻기가 그대로 살아났다.
+        withCollectionDaySourceLine(
+          "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
+          regionMatch,
+        )
       : undefined,
     region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
   ]
@@ -1050,7 +1066,12 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
         : "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
       : undefined,
     planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
-      ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      ? // 플랜도 마찬가지다. 대청소는 지역을 함께 주는 호출이 많아 오히려 여기서 되묻기가
+        // 나오면 손해가 크다 — 품목이 여러 개라 되물은 뒤 다시 세우는 값이 그만큼 많다.
+        withCollectionDaySourceLine(
+          "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
+          regionMatch,
+        )
       : undefined,
     // 다음 걸음 안내. 예고는 그 후속 호출이 **어느 지역에서나** 내놓는 것에만 건다.
     // 여기서 두 번 미끄러졌다 — 처음엔 "규격별 수수료 전체 표"를 걸었는데 품목을 넘겨도
@@ -1138,6 +1159,29 @@ const MAX_LISTED_DISTRICTS = 6;
 
 /** `get_region_disposal_info`의 structuredContent 상한. Phase 0 R5가 정한 값이다. */
 const MAX_OFFICIAL_SOURCES = 3;
+
+/**
+ * 상한에 걸려 자를 때 **요일 확인처는 남긴다.**
+ *
+ * 요일 출처는 지역 데이터에 나중에 붙은 게 많아 `sources` 뒤쪽에 몰려 있는데, 앞에서
+ * 세 개를 세면 그게 그대로 잘린다. 하필 이 링크는 본문 "확인할 정보"가 **직접 가리키는
+ * 주소**라, 구조화 응답만 읽는 호스트에서는 본문이 "여기서 확인하세요"라고 말한 그
+ * 페이지가 목록에 없다. 세종시와 고양시가 그랬다.
+ *
+ * 상한을 올리는 대신 고르는 순서를 바꾼다 — 상한은 응답 크기 예산이라 손댈 값이 아니고,
+ * 자리를 하나 내주는 쪽이 잃는 게 적다. 원래 배열 순서는 그대로 지켜, 요일 출처가 앞에
+ * 있으면 아무것도 달라지지 않는다.
+ */
+function pickRegionOfficialSources(region: RegionalPolicyData, room: number): RegionalPolicyData["sources"] {
+  if (room <= 0) return [];
+
+  const head = region.sources.slice(0, room);
+  const daySource = findRegionCollectionDaySource(region);
+  if (!daySource || head.includes(daySource)) return head;
+
+  const kept = new Set([...head.slice(0, room - 1), daySource]);
+  return region.sources.filter((source) => kept.has(source));
+}
 
 function metroNarrowingLine(metro: MatchedRegionPolicy): string {
   const districts = findRegisteredDistricts(metro.region);
@@ -1369,7 +1413,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
                 : [];
             const room = Math.max(0, MAX_OFFICIAL_SOURCES - national.length);
             return [
-              ...regionMatch.region.sources.slice(0, room).map((source) => ({ title: source.title, url: source.url })),
+              ...pickRegionOfficialSources(regionMatch.region, room).map((source) => ({ title: source.title, url: source.url })),
               ...national,
             ];
           })()

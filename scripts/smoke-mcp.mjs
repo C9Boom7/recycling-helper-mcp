@@ -142,7 +142,7 @@ const NATIONAL_DAY_FALLBACK_URL = "region.do";
 // 선택이 안 되는** 누락이 조용해서다 — 용산구는 요일 안내가 있는 페이지를 출처로
 // 얻고도 basis 어휘가 선택 정규식에 안 걸려 전국 안내로 남았고, 응답은 멀쩡해 보였다.
 // 지역이 늘거나 요일 출처를 더 채우면 이 숫자도 같이 올린다.
-const REGIONS_WITH_OWN_DAY_PAGE = 33;
+const REGIONS_WITH_OWN_DAY_PAGE = 31;
 
 async function getFreePort() {
   const server = createServer();
@@ -902,7 +902,18 @@ async function runSmoke() {
         !bulkyUrl,
         `${policy.name}: 요일 확인처가 대형폐기물 신청·수수료 페이지다 (${bulkyUrl}) — 요일은 그 페이지에 없다`,
       );
-      if (!dayLine.includes(NATIONAL_DAY_FALLBACK_URL)) ownDayPageCount++;
+      if (!dayLine.includes(NATIONAL_DAY_FALLBACK_URL)) {
+        ownDayPageCount++;
+        // 본문이 가리키는 링크가 구조화 출력에서 잘리면 안 된다. `officialSources`는 앞
+        // 세 개까지만 싣는데 요일 출처는 뒤늦게 채운 게 많아 배열 뒤쪽에 몰려 있어서,
+        // 세종시·고양시는 본문이 "여기서 확인하세요"라고 말한 그 페이지가 목록에 없었다.
+        // 전국 안내로 닫힌 지역은 뺀다 — 분리배출.kr은 광역에만 목록으로 들어간다.
+        const officialSources = dayResult.structuredContent?.officialSources ?? [];
+        assert(
+          officialSources.some((source) => source?.url && dayLine.includes(source.url)),
+          `${policy.name}: 본문 요일 링크가 officialSources에서 잘렸다 — 구조화 출력만 읽는 호스트는 본문이 가리킨 페이지를 못 받는다: "${dayLine}"`,
+        );
+      }
     }
     assert(
       ownDayPageCount === REGIONS_WITH_OWN_DAY_PAGE,
@@ -925,6 +936,15 @@ async function runSmoke() {
       // 요일이 대형폐기물 문맥으로만 적혀 있어 선택 근거가 틀렸던 곳. 같은 페이지가 맞지만
       // 일반 생활쓰레기 요일 안내로 걸려야 한다. 대형폐기물 포털로 새면 실패다.
       { region: "남양주시", contains: "contents.do?key=3005", absent: "smartclean.nyj.go.kr" },
+      // 출처가 많아 `officialSources` 상한(3개)에 걸리는 지역. 요일 출처가 배열 뒤쪽에
+      // 있어 본문 링크만 남고 구조화 출력에서는 잘려 나갔다. 어느 페이지로 닫는지도
+      // 함께 고정한다 — 고양시는 대형폐기물 쪽 출처가 앞에 셋이나 있다.
+      { region: "세종시", contains: "sub03_01_02.do" },
+      { region: "고양시", contains: "www03_3_3_tab1.jsp", absent: "clean.gys.or.kr" },
+      // 요일 안내가 없는 페이지를 요일 출처로 잡고 있던 곳. 구로구 청소행정서비스헌장은
+      // 배출시간·수거시간 표만 있고 요일은 "변경되면 알려드리겠다"는 문장에만 나온다 —
+      // 요일을 물은 사람을 답 없는 페이지로 보내느니 전국 안내로 닫는 편이 낫다.
+      { region: "서울 구로구", contains: "region.do", absent: "contents.do?key=1649" },
       // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다. 용인은 시 누리집에 일반
       // 생활쓰레기 요일 안내가 없다는 걸 2026-08-20에 확인했다 — 검색에 뜨는 구별
       // 요일(수지 화·금 등)은 대형폐기물 수거 요일이라 여기 쓸 값이 아니다.
@@ -1008,6 +1028,52 @@ async function runSmoke() {
       stepsDayLine.includes("www.gangnam.go.kr"),
       `get_disposal_steps 빗자루+강남구: 요일 확인 항목에 확인처 링크가 없다 — 호스트 모델이 그 빈자리를 동 되묻기로 메운다: "${stepsDayLine}"`,
     );
+
+    // 위 픽스처는 checkItems에 요일이 든 품목이라, 그 갈래만 닫아 두면 통과해 버린다.
+    // 실제로 새던 건 `regionCheckLevel: required`인데 **checkItems에 요일이 없는** 품목
+    // 쪽이다 — 뚝배기·와인잔·즉석밥 용기가 그렇다. 이 품목들은 지역 요약 한 줄("배출
+    // 요일과 시간은 … 넣지 않았습니다")만 받고 끝났다.
+    const stepsSummaryResult = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "뚝배기", region: "서울 강남구" },
+      requestId++,
+    );
+    const stepsSummaryAnswer = resultText(stepsSummaryResult);
+    const stepsSummaryLine = stepsSummaryAnswer
+      .split("\n")
+      .find((line) => line.startsWith("- ") && line.includes("배출 요일과 시간은"));
+    assert(
+      stepsSummaryLine,
+      "get_disposal_steps 뚝배기+강남구: 지역 요약 줄이 사라졌다 — 요약 문구가 바뀌었으면 요일을 말하는 다른 품목으로 픽스처를 갈아 끼운다",
+    );
+    assert(
+      stepsSummaryLine.includes("www.gangnam.go.kr"),
+      `get_disposal_steps 뚝배기+강남구: 지역 요약이 요일을 못 준다고만 하고 확인처를 안 준다: "${stepsSummaryLine}"`,
+    );
+    // 같은 줄이 structuredContent로도 나간다. 텍스트만 닫으면 구조화 출력만 읽는
+    // 호스트에서 되묻기가 그대로 살아난다.
+    assert(
+      (stepsSummaryResult.structuredContent?.regionNotes ?? []).some(
+        (note) => typeof note === "string" && note.includes("배출 요일과 시간은") && note.includes("www.gangnam.go.kr"),
+      ),
+      `get_disposal_steps 뚝배기+강남구: regionNotes의 요일 줄에 확인처가 없다: ${JSON.stringify(stepsSummaryResult.structuredContent?.regionNotes)}`,
+    );
+
+    // 남은 두 툴. 참고 등급 품목에 붙는 "실제 배출 요일·장소나 …" 한 줄이 링크 없이
+    // 나가고 있었다 — 같은 사람이 툴만 갈아타면 되묻기가 그대로 살아나는 자리다.
+    for (const [tool, args] of [
+      ["classify_waste_item", { itemName: "페트병", region: "서울 강남구" }],
+      ["make_cleanup_plan", { items: ["페트병"], region: "서울 강남구" }],
+    ]) {
+      const answer = resultText(await callTool(baseUrl, tool, args, requestId++));
+      const line = answer.split("\n").find((candidate) => candidate.includes("실제 배출 요일"));
+      assert(line, `${tool} 페트병+강남구: 요일을 말하는 지역 줄이 사라졌다 — 픽스처를 참고 등급 품목으로 갈아 끼운다`);
+      assert(
+        line.includes("www.gangnam.go.kr"),
+        `${tool} 페트병+강남구: 요일 줄에 확인처 링크가 없다 — 툴만 갈아타면 되묻기가 살아난다: "${line}"`,
+      );
+    }
 
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
     // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.

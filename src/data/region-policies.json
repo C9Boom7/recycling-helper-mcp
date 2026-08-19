@@ -2833,13 +2833,6 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "배출 장소와 약 형태별 배출방법 (본문이 첨부 이미지라 이미지를 읽어 확인)"
-      },
-      {
-        "title": "구로구 청소 행정 서비스",
-        "url": "https://www.guro.go.kr/www/contents.do?key=1649",
-        "sourceType": "local_guidance",
-        "checkedAt": "2026-08-20",
-        "basis": "생활쓰레기·음식물류폐기물·재활용품의 배출시간과 수거시간, 수집·운반 주체를 표로 안내하는 청소행정서비스헌장 페이지다"
       }
     ]
   },
@@ -3393,7 +3386,7 @@
         "url": "https://www.busan.go.kr/depart/ahwastepolicy09",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
-        "basis": "시 단위 재활용품 분리배출 안내와 하위 '구·군별 배출시간·장소' 메뉴 확인"
+        "basis": "시 단위 재활용품 분리배출 요령 안내. 구·군별 기준은 이 페이지에 없어 거주 구·군 누리집을 따로 확인해야 한다"
       }
     ]
   },

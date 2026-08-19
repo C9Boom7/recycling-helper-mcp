@@ -1412,6 +1412,17 @@ export function withCollectionDaySource(checks: string[], regionMatch?: MatchedR
 }
 
 /**
+ * 목록이 아니라 문장 하나를 닫는 자리. 안내문 중간에 박혀 있는 요일 한 줄이 여기 온다.
+ *
+ * 같은 불변식이 네 툴에 흩어져 있어서, 판정과 문구는 위 `withCollectionDaySource` 하나만
+ * 쓴다. 호출부마다 "요일을 말하는지" 조건을 따로 쓰면 그게 어긋나는 순간 다시 새는데,
+ * `get_region_disposal_info`만 닫혀 있고 나머지 셋이 새고 있던 게 정확히 그 모양이었다.
+ */
+export function withCollectionDaySourceLine(line: string, regionMatch?: MatchedRegionPolicy): string {
+  return withCollectionDaySource([line], regionMatch)[0];
+}
+
+/**
  * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
  * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
  * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.
@@ -1596,7 +1607,17 @@ export function formatRegionItemGuide(
     ];
   }
 
-  return [`- ${region.summary}`];
+  // 여기가 요일 불변식이 새던 마지막 구멍이다. 지역 요약은 자치구 32곳 모두 "배출
+  // 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다"로 끝나는데,
+  // 대형폐기물도 수거함도 아닌 품목(뚝배기·와인잔·즉석밥 용기 등)은 이 갈래로 떨어져
+  // 그 문장만 받고 끝났다 — 못 준다고 말해놓고 어디서 확인하는지는 안 적는, 되묻기를
+  // 부른 그 모양이다. `formatItemGuide`의 checkItems 쪽만 닫아 둬서 못 잡았다.
+  //
+  // 닫는 자리를 응답 조립부가 아니라 문장을 만드는 여기로 잡은 건 이 줄이 세 경로로
+  // 나가서다 — get_disposal_steps 텍스트, structuredContent의 regionNotes, 그리고
+  // 위젯 카드. 응답을 후처리하면 카드의 JSON까지 건드려야 하는데, 여기서 닫으면 셋이
+  // 한 번에 닫힌다.
+  return [withCollectionDaySourceLine(`- ${region.summary}`, regionMatch)];
 }
 
 export function formatItemGuide(item: WasteItem, region?: string): string {
