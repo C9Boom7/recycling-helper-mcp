@@ -85,9 +85,10 @@ text 출력(마크다운)은 현행 유지 — 이미 정제된 형식이고 가
 
 ### R6. 툴 호출 로깅
 
-QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다 (k8s/PlayMCP 로그로 수집됨).
+QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다. 다만 운영에서는 이 로그를 볼 수 없다 — KC 콘솔에 컨테이너 로그 화면이 없어(2026-08-19 확인, 모니터링 탭의 Istio 지표뿐) 로컬로 띄운 서버의 stdout에서만 보인다. 운영 문의는 로컬 재현으로 로그를 받는다([qa-runbook 2절](../qa-runbook.md) 참고).
 
-- 필드: `ts, tool, input(itemName/region/items), status(match|partial|ambiguous|not_found|ok|error), matchedId, matchedRegion, score, matched/total(cleanup plan), ms`
+- 늘 찍히는 필드: `ts, tool, status(match|partial|ambiguous|not_found|ok|error), ms`. 값이 있을 때만 붙는 필드: `matchedId, matchedRegion, regionStatus, score, matched/total(cleanup plan), fallbackTier, inputSource`. `status`가 `error`면 `errorName`과 (스택이 있으면) `errorAt` 한 줄이 대신 붙는다.
+- 호출자가 넘긴 문자열(`input`의 `itemName/region/items`, 오류 `message`)은 기본 로그에서 뺀다. `CALL_LOG_DETAILS=true`를 준 로컬 QA에서만 함께 찍는다 — 임의 문자열을 운영 쪽에 남기지 않기 위해서다.
 - `matchedId`는 항상 품목 데이터 id로 통일한다 (표시 이름·지역명 금지 — 툴 간 로그 조인용). 매칭된 지역은 `matchedRegion`에 별도 기록.
 - 구현: 툴 핸들러를 감싸는 `withCallLog(name, handler)` 헬퍼 하나로. 핸들러가 `_log` 메타데이터로 식별자를 넘기고 withCallLog가 클라이언트 응답에서 제거한다.
 - 개인정보 유의: 입력은 품목명/지역명뿐이므로 문제없으나, 그 이상을 로깅하지 않는다.
@@ -113,6 +114,6 @@ QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 �
 - [x] R3 descriptions + SERVER_INSTRUCTIONS — PRD 초안 그대로 적용
 - [x] R4 단일 소스 툴 정의 — `TOOL_DEFS`에서 SSE/JSON-only 양쪽 생성 (zod-to-json-schema, SDK와 동일 옵션), smoke에 두 경로 byte-identical 검증 추가. SDK가 execution taskSupport "forbidden"을 기본 부여하므로 COMPAT에도 미러링
 - [x] R5 structuredContent 다이어트 — 1차: get_disposal_steps 전체 품목 덤프 제거. 2차(코드리뷰 반영): `regionalPolicy` 블롭을 `regionNotes` 줄 배열로 대체하고 스펙 필수 필드 `steps`/`cautions` 추가, smoke에 툴별 키 화이트리스트 강제 추가. 지역 조합 대표 응답 structured 2,964B→953B(steps), 3,200B→630B(region info). 케이스 196건 기대값을 새 계약으로 이행 (매칭 정체성 단언은 `id`/`matchedBy`로 유지)
-- [x] R6 호출 로깅 — withCallLog + 핸들러 `_log` 메타. stdout JSONL {ts, tool, input, status, matchedId(항상 품목 id), matchedRegion, score, matched/total, ms}
+- [x] R6 호출 로깅 — withCallLog + 핸들러 `_log` 메타. stdout JSONL {ts, tool, status, matchedId(항상 품목 id), matchedRegion, regionStatus, score, matched/total, fallbackTier, inputSource, ms}, 오류 줄은 errorName/errorAt. 호출자 문자열(input, 오류 message)은 CALL_LOG_DETAILS=true를 준 로컬 QA에서만
 - [x] 코드리뷰 후속 — JSON-only 경로 tools/call 지원(406 해소), host 검증 /mcp 한정(/health 프로브 403 해소), SDK `toJsonSchemaCompat` 재사용(zod-to-json-schema 직접 의존 제거), 툴 정의·핸들러 단일 배열 통합, smoke의 무동작 fetch Host 헤더 제거
 - [x] DoD — pnpm local:test 통과 (196 answer cases), curl로 임의 host 403/와일드카드 200 확인, 로컬 main 머지

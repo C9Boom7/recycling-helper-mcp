@@ -1347,7 +1347,8 @@ function errorSignature(error: unknown): { errorName: string; errorAt?: string }
 }
 
 /**
- * Emits one JSON line per tool call to stdout (collected as container logs).
+ * Emits one JSON line per tool call to stdout — readable only when the server
+ * runs locally, since the KC console exposes no container log view.
  * Log identifiers come from the handler's `_log` metadata (stripped here so it
  * never reaches a client), not from client-facing structuredContent fields.
  * Item names and exception messages are omitted by default because callers can
