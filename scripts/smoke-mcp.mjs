@@ -1210,14 +1210,14 @@ async function runWidgetBuilderCases() {
 
   const nationwideCard = card({ item: nationwide });
   assert(!nationwideCard.includes("거주 지역 기준 확인 필요"), "nationally uniform item should carry no region line");
-  assert(!nationwideCard.includes("기준으로 배출 요일"), "nationally uniform item should carry no region line");
+  assert(!nationwideCard.includes("거주지 배출 기준만"), "nationally uniform item should carry no region line");
 
   // R2-1: only a *required* region check earns the ask. Advisory-level items —
   // 42 of the 130 — read as complete without one, and formatItemGuide adds no
   // region section for them either.
   const advisoryCard = card({ item: advisory });
   assert(!advisoryCard.includes("거주 지역 기준 확인 필요"), "advisory-level item should not demand a region");
-  assert(card({ item: advisory, regionName: "서울 강남구" }).includes("서울 강남구 기준으로 배출 요일"), "advisory item with a matched region should name it");
+  assert(card({ item: advisory, regionName: "서울 강남구" }).includes("서울 강남구 거주지 배출 기준만"), "advisory item with a matched region should name it");
 
   const withNotes = card({ item: regional, regionName: "서울 강남구", regionNotes: ["- 강남구 기준 안내", "- 두 번째 줄", "- 세 번째 줄"] });
   assert(withNotes.includes("서울 강남구 기준"), "region card is missing the region caption");
@@ -1237,7 +1237,7 @@ async function runWidgetBuilderCases() {
   assert(!withFee.includes("세 번째 줄"), "fee line must not widen the region note cap");
 
   const withoutNotes = card({ item: regional, regionName: "서울 강남구" });
-  assert(withoutNotes.includes("서울 강남구 기준으로 배출 요일"), "matched region without guidance should still name the region");
+  assert(withoutNotes.includes("서울 강남구 거주지 배출 기준만"), "matched region without guidance should still name the region");
 
   const withoutRegion = card({ item: regional });
   assert(withoutRegion.includes("거주 지역 기준 확인 필요"), "region-sensitive item without a region should ask for one");

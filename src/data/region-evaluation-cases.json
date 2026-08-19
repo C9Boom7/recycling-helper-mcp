@@ -8,10 +8,10 @@
   },
   {
     "region": "서울 강남구",
-    "query": "투명 페트병",
+    "query": "화분 흙",
     "expectedRegionId": "gangnam_gu",
-    "expectedItemId": "pet_bottle",
-    "expectedGuideContains": "목요일에 비닐"
+    "expectedItemId": "plant_soil",
+    "expectedGuideContains": "특수규격마대"
   },
   {
     "region": "서울시 강남구",
@@ -30,10 +30,10 @@
   },
   {
     "region": "서울 서초구",
-    "query": "투명 페트병",
+    "query": "화분 흙",
     "expectedRegionId": "seocho_gu",
-    "expectedItemId": "pet_bottle",
-    "expectedGuideContains": "목요일 또는 금요일"
+    "expectedItemId": "plant_soil",
+    "expectedGuideContains": "특수마대"
   },
   {
     "region": "seocho-gu",
@@ -51,10 +51,10 @@
   },
   {
     "region": "서울 송파구",
-    "query": "투명 페트병",
+    "query": "화분 흙",
     "expectedRegionId": "songpa_gu",
-    "expectedItemId": "pet_bottle",
-    "expectedGuideContains": "목요일 또는 금요일"
+    "expectedItemId": "plant_soil",
+    "expectedGuideContains": "특수규격봉투(마대)"
   },
   {
     "region": "songpa-gu",
@@ -65,17 +65,17 @@
   },
   {
     "region": "서울 마포구",
-    "query": "투명 페트병",
+    "query": "화분 흙",
     "expectedRegionId": "mapo_gu",
-    "expectedItemId": "pet_bottle",
-    "expectedGuideContains": "수요일에 별도 배출"
+    "expectedItemId": "plant_soil",
+    "expectedGuideContains": "특수규격봉투(PP포대)"
   },
   {
     "region": "마포구",
-    "query": "종이컵",
+    "query": "매트리스",
     "expectedRegionId": "mapo_gu",
-    "expectedItemId": "paper_cup",
-    "expectedGuideContains": "일·월·화·목요일"
+    "expectedItemId": "mattress",
+    "expectedGuideContains": "신고필증"
   },
   {
     "region": "서울시 마포구",

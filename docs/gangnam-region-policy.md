@@ -2,6 +2,10 @@
 
 `서울 강남구`는 재활용척척의 1차 지역 보강 대상이다. 런타임 데이터는 `src/data/region-policies.json`의 `gangnam_gu` 항목을 기준으로 한다.
 
+> **2026-08-19 — 아래 요일제 서술은 조사 기록이지 런타임 데이터가 아니다.**
+> 배출 요일·시간·수거용기는 같은 구 안에서도 동과 주택 유형에 따라 갈려 전부 걷어냈다([data-quality.md](data-quality.md)의 지역 커버리지 티어 절).
+> 이 문서를 근거로 요일을 다시 데이터에 넣지 않는다 — `scripts/test-region-matching.ts`가 막는다.
+
 ## Why This Exists
 
 `region_review_needed` 품목은 전국 공통 판단만으로는 사용자에게 충분하지 않은 경우다.

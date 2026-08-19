@@ -83,8 +83,8 @@ export type BulkyWasteFeeSchedule = {
 };
 
 /**
- * `full`은 배출 요일까지 확인한 기존 5개 지역, `standard`는 대형폐기물 신청
- * 경로와 수거함 안내만 담은 얕은 티어, `metro`는 자치구가 등록되지 않았을 때
+ * `full`은 품목별 지역 안내와 신청 기한까지 확인한 초기 5개 지역, `standard`는
+ * 대형폐기물 신청 경로와 수거함 안내만 담은 얕은 티어, `metro`는 자치구가 등록되지 않았을 때
  * 착지시키는 광역시도 레이어다. 대형폐기물 접수는 기초자치단체 소관이라
  * `metro`에는 `bulkyWaste`를 두지 않는다(validate가 강제).
  */
@@ -135,21 +135,9 @@ export type RegionalPolicyData = {
   metroId?: string;
   checkedAt: string;
   summary: string;
-  generalWaste?: {
-    time: string;
-    place: string;
-    method: string;
-    notes: string[];
-  };
-  recycling?: {
-    appliesTo: string;
-    time: string;
-    place: string;
-    vinylAndPetDay: string;
-    otherDays: string;
-    method: string[];
-    notes: string[];
-  };
+  // 배출 요일·시간·장소를 담던 `generalWaste`·`recycling`은 2026-08-19에 걷어냈다.
+  // 구 대표값 하나로는 동과 주택 유형에 따라 갈리는 실제 배출 기준을 맞출 수 없어,
+  // 확정 안내 대신 "직접 확인할 항목"과 공식 출처로만 잇는다.
   foodWaste?: {
     method: string[];
     generalWasteExceptions: string[];
@@ -1278,7 +1266,7 @@ export function itemRegionGuidance(item: WasteItem): string {
     return "지역 기준이 실제 배출 방법을 바꿀 수 있습니다. 전용 수거함, 신고 방식, 수수료 같은 공식 기준 확인이 필요합니다.";
   }
 
-  return "기본 분리배출 판단은 전국 기준으로 안내 가능하며, 지역 정보는 배출 요일·장소 확인용입니다.";
+  return "기본 분리배출 판단은 전국 기준으로 안내 가능하며, 거주지 배출 기준만 따로 확인하면 됩니다.";
 }
 
 export function itemSourceRefs(item: WasteItem): string[] {
@@ -1561,7 +1549,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     lines.push(
       hasRegionGuide
         ? `- ${regionMatch.region.name} 기준으로 확인된 지역 안내를 함께 반영합니다.`
-        : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 기준 배출 요일·장소나 수거함·회수 가능 여부만 맞춰 확인하면 됩니다.`,
+        : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 거주지 배출 기준이나 수거함·회수 가능 여부만 맞춰 확인하면 됩니다.`,
     );
     if (hasRegionGuide) lines.push(...regionGuideLines);
   }

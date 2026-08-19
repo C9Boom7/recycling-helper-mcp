@@ -132,7 +132,7 @@ function regionNodes({ item, regionName, regionNotes, regionFeeLine }: DisposalW
     ];
   }
 
-  return [...fee, text(`${regionName} 기준으로 배출 요일·장소만 확인하면 됩니다.`)];
+  return [...fee, text(`${regionName} 거주지 배출 기준만 확인하면 됩니다.`)];
 }
 
 /**

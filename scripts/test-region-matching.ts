@@ -417,6 +417,34 @@ for (const testCase of regionEvaluationCases) {
   }
 }
 
+/**
+ * 배출 요일·시간이 지역 데이터로 다시 스며드는 걸 막는다. 구 대표값 하나로는
+ * 동과 주택 유형에 따라 갈리는 실제 기준을 맞출 수 없어 2026-08-19에 전부
+ * 걷어냈는데, 지역을 새로 추가하다 보면 출처 페이지의 요일표를 그대로 옮겨
+ * 적기 쉽다. 사용자에게 나가는 필드만 본다 — 출처 설명(`sources`)은 "그 페이지에
+ * 요일이 있다"는 안내라 오히려 남겨야 하므로 제외한다.
+ */
+const CONCRETE_SCHEDULE = /[월화수목금토일]요일|\d{1,2}:\d{2}/;
+for (const region of regionalPolicies) {
+  const userFacing = [
+    region.summary,
+    ...(region.itemGuides ?? []).flatMap((guide) => [guide.summary, ...(guide.steps ?? [])]),
+  ].filter((line): line is string => typeof line === "string");
+
+  for (const line of userFacing) {
+    if (CONCRETE_SCHEDULE.test(line)) {
+      failures.push(`${region.name}: 확정 배출 요일·시간이 다시 들어왔다 — "${line.slice(0, 60)}"`);
+    }
+  }
+
+  // 요일을 왜 안 싣는지는 `지역 요약`(summary)만 말한다. regionCoverageNote가 같은
+  // 말을 하지 않는 건 이 문장이 자치구 전부에 있다는 전제 위에 서 있으므로, 지역을
+  // 새로 추가할 때 빠지면 그 지역만 이유 없이 요일이 사라진 답을 받게 된다.
+  if (region.coverageTier !== "metro" && !region.summary.includes("동·주택 유형별로")) {
+    failures.push(`${region.name}: summary에 배출 요일을 싣지 않는 이유가 빠졌다 (자치구·시는 모두 있어야 한다)`);
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Region matching test failed (${failures.length}):`);
   for (const failure of failures) console.error(`- ${failure}`);
