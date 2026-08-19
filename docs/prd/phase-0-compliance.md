@@ -85,7 +85,7 @@ text 출력(마크다운)은 현행 유지 — 이미 정제된 형식이고 가
 
 ### R6. 툴 호출 로깅
 
-QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다 (k8s/PlayMCP 로그로 수집됨).
+QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다. 다만 운영에서는 이 로그를 볼 수 없다 — KC 콘솔에 컨테이너 로그 화면이 없어(2026-08-19 확인, 모니터링 탭의 Istio 지표뿐) 로컬로 띄운 서버의 stdout에서만 보인다. 운영 문의는 로컬 재현으로 로그를 받는다([qa-runbook 2절](../qa-runbook.md) 참고).
 
 - 필드: `ts, tool, input(itemName/region/items), status(match|partial|ambiguous|not_found|ok|error), matchedId, matchedRegion, score, matched/total(cleanup plan), ms`
 - `matchedId`는 항상 품목 데이터 id로 통일한다 (표시 이름·지역명 금지 — 툴 간 로그 조인용). 매칭된 지역은 `matchedRegion`에 별도 기록.
