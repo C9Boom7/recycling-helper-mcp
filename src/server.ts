@@ -11,6 +11,7 @@ import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-sc
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteItem, WasteMatch } from "./data.js";
 import {
+  collectionDayCheckLine,
   confidenceLabel,
   disposalGroupLabel,
   findBulkyWasteFeeRowTotal,
@@ -35,10 +36,14 @@ import {
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
   itemRegionGuidance,
+  needsCollectionDaySource,
   publicReviewMetadata,
   resolveRegionalPolicy,
   resolveWasteItem,
   wasteItems,
+  withCollectionDaySource,
+  withCollectionDaySourceLine,
+  REGION_SELECT_GUIDE_LINK,
 } from "./data.js";
 import type { DisposalWidgetPayload } from "./widgets.js";
 import { buildDisposalWidget } from "./widgets.js";
@@ -283,7 +288,7 @@ const TOOL_DEFS: ToolDef[] = [
     name: "get_region_disposal_info",
     title: "Get Region Disposal Info",
     description:
-      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps returns no day guidance. Optional itemName narrows the checklist to that item.",
+      "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps covers days for only some items. Optional itemName narrows the checklist to that item.",
     inputShape: {
       region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
@@ -323,20 +328,31 @@ function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?
  * text path (formatItemGuide) gates them: only when the item has a
  * region-specific guide or the region check is critical. Advisory-only items
  * get no region lines, keeping "no region noise" responses noise-free.
+ *
+ * 예외는 요일 불변식 하나다. 위젯 응답의 content는 카드 JSON이라 완성된 답변에
+ * 문장을 이어 붙일 자리가 없어서, 요일을 닫는 줄도 여기서 실어야 한다 — 안 그러면
+ * 카드에도 구조화 출력에도 확인처가 없다. 참고 등급인 `빈 약통`이 그랬다.
  */
 function buildRegionNotes(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined, region?: string): string[] | undefined {
-  if (!regionMatch || !itemNeedsRegionCheck(item)) return undefined;
+  if (!itemNeedsRegionCheck(item)) return undefined;
 
-  const hasSpecificGuide = Boolean(findRegionItemGuide(regionMatch.region, item));
-  if (!hasSpecificGuide && !itemNeedsCriticalRegionCheck(item)) return undefined;
-
+  const hasSpecificGuide = Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item));
   // 지역 툴과 같은 갈래. 시·군·구를 이미 댄 사람에게 되묻는 대신 그 이름을 부른다.
   // 줄 수는 그대로다 — 되묻기 한 줄이 이름 부르기 한 줄로 바뀔 뿐이라 카드의
   // 지역 줄 두 개 예산을 밀지 않는다.
-  const lines = formatRegionItemGuide(item, regionMatch, {
-    namedSubRegion: findNamedSubRegionForMatch(regionMatch, region),
-  });
-  return lines.length > 0 ? lines : undefined;
+  const lines =
+    regionMatch && (hasSpecificGuide || itemNeedsCriticalRegionCheck(item))
+      ? formatRegionItemGuide(item, regionMatch, { namedSubRegion: findNamedSubRegionForMatch(regionMatch, region) })
+      : [];
+
+  // 판정 범위는 카드가 실제로 싣는 것 — 품목 단계·주의와 위 지역 줄들이다. 참고 등급
+  // 품목은 지역 줄이 아예 없어 `steps`의 "플라스틱류 배출 요일과 장소는 지역 기준을
+  // 확인합니다" 한 줄만 나가고 있었다. 닫는 줄은 맨 앞에 둔다. 카드는 지역 줄을 두 개까지
+  // 자르는데, 뒤에 붙이면 지역 안내가 긴 품목에서 확인처부터 잘려 나간다.
+  const body = [...item.steps, ...item.cautions, ...lines].join("\n");
+  const notes = needsCollectionDaySource(body, regionMatch) ? [`- ${collectionDayCheckLine(regionMatch)}`, ...lines] : lines;
+
+  return notes.length > 0 ? notes : undefined;
 }
 
 /**
@@ -559,58 +575,9 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
 }
 
 /**
- * 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에 따라
- * 갈리는데 우리가 그 단위까지 확인할 수 없어서다. 문제는 그 다음이었다 — "직접 확인할
- * 항목"으로만 남기고 **어디서** 확인하는지를 안 적었더니, 호스트 모델이 그 빈자리를
- * 사용자에게 되묻는 걸로 메웠다("사는 동 이름을 알려주세요"). 그런데 동 이름을 받아도
- * 우리가 줄 게 없다. 2026-08-19 Preview 측정에서 그 되묻기 뒤 후속 턴이 통째로 웹
- * 검색으로 샜고, 세 번째 턴은 부동산 커뮤니티 입주민 후기로 답이 나갔다.
- *
- * 그래서 못 준다고 말하는 그 자리에서 링크로 닫는다. 되물을 자리를 없애는 게 목적이라,
- * 지자체 요일 페이지가 있으면 그걸, 없으면 전국 지역별 안내를 붙인다. 어느 쪽이든 이
- * 줄에는 항상 URL이 하나 들어가야 하고, 그건 `scripts/smoke-mcp.mjs`가 지킨다.
- * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
- */
-function collectionDaySourceHint(region?: MatchedRegionPolicy): string {
-  const daySource = region ? findRegionCollectionDaySource(region.region) : undefined;
-
-  if (daySource?.url) {
-    const checkedAt = daySource.checkedAt ? `, 확인일 ${daySource.checkedAt}` : "";
-    return `${daySource.title}에서 확인하세요 (${daySource.url}${checkedAt})`;
-  }
-
-  return `${REGION_SELECT_GUIDE_LINK.title}에서 거주 지역을 선택해 확인하세요 (${REGION_SELECT_GUIDE_LINK.url})`;
-}
-
-function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
-  return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(region)}`;
-}
-
-/**
- * 품목을 함께 물은 갈래. 체크리스트가 그 품목으로 좁혀지느라 위 요일 줄이 통째로
- * 빠지는데, 되묻기를 부르는 질문은 오히려 이쪽이 흔하다("강남구 오피스텔은 비닐봉지
- * 목요일 배출 맞아?"). 좁히기는 그대로 두고, 요일을 말하는 줄에만 확인처를 이어 붙인다.
- *
- * 요일 줄이 없으면 아무것도 더하지 않는다. 폐형광등 수거함처럼 요일과 무관한 품목까지
- * 링크를 달면 안내가 길어지기만 한다. 붙이는 자리는 첫 줄 하나뿐이다 — 같은 주소를
- * 여러 줄에 반복해 봐야 읽는 쪽이 고를 게 늘지 않는다.
- */
-function withCollectionDaySource(checks: string[], region?: MatchedRegionPolicy): string[] {
-  const dayIndex = checks.findIndex((check) => mentionsCollectionDay(check) && !check.includes("http"));
-  if (dayIndex < 0) return checks;
-
-  const withSource = [...checks];
-  withSource[dayIndex] = `${withSource[dayIndex]} — ${collectionDaySourceHint(region)}`;
-  return withSource;
-}
-
-/** 요일을 말하는 줄인지. 확인처가 붙은 줄은 이미 닫혀 있으므로 URL 유무로 갈라 본다. */
-function mentionsCollectionDay(text: string): boolean {
-  return text.includes("요일");
-}
-
-/**
  * 불변식: **응답이 요일을 언급하면 그 응답 어딘가에 요일 확인처가 있어야 한다.**
+ * 문장과 판정은 `data.ts`가 한 벌만 들고 있다(`collectionDayCheckLine`,
+ * `needsCollectionDaySource`) — 호출부마다 다시 쓰면 어긋나는 순간 조용히 샌다.
  *
  * 체크 항목만 보고 붙이던 게 화근이었다. 지역 요약은 자치구 48곳 모두 "배출 요일과
  * 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다"로 끝나는데, 품목이 붙어
@@ -623,10 +590,14 @@ function mentionsCollectionDay(text: string): boolean {
  * 없으면 여기서 요일 확인 항목을 한 줄 더해 닫는다. 일반 체크리스트를 통째로 되살리지는
  * 않는다 — 좁히기는 의도한 동작이고, 침대를 물은 사람에게 폐형광등 수거함까지 돌려줄
  * 이유는 없다. 요일을 아무 데서도 말하지 않는 응답에는 아무것도 더하지 않는다.
+ *
+ * **판정에는 응답 본문(`answerText`)도 함께 넣는다.** 예전에는 체크 항목만 보고 "아직
+ * 안 닫혔다"고 판단했는데, 그 사이 `formatRegionItemGuide`가 지역 요약 줄에서 직접
+ * 닫게 되면서 이미 확인처가 실린 응답에 체크리스트 줄이 하나 더 붙었다 — 같은 주소가
+ * 한 응답에 두 번 나갔다(강남구 + 뚝배기). 닫혔는지는 응답 전체를 보고 정해야 한다.
  */
 function closeCollectionDayMention(checks: string[], answerText: string, region?: MatchedRegionPolicy): string[] {
-  if (checks.some((check) => mentionsCollectionDay(check) && check.includes("http"))) return checks;
-  if (!mentionsCollectionDay(answerText) && !checks.some(mentionsCollectionDay)) return checks;
+  if (!needsCollectionDaySource([...checks, answerText].join("\n"), region)) return checks;
   return [...checks, collectionDayCheckLine(region)];
 }
 
@@ -831,7 +802,12 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     itemNeedsCriticalRegionCheck(item)
       ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
       : itemNeedsRegionCheck(item)
-      ? "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      ? // 이 줄도 요일을 말하므로 확인처까지 함께 낸다. 지역 툴만 닫혀 있어서, 같은
+        // 사람이 툴만 갈아타면 되묻기가 그대로 살아났다.
+        withCollectionDaySourceLine(
+          "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
+          regionMatch,
+        )
       : undefined,
     region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
   ]
@@ -1076,7 +1052,12 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
         : "전용 수거함, 지정 수거처, 대형폐기물 신고·수수료 품목은 지역 공식 안내 확인이 필요합니다."
       : undefined,
     planned.some((entry) => entry.found && entry.regionCheckLevel === "참고")
-      ? "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다."
+      ? // 플랜도 마찬가지다. 대청소는 지역을 함께 주는 호출이 많아 오히려 여기서 되묻기가
+        // 나오면 손해가 크다 — 품목이 여러 개라 되물은 뒤 다시 세우는 값이 그만큼 많다.
+        withCollectionDaySourceLine(
+          "일부 품목은 기본 판단은 위와 같고, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
+          regionMatch,
+        )
       : undefined,
     // 다음 걸음 안내. 예고는 그 후속 호출이 **어느 지역에서나** 내놓는 것에만 건다.
     // 여기서 두 번 미끄러졌다 — 처음엔 "규격별 수수료 전체 표"를 걸었는데 품목을 넘겨도
@@ -1146,17 +1127,6 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
 }
 
 /**
- * 지역을 골라 들어가는 전국 안내. 미등록 지역 폴백이면서, 지자체 요일 페이지가 없는
- * 42곳에서 `collectionDayCheckLine`이 요일 질문을 닫는 링크이기도 하다. 두 자리가
- * 같은 주소를 각자 적고 있으면 한쪽만 고쳐지므로 상수 하나로 묶는다.
- */
-const REGION_SELECT_GUIDE_LINK = {
-  title: "생활폐기물 분리배출 누리집 지역별 안내",
-  url: "https://www.분리배출.kr/front/region/region.do",
-  basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
-};
-
-/**
  * 미등록 지역에서도 다음 행동이 남아야 한다. "지역번호+120" 대표 민원번호는
  * 연결해도 담당 부서까지 한참 돌아가 안내로서 값이 없으므로 넣지 않는다 —
  * 번호를 준다면 지역 데이터에서 확인한 직통번호여야 하고, 없으면 빼는 쪽이 낫다.
@@ -1175,6 +1145,29 @@ const MAX_LISTED_DISTRICTS = 6;
 
 /** `get_region_disposal_info`의 structuredContent 상한. Phase 0 R5가 정한 값이다. */
 const MAX_OFFICIAL_SOURCES = 3;
+
+/**
+ * 상한에 걸려 자를 때 **요일 확인처는 남긴다.**
+ *
+ * 요일 출처는 지역 데이터에 나중에 붙은 게 많아 `sources` 뒤쪽에 몰려 있는데, 앞에서
+ * 세 개를 세면 그게 그대로 잘린다. 하필 이 링크는 본문 "확인할 정보"가 **직접 가리키는
+ * 주소**라, 구조화 응답만 읽는 호스트에서는 본문이 "여기서 확인하세요"라고 말한 그
+ * 페이지가 목록에 없다. 세종시와 고양시가 그랬다.
+ *
+ * 상한을 올리는 대신 고르는 순서를 바꾼다 — 상한은 응답 크기 예산이라 손댈 값이 아니고,
+ * 자리를 하나 내주는 쪽이 잃는 게 적다. 원래 배열 순서는 그대로 지켜, 요일 출처가 앞에
+ * 있으면 아무것도 달라지지 않는다.
+ */
+function pickRegionOfficialSources(region: RegionalPolicyData, room: number): RegionalPolicyData["sources"] {
+  if (room <= 0) return [];
+
+  const head = region.sources.slice(0, room);
+  const daySource = findRegionCollectionDaySource(region);
+  if (!daySource || head.includes(daySource)) return head;
+
+  const kept = new Set([...head.slice(0, room - 1), daySource]);
+  return region.sources.filter((source) => kept.has(source));
+}
 
 function metroNarrowingLine(metro: MatchedRegionPolicy): string {
   const districts = findRegisteredDistricts(metro.region);
@@ -1406,7 +1399,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
                 : [];
             const room = Math.max(0, MAX_OFFICIAL_SOURCES - national.length);
             return [
-              ...regionMatch.region.sources.slice(0, room).map((source) => ({ title: source.title, url: source.url })),
+              ...pickRegionOfficialSources(regionMatch.region, room).map((source) => ({ title: source.title, url: source.url })),
               ...national,
             ];
           })()

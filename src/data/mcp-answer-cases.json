@@ -3599,7 +3599,10 @@
       "\"id\":\"medicine\""
     ],
     "expectedRegionNotes": {
-      "present": false
+      "present": true,
+      "includes": [
+        "www.gangnam.go.kr"
+      ]
     }
   },
   {
@@ -3750,7 +3753,10 @@
       "\"id\":\"medicine\""
     ],
     "expectedRegionNotes": {
-      "present": false
+      "present": true,
+      "includes": [
+        "www.gangnam.go.kr"
+      ]
     }
   },
   {
@@ -4295,7 +4301,8 @@
     "expectedTextIncludes": [
       "## 빈 약통",
       "### 지역 참고",
-      "기본 배출 판단은 위와 같고"
+      "기본 배출 판단은 위와 같고",
+      "www.gangnam.go.kr"
     ],
     "expectedTextExcludes": [
       "### 지역 확인 필요",
@@ -4306,7 +4313,10 @@
       "\"regionCheckLevel\":\"참고\""
     ],
     "expectedRegionNotes": {
-      "present": false
+      "present": true,
+      "includes": [
+        "www.gangnam.go.kr"
+      ]
     }
   },
   {

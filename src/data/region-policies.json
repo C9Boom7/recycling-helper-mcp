@@ -1576,6 +1576,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "품목별 수수료 조회 페이지"
+      },
+      {
+        "title": "종로구 생활쓰레기 배출일시 검색",
+        "url": "https://www.jongno.go.kr/portal/garbage/selectWasteEmissionsList.do?menuId=110339&menuNo=110339",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "도로명이나 지번을 넣으면 그 주소의 수거업체·배출요일·배출시간을 찾아주는 조회 서비스이고, 일반쓰레기·음식물·재활용품을 지정된 요일과 시간에 내 집 앞에 내놓으라는 안내가 함께 붙어 있다"
       }
     ]
   },
@@ -1627,6 +1634,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐의약품 배출방법과 수거함·우체통 위치"
+      },
+      {
+        "title": "용산구 생활쓰레기배출안내",
+        "url": "https://www.yongsan.go.kr/portal/main/contents.do?menuNo=200680",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "일반주택 생활쓰레기를 골목길·도로변으로 나눠 배출 요일과 시간대로 안내하고, 배출이 금지되는 요일도 함께 적혀 있다. 아파트는 단지 기준을 따로 확인해야 한다"
       }
     ]
   },
@@ -1677,6 +1691,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 배출방법"
+      },
+      {
+        "title": "광진구 쓰레기 배출요령",
+        "url": "https://www.gwangjin.go.kr/portal/main/contents.do?menuNo=200838",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출요일과 배출시간, 수거요일·수거시간, 종류별 배출요령을 한 페이지에 담고 있다"
       }
     ]
   },
@@ -1728,6 +1749,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 배출방법과 거점 수거함"
+      },
+      {
+        "title": "강북구 일반쓰레기 배출안내",
+        "url": "https://www.gangbuk.go.kr/portal/main/contents.do?menuNo=200843",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "일반 생활쓰레기의 배출요일·배출시간·배출장소와 품목별 배출방법, 재활용 비대상 품목 처리요령을 안내한다"
       }
     ]
   },
@@ -1779,6 +1807,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 수거함 위치와 배출방법"
+      },
+      {
+        "title": "도봉구 생활폐기물 배출안내",
+        "url": "https://www.dobong.go.kr/subsite/waste/Contents.asp?code=10007358",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활폐기물 수거일시와 배출시간·배출장소, 품목별 배출금지 요일을 안내한다"
       }
     ]
   },
@@ -1829,6 +1864,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 분리수거함 설치장소"
+      },
+      {
+        "title": "노원구 재활용품배출방법",
+        "url": "https://www.nowon.kr/www/minwon/minwon4/minwon4_03/minwon4_03_04.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "재활용품을 품목별로 나눠 배출요일과 배출시간, 주택유형별 배출장소를 안내한다"
       }
     ]
   },
@@ -1880,6 +1922,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 전용수거함 배출방법"
+      },
+      {
+        "title": "은평구 쓰레기분리수거/배출안내",
+        "url": "https://www.ep.go.kr/www/contents.do?key=1239",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "동을 두 그룹으로 나눈 배출요일과 계절별 배출시간, 집중배출시간, 배출장소·배출종류를 안내한다"
       }
     ]
   },
@@ -1930,6 +1979,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐의약품 배출장소와 방법"
+      },
+      {
+        "title": "강서구 일반 생활쓰레기 배출방법",
+        "url": "https://www.gangseo.seoul.kr/env/env010401",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "일반 생활쓰레기 배출시간·배출장소·종량제봉투 사용법과 '우리 동네 쓰레기 버리는 날' 동별 배출요일·수거 대행업체 표"
       }
     ]
   },
@@ -1981,6 +2037,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐의약품 배출방법과 배출장소"
+      },
+      {
+        "title": "금천구 생활폐기물 배출은 이렇게",
+        "url": "https://www.geumcheon.go.kr/portal/contents.do?key=812",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "매일수거제에 따른 생활폐기물 배출요일·배출시간과 주요도로 상가지역 별도 배출시간, 배출장소 안내"
       }
     ]
   },
@@ -2032,6 +2095,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 배출요령과 부푼 배터리 처리"
+      },
+      {
+        "title": "영등포구 생활쓰레기배출요령",
+        "url": "https://www.ydp.go.kr/www/contents.do?key=2735",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간과 토요일·명절연휴 배출 금지, 배출장소와 종량제봉투 사용 원칙, 배출시간 위반 과태료 안내"
       }
     ]
   },
@@ -2083,6 +2153,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 배출방법과 수거함 개소"
+      },
+      {
+        "title": "동작구 생활쓰레기 배출",
+        "url": "https://www.dongjak.go.kr/portal/main/contents.do?menuNo=200589",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간과 토요일·공휴일 전날 배출 제한, 문전 배출 원칙과 종량제봉투 사용법 안내"
       }
     ]
   },
@@ -2134,6 +2211,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐의약품과 폐형광등·폐건전지 배출방법"
+      },
+      {
+        "title": "관악구 생활쓰레기 배출",
+        "url": "https://www.gwanak.go.kr/site/gwanak/07/10703010100002016051206.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출요일과 주거지역·가로지역별 배출시간, 배출장소와 종량제봉투 사용 원칙 안내"
       }
     ]
   },
@@ -2185,6 +2269,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "폐건전지 배출방법과 부푼 리튬전지 처리"
+      },
+      {
+        "title": "강동구 쓰레기배출안내",
+        "url": "https://www.gangdong.go.kr/web/newportal/contents/gdp_005_004_010_001",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "쓰레기 배출요일·배출시간과 공휴일 전날·토요일 배출 제한, 목요일 폐비닐·투명페트병 배출, 가연성·불연성 종량제봉투 구분 안내"
       }
     ]
   },
@@ -2251,6 +2342,13 @@
         "sourceType": "law",
         "checkedAt": "2026-08-16",
         "basis": "[별표5] 대형생활폐기물 수수료(제32조제1항 관련) — 구 홈페이지에 수수료 조회 페이지가 없어 조례를 대신 건다"
+      },
+      {
+        "title": "중구 쓰레기 배출안내",
+        "url": "https://www.junggu.seoul.kr/content.do?cmsid=14187",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "4개 권역으로 나눈 동별 배출금지일과 배출시간 표, 특수종량제봉투 배출 품목, 배출시간·장소 위반 과태료 안내"
       }
     ]
   },
@@ -2317,6 +2415,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "약 형태별 배출방법, 우체통 배출 조건, 수거함 36곳"
+      },
+      {
+        "title": "성동구 일반생활쓰레기 배출방법",
+        "url": "https://www.sd.go.kr/main/contents.do?key=1674",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "일반생활쓰레기의 동별 배출요일과 배출시간, 주택·공장·아파트별 배출장소와 특수마대 사용 기준을 안내한다"
       }
     ]
   },
@@ -2384,6 +2489,13 @@
         "sourceType": "law",
         "checkedAt": "2026-08-16",
         "basis": "[별표1] 대형폐기물 수집운반수수료 품목별 부과 기준 — 구 홈페이지 수수료표는 내려받는 파일이라 조례를 대신 건다"
+      },
+      {
+        "title": "동대문구 쓰레기배출및수거",
+        "url": "https://www.ddm.go.kr/www/contents.do?key=858",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간·배출방법과 동별 배출요일, 수거시간을 표로 안내하고 쓰레기 종류별 배출요령을 덧붙인다"
       }
     ]
   },
@@ -2441,6 +2553,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "폐형광등·폐건전지·폐의약품 배출 장소"
+      },
+      {
+        "title": "중랑구 음식물쓰레기 배출 안내 (일반주택 배출요일 표 포함)",
+        "url": "https://www.jungnang.go.kr/portal/main/contents.do?menuNo=200051",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "페이지 이름은 음식물쓰레기지만 일반주택 지역의 쓰레기 배출 요일 표와 배출시간, 요일별 청소대행업체가 함께 실려 있다"
       }
     ]
   },
@@ -2500,6 +2619,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "배출 장소와 약 형태별 배출방법, 수거함·우체통 설치 위치"
+      },
+      {
+        "title": "성북구 동별 생활쓰레기 배출 및 수거시간 일정표",
+        "url": "https://www.sb.go.kr/www/selectBbsNttView.do?key=5927&bbsNo=91&nttNo=9502164",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "2025년 5월 12일 시행 기준으로 동별 생활쓰레기 배출요일·배출시간과 수거시간을 정리한 일정표다"
       }
     ]
   },
@@ -2567,6 +2693,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "배출 장소와 약 형태별 배출방법 (본문이 이미지 한 장이라 이미지를 읽어 확인)"
+      },
+      {
+        "title": "서대문구 생활쓰레기 배출 안내",
+        "url": "https://www.sdm.go.kr/civil/type/ceanup/info.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간·배출장소와 동별 배출요일 표, 배출방법 위반 과태료 기준을 안내한다"
       }
     ]
   },
@@ -2626,6 +2759,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "전지·형광등 배출요령 (구청 청소/위생 메뉴에는 항목이 없고 이 안내문에만 있다)"
+      },
+      {
+        "title": "양천구 생활쓰레기 배출 방법 및 구분 기준 안내",
+        "url": "https://www.yangcheon.go.kr/site/yangcheon/ex/bbs/View.do?cbIdx=279&bcIdx=897&parentSeq=897",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간·배출장소와 동별 배출요일, 타는 쓰레기·안타는 쓰레기·재활용품의 구분 기준과 수거 횟수를 안내한다"
       }
     ]
   },
@@ -2693,6 +2833,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "배출 장소와 약 형태별 배출방법 (본문이 첨부 이미지라 이미지를 읽어 확인)"
+      },
+      {
+        "title": "구로구 청소 행정 서비스",
+        "url": "https://www.guro.go.kr/www/contents.do?key=1649",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "청소행정서비스헌장. 생활쓰레기·음식물류폐기물·재활용품을 몇 시에 내놓고 몇 시에 걷어 가는지, 수집·운반을 누가 맡는지를 표로 안내한다. 무슨 날에 내놓는지는 적혀 있지 않다"
       }
     ]
   },
@@ -2925,6 +3072,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "자원순환과 2025-11-06 새소식. 동 행정복지센터 민원실 수거함 운영과 약 형태별 배출 요령, 약 봉투 제거 안내"
+      },
+      {
+        "title": "고양시 생활폐기물",
+        "url": "https://www.goyang.go.kr/www/www03/www03_3/www03_3_3/www03_3_3_tab1.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활폐기물 종량제 봉투 배출방법과 배출시간, 청소대행업체의 수거시간대 및 수거하지 않는 요일을 안내한다"
       }
     ]
   },
@@ -2998,6 +3152,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "시청 홈페이지 안내. 담당부서 자원순환과와 연락처 031-5189-6818 확인"
+      },
+      {
+        "title": "화성시 청소행정포털 - 우리동네 수거정보",
+        "url": "https://h-waste.hscity.go.kr/01_vehicle/01_vehicle0101.asp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "행정읍면동을 고르면 폐기물 종류별로 무슨 요일에 걷어 가는지(월~일) 바로 나오는 조회 페이지. 배출안내(05_recycle0101.asp)가 요일은 지역마다 다르니 여기서 보라고 넘기는 곳이다"
       }
     ]
   },
@@ -3070,6 +3231,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "전지수거함 배출과 분리 기준, 손상 배터리 취급 주의. 메뉴가 아니라 청소알림방 게시글에 있었다"
+      },
+      {
+        "title": "부천시 생활쓰레기",
+        "url": "https://www.bucheon.go.kr/site/homepage/menu/viewMenu?menuid=148006007006001",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "생활쓰레기 배출시간과 주택유형별 배출장소, 배출하면 안 되는 날과 수거하지 않는 날을 안내한다"
       }
     ]
   },
@@ -3155,6 +3323,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
         "basis": "2024-10-04 보건소 게시글. 본문이 이미지 한 장이라 첨부 이미지를 읽어 배출 장소 16개 읍면동과 보건소 두 곳, 약 형태별 방법을 확인했다"
+      },
+      {
+        "title": "남양주시 생활쓰레기 수거",
+        "url": "https://www.nyj.go.kr/www/contents.do?key=3005",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "일반·음식물 종량제봉투와 재활용품 수거 안내. 일반쓰레기는 요일 값을 싣지 않고 권역마다 다르니 읍면동 담당 수거업체에 문의하라고 안내하며, 그 업체 연락처를 권역별 표로 준다. 요일이 적힌 건 대형생활폐기물뿐이다(아파트 월·수·금, 그 외 화·목·토)"
       }
     ]
   },
@@ -3218,7 +3393,7 @@
         "url": "https://www.busan.go.kr/depart/ahwastepolicy09",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
-        "basis": "시 단위 재활용품 분리배출 안내와 하위 '구·군별 배출시간·장소' 메뉴 확인"
+        "basis": "시 단위 재활용품 분리배출 요령 안내. 구·군별 기준은 이 페이지에 없어 거주 구·군 누리집을 따로 확인해야 한다"
       }
     ]
   },
@@ -3405,6 +3580,13 @@
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-14",
         "basis": "읍·면지역과 동지역 배출 방식 차이, 야간 배출 원칙 확인"
+      },
+      {
+        "title": "세종특별자치시 생활쓰레기 수거요일",
+        "url": "https://www.sejong.go.kr/recycle/sub03_01_02.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-20",
+        "basis": "세종시 자원순환 누리집에서 동 지역과 읍·면 지역의 생활폐기물 수거 요일, 수거 횟수, 근무시간, 배출 시각을 표로 안내하는 페이지다."
       }
     ]
   },
