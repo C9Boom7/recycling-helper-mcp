@@ -103,7 +103,7 @@ for (const [gu, regionId, regionName] of TARGETS) {
   const skipped = new Map<string, number>();
   const rerouted: string[] = [];
   for (const row of regionRows) {
-    const verdict = classifyName(row.LAR_WAS_NM);
+    const verdict = classifyName(row.LAR_WAS_NM, "whole_cell");
     if (!verdict.ok) {
       skipped.set(verdict.reason, (skipped.get(verdict.reason) ?? 0) + 1);
       continue;

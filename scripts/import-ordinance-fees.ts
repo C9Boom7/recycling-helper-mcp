@@ -82,7 +82,7 @@ const TARGETS = [
   //   - `chair / 좌식의자, 접의자 / 2,000원`은 `multi_item_name`으로 빠진다.
   //   - 요가매트는 돗자리가 `picnic_mat`으로 제자리를 찾으면서 근거 행을 잃었다.
   //     그 빈자리를 「유아용 놀이매트 2,000원」이 메우고 있었고, 그건 요가매트가
-  //     아니라서 `HEAD_COLLISION_NAMES`로 막았다. 결과적으로 마포 요가매트는 금액이
+  //     아니라서 `HEAD_COLLISION_NAMES_ANY_SPACING`으로 막았다. 결과적으로 마포 요가매트는 금액이
   //     없다 — 조례에 그 품목 행이 없다는 뜻이고, 틀린 값보다는 없는 편이 맞다.
   // R2 검증은 마포 14/14 일치, 불일치 0이었다.
   //
@@ -156,7 +156,7 @@ function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: s
 
   const spec = cleanLabel(row.spec);
   for (const candidate of specNameCandidates(spec)) {
-    const verdict = classifyName(candidate);
+    const verdict = classifyName(candidate, "spec_fragment");
     if (verdict.ok && verdict.itemId !== itemId && hasBulkyRoute(verdict.itemId)) {
       return { ok: false, reason: "spec_names_other_item" };
     }
@@ -165,7 +165,7 @@ function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: s
   if (!row.nameInherited) return { ok: true };
   if (SPEC_LIKE.test(spec)) return { ok: true };
 
-  const specVerdict = classifyName(spec);
+  const specVerdict = classifyName(spec, "whole_cell");
   if (specVerdict.ok && specVerdict.itemId === itemId) return { ok: true };
   return { ok: false, reason: "spec_is_not_a_size" };
 }
@@ -348,7 +348,7 @@ for (const regionId of targets) {
     }
     const itemName = cleanLabel(row.itemName);
     const spec = cleanLabel(row.spec) || "모든 규격";
-    const verdict = classifyName(itemName);
+    const verdict = classifyName(itemName, "whole_cell");
     if (!verdict.ok) {
       note(verdict.reason);
       continue;

@@ -30,24 +30,53 @@ const GROUPS_PATH = "src/data/disposal-groups.json";
  * 그대로 금액이 되어 확신 있는 오답으로 굳는다.
  *
  * 조례에서만 나오는 위험이 둘 더 있어 아래 usableRow에서 따로 막는다.
+ *
+ * 막을 이름은 두 목록으로 나눠 담는다. 표기 그대로 맞추는 쪽이 여기고, 띄어쓰기를
+ * 무시하고 맞추는 쪽이 아래 `HEAD_COLLISION_NAMES_ANY_SPACING`이다.
+ *
+ * ---
+ *
+ * 이쪽은 표에서 실제로 본 철자만 담는다.
+ *
+ * 한때 이 목록도 `normalizeText` 키로 돌렸다가 되돌렸다. 정규화는 「유아용싱크대」처럼
+ * 붙여 쓴 표기를 잡아 주지만, 동시에 **띄어 쓴 멀쩡한 규격 칸까지** 이 목록에 끌어들인다.
+ * 영등포에 「빨래 건조대 / 규격 식기 건조대 / 1,000원」이 저장돼 있는데, `식기 건조대`가
+ * `식기건조대`와 같아지는 순간 `usableRow`의 규격 칸 판정이 `head_collision`을 받아
+ * `spec_is_not_a_size`로 행을 통째로 버린다 — 다음 `pnpm import:ordinance`에서 저장된
+ * 행이 소리 없이 사라진다는 뜻이다.
+ *
+ * 이 목록은 "이 이름으로 품목을 확정하지 마라"는 뜻인데, 규격 칸에서는 그 거부가 곧
+ * 행 삭제로 번역된다. 그래서 넓히는 데 값이 붙는다. 아래 `ANY_SPACING` 쪽만 넓히고
+ * 여기는 확인한 철자만 한 줄씩 적는다.
  */
-// 키는 `normalizeText`를 거친 형태로 담고 검사도 같은 형태로 한다. 원문 그대로 맞추면
-// 띄어쓰기 한 칸에 규칙이 뚫린다 — 표는 같은 이름을 붙여서도 적는다(강서 「유아용카시트」,
-// 강북 「유아카시트」). 아래 목록은 읽기 좋게 띄어 적어 두고 정규화는 코드가 맡는다.
-export const HEAD_COLLISION_NAMES = new Set(
+export const HEAD_COLLISION_NAMES = new Set([
+  "식기건조대",
+  "욕실 수납장",
+  // 붙여 쓴 표기도 같은 물건이라 함께 적는다. 정규화로 뭉뚱그리지 않고 철자마다 한 줄씩
+  // 적는 것이 이 목록의 방식이다.
+  "욕실수납장",
+  "상자",
+  "김치통",
+  "골프채 가방",
+]);
+
+/**
+ * 띄어쓰기와 무관하게 막는 쪽. 키도 검사도 `normalizeText`를 거친 형태로 한다.
+ *
+ * `유아용 X`는 핵심어가 뒤라 수식어 검사를 통과하는데, 물건은 전혀 다르다. 마포
+ * 조례를 넣으며 실제로 새어 나왔다 — `sink_unit`의 **유일한 행**이 「유아용 씽크대 /
+ * 3,000원」이 되어, 주방 싱크대를 물은 사람에게 장난감 싱크대 값이 나갔다.
+ *
+ * 이 계열만 정규화하는 이유는 표마다 붙여 쓰기가 갈리기 때문이다 — 강서 「유아용카시트」,
+ * 강북 「유아카시트」. 원문으로 맞추면 띄어쓰기 한 칸에 규칙이 뚫린다. 반대로 「유아용 X」가
+ * 규격 칸에 오는 행은 `SPEC_LIKE`가 `유아용`을 크기 어휘로 이미 잡아 통과시키므로,
+ * 여기를 정규화해도 위 목록에서 겪은 규격 칸 부작용이 생기지 않는다.
+ *
+ * `유아용`을 통째로 막지는 않는다. 「유아용 침대」는 진짜 침대고 금액도 그 품목의
+ * 것이다. 어느 쪽인지는 물건마다 달라 규칙으로 못 가르므로, 확인한 이름만 적는다.
+ */
+export const HEAD_COLLISION_NAMES_ANY_SPACING = new Set(
   [
-    "식기건조대",
-    "욕실 수납장",
-    "상자",
-    "김치통",
-    "골프채 가방",
-    // `유아용 X`는 핵심어가 뒤라 수식어 검사를 통과하는데, 물건은 전혀 다르다. 마포
-    // 조례를 넣으며 실제로 새어 나왔다 — `sink_unit`의 **유일한 행**이 「유아용 씽크대 /
-    // 3,000원」이 되어, 주방 싱크대를 물은 사람에게 장난감 싱크대 값이 나갔다.
-    //
-    // `유아용`을 통째로 막지는 않는다. 「유아용 침대」는 진짜 침대고 금액도 그 품목의
-    // 것이다. 어느 쪽인지는 물건마다 달라 규칙으로 못 가르므로, 확인한 이름만 적는다.
-    //
     // 표기가 갈리는 것도 각각 적는다. 「씽크대」만 막아 뒀더니 같은 물건이 다른 철자로
     // 그대로 새어 나왔다 — 노원·도봉은 「유아용 싱크대」, 성북은 「유아용 주방씽크대」다.
     "유아용 씽크대",
@@ -184,6 +213,13 @@ const LABEL_PICKS = new Map<string, string>(
  * 수식어 자리가 없고, 여기서만 확정하면 질의 쪽은 아무것도 바뀌지 않는다.
  * `LABEL_PICKS`와 나눠 둔 이유는 사연이 달라서다 — 저쪽은 괄호를 떼면 판정 근거가
  * 사라지는 라벨이고, 이쪽은 표기 자체는 멀쩡한데 질의로 열면 손해가 나는 이름이다.
+ *
+ * **"칸 전체"라는 근거가 성립하는 자리에서만 본다**(`classifyName`의 `source` 인자).
+ * 임포터는 규격 칸도 낱말 단위로 쪼개 `classifyName`에 태우는데, 그 조각은 칸 전체가
+ * 아니라 수식어일 수 있는 낱말이다. 수납함 행의 규격 칸에 「장난감류 정리함」이 오면
+ * 조각 `장난감류`가 여기서 `toy`로 확정되고, 품명과 itemId가 달라 `spec_names_other_item`
+ * 으로 행이 통째로 빠진다 — 전에는 `modifier_position`으로 걸러져 행이 살아 있었다.
+ * 이 표를 만든 목적인 서초 병합 임포트가 바로 그 자리다.
  */
 const IMPORT_ONLY_NAMES = new Map<string, string>(
   (
@@ -236,10 +272,21 @@ export function alsoItemIds(rawName: string, decidedItemId: string): readonly st
   return extra.filter((itemId) => itemId !== decidedItemId);
 }
 
-export function classifyName(rawName: string): Verdict {
+/**
+ * 이 이름이 표의 어느 자리에서 왔는가.
+ *
+ * - `whole_cell` — 품명 칸 전체, 또는 규격 칸 전체. 칸 하나가 곧 품목이라 수식어 자리가 없다.
+ * - `spec_fragment` — 규격 칸을 `specNameCandidates`가 낱말로 쪼갠 조각. 앞뒤에 무엇이
+ *   붙어 있었는지 잃은 상태라, 칸 전체임을 전제하는 규칙(`IMPORT_ONLY_NAMES`)은 걸지 않는다.
+ */
+export type NameSource = "whole_cell" | "spec_fragment";
+
+export function classifyName(rawName: string, source: NameSource): Verdict {
   // 괄호를 떼기 전에 먼저 본다. 떼고 나면 판정 근거가 되는 괄호 내용이 사라진다.
   const normalizedRaw = normalizeText(rawName);
-  const picked = LABEL_PICKS.get(normalizedRaw) ?? IMPORT_ONLY_NAMES.get(normalizedRaw);
+  const picked =
+    LABEL_PICKS.get(normalizedRaw) ??
+    (source === "whole_cell" ? IMPORT_ONLY_NAMES.get(normalizedRaw) : undefined);
   if (picked) return { ok: true, itemId: picked };
 
   // 밑줄은 「품목_조건」을 가르는 표기다 — 관악구 고시명이 그렇다. 「식탁_유리제외」는
@@ -258,7 +305,9 @@ export function classifyName(rawName: string): Verdict {
   // 수식어 검사가, 정말 다른 품목이면 규격 검사가 각각 맡는다.
   if (/[,/·ㆍ]/.test(base)) return { ok: false, reason: "multi_item_name" };
   if (/별도|추가금|추가 요금/.test(named)) return { ok: false, reason: "surcharge_row" };
-  if (HEAD_COLLISION_NAMES.has(normalizeText(base))) return { ok: false, reason: "head_collision" };
+  if (HEAD_COLLISION_NAMES.has(base) || HEAD_COLLISION_NAMES_ANY_SPACING.has(normalizeText(base))) {
+    return { ok: false, reason: "head_collision" };
+  }
 
   const resolved = resolveWasteItem(base);
   if (resolved.status !== "match") return { ok: false, reason: resolved.status };
