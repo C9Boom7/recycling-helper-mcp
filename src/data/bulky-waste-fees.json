@@ -23319,6 +23319,48 @@
         "feeKrw": 8000
       },
       {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "유아용 침대",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "1인용(틀)",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용(틀)",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "1인용 세트 (매트리스1개+틀)",
+        "feeKrw": 10000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "2인용 세트 (매트리스1개+틀)",
+        "feeKrw": 15000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대",
+        "spec": "어린이 2층 침대",
+        "feeKrw": 20000
+      },
+      {
         "itemId": "mattress",
         "category": "bulky",
         "itemName": "토퍼",
@@ -23345,48 +23387,6 @@
         "itemName": "침대",
         "spec": "2인용(매트리스)",
         "feeKrw": 8000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "1인용 세트 (매트리스1개+틀)",
-        "feeKrw": 10000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "2인용 세트 (매트리스1개+틀)",
-        "feeKrw": 15000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "유아용 침대",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "1인용(틀)",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "2인용(틀)",
-        "feeKrw": 7000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대",
-        "spec": "어린이 2층 침대",
-        "feeKrw": 20000
       },
       {
         "itemId": "stone_bed",
@@ -23793,6 +23793,34 @@
         "itemName": "유모차(보행기)",
         "spec": "모든규격",
         "feeKrw": 3000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "인형/ 장난감류",
+        "spec": "소형(3kg당)",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "인형/ 장난감류",
+        "spec": "대형(미끄럼틀/ 놀이집 등)",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "textile_mixed",
+        "itemName": "인형/ 장난감류",
+        "spec": "소형(3kg당)",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "textile_mixed",
+        "itemName": "인형/ 장난감류",
+        "spec": "대형(미끄럼틀/ 놀이집 등)",
+        "feeKrw": 2000
       },
       {
         "itemId": "bicycle",

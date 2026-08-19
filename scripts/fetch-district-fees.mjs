@@ -188,9 +188,9 @@ function parseGangnamTable(html) {
     if (fee === null) continue;
     rows.push({ itemName, spec, feeKrw: fee });
   }
-  // 표가 JS 렌더링으로 바뀌면 0행이 되는데, 그걸 "그 지역엔 쓸 행이 없다"로 읽으면
-  // 커버리지 착시가 된다. 수집 단계에서 경고로 남긴다.
-  if (rows.length === 0) warnings.push("행을 하나도 뽑지 못했다 — 표가 서버 렌더링에서 바뀐 것으로 보인다");
+  // 0행일 때는 경고를 남기지 않는다 — `main()`이 그 전에 "표 없음"으로 세우고
+  // 덤프를 아예 안 써서 warnings가 버려지기 때문이다(도달 불가 코드였다). 실패는
+  // 그쪽에서 이미 시끄럽게 드러나므로, 여기서 조용히 0행을 돌려주면 된다.
   return { rows, warnings };
 }
 

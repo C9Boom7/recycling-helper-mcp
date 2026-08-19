@@ -66,9 +66,25 @@ export const HEAD_COLLISION_NAMES = new Set([
  * `(라텍스 포함)`처럼 다른 낱말에 붙은 `포함`은 걸리지 않도록 낱말 바로 뒤만 본다.
  * `별도`도 같은 뜻인데 빠져 있었다 — 성동구 「침대틀 / 1인용, 매트리스 별도 / 5,000원」이
  * `mattress`로 들어가, 매트리스를 물은 사람이 프레임만의 값을 후보로 받았다.
+ *
+ * **낱말 바로 뒤만 보는 것으로는 부족하다.** 강남 구청 표는 세트를 「1인용 세트
+ * (매트리스1개+틀) / 10,000원」으로 적는데, `매트리스` 뒤에 오는 것이 `1개+틀`이라
+ * 위 `deny`를 그대로 빠져나가 `mattress`로 들어갔다 — 매트리스만 버리려는 사람이
+ * 세트 값 10,000원을 후보로 받는다(실제 1인용 매트리스는 5,000원). 그래서 같은 칸에
+ * **틀·프레임이 함께 적힌 행**도 막는다.
+ *
+ * 막으면 그 행은 원래 자리인 `bed_frame`에 남는다. 버리지 않는 이유는 세트가 실제로
+ * 존재하는 배출 방식이고, 규격 칸이 「1인용 세트 (매트리스1개+틀)」처럼 스스로를 설명해서
+ * 후보 목록에서 프레임만의 값(5,000원)과 구별되기 때문이다. 매트리스 쪽으로 가는 것만
+ * 막으면 리뷰가 짚은 해악 — 매트리스만 버리는 사람이 세트 값을 받는 것 — 은 사라진다.
  */
 export const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?: RegExp }> = [
-  { from: "bed_frame", hint: /매트리스|토퍼/, to: "mattress", deny: /(매트리스|토퍼)\s*[)）]?\s*(제외|미포함|불포함|없음|포함|별도)/ },
+  {
+    from: "bed_frame",
+    hint: /매트리스|토퍼/,
+    to: "mattress",
+    deny: /(매트리스|토퍼)\s*[)）]?\s*(제외|미포함|불포함|없음|포함|별도)|세\s*트|매트리스[^)）]*[+＋]\s*틀|틀\s*[+＋][^)）]*매트리스|프레임/,
+  },
   // 조례는 돌·옥·황토 침대를 「침대」 아래 규격으로 적는다 — 종로 「1인용 돌침대
   // 26,000」, 강북 「돌침대, 전동침대 1인용」, 광진 「1인용 돌, 옥, 황토」. 그대로 두면
   // 돌침대를 물은 사람은 금액을 못 받고, 침대 프레임을 물은 사람은 돌침대 값을 받는다.
@@ -120,6 +136,11 @@ const LABEL_PICKS = new Map<string, string>(
       // 데이터가 그렇게 이어 놨고 `gangnam_large_plastic_storage_box_size_split` 회귀
       // 케이스가 그 결정을 붙들고 있다 — 자동 판정만으로는 상위어라 거부된다.
       ["기타 프라스틱류", "plastic_storage_box"],
+      // 우리 품목 둘을 한 칸에 묶어 적은 라벨. `/` 때문에 아래 `multi_item_name`에서
+      // 거부돼 두 품목이 다 금액을 잃는다 — 강남 toy·stuffed_toy가 4행에서 0행이 됐고,
+      // 처음엔 `ALSO_ITEM_IDS`만 넣었다가 여기서 먼저 걸러지는 걸 못 봐서 죽은 코드가
+      // 됐다. 확정은 toy로 하고 stuffed_toy는 `ALSO_ITEM_IDS`가 겸하게 한다.
+      ["인형/ 장난감류", "toy"],
     ] as const
   ).map(([label, itemId]) => [normalizeText(label), itemId]),
 );
@@ -139,7 +160,8 @@ const LABEL_PICKS = new Map<string, string>(
 const ALSO_ITEM_IDS = new Map<string, readonly string[]>(
   (
     [
-      ["인형/ 장난감류", ["toy", "stuffed_toy"]],
+      // 확정은 `LABEL_PICKS`가 toy로 낸다. 여기서는 겸하는 쪽만 적는다.
+      ["인형/ 장난감류", ["stuffed_toy"]],
       ["돗자리(대자리/놀이매트)", ["yoga_mat"]],
     ] as const
   ).map(([label, ids]) => [normalizeText(label), ids]),
