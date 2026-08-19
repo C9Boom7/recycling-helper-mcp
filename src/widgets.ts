@@ -112,7 +112,13 @@ function regionNodes({ item, regionName, regionNotes, regionFeeLine }: DisposalW
     // complete without one — formatItemGuide adds no region section for them
     // either — and they are a third of the catalogue, so gating on
     // itemNeedsRegionCheck here would put a needless demand on 42 of 130 cards.
-    return itemNeedsCriticalRegionCheck(item) ? [text("거주 지역 기준 확인 필요")] : [];
+    //
+    // 지역을 안 물어도 `regionNotes`가 오는 경우가 하나 있다. 품목 단계가 요일을 말하는데
+    // (`빈 약통`) 그 자리를 닫을 지역 줄이 없을 때, 핸들러가 전국 지역별 안내 링크 한 줄을
+    // 실어 보낸다. 여기서 버리면 카드는 요일을 못 준다고만 하고 어디서 확인하는지는 안
+    // 적는 모양이 된다 — formatItemGuide도 같은 자리에 같은 줄을 세운다.
+    const notes = (regionNotes ?? []).slice(0, MAX_CARD_REGION_NOTES).map((note) => text(stripBullet(note)));
+    return itemNeedsCriticalRegionCheck(item) ? [text("거주 지역 기준 확인 필요"), ...notes] : notes;
   }
 
   // The fee is the one number the user came for. formatRegionItemGuide emits it

@@ -1423,6 +1423,38 @@ export function withCollectionDaySourceLine(line: string, regionMatch?: MatchedR
 }
 
 /**
+ * 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에 따라
+ * 갈리는데 우리가 그 단위까지 확인할 수 없어서다. 문제는 그 다음이었다 — "직접 확인할
+ * 항목"으로만 남기고 **어디서** 확인하는지를 안 적었더니, 호스트 모델이 그 빈자리를
+ * 사용자에게 되묻는 걸로 메웠다("사는 동 이름을 알려주세요"). 그런데 동 이름을 받아도
+ * 우리가 줄 게 없다. 2026-08-19 Preview 측정에서 그 되묻기 뒤 후속 턴이 통째로 웹
+ * 검색으로 샜고, 세 번째 턴은 부동산 커뮤니티 입주민 후기로 답이 나갔다.
+ *
+ * 그래서 못 준다고 말하는 그 자리에서 링크로 닫는다. 이을 줄이 이미 있으면
+ * `withCollectionDaySource`가 거기 잇고, 이을 줄 자체가 없으면 이 문장을 새로 세운다.
+ * 어느 쪽이든 URL이 하나 들어가고, 그건 `scripts/smoke-mcp.mjs`가 지킨다 —
+ * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
+ *
+ * 문장을 여기 두는 건 지역 툴의 체크리스트와 품목 툴의 지역 블록이 같은 말을 하기
+ * 때문이다. 두 곳이 따로 쓰면 한쪽만 고쳐진다.
+ */
+export function collectionDayCheckLine(regionMatch?: MatchedRegionPolicy): string {
+  return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(regionMatch)}`;
+}
+
+/**
+ * 이 본문이 요일을 말해놓고 확인처는 안 주는지. 닫는 줄을 더할지 가르는 판정이다.
+ *
+ * **판정 범위는 호출부가 정한다.** 응답 전체를 넘기면 과녁을 넘는다 — 출처 basis와
+ * 품목 주의사항에 "배출 요일과 장소는 지역별로 확인합니다" 같은 문장이 여럿이라,
+ * 지역을 묻지도 않은 응답마다 링크가 한 줄씩 따라붙는다. 그래서 호출부는 사용자가
+ * 실제로 읽는 본문(품목 단계·주의·지역 안내)까지만 넘긴다.
+ */
+export function needsCollectionDaySource(bodyText: string, regionMatch?: MatchedRegionPolicy): boolean {
+  return mentionsCollectionDay(bodyText) && !hasCollectionDaySource(bodyText, regionMatch);
+}
+
+/**
  * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
  * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
  * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.
@@ -1633,6 +1665,9 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
       ? formatRegionItemGuide(item, regionMatch, { namedSubRegion })
       : [];
   const hasRegionGuide = regionGuideLines.length > 0;
+  // 아래 두 갈래 중 하나라도 열리면 지역 블록의 제목이 이미 찍힌다. 요일을 닫는 줄이
+  // 그 블록에 얹힐지, 제목부터 세워야 할지를 여기서 한 번만 판단한다.
+  const opensRegionSection = needsCriticalRegionCheck || (needsAdvisoryRegionCheck && Boolean(regionMatch));
   const lines = [
     `## ${item.name}`,
     "",
@@ -1677,6 +1712,19 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
         : `- 기본 배출 판단은 위와 같고, ${regionMatch.region.name} 거주지 배출 기준이나 수거함·회수 가능 여부만 맞춰 확인하면 됩니다.`,
     );
     if (hasRegionGuide) lines.push(...regionGuideLines);
+  }
+
+  // 불변식의 마지막 구멍. 참고 등급 품목은 `checkItems`를 렌더하지도
+  // `formatRegionItemGuide`를 타지도 않는데, 품목 단계에는 "플라스틱류 배출 요일과
+  // 장소는 지역 기준을 확인합니다"가 그대로 나간다(빈 약통). 위 두 갈래는 자기가 만든
+  // 문장만 닫아서 이걸 못 잡았다 — 못 준다고 말해놓고 어디서 확인하는지는 안 적는,
+  // 되묻기를 부른 바로 그 모양이다.
+  //
+  // 판정은 여기까지 쌓인 본문으로만 한다. 아래 `근거`까지 넣으면 출처 basis의 요일에
+  // 걸려 지역을 묻지도 않은 응답마다 링크가 따라붙는다.
+  if (needsCollectionDaySource(lines.join("\n"), regionMatch)) {
+    if (!opensRegionSection) lines.push("", "### 지역 참고");
+    lines.push(`- ${collectionDayCheckLine(regionMatch)}`);
   }
 
   lines.push("", "### 근거", ...formatSourceList(item));

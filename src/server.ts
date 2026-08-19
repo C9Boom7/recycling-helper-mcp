@@ -11,7 +11,7 @@ import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-sc
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteItem, WasteMatch } from "./data.js";
 import {
-  collectionDaySourceHint,
+  collectionDayCheckLine,
   confidenceLabel,
   disposalGroupLabel,
   findBulkyWasteFeeRowTotal,
@@ -29,7 +29,6 @@ import {
   formatRegionItemGuide,
   formatRegionSourceList,
   formatUnregisteredDistrictScope,
-  hasCollectionDaySource,
   inferMaterialCategories,
   isBulkySecondaryRoute,
   itemHasBulkyRoute,
@@ -37,7 +36,7 @@ import {
   itemNeedsRegionCheck,
   itemRegionCheckLabel,
   itemRegionGuidance,
-  mentionsCollectionDay,
+  needsCollectionDaySource,
   publicReviewMetadata,
   resolveRegionalPolicy,
   resolveWasteItem,
@@ -329,20 +328,31 @@ function itemTopSources(item: WasteItem, limit = 2): Array<{ title: string; url?
  * text path (formatItemGuide) gates them: only when the item has a
  * region-specific guide or the region check is critical. Advisory-only items
  * get no region lines, keeping "no region noise" responses noise-free.
+ *
+ * 예외는 요일 불변식 하나다. 위젯 응답의 content는 카드 JSON이라 완성된 답변에
+ * 문장을 이어 붙일 자리가 없어서, 요일을 닫는 줄도 여기서 실어야 한다 — 안 그러면
+ * 카드에도 구조화 출력에도 확인처가 없다. 참고 등급인 `빈 약통`이 그랬다.
  */
 function buildRegionNotes(item: WasteItem, regionMatch: MatchedRegionPolicy | undefined, region?: string): string[] | undefined {
-  if (!regionMatch || !itemNeedsRegionCheck(item)) return undefined;
+  if (!itemNeedsRegionCheck(item)) return undefined;
 
-  const hasSpecificGuide = Boolean(findRegionItemGuide(regionMatch.region, item));
-  if (!hasSpecificGuide && !itemNeedsCriticalRegionCheck(item)) return undefined;
-
+  const hasSpecificGuide = Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item));
   // 지역 툴과 같은 갈래. 시·군·구를 이미 댄 사람에게 되묻는 대신 그 이름을 부른다.
   // 줄 수는 그대로다 — 되묻기 한 줄이 이름 부르기 한 줄로 바뀔 뿐이라 카드의
   // 지역 줄 두 개 예산을 밀지 않는다.
-  const lines = formatRegionItemGuide(item, regionMatch, {
-    namedSubRegion: findNamedSubRegionForMatch(regionMatch, region),
-  });
-  return lines.length > 0 ? lines : undefined;
+  const lines =
+    regionMatch && (hasSpecificGuide || itemNeedsCriticalRegionCheck(item))
+      ? formatRegionItemGuide(item, regionMatch, { namedSubRegion: findNamedSubRegionForMatch(regionMatch, region) })
+      : [];
+
+  // 판정 범위는 카드가 실제로 싣는 것 — 품목 단계·주의와 위 지역 줄들이다. 참고 등급
+  // 품목은 지역 줄이 아예 없어 `steps`의 "플라스틱류 배출 요일과 장소는 지역 기준을
+  // 확인합니다" 한 줄만 나가고 있었다. 닫는 줄은 맨 앞에 둔다. 카드는 지역 줄을 두 개까지
+  // 자르는데, 뒤에 붙이면 지역 안내가 긴 품목에서 확인처부터 잘려 나간다.
+  const body = [...item.steps, ...item.cautions, ...lines].join("\n");
+  const notes = needsCollectionDaySource(body, regionMatch) ? [`- ${collectionDayCheckLine(regionMatch)}`, ...lines] : lines;
+
+  return notes.length > 0 ? notes : undefined;
 }
 
 /**
@@ -565,37 +575,9 @@ function ambiguousItemResult(itemName: string, candidates: WasteMatch[]): CallTo
 }
 
 /**
- * 배출 요일·시간은 확정 값으로 싣지 않는다. 같은 구 안에서도 동과 주택 유형에 따라
- * 갈리는데 우리가 그 단위까지 확인할 수 없어서다. 문제는 그 다음이었다 — "직접 확인할
- * 항목"으로만 남기고 **어디서** 확인하는지를 안 적었더니, 호스트 모델이 그 빈자리를
- * 사용자에게 되묻는 걸로 메웠다("사는 동 이름을 알려주세요"). 그런데 동 이름을 받아도
- * 우리가 줄 게 없다. 2026-08-19 Preview 측정에서 그 되묻기 뒤 후속 턴이 통째로 웹
- * 검색으로 샜고, 세 번째 턴은 부동산 커뮤니티 입주민 후기로 답이 나갔다.
- *
- * 그래서 못 준다고 말하는 그 자리에서 링크로 닫는다. 되물을 자리를 없애는 게 목적이라,
- * 지자체 요일 페이지가 있으면 그걸, 없으면 전국 지역별 안내를 붙인다. 어느 쪽이든 이
- * 줄에는 항상 URL이 하나 들어가야 하고, 그건 `scripts/smoke-mcp.mjs`가 지킨다.
- * 타입 검사만으로는 안 잡히니 `pnpm check`가 아니라 `pnpm local:test`로 돌려야 한다.
- *
- * 문구를 만드는 `collectionDaySourceHint`와 붙이는 `withCollectionDaySource`는
- * `data.ts`에 있다. 네 툴이 그 한 구현을 나눠 쓴다 — 판정("이 줄이 요일을 말하나")과
- * 문구를 호출부마다 다시 쓰면 그게 어긋나는 순간 조용히 새고, 실제로 그렇게 샜다.
- *
- * 닫는 자리는 응답을 조립한 뒤가 아니라 **요일을 말하는 문장을 만드는 곳**이다.
- * 완성된 응답 텍스트에 한 번에 거는 쪽을 먼저 봤는데 두 군데서 막힌다.
- * 하나, 위젯 응답의 content는 카드 JSON이라 문장을 이어 붙일 자리가 없다 — 텍스트에만
- * 걸면 카드를 켠 배포에서는 불변식이 통째로 빠진다.
- * 둘, 텍스트에서도 과녁을 넘는다. `근거`에 찍히는 출처 basis와 품목 주의사항에 "배출
- * 요일과 장소는 지역별로 확인합니다" 같은 문장이 여럿 있어서, 지역을 묻지도 않은
- * get_disposal_steps 응답마다 링크가 한 줄씩 따라붙는다.
- * 그래서 네 지점에서 각각 닫되, 판정과 문구는 한 벌만 둔다.
- */
-function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
-  return `일반쓰레기·재활용품 배출 요일과 시간 — 동·주택 유형별로 갈려 이 안내에는 싣지 않습니다. ${collectionDaySourceHint(region)}`;
-}
-
-/**
  * 불변식: **응답이 요일을 언급하면 그 응답 어딘가에 요일 확인처가 있어야 한다.**
+ * 문장과 판정은 `data.ts`가 한 벌만 들고 있다(`collectionDayCheckLine`,
+ * `needsCollectionDaySource`) — 호출부마다 다시 쓰면 어긋나는 순간 조용히 샌다.
  *
  * 체크 항목만 보고 붙이던 게 화근이었다. 지역 요약은 자치구 48곳 모두 "배출 요일과
  * 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다"로 끝나는데, 품목이 붙어
@@ -608,10 +590,14 @@ function collectionDayCheckLine(region?: MatchedRegionPolicy): string {
  * 없으면 여기서 요일 확인 항목을 한 줄 더해 닫는다. 일반 체크리스트를 통째로 되살리지는
  * 않는다 — 좁히기는 의도한 동작이고, 침대를 물은 사람에게 폐형광등 수거함까지 돌려줄
  * 이유는 없다. 요일을 아무 데서도 말하지 않는 응답에는 아무것도 더하지 않는다.
+ *
+ * **판정에는 응답 본문(`answerText`)도 함께 넣는다.** 예전에는 체크 항목만 보고 "아직
+ * 안 닫혔다"고 판단했는데, 그 사이 `formatRegionItemGuide`가 지역 요약 줄에서 직접
+ * 닫게 되면서 이미 확인처가 실린 응답에 체크리스트 줄이 하나 더 붙었다 — 같은 주소가
+ * 한 응답에 두 번 나갔다(강남구 + 뚝배기). 닫혔는지는 응답 전체를 보고 정해야 한다.
  */
 function closeCollectionDayMention(checks: string[], answerText: string, region?: MatchedRegionPolicy): string[] {
-  if (checks.some((check) => hasCollectionDaySource(check, region))) return checks;
-  if (!mentionsCollectionDay(answerText) && !checks.some(mentionsCollectionDay)) return checks;
+  if (!needsCollectionDaySource([...checks, answerText].join("\n"), region)) return checks;
   return [...checks, collectionDayCheckLine(region)];
 }
 

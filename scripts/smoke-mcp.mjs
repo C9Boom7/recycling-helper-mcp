@@ -942,8 +942,9 @@ async function runSmoke() {
       { region: "세종시", contains: "sub03_01_02.do" },
       { region: "고양시", contains: "www03_3_3_tab1.jsp", absent: "clean.gys.or.kr" },
       // 요일 안내가 없는 페이지를 요일 출처로 잡고 있던 곳. 구로구 청소행정서비스헌장은
-      // 배출시간·수거시간 표만 있고 요일은 "변경되면 알려드리겠다"는 문장에만 나온다 —
+      // 배출·수거 시각 표만 있고 요일은 "변경되면 알려드리겠다"는 문장에만 나온다 —
       // 요일을 물은 사람을 답 없는 페이지로 보내느니 전국 안내로 닫는 편이 낫다.
+      // 페이지 자체는 유효해서 `공식 확인처` 목록에는 남아 있다. 요일 확인처로만 안 뽑힌다.
       { region: "서울 구로구", contains: "region.do", absent: "contents.do?key=1649" },
       // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다. 용인은 시 누리집에 일반
       // 생활쓰레기 요일 안내가 없다는 걸 2026-08-20에 확인했다 — 검색에 뜨는 구별
@@ -968,6 +969,17 @@ async function runSmoke() {
         `${region}: 요일 확인처로 대형폐기물 페이지("${absent}")가 잡혔다: "${dayLine}"`,
       );
     }
+
+    // 요일 확인처로 안 뽑히는 것과 출처 목록에서 지우는 것은 다른 이야기다. 구로구
+    // 청소행정서비스헌장은 배출·수거 시각 표를 가진 유일한 구로구 페이지라 확인처로는
+    // 값이 있는데, basis만 고치겠다고 해놓고 항목을 통째로 지운 적이 있다.
+    const guroAnswer = resultText(
+      await callTool(baseUrl, "get_region_disposal_info", { region: "서울 구로구" }, requestId++),
+    );
+    assert(
+      guroAnswer.includes("guro.go.kr/www/contents.do?key=1649"),
+      "구로구 청소행정서비스헌장이 공식 확인처에서 사라졌다 — 요일 확인처로 안 뽑는 것과 출처를 지우는 것은 다르다",
+    );
 
     // 품목이 붙으면 체크리스트가 그 품목으로 좁혀진다. 좁히는 건 의도지만, 되묻기를
     // 부르는 질문은 오히려 이쪽이 흔하다("강남구 오피스텔은 비닐봉지 목요일 배출 맞아?").
@@ -1059,6 +1071,50 @@ async function runSmoke() {
       ),
       `get_disposal_steps 뚝배기+강남구: regionNotes의 요일 줄에 확인처가 없다: ${JSON.stringify(stepsSummaryResult.structuredContent?.regionNotes)}`,
     );
+
+    // 마지막 구멍은 **참고 등급** 품목이었다. `빈 약통`은 checkItems를 렌더하지도
+    // `formatRegionItemGuide`를 타지도 않는데, 품목 단계에 "플라스틱류 배출 요일과 장소는
+    // 지역 기준을 확인합니다"가 그대로 나간다. 위 required 갈래만 닫아 두면 통과해 버린다.
+    const advisoryDayResult = await callTool(
+      baseUrl,
+      "get_disposal_steps",
+      { itemName: "약병", region: "서울 강남구" },
+      requestId++,
+    );
+    const advisoryDayAnswer = resultText(advisoryDayResult);
+    assert(
+      mentionsDay(advisoryDayAnswer),
+      "get_disposal_steps 약병+강남구: 응답이 요일을 아예 말하지 않는다 — 품목 단계가 바뀌었으면 요일을 말하는 다른 참고 등급 품목으로 갈아 끼운다",
+    );
+    assert(
+      advisoryDayAnswer.includes("www.gangnam.go.kr"),
+      `get_disposal_steps 약병+강남구: 요일을 말해놓고 확인처가 응답 어디에도 없다:\n${advisoryDayAnswer}`,
+    );
+    // 위젯 응답의 content는 카드 JSON이라 문장을 이어 붙일 자리가 없다. 이 줄이
+    // regionNotes로 안 나가면 카드를 켠 배포에서는 확인처가 통째로 빠진다.
+    assert(
+      (advisoryDayResult.structuredContent?.regionNotes ?? []).some(
+        (note) => typeof note === "string" && note.includes("요일") && note.includes("www.gangnam.go.kr"),
+      ),
+      `get_disposal_steps 약병+강남구: regionNotes에 요일 확인처가 없다 — 카드에도 구조화 출력에도 링크가 안 실린다: ${JSON.stringify(advisoryDayResult.structuredContent?.regionNotes)}`,
+    );
+
+    // 닫는 건 한 번만. 확인처를 붙이는 자리가 늘면서 이미 닫힌 응답에 체크리스트 줄이
+    // 하나 더 붙어, 같은 주소가 한 응답에 두 번 나갔다(지역 요약 줄 + 확인할 정보 줄).
+    // 판정은 체크 항목이 아니라 응답 전체를 보고 해야 한다.
+    for (const args of [
+      { region: "서울 강남구", itemName: "뚝배기" },
+      { region: "서울 강남구", itemName: "침대" },
+      { region: "서울 강남구" },
+      { region: "서울 구로구" },
+    ]) {
+      const answer = resultText(await callTool(baseUrl, "get_region_disposal_info", args, requestId++));
+      const hints = answer.split("확인하세요 (http").length - 1;
+      assert(
+        hints === 1,
+        `get_region_disposal_info ${JSON.stringify(args)}: 요일 확인처 문구가 ${hints}번 나온다 (기대 1번)\n${answer}`,
+      );
+    }
 
     // 남은 두 툴. 참고 등급 품목에 붙는 "실제 배출 요일·장소나 …" 한 줄이 링크 없이
     // 나가고 있었다 — 같은 사람이 툴만 갈아타면 되묻기가 그대로 살아나는 자리다.
