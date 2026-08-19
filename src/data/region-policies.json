@@ -98,7 +98,10 @@
         "배출 3일 전까지 사전 신청합니다.",
         "접수증을 출력해 부착하거나 접수번호를 수기로 기재해 품목별로 부착합니다."
       ],
-      "phone": "1522-3833"
+      "phone": "1522-3833",
+      "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02010000.do",
+      "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
+      "contactCheckedAt": "2026-07-02"
     },
     "smallElectronics": {
       "method": [
@@ -822,7 +825,10 @@
         "신고·수수료 납부 후 접수 정보 또는 배출증을 부착해 배출합니다.",
         "품목과 수거일은 동별 수거업체 또는 구청 안내를 확인합니다."
       ],
-      "phone": "02-2155-6720"
+      "phone": "02-2155-6720",
+      "applicationUrl": "https://www.seocho.go.kr/site/seocho/ex/bigWaste/BigWasteUserFStart.do",
+      "feeUrl": "https://www.seocho.go.kr/site/seocho/01/10103070301002018030701.jsp",
+      "contactCheckedAt": "2026-07-02"
     },
     "smallElectronics": {
       "method": [
@@ -1144,7 +1150,10 @@
         "수거는 배출일 기준 익일부터 1~2일 내 진행될 수 있으며 지연될 수 있습니다.",
         "빼기 앱을 통한 대형폐기물 모바일 간편 배출도 안내되어 있습니다."
       ],
-      "phone": "02-2147-6380"
+      "phone": "02-2147-6380",
+      "applicationUrl": "https://smartclean.songpa.go.kr/online/bulky/request",
+      "feeUrl": "https://smartclean.songpa.go.kr/online/bulky/item",
+      "contactCheckedAt": "2026-07-02"
     },
     "smallElectronics": {
       "method": [
@@ -1459,7 +1468,10 @@
         "대형생활폐기물은 지정 배출일 익일 09:00~15:00에 수거하며, 토요일·일요일 및 공휴일은 미수거로 안내되어 있습니다.",
         "대형폐가전은 1599-0903 또는 e순환거버넌스 무료 방문수거 대상 여부를 먼저 확인합니다."
       ],
-      "phone": "02-3153-9200"
+      "phone": "02-3153-9200",
+      "applicationUrl": "https://www.mapo.go.kr/site/main/content/mapo05060506",
+      "feeUrl": "https://www.mapo.go.kr/site/main/content/mapo05060502",
+      "contactCheckedAt": "2026-07-03"
     },
     "smallElectronics": {
       "method": [

@@ -8879,5 +8879,24 @@
     "expectedStructuredIncludes": [
       "\"id\":\"microwave\""
     ]
+  },
+  {
+    "id": "cleanup_plan_mapo_bed_frame_fee",
+    "tool": "make_cleanup_plan",
+    "arguments": {
+      "items": [
+        "침대",
+        "화분"
+      ],
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "침대 -> 침대 프레임",
+      "수수료 2,000원~20,000원",
+      "대형폐기물에 해당할 때만 수수료 1,000원~1,500원"
+    ],
+    "expectedStructuredIncludes": [
+      "\"fee\":\"수수료 2,000원~20,000원"
+    ]
   }
 ]
