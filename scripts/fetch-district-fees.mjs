@@ -35,6 +35,7 @@ const USER_AGENT =
  * - `sdm_table`: 서대문 폐기물 규격 페이지. 서버가 그린 HTML 표.
  * - `sd_popup`: 성동 부과기준표 팝업. **금액이 행 머리**이고 품목이 그 아래 묶인다.
  * - `guro_list`: 구로 처리비용. 분류별로 페이지가 갈리고 서버가 그린 표다.
+ * - `gn_table`: 강남 자원순환 종합포털. 서버가 그린 4열 표이고 셀에 열 이름 접두어가 붙는다.
  */
 export const TARGETS = [
   { regionId: "seongbuk_gu", name: "서울 성북구", kind: "smartclean", url: "https://smartclean.sb.go.kr/online/bulky/item" },
@@ -43,6 +44,10 @@ export const TARGETS = [
   { regionId: "seodaemun_gu", name: "서울 서대문구", kind: "sdm_table", url: "https://www.sdm.go.kr/civil/print/waste/standards.do" },
   { regionId: "seongdong_gu", name: "서울 성동구", kind: "sd_popup", url: "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html" },
   { regionId: "guro_gu", name: "서울 구로구", kind: "guro_list", url: "https://www.guro.go.kr/www/costList.do?key=3412" },
+  // 강남구(2026-08-19). 골든셋 수기 19행을 이 표로 갈아탄다 — 조례 트랙은 좌우 2단
+  // 조판에서 침대 규격을 TV에 붙여 놓고 침대 품목은 한 행도 못 잡았다. `parseGangnamTable`
+  // 주석에 실제로 나온 오행을 적어 뒀다.
+  { regionId: "gangnam_gu", name: "서울 강남구", kind: "gn_table", url: "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do" },
 ];
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -157,6 +162,55 @@ function parseSdmTable(html) {
 }
 
 /**
+ * 강남구 자원순환 종합포털 수수료표. 서버가 그린 `종류|품목|규격|수수료(원)` 4열이다.
+ *
+ * 조례 트랙을 쓰지 않는 이유가 여기 있다. 강남 별표는 좌우 2단 조판이라 순차 텍스트로
+ * 펴면 열이 어긋난다 — 침대 규격이 통째로 TV 품목에 붙어 「텔레비전 / 유아용 침대
+ * 3,000원」·「TV받침일체형 / 2인용 돌침대 세트 30,000원」이 나왔고, 정작 침대 품목은
+ * 한 행도 안 잡혔다. 이 표는 품목·규격이 이미 갈려 있어 그 갈래가 아예 없다.
+ * 「침대 / 1인용(틀) / 5,000원」이 그대로 읽힌다.
+ *
+ * 셀 텍스트가 `품목: 침대`처럼 열 이름을 접두어로 달고 나온다(좁은 화면용 라벨이
+ * 텍스트로 같이 들어온다). 접두어를 떼지 않으면 품명 판정이 통째로 `not_found`가 된다.
+ */
+function parseGangnamTable(html) {
+  const rows = [];
+  const warnings = [];
+  // `품목: 침대` → `침대`. 콜론이 없는 표로 바뀌어도 그대로 통과한다.
+  const strip = (text) => String(text ?? "").replace(/^[^:：]{1,10}[:：]\s*/, "").trim();
+  // 셀이 하나라도 있는 행을 먼저 센다. 아래에서 버리는 행이 몇인지 알아야
+  // **부분** 누락을 잡을 수 있다 — 0행일 때만 실패로 잡히면 종류 열에 rowspan이
+  // 붙어 대부분이 3칸이 되는 순간 136행이 조용히 한 줌으로 줄어든다. 그때도 0은
+  // 아니라서 `main()`의 빈 결과 가드도, 임포터의 `rows.length === 0` 가드도 안 운다.
+  // `parseSmartclean`이 같은 이유로 후보를 먼저 센다.
+  let candidates = 0;
+  for (const cells of tableRows(html)) {
+    if (cells.length === 0) continue;
+    const itemName = strip(cells[1] ?? "");
+    // 머리글 행. 접두어를 뗀 뒤에도 열 이름만 남는다. 후보로도 세지 않는다.
+    if (/^(품목|종류|규격|수수료)/.test(itemName)) continue;
+    candidates += 1;
+    if (cells.length < 4) continue;
+    if (!itemName) continue;
+    const spec = strip(cells[2]);
+    const fee = toKrw(strip(cells[3]));
+    if (fee === null) continue;
+    rows.push({ itemName, spec, feeKrw: fee });
+  }
+  // 0행일 때는 경고를 남기지 않는다 — `main()`이 그 전에 "표 없음"으로 세우고
+  // 덤프를 아예 안 써서 warnings가 버려지기 때문이다(도달 불가 코드였다). 실패는
+  // 그쪽에서 이미 시끄럽게 드러나므로, 여기서 조용히 0행을 돌려주면 된다.
+  //
+  // 채택률에 바닥을 두는 건 다르다. 실측은 213행 중 136행(64%)인데, 그 격차는
+  // 무상수거·안내 행이라 정상이다. 절반 아래로 떨어지면 표 구조가 바뀐 쪽을 먼저
+  // 의심해야 한다 — 이건 덤프를 쓰고 나서도 남는 경고라 다음 사람이 본다.
+  if (rows.length > 0 && rows.length * 2 < candidates) {
+    warnings.push(`후보 ${candidates}행 중 ${rows.length}행만 읽었다 — 열 구조가 바뀌었는지 확인해라`);
+  }
+  return { rows, warnings };
+}
+
+/**
  * 성동은 **금액이 행 머리**고 품목이 그 아래 `<ul class="bu"><li>`로 묶인다.
  * 「3,000원 | <li>난로</li><li>문짝</li>… 」 형태라, 금액을 이어받아 `li` 하나를
  * 한 행으로 편다. 태그를 먼저 지우면 품목이 전부 한 덩어리가 되므로 `li`를
@@ -251,6 +305,7 @@ async function collect(target) {
   const html = await fetchText(target.url);
   if (target.kind === "smartclean") return parseSmartclean(html);
   if (target.kind === "sdm_table") return parseSdmTable(html);
+  if (target.kind === "gn_table") return parseGangnamTable(html);
   if (target.kind === "sd_popup") return parseSdPopup(html);
   throw new Error(`모르는 kind: ${target.kind}`);
 }

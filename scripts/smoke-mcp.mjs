@@ -842,18 +842,23 @@ async function runSmoke() {
     );
     requestId += 2;
 
-    // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 강남구 고시에는 의자 행은 있고 옷장
-    // 행은 없는데, 예전에는 "금액이 하나라도 있으면" 수수료 확인 문구가 통째로 사라져
-    // 옷장까지 값이 확인된 것처럼 읽혔다.
+    // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
+    // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.
+    //
+    // 픽스처는 강남에 행이 있는 품목(의자) + 없는 품목(여행용 캐리어)이다. 없는 쪽은
+    // **주 배출로가 대형폐기물인** 품목이어야 한다 — 텐트처럼 「일반쓰레기/대형폐기물」인
+    // 보조 배출로는 애초에 조건부라 이 문구를 안 부른다(그게 맞는 동작이다). 처음엔 옷장을
+    // 썼는데 강남이 구청 표로 갈아타며 장롱 행이 들어와 조건이 깨졌다 — 아래 단언이 깨지면
+    // 데이터가 그 품목을 얻은 것이니, 그때는 여전히 행이 없는 주-대형폐기물 품목으로 갈아 끼운다.
     const cleanupPartialFee = await callTool(
       baseUrl,
       "make_cleanup_plan",
-      { items: ["책상의자", "옷장"], region: "서울 강남구" },
+      { items: ["책상의자", "여행용 캐리어"], region: "서울 강남구" },
       requestId,
     );
     assert(
       resultText(cleanupPartialFee).includes("금액을 적지 못한 대형폐기물 품목의 수수료"),
-      `a bulky item with no fee row must keep its fee-check instruction: ${resultText(cleanupPartialFee)}`,
+      `a bulky item with no fee row must keep its fee-check instruction — swap the fee-less fixture item if 강남 gained a row: ${resultText(cleanupPartialFee)}`,
     );
     requestId += 1;
 

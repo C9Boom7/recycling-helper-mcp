@@ -23,6 +23,7 @@ import type { BulkyWasteFee, BulkyWasteFeeSchedule, RegionalPolicyData } from ".
 import { TARGETS as FETCH_TARGETS } from "./fetch-district-fees.mjs";
 import {
   SPLIT_HINTS,
+  alsoItemIds,
   classifyName,
   cleanLabel,
   hasBulkyRoute,
@@ -158,9 +159,14 @@ for (const regionId of targets) {
       continue;
     }
 
-    const list = grouped.get(itemId) ?? [];
-    list.push({ itemId, category: itemCategory(itemId), itemName, spec, feeKrw: row.feeKrw });
-    grouped.set(itemId, list);
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 하나만 남기면 나머지 품목은
+    // 금액을 통째로 잃는다 — 강남에서 요가매트·인형·장난감이 그랬다.
+    for (const target of [itemId, ...alsoItemIds(itemName, itemId)]) {
+      if (!hasBulkyRoute(target)) continue;
+      const list = grouped.get(target) ?? [];
+      list.push({ itemId: target, category: itemCategory(target), itemName, spec, feeKrw: row.feeKrw });
+      grouped.set(target, list);
+    }
   }
 
   const fees: BulkyWasteFee[] = [];

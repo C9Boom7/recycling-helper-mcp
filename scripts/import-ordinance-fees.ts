@@ -18,6 +18,7 @@ import type { BulkyWasteFee, BulkyWasteFeeSchedule, RegionalPolicyData } from ".
 import {
   SPEC_LIKE,
   SPLIT_HINTS,
+  alsoItemIds,
   classifyName,
   cleanLabel,
   hasBulkyRoute,
@@ -97,8 +98,13 @@ const TARGETS = [
   // - **강남·송파**: 파서가 좌우 2단 조판에서 아직 열을 놓쳐, 골든셋 69행 **바깥**
   //   행의 품명이 어긋난다. 강남은 침대 금액이 「텔레비전 / 유아용 침대 3,000원」처럼
   //   TV에 붙고 정작 침대틀 행은 하나도 안 잡히며, 송파는 「TV / 가스 레인지 = 0」류가
-  //   42행이다. 지금 넣으면 TV를 물은 사람이 돌침대 값을 받는다. 이 둘은 수기 데이터를
-  //   그대로 둬 파서를 대조할 독립 기준으로 남긴다(`GOLDEN_TARGETS` 주석 참고).
+  //   42행이다. 지금 넣으면 TV를 물은 사람이 돌침대 값을 받는다.
+  //
+  //   **강남은 그 뒤 구청 표 트랙으로 갈아탔다**(`fetch-district-fees.mjs`의 `gn_table`).
+  //   조례 파서는 그대로라 여기서는 여전히 대상이 아니고, 대조 기준에서도 빠졌다 —
+  //   출처가 달라 금액이 갈리는 게 정상이기 때문이다. 이 주석을 믿고 강남을
+  //   `GOLDEN_TARGETS`에 되돌리면 R2가 헛되이 깨진다. 수기 데이터로 남아 파서를
+  //   대조하는 건 **서초·송파뿐**이다(`GOLDEN_TARGETS` 주석 참고).
   //
   // 원문은 `pnpm fees:fetch mapo_gu`로 받는다. 골든셋에서 뺐으니 `fees:verify`는
   // 마포를 인자로 받지 않는다 — 한동안 이 자리에 그 명령이 적혀 있었고, 둘 다 exit 1이라
@@ -374,15 +380,21 @@ for (const regionId of targets) {
       continue;
     }
 
-    const list = grouped.get(itemId) ?? [];
-    list.push({
-      itemId,
-      category: itemCategory(itemId),
-      itemName,
-      spec,
-      feeKrw: row.feeKrw,
-    });
-    grouped.set(itemId, list);
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 구청 트랙만 이걸 하고 있어서
+    // 트랙마다 답이 갈렸다 — 마포 조례에 「돗자리 1m²당 1,000원」이 있는데도 요가매트가
+    // 금액을 통째로 잃었고, 같은 라벨을 구청 표로 받은 강남은 요가매트를 지켰다.
+    for (const target of [itemId, ...alsoItemIds(itemName, itemId)]) {
+      if (!hasBulkyRoute(target)) continue;
+      const list = grouped.get(target) ?? [];
+      list.push({
+        itemId: target,
+        category: itemCategory(target),
+        itemName,
+        spec,
+        feeKrw: row.feeKrw,
+      });
+      grouped.set(target, list);
+    }
   }
 
   const fees: BulkyWasteFee[] = [];
