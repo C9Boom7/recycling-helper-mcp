@@ -1,9 +1,9 @@
 /**
  * 자치법규 별표 → `src/data/bulky-waste-fees.json` 인제스트 (Phase 6 R3).
  *
- * Phase 6 조례 트랙 10곳만 대상으로 한다. 용산·노원·강서·관악은 공공데이터포털
- * 표준데이터 트랙이 `scripts/import-bulky-fees.ts`로 넣고, 골든셋 4곳
- * (강남·서초·송파·마포)은 기존 수기 데이터를 그대로 둔다.
+ * Phase 6 조례 트랙 10곳 + 마포를 대상으로 한다. 용산·노원·강서·관악은 공공데이터포털
+ * 표준데이터 트랙이 `scripts/import-bulky-fees.ts`로 넣고, 골든셋에 남은 셋
+ * (강남·서초·송파)은 기존 수기 데이터를 그대로 둔다.
  *
  * 사전 준비:
  *   1. pnpm fees:fetch [regionId...]   (조례 별표 수집 → data/ordinance-raw/)
@@ -56,7 +56,14 @@ const REGIONS_PATH = "src/data/region-policies.json";
  */
 const MAX_FEE_ROWS = 12;
 
-/** Phase 6 조례 트랙 10곳. 여기 없는 지역은 인자로 줘도 받지 않는다. */
+/**
+ * 조례 원문을 `fees:fetch`가 아니라 `fees:verify`로 받는 지역. 골든셋 목록에 있어서
+ * 수집 스크립트의 TARGETS에는 없다. 마포는 여기 데이터를 쓰면서도 대조 기준에서는
+ * 빠져 있어(자기 충족을 막으려고) 이 목록으로 따로 표시한다.
+ */
+const GOLDEN_SOURCED = new Set(["mapo_gu"]);
+
+/** Phase 6 조례 트랙 10곳 + 마포. 여기 없는 지역은 인자로 줘도 받지 않는다. */
 const TARGETS = [
   "seongnam_si",
   "jongno_gu",
@@ -73,10 +80,17 @@ const TARGETS = [
   "jung_gu",
   "dongdaemun_gu",
   // 골든셋 4곳 중 **마포만** 연다(2026-08-19). 수기 14행은 Top 50 범위로만 추린
-  // 것이라 이사에서 제일 흔한 침대 프레임조차 없었다. 조례 214행을 넣으니 품목이
-  // 7→73개가 되고 「1인용 침대틀(서랍별도) 4,000원」이 들어오는데, **잃는 행이
-  // 하나도 없다** — 수기 14행이 전부 같은 금액으로 되살아난다(라벨만 조례 표기로
-  // 바뀐다). R2 검증도 마포는 14/14 일치, 불일치 0이었다.
+  // 것이라 이사에서 제일 흔한 침대 프레임조차 없었다. 조례 214행을 넣으면 품목이
+  // 7→73개가 되고 「1인용 침대틀(서랍별도) 4,000원」이 들어온다.
+  //
+  // 다만 **공짜는 아니다.** 처음엔 "잃는 행이 하나도 없다"고 적었는데 14행 중 2행에서
+  // 틀렸다. 검증을 itemId 단위로만 해서 "같은 품목 안에서 값이 바뀐" 경우를 못 봤다.
+  //   - `chair / 좌식의자, 접의자 / 2,000원`은 `multi_item_name`으로 빠진다.
+  //   - 요가매트는 돗자리가 `picnic_mat`으로 제자리를 찾으면서 근거 행을 잃었다.
+  //     그 빈자리를 「유아용 놀이매트 2,000원」이 메우고 있었고, 그건 요가매트가
+  //     아니라서 `HEAD_COLLISION_NAMES`로 막았다. 결과적으로 마포 요가매트는 금액이
+  //     없다 — 조례에 그 품목 행이 없다는 뜻이고, 틀린 값보다는 없는 편이 맞다.
+  // R2 검증은 마포 14/14 일치, 불일치 0이었다.
   //
   // 나머지 셋은 각각 다른 이유로 뺀다.
   //
@@ -277,7 +291,11 @@ for (const regionId of targets) {
     // 인자 없이 전체를 돌릴 때는 준비된 지역까지 함께 막을 이유가 없다 — 원문은
     // gitignore 대상이라 한 배치씩 받아 넣는 게 정상 흐름이다.
     if (requested.length > 0) {
-      console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 pnpm fees:fetch ${regionId}`);
+      // 골든셋 출신은 `fees:fetch`가 안 받는다(그쪽 TARGETS가 아니라 GOLDEN_TARGETS에
+      // 있다). 되는 명령을 그대로 찍는다 — 안 되는 명령을 안내하면 다음 사람이 그
+      // 오류부터 디버깅한다.
+      const fetchHint = GOLDEN_SOURCED.has(regionId) ? `pnpm fees:verify ${regionId}` : `pnpm fees:fetch ${regionId}`;
+      console.error(`${regionId}: ${RAW_DIR}/${regionId}.json이 없다 — 먼저 ${fetchHint}`);
       process.exit(1);
     }
     missing.push(regionId);

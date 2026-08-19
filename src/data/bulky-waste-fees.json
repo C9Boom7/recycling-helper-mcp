@@ -22856,20 +22856,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "sink_unit",
-        "category": "bathroom_fixture",
-        "itemName": "유아용 씽크대",
-        "spec": "일반",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "rubber_or_pvc_mat",
-        "itemName": "유아용 놀이매트",
-        "spec": "1m²당",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "bed_frame",
         "category": "bulky",
         "itemName": "침대",
