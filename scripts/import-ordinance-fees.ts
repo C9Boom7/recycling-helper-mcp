@@ -18,6 +18,7 @@ import type { BulkyWasteFee, BulkyWasteFeeSchedule, RegionalPolicyData } from ".
 import {
   SPEC_LIKE,
   SPLIT_HINTS,
+  alsoItemIds,
   classifyName,
   cleanLabel,
   hasBulkyRoute,
@@ -379,15 +380,21 @@ for (const regionId of targets) {
       continue;
     }
 
-    const list = grouped.get(itemId) ?? [];
-    list.push({
-      itemId,
-      category: itemCategory(itemId),
-      itemName,
-      spec,
-      feeKrw: row.feeKrw,
-    });
-    grouped.set(itemId, list);
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 구청 트랙만 이걸 하고 있어서
+    // 트랙마다 답이 갈렸다 — 마포 조례에 「돗자리 1m²당 1,000원」이 있는데도 요가매트가
+    // 금액을 통째로 잃었고, 같은 라벨을 구청 표로 받은 강남은 요가매트를 지켰다.
+    for (const target of [itemId, ...alsoItemIds(itemName, itemId)]) {
+      if (!hasBulkyRoute(target)) continue;
+      const list = grouped.get(target) ?? [];
+      list.push({
+        itemId: target,
+        category: itemCategory(target),
+        itemName,
+        spec,
+        feeKrw: row.feeKrw,
+      });
+      grouped.set(target, list);
+    }
   }
 
   const fees: BulkyWasteFee[] = [];

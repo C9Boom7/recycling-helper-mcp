@@ -1507,6 +1507,21 @@
     ]
   },
   {
+    "id": "mapo_yoga_mat_fee_from_ordinance",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "요가매트 버리려면?",
+      "region": "서울 마포구"
+    },
+    "expectedTextIncludes": [
+      "요가매트",
+      "돗자리 1m²당: 1,000원"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"yoga_mat\""
+    ]
+  },
+  {
     "id": "gangnam_yoga_mat_not_blanket",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -4228,8 +4243,8 @@
     "expectedTextIncludes": [
       "책상의자 -> 의자",
       "화분 -> 화분",
-      "수수료 2,000원~5,000원 (규격 4종, 2026-08-18 확인)",
-      "대형폐기물에 해당할 때만 수수료 1,000원~2,000원 (규격 2종, 2026-08-18 확인). 그 외에는 위 배출 방법을 따릅니다.",
+      "수수료 2,000원~5,000원 (규격 4종, 2026-08-19 확인)",
+      "대형폐기물에 해당할 때만 수수료 1,000원~2,000원 (규격 2종, 2026-08-19 확인). 그 외에는 위 배출 방법을 따릅니다.",
       "서울 강남구의 대형폐기물 신고 절차와 전용 수거함 위치, 공식 확인처도 이어서 안내할 수 있습니다."
     ],
     "expectedTextExcludes": [

@@ -178,19 +178,35 @@ function parseGangnamTable(html) {
   const warnings = [];
   // `품목: 침대` → `침대`. 콜론이 없는 표로 바뀌어도 그대로 통과한다.
   const strip = (text) => String(text ?? "").replace(/^[^:：]{1,10}[:：]\s*/, "").trim();
+  // 셀이 하나라도 있는 행을 먼저 센다. 아래에서 버리는 행이 몇인지 알아야
+  // **부분** 누락을 잡을 수 있다 — 0행일 때만 실패로 잡히면 종류 열에 rowspan이
+  // 붙어 대부분이 3칸이 되는 순간 136행이 조용히 한 줌으로 줄어든다. 그때도 0은
+  // 아니라서 `main()`의 빈 결과 가드도, 임포터의 `rows.length === 0` 가드도 안 운다.
+  // `parseSmartclean`이 같은 이유로 후보를 먼저 센다.
+  let candidates = 0;
   for (const cells of tableRows(html)) {
+    if (cells.length === 0) continue;
+    const itemName = strip(cells[1] ?? "");
+    // 머리글 행. 접두어를 뗀 뒤에도 열 이름만 남는다. 후보로도 세지 않는다.
+    if (/^(품목|종류|규격|수수료)/.test(itemName)) continue;
+    candidates += 1;
     if (cells.length < 4) continue;
-    const itemName = strip(cells[1]);
+    if (!itemName) continue;
     const spec = strip(cells[2]);
     const fee = toKrw(strip(cells[3]));
-    // 머리글 행. 접두어를 뗀 뒤에도 열 이름만 남는다.
-    if (/^(품목|종류|규격|수수료)/.test(itemName) || !itemName) continue;
     if (fee === null) continue;
     rows.push({ itemName, spec, feeKrw: fee });
   }
   // 0행일 때는 경고를 남기지 않는다 — `main()`이 그 전에 "표 없음"으로 세우고
   // 덤프를 아예 안 써서 warnings가 버려지기 때문이다(도달 불가 코드였다). 실패는
   // 그쪽에서 이미 시끄럽게 드러나므로, 여기서 조용히 0행을 돌려주면 된다.
+  //
+  // 채택률에 바닥을 두는 건 다르다. 실측은 213행 중 136행(64%)인데, 그 격차는
+  // 무상수거·안내 행이라 정상이다. 절반 아래로 떨어지면 표 구조가 바뀐 쪽을 먼저
+  // 의심해야 한다 — 이건 덤프를 쓰고 나서도 남는 경고라 다음 사람이 본다.
+  if (rows.length > 0 && rows.length * 2 < candidates) {
+    warnings.push(`후보 ${candidates}행 중 ${rows.length}행만 읽었다 — 열 구조가 바뀌었는지 확인해라`);
+  }
   return { rows, warnings };
 }
 
