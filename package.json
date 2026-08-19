@@ -21,7 +21,7 @@
     "backlog:auto": "node scripts/auto-backlog-queries.mjs",
     "backlog:auto:quality": "node scripts/auto-backlog-queries.mjs --input logs/quality-seed-queries.example.jsonl --region \"서울 강남구\"",
     "log:query": "node scripts/log-query.mjs",
-    "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && tsx scripts/evaluate-data.ts && tsx scripts/test-region-matching.ts",
+    "check": "tsc --noEmit && tsc -p tsconfig.scripts.json && node scripts/validate-data.mjs && tsx scripts/evaluate-data.ts && tsx scripts/test-region-matching.ts && tsx scripts/test-item-classification.ts",
     "smoke:mcp": "pnpm build && node scripts/smoke-mcp.mjs",
     "local:test": "pnpm check && pnpm smoke:mcp",
     "import:fees": "tsx scripts/import-bulky-fees.ts",
