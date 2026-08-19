@@ -135,6 +135,15 @@ function mentionsDay(answerText) {
   return answerText.includes("요일");
 }
 
+// 요일 확인처가 전국 안내로 내려갔는지 가르는 주소. 지자체 페이지로 닫혔으면 이 주소가 없다.
+const NATIONAL_DAY_FALLBACK_URL = "region.do";
+
+// 자기 지자체 요일 페이지로 닫히는 지역 수. 이 숫자를 박아 두는 건 **출처를 넣었는데
+// 선택이 안 되는** 누락이 조용해서다 — 용산구는 요일 안내가 있는 페이지를 출처로
+// 얻고도 basis 어휘가 선택 정규식에 안 걸려 전국 안내로 남았고, 응답은 멀쩡해 보였다.
+// 지역이 늘거나 요일 출처를 더 채우면 이 숫자도 같이 올린다.
+const REGIONS_WITH_OWN_DAY_PAGE = 33;
+
 async function getFreePort() {
   const server = createServer();
   server.listen(0, HOST);
@@ -872,6 +881,7 @@ async function runSmoke() {
     //
     // 이름이 실제로 그 지역으로 매칭됐는지부터 본다. 광역으로 폴백하거나 되묻기로 빠지면
     // 다른 지역의 요일 줄을 놓고 아래 단언이 전부 통과해, 49곳을 돈다는 이 루프가 헛돈다.
+    let ownDayPageCount = 0;
     for (const policy of regionPolicies) {
       const dayResult = await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++);
       assert(
@@ -892,7 +902,12 @@ async function runSmoke() {
         !bulkyUrl,
         `${policy.name}: 요일 확인처가 대형폐기물 신청·수수료 페이지다 (${bulkyUrl}) — 요일은 그 페이지에 없다`,
       );
+      if (!dayLine.includes(NATIONAL_DAY_FALLBACK_URL)) ownDayPageCount++;
     }
+    assert(
+      ownDayPageCount === REGIONS_WITH_OWN_DAY_PAGE,
+      `자기 지자체 요일 페이지로 닫히는 지역이 ${ownDayPageCount}곳이다 (기대 ${REGIONS_WITH_OWN_DAY_PAGE}곳) — 줄었으면 출처의 basis가 선택 정규식에 안 걸리는 것이고, 늘었으면 이 숫자를 올린다`,
+    );
 
     // 어느 페이지로 닫는지까지 고정한다. 매칭이 여럿인 지역은 JSON 배열 순서에 답이
     // 매달려서, 순서가 바뀌면 확인처가 대형폐기물 포털로 조용히 옮겨간다.
@@ -905,6 +920,11 @@ async function runSmoke() {
       { region: "서울 송파구", contains: "www.songpa.go.kr", absent: "smartclean.songpa.go.kr" },
       // 이 PR로 요일 출처를 얻은 지역. 전국 안내가 아니라 자기 지자체 조회 페이지로 닫힌다.
       { region: "서울 종로구", contains: "jongno.go.kr", absent: "region.do" },
+      // 요일 안내가 있는 페이지를 출처로 넣고도 basis 어휘 때문에 전국 안내로 남았던 곳.
+      { region: "서울 용산구", contains: "menuNo=200680", absent: "region.do" },
+      // 요일이 대형폐기물 문맥으로만 적혀 있어 선택 근거가 틀렸던 곳. 같은 페이지가 맞지만
+      // 일반 생활쓰레기 요일 안내로 걸려야 한다. 대형폐기물 포털로 새면 실패다.
+      { region: "남양주시", contains: "contents.do?key=3005", absent: "smartclean.nyj.go.kr" },
       // 요일 출처가 없는 지역. 전국 지역별 안내로 닫는다. 용인은 시 누리집에 일반
       // 생활쓰레기 요일 안내가 없다는 걸 2026-08-20에 확인했다 — 검색에 뜨는 구별
       // 요일(수지 화·금 등)은 대형폐기물 수거 요일이라 여기 쓸 값이 아니다.
@@ -974,6 +994,20 @@ async function runSmoke() {
         `강남구+침대: 요일을 닫으면서 일반 체크리스트("${general}")까지 되살아났다 — 품목 좁히기가 풀린다`,
       );
     }
+
+    // 같은 불변식이 품목 툴에도 걸린다. `빗자루`는 `regionCheckLevel: required`에
+    // checkItems가 "배출 장소·요일"이라, 지역을 함께 주면 "- 확인 항목: 배출 장소·요일"
+    // 한 줄로 끝나 있었다 — 요일을 말해놓고 어디서 확인하는지는 안 적는, 되묻기를 부른
+    // 바로 그 모양이다. 지역 툴과 같은 확인처로 닫는지 본다.
+    const stepsDayAnswer = resultText(
+      await callTool(baseUrl, "get_disposal_steps", { itemName: "빗자루", region: "서울 강남구" }, requestId++),
+    );
+    const stepsDayLine = stepsDayAnswer.split("\n").find((line) => line.startsWith("- 확인 항목:") && line.includes("요일"));
+    assert(stepsDayLine, "get_disposal_steps 빗자루+강남구: 요일 확인 항목이 사라졌다 — 픽스처를 요일이 든 품목으로 갈아 끼운다");
+    assert(
+      stepsDayLine.includes("www.gangnam.go.kr"),
+      `get_disposal_steps 빗자루+강남구: 요일 확인 항목에 확인처 링크가 없다 — 호스트 모델이 그 빈자리를 동 되묻기로 메운다: "${stepsDayLine}"`,
+    );
 
     // 한 품목의 금액이 플랜 전체를 덮으면 안 된다. 예전에는 "금액이 하나라도 있으면"
     // 수수료 확인 문구가 통째로 사라져, 행이 없는 품목까지 값이 확인된 것처럼 읽혔다.

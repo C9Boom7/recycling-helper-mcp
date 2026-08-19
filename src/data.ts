@@ -1353,6 +1353,65 @@ export function findRegionCollectionDaySource(region: RegionalPolicyData): Regio
 }
 
 /**
+ * 지역을 골라 들어가는 전국 안내. 미등록 지역 폴백이면서, 지자체 요일 페이지가 없는
+ * 곳에서 요일 질문을 닫는 링크이기도 하다. 두 자리가 같은 주소를 각자 적고 있으면
+ * 한쪽만 고쳐지므로 상수 하나로 묶는다.
+ */
+export const REGION_SELECT_GUIDE_LINK = {
+  title: "생활폐기물 분리배출 누리집 지역별 안내",
+  url: "https://www.분리배출.kr/front/region/region.do",
+  basis: "거주 지역을 선택하면 그 지자체의 분리배출 기준을 볼 수 있습니다.",
+};
+
+/** 요일을 말하는 줄인지. */
+export function mentionsCollectionDay(text: string): boolean {
+  return text.includes("요일");
+}
+
+/**
+ * 요일을 못 준다고 말하는 자리에 이어 붙일 확인처 한 조각. 지자체 요일 페이지가 있으면
+ * 그걸, 없으면 전국 지역별 안내를 준다 — 어느 쪽이든 URL이 하나는 들어간다.
+ */
+export function collectionDaySourceHint(regionMatch?: MatchedRegionPolicy): string {
+  const daySource = regionMatch ? findRegionCollectionDaySource(regionMatch.region) : undefined;
+
+  if (daySource?.url) {
+    const checkedAt = daySource.checkedAt ? `, 확인일 ${daySource.checkedAt}` : "";
+    return `${daySource.title}에서 확인하세요 (${daySource.url}${checkedAt})`;
+  }
+
+  return `${REGION_SELECT_GUIDE_LINK.title}에서 거주 지역을 선택해 확인하세요 (${REGION_SELECT_GUIDE_LINK.url})`;
+}
+
+/**
+ * 이 줄이 **우리가 붙인** 확인처를 이미 갖고 있는지.
+ *
+ * 예전에는 `text.includes("http")`로 봤다. 그러면 요일을 말하면서 요일과 무관한 주소를
+ * 달고 있는 체크 항목 하나로 판정이 뒤집힌다 — 확인처를 잇지도, 닫는 줄을 더하지도 않고
+ * 조용히 통과한다. 지금 데이터에는 그런 항목이 없지만 근거가 틀린 판정이라, 붙일 문구와
+ * 같은지로 본다. 문구는 `collectionDaySourceHint`가 지역별로 한 번만 만드니 비교가 샐 일이 없다.
+ */
+export function hasCollectionDaySource(text: string, regionMatch?: MatchedRegionPolicy): boolean {
+  return text.includes(collectionDaySourceHint(regionMatch));
+}
+
+/**
+ * 요일을 말하는 첫 줄에 확인처를 이어 붙인다.
+ *
+ * 요일 줄이 없으면 아무것도 더하지 않는다. 폐형광등 수거함처럼 요일과 무관한 품목까지
+ * 링크를 달면 안내가 길어지기만 한다. 붙이는 자리는 첫 줄 하나뿐이다 — 같은 주소를
+ * 여러 줄에 반복해 봐야 읽는 쪽이 고를 게 늘지 않는다.
+ */
+export function withCollectionDaySource(checks: string[], regionMatch?: MatchedRegionPolicy): string[] {
+  const dayIndex = checks.findIndex((check) => mentionsCollectionDay(check) && !hasCollectionDaySource(check, regionMatch));
+  if (dayIndex < 0) return checks;
+
+  const withSource = [...checks];
+  withSource[dayIndex] = `${withSource[dayIndex]} — ${collectionDaySourceHint(regionMatch)}`;
+  return withSource;
+}
+
+/**
  * 대형폐기물 신청 경로. `standard`는 신청·수수료 URL과 직통번호가 전부 채워져
  * 있다는 게 데이터 추가 조건이고, `metro`는 접수 자체가 자치구 소관이라
  * 번호 대신 자치구 확인이 필요하다는 사실을 밝힌다.
@@ -1583,7 +1642,12 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     }
 
     if (hasRegionGuide) lines.push(...regionGuideLines);
-    if (item.regionPolicy?.checkItems?.length) lines.push(...item.regionPolicy.checkItems.map((checkItem) => `- 확인 항목: ${checkItem}`));
+    // 요일 확인 항목은 여기서도 확인처로 닫는다. `빗자루`·`다리미판`처럼 checkItems에
+    // 요일이 든 품목이 이 갈래로 떨어지는데, 지역 툴과 달리 "확인 항목: 배출 장소·요일"
+    // 한 줄로 끝나 **어디서** 확인하는지가 빠져 있었다. 못 준다고 말해놓고 확인처를 안
+    // 적는 그 모양이 호스트 모델의 되묻기를 부른 원인이라, 두 툴이 같게 닫아야 한다.
+    if (item.regionPolicy?.checkItems?.length)
+      lines.push(...withCollectionDaySource(item.regionPolicy.checkItems, regionMatch).map((checkItem) => `- 확인 항목: ${checkItem}`));
   } else if (needsAdvisoryRegionCheck && regionMatch) {
     lines.push("", "### 지역 참고");
     lines.push(
