@@ -9044,5 +9044,83 @@
       "유아용 소파 1인용: 2,000원",
       "소파 1인당: 4,000원"
     ]
+  },
+  {
+    "id": "ordinance_label_stuffed_toy_ryu",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형류"
+    },
+    "expectedTextIncludes": [
+      "## 인형"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stuffed_toy\""
+    ]
+  },
+  {
+    "id": "ordinance_label_toy_ryu",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장난감류"
+    },
+    "expectedTextIncludes": [
+      "## 장난감"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toy\""
+    ]
+  },
+  {
+    "id": "ordinance_label_chair_desk_chair",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상용의자"
+    },
+    "expectedTextIncludes": [
+      "## 의자"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"chair\""
+    ]
+  },
+  {
+    "id": "desk_not_taken_by_desk_chair_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "책상"
+    },
+    "expectedTextIncludes": [
+      "## 책상"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"desk\""
+    ]
+  },
+  {
+    "id": "toy_plain_still_toy",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "장난감"
+    },
+    "expectedTextIncludes": [
+      "## 장난감"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toy\""
+    ]
+  },
+  {
+    "id": "stuffed_toy_plain_still_stuffed_toy",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인형"
+    },
+    "expectedTextIncludes": [
+      "## 인형"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"stuffed_toy\""
+    ]
   }
 ]
