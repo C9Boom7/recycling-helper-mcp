@@ -240,9 +240,9 @@ Data validation passed: 330 waste items, 49 regional policies
 Data evaluation passed: 330 item cases (resolver: src/data.ts)
 Region matching test passed: 9 fixture cases, 94 region cases, 49 policies' aliases, 168 sub-region names, 854 metro-prefixed combinations
 Item classification test passed: 17 whole-cell names, 3 spec fragments, 4 runtime queries
-MCP smoke test passed at http://127.0.0.1:58945 (509 answer cases)
+MCP smoke test passed at http://127.0.0.1:59021 (510 answer cases)
 Widget catalogue sweep: 330/330 cards validated
-Widget smoke passed at http://127.0.0.1:58692 (WIDGET_ENABLED=true)
+Widget smoke passed at http://127.0.0.1:59026 (WIDGET_ENABLED=true)
 ```
 
 ```
@@ -266,7 +266,7 @@ PRD의 DoD 두 줄을 채웠다.
 | --- | --- | --- | --- | --- |
 | 총 품목 | 324 | 329 | 330 | 330 |
 | 평가 케이스 | 324 | 329 | 330 | 330 |
-| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) | 507 (신규 6) | 509 (신규 2) |
+| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) | 507 (신규 6) | 510 (신규 3) |
 | `verified` | 39 | 41 | 41 | 41 |
 | `region_review_needed` | 84 | 87 | 88 | 88 |
 | `needs_source` | 7 | 7 | 7 | 7 |

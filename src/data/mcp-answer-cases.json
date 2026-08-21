@@ -9522,5 +9522,23 @@
     "expectedStructuredIncludes": [
       "\"id\":\"dish_brush\""
     ]
+  },
+  {
+    "id": "p8_pet_food_itself_not_sack",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "사료 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "## 쌀포대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
   }
 ]
