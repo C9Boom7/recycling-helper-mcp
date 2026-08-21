@@ -16,15 +16,24 @@ R3(수수료 임포트)를 이어받을 세션이 URL·전화·확인일만 채�
 
 | 지역 | `id` | 신청 경로 | 직통 전화 |
 | --- | --- | --- | --- |
-| 부산 해운대구 | `haeundae_gu` | 대행업체 전화 접수(구청 안내 페이지) | 051-749-4462 |
+| 부산 해운대구 | `haeundae_gu` | 구청 자체 온라인 신청(대행업체 전화 접수 병행) | 051-749-4462 |
 | 부산 부산진구 | `busanjin_gu` | 대행업체 네이버 스마트스토어(구청 안내 페이지) | 051-605-4462 |
 | 대구 북구 | `buk_gu_daegu` | 구청 통합예약 자체 신청 | 053-665-2727 |
 | 인천 남동구 | `namdong_gu` | 구 누리집 스티커 구입 | 032-453-2560 |
 | 인천 부평구 | `bupyeong_gu` | 구 폐기물배출신고 시스템 | 032-509-6610 |
 
-값은 전부 **실제로 연 페이지에서만** 옮겼다. 해운대구와 부산진구는 구청에 자체 신청 화면이 없고
-신청 안내와 품목별 수수료표가 한 페이지에 같이 있어 `applicationUrl`과 `feeUrl`이 같은 주소다.
-그 사정은 두 지역 `summary`에 적어 두었다.
+값은 전부 **실제로 연 페이지에서만** 옮겼다. 해운대구는 구청 자체 온라인 신청 화면이 따로 있어
+`applicationUrl`은 그 신청 페이지(`menuCd=DOM_000000102014007003`), `feeUrl`은 품목별 수수료표가
+실린 안내 페이지(`...007000`)를 가리킨다. 라운드 1까지는 신청 화면을 못 찾아 두 값이 같은
+안내 페이지였는데, 라운드 2 리뷰에서 신청 페이지가 확인돼 바로잡았다.
+부산진구는 구청에 자체 신청 화면이 없고 대행업체 접수 링크와 품목별 수수료표가 한 페이지에 같이
+있어 `applicationUrl`과 `feeUrl`이 같은 주소다. 그 사정은 `summary`에 적어 두었다.
+
+두 지역 모두 배출 전에 붙일 스티커나 접수번호를 발급하지 않는다 — 업체가 수거 현장에서 품목을
+확인하고 그때 수수료를 받는다. standard 티어 고정 문장은 "접수증 또는 접수번호를 부착해"라고
+안내하므로, 이 어긋남은 두 지역 `summary`에 실제 절차를 적어 줄이고
+[docs/data-decision-backlog.md](../data-decision-backlog.md)에 후속 항목으로 남겼다.
+런타임 코드는 이 Phase의 범위 밖이다.
 
 ### 0-2. 미룬 3곳과 이유
 
@@ -43,7 +52,7 @@ R3(수수료 임포트)를 이어받을 세션이 URL·전화·확인일만 채�
 `pnpm measure:region` 기준 **자치구 확정 30/79(38.0%) → 40/88(45.5%)**, 오매칭 0, 되묻기 0이다.
 입력이 79줄에서 88줄로 늘었다(기존 4줄 수정 + 9줄 추가).
 
-`pnpm local:test` 통과 — 324 품목 / **54 지역** / **103 지역 케이스** / **498 answer case**.
+`pnpm local:test` 통과 — 324 품목 / **54 지역** / **103 지역 케이스** / **499 answer case**.
 warning 9건은 기존부터 있던 임포터 재실행 안내다.
 
 ### 0-4. 실제로 바뀐 파일
@@ -53,7 +62,10 @@ warning 9건은 기존부터 있던 임포터 재실행 안내다.
 - `logs/region-expansion-queries.example.jsonl` — 4줄 수정 + 9줄 추가(반례 `북구`는 `expectRefusal`)
 - `src/data/region-evaluation-cases.json` — 기존 3건 승격, 확정 4건·반례 5건 추가
 - `src/data/mcp-answer-cases.json` — `region_info_metro_fallback_battery_collection`을
-  `부산 사하구`로 옮기고(구 이름이 박힌 기대 문자열 넷을 함께 교체), `p9_` 11건 추가.
+  `부산 사하구`로 옮기고(구 이름이 박힌 기대 문자열 넷을 함께 교체), `p9_` 12건 추가.
+  12건째인 `p9_haeundae_battery_collection`은 라운드 2 리뷰에서 더했다 — 폴백 케이스를 사하구로
+  옮기면서 해운대구 폐건전지 질의를 도는 회귀가 하나도 남지 않았다.
+  `question-backlog.json`의 `auto_990c3c72c0`도 `guardedBy`를 이 케이스로 돌렸다.
   `부산` 광역 케이스는 새로 만들지 않고 기존 `region_metro_fallback_busan`의
   `expectedTextExcludes`에 자치구 직통번호를 박았다 — 같은 tool/input 케이스는 validate가 막는다.
 - `docs/session-coordination.md`·`docs/source-coverage.md`·`docs/qa-runbook.md` — 카운트와 티어 집계
@@ -168,7 +180,8 @@ id는 PRD R1 표를 그대로 따랐다. 다만 `scripts/test-region-matching.ts
 
 ```
 haeundae_gu     ["해운대구", "부산 해운대구", "부산시 해운대구", "부산광역시 해운대구", "haeundae-gu"]
-busanjin_gu     ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구"]
+busanjin_gu     ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구",
+                 "부산 진구", "부산시 진구", "부산광역시 진구"]
 dalseo_gu       ["달서구", "대구 달서구", "대구시 달서구", "대구광역시 달서구", "dalseo-gu"]
 buk_gu_daegu    ["대구 북구", "대구시 북구", "대구광역시 북구"]
 namdong_gu      ["남동구", "인천 남동구", "인천시 남동구", "인천광역시 남동구", "namdong-gu"]
@@ -195,6 +208,13 @@ Phase 5 회고에도 같은 구멍이 적혀 있다 — 서울이 멀쩡해 보�
 | `daegu` | `prefixOnlyDistrictAliases` | `북구` |
 | `gwangju` | `prefixOnlyDistrictAliases` | `북구` |
 | `daejeon` | `prefixOnlyDistrictAliases` | `서구` |
+
+`busanjin_gu`에 `부산 진구`·`부산시 진구`·`부산광역시 진구`를 더 단 건 라운드 2 리뷰에서 나왔다.
+부산진구청이 스스로를 "부산 진구청"으로 적는데, 그렇게 부르면 `부산광역시` 광역으로만 내려앉았다.
+`부산 진구`가 이미 통하는 것처럼 보인 건 `normalizeText`가 공백을 지워 `부산진구`와 같아진 덕이라
+`부산시 진구`·`부산광역시 진구`는 그대로 새고 있었다. 맨 `진구`는 어느 광역인지 알 수 없으므로
+별칭에 넣지 않았고, 지금도 `not_found`다. 별칭을 늘린 뒤 광역 이름 조각 누수를 다시 쟀는데
+`gwang`·`gwangj` → `gwangjin_gu` 둘 말고는 새로 생긴 게 없다(그 둘은 라운드 1 이전부터 있던 값이다).
 
 `prefixOnlyDistrictAliases`까지 손대야 하는 게 놓치기 쉽다. `test-region-matching.ts`의 naming sweep은
 `[...districtAliases, ...prefixOnlyDistrictAliases]`를 돌며 `"대구광역시 북구"`가 **daegu에 metro 레벨로
@@ -563,6 +583,14 @@ append-only 원칙의 예외가 불가피하다. 두 가지 길이 있고 **후�
    `expectedTextIncludes`의 `"해운대구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다"`와
    `"대형폐기물 신청 경로와 수수료는 해운대구 소관이니"`, `expectedTextExcludes`는 그대로 두고,
    `expectedStructuredIncludes`의 `"\"region\":\"부산 해운대구\""`까지 넷을 함께 갈아야 스모크가 통과한다.
+
+**옮긴 자리를 비워 두면 안 된다(라운드 2 리뷰).** 케이스를 사하구로 옮기고 나니 해운대구 폐건전지
+질의를 도는 회귀가 하나도 없어졌고, `question-backlog.json`의 `auto_990c3c72c0`이 가리키던
+`guardedBy`도 다른 구를 도는 케이스를 가리키게 됐다. 해운대구는 이제 `specialCollections` 문장을
+사용자에게 그대로 내보내므로, 같은 질의를 해운대구로 부르는 `p9_haeundae_battery_collection`을
+새로 넣고 `guardedBy`를 그쪽으로 돌렸다. 원래 케이스가 막던 것 중 지금도 유효한
+`"수거함 주소"`·`"강남구 기본 배출 기준"`·`"서울 강남구 공식 출처"`를 그대로 가져왔고,
+정상적으로 나가게 된 `"문의/신청 안내 전화"`는 제외 목록에서 뺐다.
 
 신규 케이스:
 

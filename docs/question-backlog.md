@@ -137,7 +137,7 @@ Top 50과 1차 사용자 질문 확장 품목을 처리한 뒤, 다음 데이터
 
 이 인덱스는 닫힌 region gap 2개의 smoke coverage 추적성 메모다.
 
-- 부산 해운대구 폐건전지 수거함 위치 알려줘: `region_info_metro_fallback_battery_collection`으로 상세 데이터가 없는 지역에서 수거함 주소를 지어내지 않도록 방어한다. 2026-08-21 Phase 9에서 해운대구가 standard 티어로 들어와 이 케이스의 질의는 부산 사하구로 옮겼다. 해운대구는 이제 배출 방법과 공동주택 수거 신청 번호까지 안내하지만, 수거함 개별 주소는 그대로 담지 않는다.
+- 부산 해운대구 폐건전지 수거함 위치 알려줘: `p9_haeundae_battery_collection`으로 해운대구가 수거함 개별 주소를 지어내지 않고 동주민센터·공동주택 수거신청 경로로 잇는지 방어한다. 2026-08-21 Phase 9에서 해운대구가 standard 티어로 들어오면서, 상세 데이터가 없는 지역 쪽 방어는 `region_info_metro_fallback_battery_collection`이 부산 사하구 질의로 이어받았다. 두 케이스가 각각 등록 지역과 미등록 지역을 맡는다.
 - 강남구 오피스텔은 비닐봉지 목요일 배출 맞아?: `gangnam_officetel_vinyl_building_type_guard`로 오피스텔 전용 목요일 배출 단정을 방지한다. 관련 기본 비닐/강남 요일 smoke는 `gangnam_parcel_plastic_bag_thursday`, `gangnam_food_contaminated_vinyl_region_phrase`다.
 
 우선순위는 안전 리스크가 큰 품목을 `high`로 두고, 생활 빈출이지만 공식 근거 확인이 필요한 품목은 `medium`, 제품 범위 확장 성격이 강한 품목은 `low`로 둔다. 현재 high-priority 신규 위험 품목 8개, 음식물·식물 오인 2개, 복합재질 생활용품 8개는 데이터와 MCP 답변 회귀 케이스까지 승격했다.

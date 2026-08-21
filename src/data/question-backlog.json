@@ -2506,7 +2506,7 @@
       "wontFixReason: 사용자 결정에 따라 폐건전지 수거함 개별 주소는 데이터로 담지 않음",
       "wontFixReviewedAt: 2026-08-21",
       "wontFixReviewNote: Phase 9에서 해운대구가 standard 티어로 등록되며 '미지원 지역'이라는 전제는 사라졌다. 위치를 담지 않는다는 결정 자체는 그대로 둔다",
-      "guardedBy: MCP answer case region_info_metro_fallback_battery_collection"
+      "guardedBy: MCP answer case p9_haeundae_battery_collection"
     ]
   },
   {
