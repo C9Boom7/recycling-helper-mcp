@@ -9391,5 +9391,104 @@
       "\"id\":\"rice_sack\"",
       "\"matchedBy\":\"사료 포대\""
     ]
+  },
+  {
+    "id": "p8_bottle_sterilizer_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 소독기 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 젖병살균소독기",
+      "소형전기전자제품 전용수거함"
+    ],
+    "expectedTextExcludes": [
+      "플라스틱류로 배출합니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bottle_sterilizer\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "p8_bottle_warmer_same_item",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 워머"
+    },
+    "expectedTextIncludes": [
+      "## 젖병살균소독기",
+      "1599-0903"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bottle_sterilizer\""
+    ]
+  },
+  {
+    "id": "p8_baby_bottle_not_stolen_by_sterilizer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병"
+    },
+    "expectedTextIncludes": [
+      "## 젖병"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병살균소독기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_bottle\""
+    ]
+  },
+  {
+    "id": "p8_baby_bottle_nipple_still_baby_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 젖꼭지"
+    },
+    "expectedTextIncludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_bottle\""
+    ]
+  },
+  {
+    "id": "p8_bare_nipple_falls_back",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖꼭지"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "p8_seat_belt_fallback_ask_for",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "안전벨트"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙",
+      "일반쓰레기(종량제)"
+    ],
+    "expectedTextExcludes": [
+      "## 벨트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
   }
 ]

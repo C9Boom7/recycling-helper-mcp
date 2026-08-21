@@ -1972,5 +1972,11 @@
     "expectedItemId": "baby_bottle",
     "expectedDisposalType": "recycle_or_general_by_material",
     "notes": "Phase 8 품목 커버리지. 실리콘 젖꼭지와 내열유리 몸체가 갈려 재질 분기로 잡았습니다."
+  },
+  {
+    "query": "젖병 소독기 어떻게 버려?",
+    "expectedItemId": "bottle_sterilizer",
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "PR #61 리뷰 후속. 두 글자 이름 '젖병'에 걸려 젖병 카드를 받던 전기제품을 이 품목이 받는다."
   }
 ]

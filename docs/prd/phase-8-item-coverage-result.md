@@ -94,6 +94,23 @@ PRD가 "치약 근거를 그대로 옮겨 붙이지 마라"고 못 박은 자리
 | 5단계 품목은 `standard_import`로 못 올린다 | 양념통은 `verified`, 나머지는 근거 깊이에 맞춰 정했다. `standard_import`는 쓰지 않았다 |
 | `사료포대` 별칭이 죽은 항목이다 | 넣지 않았다. 매칭기가 공백을 지우므로 `사료 포대` 하나면 붙여 쓴 질의도 100점으로 걸린다 |
 
+## 4-2. PR #61 리뷰 1라운드 반영
+
+blocking 넷 중 셋을 데이터로 고치고, 하나는 케이스로 채웠다. 문서만 고친 둘은 5-4에 적었다.
+
+| 지적 | 처리 |
+| --- | --- |
+| `젖병 소독기`가 소형가전인데 젖병 카드를 받는다 | 품목사전 단독 항목(niIdx=268)을 근거로 `bottle_sterilizer`를 세웠다. `젖병 워머`·`젖병 중탕기`는 살균이 아니라 데우는 기계지만 같은 소형전기전자 갈래라 별칭으로 묶었다 |
+| `젖꼭지`가 자기 근거와 어긋나는 답을 받는다 | `젖병 젖꼭지` 별칭을 뺐다. 맨 `젖꼭지`는 재질 폴백으로 내려가고, `젖병 젖꼭지`는 이름 `젖병`이 걸려 그대로 젖병 카드다 |
+| `seasoning_container`의 주의사항 두 줄이 출처에 없다 | 내열유리 줄은 지웠다 — 세 출처 어디에도 없고 `baby_bottle`의 `needsRegionCheck: true`와도 어긋났다. 실리콘 패킹 줄은 공갈젖꼭지 항목을 근거로 붙여 남겼다 |
+| 폴백 `askFor` 구조화 페이로드를 보는 케이스가 0건이 됐다 | 여전히 not_found인 `안전벨트`·`젖꼭지`로 두 건을 채웠다. `안전벨트`는 벨트 품목이 안전벨트를 안 먹는다는 반례를 겸한다 |
+| `belt` 이름이 전동 제품까지 잡는다 | 저장소 주인이 게이트를 보류해 코드는 그대로 두고, 5-4와 `data-decision-backlog.md` Open Decisions에 실측과 함께 남겼다 |
+| 포괄어 `병`의 되묻기 후보에서 `깨진 병`이 밀렸다 | 되묻기 자체는 유지된다. 후보 한 칸이 밀린 사실을 5-3·5-4에 적었다 |
+
+새 품목의 `needsRegionCheck`는 `true`다. 무상방문수거를 안내하면서 이 값을 `false`로 두면
+지역 신청 경로가 통째로 사라진다 — PR #16 후속에서 8품목이 그 사고를 냈고,
+`session-coordination.md`에 기록이 남아 있다.
+
 ## 5. 실측 — 반영 전과 후
 
 ### 5-1. 대상 여섯 건
@@ -143,7 +160,7 @@ PRD가 "치약 근거를 그대로 옮겨 붙이지 마라"고 못 박은 자리
 | 케첩통 / 참기름병 / 간장 유리병 | 각자 s=100 그대로 |
 | 청소솔 / 치약 튜브 / 변기 / 변기 뚜껑 | 각자 s=100 그대로 |
 | 선크림 묻은 옷 | `clothing` s=83 (튜브는 안 걸린다) |
-| 포괄어 `튜브` `솔` `통` `유리` `병` | 되묻기 유지 |
+| 포괄어 `튜브` `솔` `통` `유리` `병` | 되묻기 유지. 다만 `병`은 후보 구성이 바뀌었다 — 아래 5-4 참고 |
 
 ### 5-4. 알고 남기는 위험
 
@@ -156,16 +173,29 @@ PRD가 "치약 근거를 그대로 옮겨 붙이지 마라"고 못 박은 자리
 포괄어 `유리`의 되묻기 후보 목록에서 유리병이 밀려나는 바람에 `유리 양념통` 별칭도 뺐다.
 품목 이름을 품고 있어 별칭 없이도 91점으로 걸린다.
 
+포괄어 `병`은 되묻기가 그대로지만 **후보 한 칸이 밀렸다.** `baby_bottle`(젖병)이 같은 82점 동점 후보로
+들어오면서 7칸 상한에 걸려 `broken_glass`의 별칭 `깨진 병`이 목록 밖으로 나갔다.
+유리병·페트병·향수병은 그대로라 `classify_ambiguous_short_bottle_candidates`는 통과하지만,
+"병"을 물었을 때 깨진 병 갈래가 후보로 안 보이는 건 사실이다.
+깨진 병은 `깨진 병`·`깨진 유리병`처럼 재질을 밝혀 물으면 그대로 확정되므로 이대로 둔다.
+
+리뷰 1라운드에서 벨트 위험이 공업용·부품 말고 하나 더 있다는 것이 드러났다.
+`안마 벨트`·`벨트 마사지기`·`복대 벨트`·`등산 벨트`가 전부 `belt` 79점으로 확정돼 의류수거함 안내를 받는다.
+앞의 둘은 전동 제품이라 소형가전 갈래여야 맞고, 뒤의 둘은 의류수거함이 받을지 자체가 불확실한 보조기구다.
+두 글자 품목 이름 `벨트`가 수식어를 못 가리는 같은 원인인데, `가스레인지` 때와 달리 게이트를 넣으면
+`벨트 어떻게 버려?` 같은 정상 질의까지 함께 죽는다. 저장소 주인이 게이트 도입을 보류해
+이번에는 코드를 건드리지 않고 [data-decision-backlog.md](../data-decision-backlog.md)의 Open Decisions에 올렸다.
+
 ## 6. 검증
 
 ```
-Data validation passed: 329 waste items, 49 regional policies
-Data evaluation passed: 329 item cases (resolver: src/data.ts)
+Data validation passed: 330 waste items, 49 regional policies
+Data evaluation passed: 330 item cases (resolver: src/data.ts)
 Region matching test passed: 9 fixture cases, 94 region cases, 49 policies' aliases, 168 sub-region names, 854 metro-prefixed combinations
 Item classification test passed: 17 whole-cell names, 3 spec fragments, 4 runtime queries
-MCP smoke test passed at http://127.0.0.1:58230 (501 answer cases)
-Widget catalogue sweep: 329/329 cards validated
-Widget smoke passed at http://127.0.0.1:58235 (WIDGET_ENABLED=true)
+MCP smoke test passed at http://127.0.0.1:58687 (507 answer cases)
+Widget catalogue sweep: 330/330 cards validated
+Widget smoke passed at http://127.0.0.1:58692 (WIDGET_ENABLED=true)
 ```
 
 ```
@@ -173,8 +203,8 @@ Widget smoke passed at http://127.0.0.1:58235 (WIDGET_ENABLED=true)
 - match: 50
 - not_found rate: 0.0%        (반영 전 44/50, not_found 6)
 
-# 보류 발화 내성 (329 품목 x 10 발화 = 3290)
-- match: 3290 (100.0%)
+# 보류 발화 내성 (330 품목 x 10 발화 = 3300)
+- match: 3300 (100.0%)
 - wrong: 0
 - ambiguous: 0
 - not_found: 0
@@ -185,15 +215,15 @@ PRD의 DoD 두 줄을 채웠다.
 
 ## 7. 카운트
 
-| 항목 | 반영 전 | 반영 후 |
-| --- | --- | --- |
-| 총 품목 | 324 | 329 |
-| 평가 케이스 | 324 | 329 |
-| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) |
-| `verified` | 39 | 41 |
-| `region_review_needed` | 84 | 87 |
-| `needs_source` | 7 | 7 |
-| `standard_import` | 194 | 194 |
+| 항목 | 반영 전 | 반영 후 | 리뷰 1라운드 반영 후 |
+| --- | --- | --- | --- |
+| 총 품목 | 324 | 329 | 330 |
+| 평가 케이스 | 324 | 329 | 330 |
+| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) | 507 (신규 6) |
+| `verified` | 39 | 41 | 41 |
+| `region_review_needed` | 84 | 87 | 88 |
+| `needs_source` | 7 | 7 | 7 |
+| `standard_import` | 194 | 194 | 194 |
 
 `docs/source-coverage.md` 14~20행, `docs/session-coordination.md` 49행과 53행을 함께 맞췄다.
 53행은 검증기가 `MCP answer cases (\d+)개`를 전역으로 훑기 때문에 빠뜨리면 그대로 실패한다.
