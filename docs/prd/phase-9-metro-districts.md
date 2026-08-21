@@ -17,7 +17,7 @@
 
 ## 범위
 
-포함: `src/data/region-policies.json`, `src/data/bulky-waste-fees.json`,
+포함: `src/data/region-policies.json`(신규 자치구 + 광역 티어의 별칭 목록 정리), `src/data/bulky-waste-fees.json`,
 `src/data/region-evaluation-cases.json`, `src/data/mcp-answer-cases.json`,
 `scripts/import-bulky-fees.ts`의 `TARGETS` 배열, `docs/session-coordination.md`.
 
@@ -55,6 +55,26 @@ standard 티어는 신청 URL·수수료 URL·전화·확인일·폐의약품·�
 `id` 작명에 주의한다. `buk_gu`, `seo_gu`, `jung_gu`, `dong_gu`는 여러 광역시에 동시에 있고
 `jung_gu`는 이미 서울 중구가 쓰고 있다. **동명 자치구는 광역 접미사를 붙인다.**
 
+### R1b. 광역 티어의 자치구 별칭에서 승격 대상을 뺀다
+
+**이걸 빼먹으면 `pnpm check`가 47건 터진다.** 2026-08-21 실측으로 확인했다.
+
+`region-policies.json`의 광역 티어 항목은 아직 등록되지 않은 자치구 이름을 두 목록으로 들고 있다.
+
+- `districtAliases` — 이름만으로 그 광역에 착지시키는 목록. 부산의 `해운대구`·`부산진구`가 여기 있다.
+- `prefixOnlyDistrictAliases` — 광역이 앞에 붙었을 때만 보는 목록. 동명 자치구(`중구`·`북구`·`서구`·`동구`·`남구`)가 여기 있다.
+
+자치구를 standard 티어로 승격하면 **그 이름을 위 두 목록에서 반드시 뺀다.** 안 그러면 같은 이름을
+광역과 자치구가 동시에 주장한다. 이번 8곳 기준으로 `busan`·`daegu`·`incheon`의 `districtAliases`와
+`daegu`·`gwangju`·`daejeon`의 `prefixOnlyDistrictAliases`가 대상이다.
+
+`prefixOnly` 쪽을 놓치기 쉽다. `test-region-matching.ts`의 naming sweep이
+`"대구광역시 북구"`가 daegu에 metro로 착지하는지를 단언하기 때문에, 그 목록에 이름이 남아 있으면
+승격했는데도 광역으로 끌려간다.
+
+**빼는 건 승격하는 지역만이다.** 울산 북구·부산 북구처럼 이번에 안 넣는 곳은 목록에 그대로 둬서
+광역 폴백에 남겨야 한다.
+
 ### R2. 지역 데이터 수집
 
 지역 하나마다 아래를 모은다. `src/data/region-policies.json`의 기존 항목이 필드 구성의 기준이다.
@@ -82,19 +102,33 @@ standard 티어는 신청 URL·수수료 URL·전화·확인일·폐의약품·�
 - Aside는 **로그인된 실제 브라우저**를 몰고 다닌다. 공개 페이지만 연다. 대형폐기물 신청을 실제로 접수하지 않는다 —
   **읽기만 한다.** 폼 제출 버튼을 누르지 않고, 자격 증명을 입력하거나 남기지 않는다.
 - `data.go.kr` 표준데이터와 법제처 자치법규 API는 정적 JSON이라 Aside가 필요 없다.
-  기존 스크립트(`pnpm fees:fetch`, `pnpm fees:fetch:district`)를 그대로 쓴다.
+  기존 스크립트(`node scripts/fetch-bulky-fee-standard-data.mjs`, `pnpm fees:fetch`, `pnpm fees:fetch:district`)를 그대로 쓴다.
 - 전화번호는 자원순환과·청소행정과 직통을 쓰고, 대표번호는 마지막 수단이다. 확인한 페이지를 `sources[].basis`에 남긴다.
 
 ### R3. 수수료 임포트
 
 ```bash
-pnpm fees:fetch                 # 전국 표준데이터 (22,831행) → logs/bulky-fee-standard-data.json
-# scripts/import-bulky-fees.ts 의 TARGETS 에 신규 지역 추가
+node scripts/fetch-bulky-fee-standard-data.mjs   # 전국 표준데이터 → logs/bulky-fee-standard-data.json
+# scripts/import-bulky-fees.ts 를 아래대로 고친 뒤
 pnpm import:fees
 pnpm fees:verify:rows
 ```
 
-`TARGETS`는 `[고시상 지역명, regionId, 표시명]` 튜플 배열이다. 현재 4곳이 들어 있다.
+표준데이터 수집에는 **`pnpm fees:fetch`를 쓰지 않는다.** 그건 법제처 조례 트랙이다(`fetch-ordinance-fees.mjs`).
+표준데이터 스크립트에는 package script가 없어서 파일을 직접 부른다.
+
+**`TARGETS` 튜플만 늘려서는 안 된다.** 지금 `import-bulky-fees.ts`는 행을 이렇게 고른다.
+
+```ts
+const regionRows = rows.filter(r => r.CTPV_NM.startsWith("서울") && r.SGG_NM === gu);
+```
+
+시도가 `"서울"`로 박혀 있다. 광역시 구를 그대로 넣으면 한 행도 안 걸려 throw하고,
+`북구`·`서구`처럼 여러 광역시에 있는 이름은 시도 필터가 없으면 네 곳의 행을 한 지역으로 뭉친다.
+**시도를 튜플에 한 칸 더 넣고 필터를 그 값으로 바꾼다** — `[시도, 고시상 지역명, regionId, 표시명]`.
+기존 서울 4곳도 같은 형태로 옮긴다.
+
+이건 `scripts/` 변경이라 빌드타임이다. 런타임 무변경 원칙은 그대로 지킨다.
 
 **착수 전에 원본을 받아 대상 구가 실제로 실려 있는지부터 본다.** 표준데이터는 전국이지만
 모든 기초자치단체가 올리는 건 아니다. 없으면 이 순서로 우회한다.
@@ -143,6 +177,9 @@ pnpm check:links        # 신규 링크 포함 전건
 - [ ] `pnpm local:test` 통과
 - [ ] 신규 지역마다 `sources` 2건 이상, https URL 1건 이상, `checkedAt`은 실제 확인일
 - [ ] 동명 자치구 반례가 신규 지역마다 있다
+- [ ] 승격한 자치구 이름을 광역 티어의 `districtAliases`·`prefixOnlyDistrictAliases`에서 뺐다
+- [ ] 안 넣는 동명 자치구(울산 북구·부산 북구 등)는 광역 폴백에 그대로 남는다
+- [ ] `scripts/measure-region-resolution.ts`가 읽는 입력의 기대값을 승격에 맞춰 고쳤다
 - [ ] 수수료를 넣은 지역은 지역당 10행 이상을 원문과 눈으로 대조했다
 - [ ] `docs/session-coordination.md`의 지역 개수·수수료 행 수가 데이터와 일치
 
@@ -168,6 +205,7 @@ pnpm check:links        # 신규 링크 포함 전건
 ## 체크리스트
 
 - [ ] R1 대상 확정
+- [ ] R1b 광역 별칭 정리
 - [ ] R2 지역 데이터 수집
 - [ ] R3 수수료 임포트
 - [ ] R4 케이스와 검증
