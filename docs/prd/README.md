@@ -35,6 +35,12 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-23)을 Phase 7개로 나�
 | 5 | [phase-5-region-expansion.md](phase-5-region-expansion.md) | 지역 커버리지 확장 (스키마 티어링, 매칭 단계화, 표준·광역 티어) | Phase 4a 완주 이후, 4b와 병렬 |
 | 6 | [phase-6-bulky-fee-etl.md](phase-6-bulky-fee-etl.md) | 자치법규 ETL로 등록 지역 10곳의 대형폐기물 수수료 금액 채우기 | Phase 5 머지 후. 런타임 코드 무변경이라 4b와 병렬 |
 | 7 | [phase-7-bulky-item-fee-expansion.md](phase-7-bulky-item-fee-expansion.md) | 복합명사 오매칭 교정, 대형폐기물 품목 확장, 표준데이터 수수료 임포트(용산·노원·강서·관악) | Phase 5 이후 — Phase 6과 지역 배타 분담 |
+| 8 | [phase-8-item-coverage.md](phase-8-item-coverage.md) | 확장 발화 not_found 6건 해소 (품목 데이터) | 없음 — Phase 9와 병렬 |
+| 9 | [phase-9-metro-districts.md](phase-9-metro-districts.md) | 광역시 자치구 확장 (부산·대구·인천·대전·광주) | 없음 — Phase 8과 병렬 |
+
+Phase 8·9는 2026-08-21 본선 심사기준 자체 평가에서 나온 구멍 둘을 메운다. 둘 다 **런타임 코드 무변경**이고 주 작업 영역이 갈린다 —
+Phase 8은 `waste-items.json` 계열, Phase 9는 `region-policies.json` 계열이다.
+공유 파일은 `mcp-answer-cases.json`(append-only, `p8_`/`p9_` prefix)과 카운트 문서 둘뿐이고, 머지 순서는 Phase 8이 먼저다.
 
 병렬 규칙: Phase 1은 `src/data.ts`·`src/server.ts` 로직, Phase 2는 `src/data/*.json` 데이터가 주 작업 영역이라 병렬 가능하다.
 단, 둘 다 `evaluation-cases.json`/`mcp-answer-cases.json`을 만지므로 케이스 추가는 append-only로 하고 id 충돌만 피한다.
@@ -92,6 +98,8 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 5 | 완료 (PR #10·#11 머지됨, R4 잔여는 #34에서 마감) | claude/phase5-doc-plan-review-4dcfdb 외 | 지역 5 → 35(full 5, standard 13, metro 17). 백로그로 남겼던 8곳을 2026-08-16에 채워 **43(standard 21) — 서울 25개 구 전부** |
 | 6 | R0~R4 완료, R5 1차 완료 / 2차만 남음 | claude/phase6-r2-r4, claude/phase6-r5-early | 조례 10곳 1,176행 적재 — 수수료 보유 지역 8 → 18곳(비광역 전부), 행 849 → 2,025. R2 골든셋 69행 금액 불일치 0건, 파서 결함 둘을 고쳐 행 파싱 10/10. validate 규칙 3종·회귀 3건 추가. 코드 리뷰 후속으로 품목 오귀속 규칙을 조여 42행을 옮기거나 뺐다. **R5 1차(8/15 앞당겨 실행)**: 조례 개정 0곳, 링크 점검 범위를 수수료 파일까지 넓혀 117개로 확대하고 송파구 404·성남시 302를 고쳐 117/117. R5 2차(출고 직전 재대조)는 8/22~23 |
 | 7 | 완료 (PR #22 머지됨) | claude/phase7-r2-batch4 외 | 오매칭 13 → 0, 답변 가능 94/100, 품목 324개. 되묻기 5건 해소 배치까지 마쳐 ambiguous는 포괄어 4건만 남았다 |
+| 8 | 미착수 | claude/phase8-item-coverage | 확장 발화 50개 중 not_found 6건(플라스틱 양념통·변기솔·선크림 튜브·가죽 벨트·젖병·사료 포대) |
+| 9 | 미착수 | claude/phase9-metro-districts | 기초자치단체 32/226. 서울·경기 밖은 광역 폴백뿐 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
 
