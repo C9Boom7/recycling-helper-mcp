@@ -9490,5 +9490,37 @@
       "\"inferred\":false",
       "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
     ]
+  },
+  {
+    "id": "p8_bottle_brush_not_baby_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 솔"
+    },
+    "expectedTextIncludes": [
+      "## 설거지 솔"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dish_brush\""
+    ]
+  },
+  {
+    "id": "p8_bottle_brush_alias_variant",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 브러시"
+    },
+    "expectedTextIncludes": [
+      "## 설거지 솔"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dish_brush\""
+    ]
   }
 ]

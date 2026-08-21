@@ -111,6 +111,19 @@ blocking 넷 중 셋을 데이터로 고치고, 하나는 케이스로 채웠다
 지역 신청 경로가 통째로 사라진다 — PR #16 후속에서 8품목이 그 사고를 냈고,
 `session-coordination.md`에 기록이 남아 있다.
 
+## 4-3. PR #61 리뷰 2라운드 반영
+
+| 지적 | 처리 |
+| --- | --- |
+| `젖병 솔`·`젖병 브러시`가 젖병 카드를 받는다 | `dish_brush` 별칭으로 되돌렸다. 두 글자 이름 `젖병`에 79점으로 걸리던 것이 100점 정확 일치로 바뀐다. 새 출처는 만들지 않았다 — `dish_brush`가 이미 든 청소솔·칫솔 근거가 손잡이와 솔이 붙은 복합재질 청소도구를 그대로 덮는다. 웃기게도 `젖병 세척솔`은 원래부터 91점으로 제대로 갔다. 띄어쓰기와 낱말 선택으로 답이 갈리던 자리를 `p8_bottle_brush_not_baby_bottle`·`p8_bottle_brush_alias_variant`가 못 박는다 |
+| `사료 포대` 흡수 판단이 데이터에 안 남아 있다 | `rice_sack`이 별칭만 받고 `sources`·`review`는 Phase 2 임포트 그대로였다. 사료 포대·마대 검색이 비었다는 사실과 쌀 마대자루 원문을 그대로 쓰는 이유를 `manual_review` source로 넣고(`standard_import`라 url 필수), `sourceRefs`·`review.notes`·`lastReviewedAt`을 함께 올렸다. `summary`도 "쌀 마대자루(쌀포대)는 …"이라 사료 포대를 물은 사람에게 남의 물건처럼 읽히던 것을 쌀·사료·곡물 포대를 함께 덮는 문장으로 고쳤다 |
+| 출처에 없는 주의사항이 두 줄 더 남아 있다 | 1라운드에서 `seasoning_container`를 지운 것과 같은 이유다. `belt`의 "금속 버클이 쉽게 떨어지면 떼어내 고철로" 줄은 세 출처 어디에도 근거가 없어 지웠다(단계가 이 문장에 기대지 않는다). `baby_bottle`의 "젖병 유리는 대부분 내열유리라"는 사실 단정을 "내열유리인지 먼저 확인하고, 내열유리면 유리병 수거함에 넣지 않는다"는 조건형으로 바꿔 내열식기 출처가 덮는 범위 안으로 넣었다 — `유리 젖병`·`젖병 유리`·`강화유리` 모두 품목사전 검색 결과가 없어 "대부분"을 뒷받침할 근거가 없다 |
+| Phase 8 상태 문서가 미착수 그대로다 | `docs/prd/README.md`의 Phase 8 행과 `phase-8-item-coverage.md` 하단 체크리스트를 실제 상태로 맞췄다. PR이 아직 안 머지됐으니 "완료"가 아니라 "작업 완료, PR #61 리뷰 중 (머지 전)"으로 적었다 |
+| `선크림`·`썬크림`을 별칭으로 추가해도 안전하다 | 반박했다. 별칭을 임시로 넣고 재보니 `선크림 묻은 옷`이 `sunscreen_tube` 96점으로 `clothing` 83을 밀어낸다. 다만 지적이 짚은 비대칭(`선크림`만 82점으로 나가고 `썬크림`·`자외선차단제`·`선블록`은 not_found)은 사실이라 5-4에 실측 그대로 남겼다. 데이터는 건드리지 않았다 |
+
+`젖병 집게`·`젖병 보관함`은 대응 품목이 없어 별칭으로 되돌릴 수가 없다. 벨트와 원인이 같아
+`data-decision-backlog.md`의 벨트 Open Decision을 넓혀 함께 다루기로 했고, 코드 게이트는 넣지 않았다.
+
 ## 5. 실측 — 반영 전과 후
 
 ### 5-1. 대상 여섯 건
@@ -156,6 +169,9 @@ blocking 넷 중 셋을 데이터로 고치고, 하나는 케이스로 채웠다
 | 자전거 벨트 | `bicycle` s=96 |
 | 안전벨트 / 자동차 안전벨트 | `not_found` |
 | 젖병 건조대 / 젖병 세척솔 | `drying_rack` 91 / `dish_brush` 91 |
+| 젖병 솔 / 젖병 브러시 | `dish_brush` s=100 (2라운드에서 별칭으로 되돌렸다. 그 전에는 `baby_bottle` 79) |
+| 젖병 / 아기 젖병 / 분유병 / 젖병 젖꼭지 | `baby_bottle` 그대로 (앞의 셋은 100, `젖병 젖꼭지`는 79) |
+| 젖병 소독기 / 설거지 솔 / 청소솔 | `bottle_sterilizer` 100 / `dish_brush` 100 / `dish_brush` 100 |
 | 양념 묻은 배달용기 / 고추장 묻은 플라스틱 용기 | `plastic_food_container` s=100 |
 | 케첩통 / 참기름병 / 간장 유리병 | 각자 s=100 그대로 |
 | 청소솔 / 치약 튜브 / 변기 / 변기 뚜껑 | 각자 s=100 그대로 |
@@ -169,6 +185,37 @@ blocking 넷 중 셋을 데이터로 고치고, 하나는 케이스로 채웠다
 정말 지켜야 할 `러닝머신 벨트`는 97점으로 `exercise_machine`을 지키고 있고, 그 우열은 회귀 케이스로 고정했다.
 
 `선크림`·`썬크림` 단독은 별칭으로 넣지 않았다. 넣으면 "선크림 묻은 옷"이 옷을 제치고 튜브로 확정된다.
+리뷰 2라운드에서 "별칭을 넣어도 `선크림 묻은 옷`은 `clothing` 83으로 안전하다"는 제안이 다시 올라와,
+별칭을 임시로 넣고 직접 재봤다. 안전하지 않다.
+
+```
+(선크림·썬크림 별칭을 넣었을 때)
+[선크림 묻은 옷]    => sunscreen_tube s=96 query_contains_name   (clothing 83이 밀린다)
+[썬크림 묻은 수건]  => sunscreen_tube s=96 query_contains_name
+[선크림 묻은 이불]  => sunscreen_tube s=96
+```
+
+별칭이 세 글자라 `short_alias_standalone`(79)이 아니라 `query_contains_name` 갈래를 타서 88+3+5=96이 되고,
+`clothing`의 83을 넘어선다. 오염된 옷·수건·이불을 물은 사람에게 튜브 배출 안내가 나간다.
+`선크림 묻은 옷`이 83으로 버틴다는 관찰은 **별칭이 없는 지금 상태**의 값이라, 별칭 추가 후의 근거가 되지 못한다.
+
+다만 제안의 나머지 절반은 사실이다. 지금 상태에는 비대칭이 있다.
+
+```
+(현재 상태)
+[선크림]             => sunscreen_tube s=82 generic_fragment
+[썬크림]             => not_found
+[선크림 어떻게 버려?] => not_found
+[자외선차단제]        => not_found
+[선블록]             => not_found
+```
+
+`선크림`만 품목 이름 `선크림 튜브`의 뒷자리 규칙(`generic_fragment`)에 걸려 82점으로 답이 나가고,
+표기만 다른 `썬크림`과 조사·어미가 붙은 `선크림 어떻게 버려?`, 동의어 `자외선차단제`·`선블록`은 전부 되묻기다.
+비대칭인 건 맞지만 별칭으로 메우면 위의 96점 사고를 부르므로 이번에는 데이터를 건드리지 않았다.
+게다가 별칭을 넣어도 `자외선차단제`·`선블록`은 그대로 not_found라, 비대칭이 다 메워지지도 않는다.
+같은 제안이 다시 올라올 때를 대비해 두 실측을 함께 남긴다.
+메우려면 별칭이 아니라, 오염 표현(`묻은`·`묻힌`)이 붙은 질의에서 세정용품 품목을 확정 후보에서 빼는 쪽이 맞다.
 
 포괄어 `유리`의 되묻기 후보 목록에서 유리병이 밀려나는 바람에 `유리 양념통` 별칭도 뺐다.
 품목 이름을 품고 있어 별칭 없이도 91점으로 걸린다.
@@ -193,7 +240,7 @@ Data validation passed: 330 waste items, 49 regional policies
 Data evaluation passed: 330 item cases (resolver: src/data.ts)
 Region matching test passed: 9 fixture cases, 94 region cases, 49 policies' aliases, 168 sub-region names, 854 metro-prefixed combinations
 Item classification test passed: 17 whole-cell names, 3 spec fragments, 4 runtime queries
-MCP smoke test passed at http://127.0.0.1:58687 (507 answer cases)
+MCP smoke test passed at http://127.0.0.1:58945 (509 answer cases)
 Widget catalogue sweep: 330/330 cards validated
 Widget smoke passed at http://127.0.0.1:58692 (WIDGET_ENABLED=true)
 ```
@@ -215,15 +262,15 @@ PRD의 DoD 두 줄을 채웠다.
 
 ## 7. 카운트
 
-| 항목 | 반영 전 | 반영 후 | 리뷰 1라운드 반영 후 |
-| --- | --- | --- | --- |
-| 총 품목 | 324 | 329 | 330 |
-| 평가 케이스 | 324 | 329 | 330 |
-| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) | 507 (신규 6) |
-| `verified` | 39 | 41 | 41 |
-| `region_review_needed` | 84 | 87 | 88 |
-| `needs_source` | 7 | 7 | 7 |
-| `standard_import` | 194 | 194 | 194 |
+| 항목 | 반영 전 | 반영 후 | 리뷰 1라운드 반영 후 | 리뷰 2라운드 반영 후 |
+| --- | --- | --- | --- | --- |
+| 총 품목 | 324 | 329 | 330 | 330 |
+| 평가 케이스 | 324 | 329 | 330 | 330 |
+| MCP 답변 회귀 케이스 | 487 | 501 (신규 14, 기존 3건은 기대값 수정) | 507 (신규 6) | 509 (신규 2) |
+| `verified` | 39 | 41 | 41 | 41 |
+| `region_review_needed` | 84 | 87 | 88 | 88 |
+| `needs_source` | 7 | 7 | 7 | 7 |
+| `standard_import` | 194 | 194 | 194 | 194 |
 
 `docs/source-coverage.md` 14~20행, `docs/session-coordination.md` 49행과 53행을 함께 맞췄다.
 53행은 검증기가 `MCP answer cases (\d+)개`를 전역으로 훑기 때문에 빠뜨리면 그대로 실패한다.
