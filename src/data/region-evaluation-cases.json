@@ -627,5 +627,30 @@
     "expectedRegionId": "incheon",
     "expectedLevel": "metro",
     "expectedNamedSubRegion": "미추홀구"
+  },
+  {
+    "region": "대구광",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "대구광역",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "daeg",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "bus",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "busa",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro"
   }
 ]
