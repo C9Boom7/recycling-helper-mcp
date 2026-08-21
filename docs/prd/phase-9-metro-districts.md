@@ -19,7 +19,10 @@
 
 포함: `src/data/region-policies.json`(신규 자치구 + 광역 티어의 별칭 목록 정리), `src/data/bulky-waste-fees.json`,
 `src/data/region-evaluation-cases.json`, `src/data/mcp-answer-cases.json`,
+`logs/region-expansion-queries.example.jsonl`(`measure:region`이 읽는 기대값),
 `scripts/import-bulky-fees.ts`의 `TARGETS` 배열, `docs/session-coordination.md`.
+Phase 8이 먼저 머지되므로 `docs/source-coverage.md`는 Phase 8 전담이지만, 이쪽이 나중에 머지되면
+그 파일의 MCP 답변 케이스 수까지 맞춘다(아래 [Phase 8과 병렬로 돌 때](#phase-8과-병렬로-돌-때) 참고).
 
 **제외: 런타임 코드.** `src/server.ts`와 `src/data.ts`는 건드리지 않는다.
 지역 매칭은 Phase 5에서 티어·단계형으로 다시 짰고 회귀 94건이 그 동작을 고정하고 있다.
@@ -54,6 +57,20 @@ standard 티어는 신청 URL·수수료 URL·전화·확인일·폐의약품·�
 
 `id` 작명에 주의한다. `buk_gu`, `seo_gu`, `jung_gu`, `dong_gu`는 여러 광역시에 동시에 있고
 `jung_gu`는 이미 서울 중구가 쓰고 있다. **동명 자치구는 광역 접미사를 붙인다.**
+
+`id`만 갈라서는 모자란다. **동명 자치구는 맨 이름을 `aliases`에 넣지 않는다.** 이번 8곳에서는
+`북구`(대구·광주)와 `서구`(대전)가 걸린다. `북구`를 두 지역이 모두 별칭으로 들면 배열에서 먼저 나오는
+쪽이 조용히 이기고, 부산 북구·울산 북구 사용자는 남의 구 전화번호를 받는다.
+`validate-data.mjs`는 이걸 못 잡는다 — 광역의 `districtAliases`·`prefixOnlyDistrictAliases`는 광역끼리
+중복을 검사하지만, 지역 자신의 `aliases`에는 지역 간 중복 검사가 없다.
+맨 `중구`가 전국 폴백에 머무는 걸 고정한 `region_bare_homonym_district_stays_national_jung`이
+이 저장소가 지켜 온 기준이다. 동명 자치구는 광역 접두어가 붙은 표기(`대구 북구`, `대구광역시 북구`,
+로마자)만 별칭으로 쓰고, 맨 이름은 그대로 되묻게 둔다.
+
+해운대구는 닫아 둔 결정 하나와 겹친다. [data-decision-backlog.md](../data-decision-backlog.md) 2026-07-05 —
+`부산 해운대구` **위치형 탐색**은 진행하지 않고 폐건전지 수거함 위치 질문은 `wont_fix`로 닫았다.
+그 결정은 그대로 둔다. 이번에 넣는 건 "가까운 수거함이 어디냐"에 주소를 답하는 기능이 아니라
+구청이 고지한 배출처 안내문이고, 그건 다른 standard 티어 지역과 같은 축이다.
 
 ### R1b. 광역 티어의 자치구 별칭에서 승격 대상을 뺀다
 
@@ -144,6 +161,31 @@ const regionRows = rows.filter(r => r.CTPV_NM.startsWith("서울") && r.SGG_NM =
 수수료 행을 넣었으면 원문과 대조한다. 이 저장소는 조례 별표 파싱에서 이웃 품목의 금액이 넘어오는 사고를
 여러 번 겪었다(서대문 「세탁기 / 소형 / 1,000원」이 실은 고무통 값이었다). 지역당 최소 10행을 표본으로 눈으로 맞춘다.
 
+### R3b. 광역 폴백을 기대하던 기존 케이스를 갱신한다
+
+승격하는 순간 지금 광역 폴백을 기대하는 케이스가 깨져 `pnpm check`와 스모크가 멈춘다.
+**케이스 파일이 append-only라는 규칙은 새 케이스를 넣을 때 얘기고, 아래 넷은 기대값을 고쳐야 한다.**
+
+`src/data/region-evaluation-cases.json` — 3건. 8곳을 다 넣을 때 기준이고, 대상을 줄이면 그만큼만 고친다.
+
+| 지금 값 | 승격 후 |
+| --- | --- |
+| `{"region":"부산 해운대구","expectedRegionId":"busan","expectedLevel":"metro","expectedNamedSubRegion":"해운대구"}` | `haeundae_gu` / `district` |
+| `{"region":"해운대구","expectedRegionId":"busan","expectedLevel":"metro",…}` | `haeundae_gu` / `district` |
+| `{"region":"부평구","expectedRegionId":"incheon","expectedLevel":"metro",…}` | `bupyeong_gu` / `district` |
+
+`src/data/mcp-answer-cases.json` — `region_info_metro_fallback_battery_collection` 1건.
+`부산 해운대구`에 "해운대구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다"와
+`"regionStatus":"unregistered_district"`를 기대하고 있다. **지우지 말고 자치구 확정 응답으로 기대값을 옮긴다.**
+그 질의가 어디로 가는지를 고정하는 자리는 그대로 있어야 한다.
+
+`logs/region-expansion-queries.example.jsonl` — `measure:region`이 읽는 입력이다.
+`부산 해운대구`·`인천 남동구`·`해운대구` 세 줄이 `expectedLevel: "metro"`다. 승격한 곳만 `district`로 바꾼다.
+`부산 기장군`·`대구 수성구`·`대전 유성구`는 이번에 안 넣으니 그대로 둔다.
+
+**반대로, 안 넣는 지역의 폴백 케이스는 손대지 않는다.** `부산 중구`·`대구 동구`·`인천 서구`는
+광역 폴백에 남는 게 맞는 동작이고, 그걸 고정하는 케이스가 이번 작업의 안전망이다.
+
 ### R4. 케이스와 검증
 
 `src/data/region-evaluation-cases.json` — 신규 지역마다 확정 케이스.
@@ -177,9 +219,11 @@ pnpm check:links        # 신규 링크 포함 전건
 - [ ] `pnpm local:test` 통과
 - [ ] 신규 지역마다 `sources` 2건 이상, https URL 1건 이상, `checkedAt`은 실제 확인일
 - [ ] 동명 자치구 반례가 신규 지역마다 있다
+- [ ] 동명 자치구(`북구`·`서구`)의 맨 이름이 어느 지역 `aliases`에도 들어가 있지 않다
 - [ ] 승격한 자치구 이름을 광역 티어의 `districtAliases`·`prefixOnlyDistrictAliases`에서 뺐다
 - [ ] 안 넣는 동명 자치구(울산 북구·부산 북구 등)는 광역 폴백에 그대로 남는다
-- [ ] `scripts/measure-region-resolution.ts`가 읽는 입력의 기대값을 승격에 맞춰 고쳤다
+- [ ] 광역 폴백을 기대하던 기존 케이스 4건(R3b)을 지우지 않고 기대값만 갱신했다
+- [ ] `logs/region-expansion-queries.example.jsonl`의 기대값을 승격에 맞춰 고쳤다
 - [ ] 수수료를 넣은 지역은 지역당 10행 이상을 원문과 눈으로 대조했다
 - [ ] `docs/session-coordination.md`의 지역 개수·수수료 행 수가 데이터와 일치
 
@@ -208,5 +252,6 @@ pnpm check:links        # 신규 링크 포함 전건
 - [ ] R1b 광역 별칭 정리
 - [ ] R2 지역 데이터 수집
 - [ ] R3 수수료 임포트
+- [ ] R3b 기존 폴백 케이스 갱신
 - [ ] R4 케이스와 검증
 - [ ] PR 생성

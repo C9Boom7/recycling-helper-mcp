@@ -99,7 +99,9 @@
 
 `sourceRefs`도 빈 배열이면 validate가 막는다. `sources`와 같이 채운다.
 
-`src/data/evaluation-cases.json` — 품목 수와 **1:1로 맞춘다**(현재 324/324, validate가 검사한다).
+`src/data/evaluation-cases.json` — 품목 수와 **1:1로 맞춘다**(현재 324/324).
+품목마다 정확히 한 건인지는 `scripts/evaluate-data.ts`가 검사하고, 총계가 문서와 맞는지는 `validate-data.mjs`가 본다.
+둘 다 `pnpm check`에 묶여 있지만 실패 메시지가 나오는 자리가 다르다.
 ```json
 { "query": "...", "expectedItemId": "...", "expectedDisposalType": "...", "notes": "..." }
 ```
@@ -110,7 +112,7 @@
 ```
 확정 케이스와 반례 케이스를 짝으로 넣는다.
 
-`docs/source-coverage.md` — 카운트 6종을 갱신한다(총 품목, 평가 케이스, MCP 답변 회귀 케이스,
+`docs/source-coverage.md` — 카운트 7종을 갱신한다(총 품목, 평가 케이스, MCP 답변 회귀 케이스,
 `verified`, `region_review_needed`, `needs_source`, `standard_import`). `validate-data.mjs`가 실제 데이터와 대조한다.
 
 `docs/session-coordination.md`의 Current State Snapshot 카운트도 같은 값으로 맞춘다.
@@ -135,16 +137,20 @@ pnpm measure:utterances   # 추가 전에 한 번 (기준값 3,240/3,240)
 # ... 데이터 반영 ...
 pnpm local:test
 pnpm measure:coverage
-pnpm measure:utterances   # 추가 후에 다시
+pnpm measure:utterances   # 추가 후에 다시 (건수는 늘고, 100%는 그대로여야 한다)
 ```
 
 `measure:utterances`를 앞뒤로 두 번 돌리는 게 이 Phase의 유일한 안전망이다.
 신규 별칭이 기존 품목의 확정을 뺏는 게 이 저장소의 단골 사고고, 다른 검증은 그걸 못 잡는다.
 
+발화 세트는 품목마다 10개를 자동으로 만들어 쓴다. 품목을 다섯 개 넣으면 3,240이 3,290이 되는 게 정상이고,
+봐야 할 건 늘어난 건수가 아니라 **wrong·ambiguous가 0에서 안 움직였는지**다.
+
 ## 완료 기준 (DoD)
 
 - [ ] `pnpm measure:coverage`의 `coverage-expansion-utterances` **not_found 0/50**
-- [ ] `pnpm measure:utterances` **3,240건 100%, wrong 0, ambiguous 0** 유지
+- [ ] `pnpm measure:utterances` **전건 100%, wrong 0, ambiguous 0** 유지
+      (건수는 `품목 수 × 10`이라 품목을 넣으면 3,240에서 함께 늘어난다. 고정할 값은 비율이지 건수가 아니다)
 - [ ] `pnpm local:test` 통과
 - [ ] 신규·수정 품목 전부 `sources` 1건 이상, `checkedAt`은 실제 확인일
 - [ ] 별칭을 추가한 품목마다 반례 케이스가 `mcp-answer-cases.json`에 있다
