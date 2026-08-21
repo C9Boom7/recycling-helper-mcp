@@ -159,15 +159,22 @@ id는 PRD R1 표를 그대로 따랐다. 다만 `scripts/test-region-matching.ts
 기존 항목의 형태를 그대로 따른다. `[맨 이름, "광역 X구", "광역시 X구", "광역광역시 X구", 로마자]` 순이고,
 동명이면 맨 이름과 맨 로마자를 뺀다. 서울 중구(`jung_gu`)·서울 강서구(`gangseo_gu`)가 정확히 그렇게 돼 있다.
 
+**로마자 별칭이 광역 로마자로 시작하면 달지 않는다.** 실측으로 드러난 규칙이다(2026-08-21).
+`busanjin-gu`를 달면 `bus`·`busa`까지 자치구 별칭의 조각으로 걸려, 광역을 부르려던 `bus` 질의가
+부산진구로 확정된다. `daegu-buk-gu`도 `da`·`dae`·`daeg`를 대구 북구로 끌어간다.
+조각(strength 1) 매칭에서 자치구가 광역보다 먼저 채택되기 때문이고,
+빼도 `busanjin-gu` 질의는 부산광역시 폴백으로 안전하게 내려앉는다.
+같은 이유로 `daejeon-seo-gu`·`gwangju-buk-gu`도 달지 않는다.
+
 ```
 haeundae_gu     ["해운대구", "부산 해운대구", "부산시 해운대구", "부산광역시 해운대구", "haeundae-gu"]
-busanjin_gu     ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구", "busanjin-gu"]
+busanjin_gu     ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구"]
 dalseo_gu       ["달서구", "대구 달서구", "대구시 달서구", "대구광역시 달서구", "dalseo-gu"]
-buk_gu_daegu    ["대구 북구", "대구시 북구", "대구광역시 북구", "daegu-buk-gu"]
+buk_gu_daegu    ["대구 북구", "대구시 북구", "대구광역시 북구"]
 namdong_gu      ["남동구", "인천 남동구", "인천시 남동구", "인천광역시 남동구", "namdong-gu"]
 bupyeong_gu     ["부평구", "인천 부평구", "인천시 부평구", "인천광역시 부평구", "bupyeong-gu"]
-seo_gu_daejeon  ["대전 서구", "대전시 서구", "대전광역시 서구", "daejeon-seo-gu"]
-buk_gu_gwangju  ["광주 북구", "광주시 북구", "광주광역시 북구", "gwangju-buk-gu"]
+seo_gu_daejeon  ["대전 서구", "대전시 서구", "대전광역시 서구"]
+buk_gu_gwangju  ["광주 북구", "광주시 북구", "광주광역시 북구"]
 ```
 
 광역 표기 세 가지를 다 적어야 하는 이유가 있다. `splitLeadingMetro`가 앞의 광역명을 떼고 다시 찾긴 하지만,
@@ -389,19 +396,19 @@ Phase 9는 앞쪽 절반만 "부르는 대신 확정한다"로 바꾸고, 뒤쪽
 
 ```
 { "id": "busanjin_gu",    "name": "부산 부산진구", "metroId": "busan",
-  "aliases": ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구", "busanjin-gu"] }
+  "aliases": ["부산진구", "부산 부산진구", "부산시 부산진구", "부산광역시 부산진구"] }
 { "id": "dalseo_gu",      "name": "대구 달서구",  "metroId": "daegu",
   "aliases": ["달서구", "대구 달서구", "대구시 달서구", "대구광역시 달서구", "dalseo-gu"] }
 { "id": "buk_gu_daegu",   "name": "대구 북구",    "metroId": "daegu",
-  "aliases": ["대구 북구", "대구시 북구", "대구광역시 북구", "daegu-buk-gu"] }
+  "aliases": ["대구 북구", "대구시 북구", "대구광역시 북구"] }
 { "id": "namdong_gu",     "name": "인천 남동구",  "metroId": "incheon",
   "aliases": ["남동구", "인천 남동구", "인천시 남동구", "인천광역시 남동구", "namdong-gu"] }
 { "id": "bupyeong_gu",    "name": "인천 부평구",  "metroId": "incheon",
   "aliases": ["부평구", "인천 부평구", "인천시 부평구", "인천광역시 부평구", "bupyeong-gu"] }
 { "id": "seo_gu_daejeon", "name": "대전 서구",    "metroId": "daejeon",
-  "aliases": ["대전 서구", "대전시 서구", "대전광역시 서구", "daejeon-seo-gu"] }
+  "aliases": ["대전 서구", "대전시 서구", "대전광역시 서구"] }
 { "id": "buk_gu_gwangju", "name": "광주 북구",    "metroId": "gwangju",
-  "aliases": ["광주 북구", "광주시 북구", "광주광역시 북구", "gwangju-buk-gu"] }
+  "aliases": ["광주 북구", "광주시 북구", "광주광역시 북구"] }
 ```
 
 ### 4-2. standard 티어 필수 필드 체크리스트

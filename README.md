@@ -129,7 +129,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 현재는 공식 기준과 자주 헷갈리는 품목 seed 데이터에 더해, 지역 데이터를 세 가지 티어로 나눠 사용합니다.
 
 - `full` 5곳(서울 강남구·서초구·송파구·마포구, 경기 성남시): 배출 요일·수거함·대형폐기물 수수료 기준까지
-- `standard` 27곳(서울 자치구 21곳, 경기 6개 시): 대형폐기물 인터넷 신청·수수료 조회 URL과 담당 직통번호, 폐의약품·폐건전지 수거함 안내까지
+- `standard` 32곳(서울 자치구 21곳, 경기 6개 시, 광역시 자치구 5곳): 대형폐기물 인터넷 신청·수수료 조회 URL과 담당 직통번호, 폐의약품·폐건전지 수거함 안내까지
 - `metro` 17곳(광역시도 전체): 자치구 데이터가 없을 때 착지할 광역 폴백. 대형폐기물 접수는 기초자치단체 소관이라 전화번호를 두지 않습니다
 
 2026-08-16에 남은 여덟 구를 채워 **서울 25개 구가 전부 등록됐습니다**(full 4곳 + standard 21곳).
@@ -154,7 +154,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 품목 데이터: `src/data/waste-items.json` (324개)
 - 대표 질문 평가셋: `src/data/evaluation-cases.json` (324개)
 - MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (451개)
-- 지역 정책 데이터: `src/data/region-policies.json` (49개 지역 — full 5, standard 27, metro 17)
+- 지역 정책 데이터: `src/data/region-policies.json` (54개 지역 — full 5, standard 32, metro 17)
 - 지역 평가셋: `src/data/region-evaluation-cases.json` (85개)
 - 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (26개 지역 3,133행 — 서울 25개 구 중 중구·동대문구만 남았다)
 - 질문 백로그: `src/data/question-backlog.json`

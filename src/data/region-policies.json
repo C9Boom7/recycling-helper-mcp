@@ -3406,8 +3406,7 @@
       "부산진구",
       "부산 부산진구",
       "부산시 부산진구",
-      "부산광역시 부산진구",
-      "busanjin-gu"
+      "부산광역시 부산진구"
     ],
     "coverageTier": "standard",
     "metroId": "busan",
@@ -3464,8 +3463,7 @@
     "aliases": [
       "대구 북구",
       "대구시 북구",
-      "대구광역시 북구",
-      "daegu-buk-gu"
+      "대구광역시 북구"
     ],
     "coverageTier": "standard",
     "metroId": "daegu",
@@ -3730,6 +3728,8 @@
     "aliases": [
       "대구",
       "대구시",
+      "대구광",
+      "대구광역",
       "대구광역시",
       "daegu"
     ],
