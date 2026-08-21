@@ -6515,13 +6515,13 @@
     "id": "region_info_metro_fallback_battery_collection",
     "tool": "get_region_disposal_info",
     "arguments": {
-      "region": "부산 해운대구",
+      "region": "부산 사하구",
       "itemName": "폐건전지 수거함 위치 알려줘"
     },
     "expectedTextIncludes": [
       "부산광역시 지역 확인 안내",
-      "해운대구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다",
-      "대형폐기물 신청 경로와 수수료는 해운대구 소관이니",
+      "사하구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다",
+      "대형폐기물 신청 경로와 수수료는 사하구 소관이니",
       "품목: 건전지",
       "전용 수거함 위치",
       "지정 수거처",
@@ -6538,7 +6538,7 @@
       "거주 중인 시·군·구를 확인해야"
     ],
     "expectedStructuredIncludes": [
-      "\"region\":\"부산 해운대구\"",
+      "\"region\":\"부산 사하구\"",
       "\"matchedRegion\":\"부산광역시\"",
       "\"regionStatus\":\"unregistered_district\"",
       "\"item\":\"건전지\""
@@ -6640,7 +6640,9 @@
       "시·군·구를 알려주시면"
     ],
     "expectedTextExcludes": [
-      "문의/신청 안내 전화"
+      "문의/신청 안내 전화",
+      "051-749-4462",
+      "051-605-4462"
     ],
     "expectedStructuredIncludes": [
       "\"regionStatus\":\"metro\"",
@@ -9190,6 +9192,246 @@
     "expectedTextIncludes": [
       "침대 1인용 세트(매트리스,침대틀,침대헤드): 14,000원",
       "침대 2인용 세트(매트리스,침대틀,침대헤드): 20,000원"
+    ]
+  },
+  {
+    "id": "p9_haeundae_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 해운대구"
+    },
+    "expectedTextIncludes": [
+      "부산 해운대구 지역 확인 안내",
+      "문의/신청 안내 전화: 051-749-4462",
+      "인터넷 신청: https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000",
+      "수수료 조회: https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "부산광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"부산 해운대구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_haeundae_sofa_steps",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "소파",
+      "region": "부산 해운대구"
+    },
+    "expectedTextIncludes": [
+      "부산 해운대구 기준으로 확인된 지역 안내를 함께 반영합니다.",
+      "문의/신청 안내 전화: 051-749-4462",
+      "인터넷 신청: https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000",
+      "부산 해운대구 공식 출처"
+    ],
+    "expectedTextExcludes": [
+      "해운대구 상세 데이터는 아직 없어",
+      "부산광역시 광역 기준"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"부산 해운대구\"",
+      "\"regionNotes\""
+    ],
+    "expectedRegionNotes": {
+      "present": true
+    }
+  },
+  {
+    "id": "p9_busanjin_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 부산진구"
+    },
+    "expectedTextIncludes": [
+      "부산 부산진구 지역 확인 안내",
+      "문의/신청 안내 전화: 051-605-4462",
+      "인터넷 신청: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
+      "수수료 조회: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "부산광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"부산 부산진구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_daegu_buk_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대구 북구"
+    },
+    "expectedTextIncludes": [
+      "대구 북구 지역 확인 안내",
+      "문의/신청 안내 전화: 053-665-2727",
+      "인터넷 신청: https://www.buk.daegu.kr/reserve/index.do?menu_id=00002634",
+      "수수료 조회: https://www.buk.daegu.kr/reserve/index.do?menu_id=00002634&menu_link=%2Ffront%2Fbigwaste%2FfronBigwasteChargeView.do"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "대구광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대구 북구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_namdong_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "인천 남동구"
+    },
+    "expectedTextIncludes": [
+      "인천 남동구 지역 확인 안내",
+      "문의/신청 안내 전화: 032-453-2560",
+      "인터넷 신청: https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
+      "수수료 조회: https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "인천광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"인천 남동구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_bupyeong_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "인천 부평구"
+    },
+    "expectedTextIncludes": [
+      "인천 부평구 지역 확인 안내",
+      "문의/신청 안내 전화: 032-509-6610",
+      "인터넷 신청: https://waste.icbp.go.kr/icbp/load_page.asp",
+      "수수료 조회: https://waste.icbp.go.kr/icbp/load_bill.asp"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "인천광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"인천 부평구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_bare_buk_gu_stays_national",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "북구"
+    },
+    "expectedTextIncludes": [
+      "\"북구\"은(는) 아직 상세 지역 데이터가 없습니다"
+    ],
+    "expectedTextExcludes": [
+      "대구광역시",
+      "부산광역시",
+      "053-665-2727",
+      "상세 데이터는 아직 없어"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"북구\"",
+      "\"regionStatus\":\"unknown\""
+    ]
+  },
+  {
+    "id": "p9_busan_buk_gu_stays_metro",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 북구"
+    },
+    "expectedTextIncludes": [
+      "부산광역시 지역 확인 안내",
+      "북구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다"
+    ],
+    "expectedTextExcludes": [
+      "문의/신청 안내 전화",
+      "053-665-2727",
+      "051-749-4462"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"부산 북구\"",
+      "\"matchedRegion\":\"부산광역시\"",
+      "\"regionStatus\":\"unregistered_district\""
+    ]
+  },
+  {
+    "id": "p9_ulsan_buk_gu_stays_metro",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "울산 북구"
+    },
+    "expectedTextIncludes": [
+      "울산광역시 지역 확인 안내",
+      "북구 상세 데이터는 아직 없어 울산광역시 광역 기준으로 안내합니다"
+    ],
+    "expectedTextExcludes": [
+      "문의/신청 안내 전화",
+      "053-665-2727"
+    ],
+    "expectedStructuredIncludes": [
+      "\"region\":\"울산 북구\"",
+      "\"matchedRegion\":\"울산광역시\"",
+      "\"regionStatus\":\"unregistered_district\""
+    ]
+  },
+  {
+    "id": "p9_daegu_metro_has_no_district_phone",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대구"
+    },
+    "expectedTextIncludes": [
+      "대구광역시 광역 기준 안내입니다",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedTextExcludes": [
+      "문의/신청 안내 전화",
+      "053-665-2727"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionStatus\":\"metro\"",
+      "\"coverageTier\":\"metro\""
+    ]
+  },
+  {
+    "id": "p9_incheon_metro_has_no_district_phone",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "인천"
+    },
+    "expectedTextIncludes": [
+      "인천광역시 광역 기준 안내입니다",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedTextExcludes": [
+      "문의/신청 안내 전화",
+      "032-453-2560",
+      "032-509-6610"
+    ],
+    "expectedStructuredIncludes": [
+      "\"regionStatus\":\"metro\"",
+      "\"coverageTier\":\"metro\""
     ]
   }
 ]

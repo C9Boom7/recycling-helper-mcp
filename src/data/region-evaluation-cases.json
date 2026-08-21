@@ -370,9 +370,9 @@
   },
   {
     "region": "부산 해운대구",
-    "expectedRegionId": "busan",
-    "expectedLevel": "metro",
-    "expectedNamedSubRegion": "해운대구"
+    "expectedRegionId": "haeundae_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "부산 중구",
@@ -504,9 +504,9 @@
   },
   {
     "region": "해운대구",
-    "expectedRegionId": "busan",
-    "expectedLevel": "metro",
-    "expectedNamedSubRegion": "해운대구"
+    "expectedRegionId": "haeundae_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "수성구",
@@ -516,9 +516,9 @@
   },
   {
     "region": "부평구",
-    "expectedRegionId": "incheon",
-    "expectedLevel": "metro",
-    "expectedNamedSubRegion": "부평구"
+    "expectedRegionId": "bupyeong_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
   },
   {
     "region": "유성구",
@@ -573,5 +573,59 @@
     "expectedRegionId": "namyangju_si",
     "expectedLevel": "district",
     "expectedBulkyApplication": true
+  },
+  {
+    "region": "부산 부산진구",
+    "expectedRegionId": "busanjin_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "대구 북구",
+    "expectedRegionId": "buk_gu_daegu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "인천 남동구",
+    "expectedRegionId": "namdong_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "인천 부평구",
+    "expectedRegionId": "bupyeong_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "부산 북구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "북구"
+  },
+  {
+    "region": "울산 북구",
+    "expectedRegionId": "ulsan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "북구"
+  },
+  {
+    "region": "부산 사하구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "사하구"
+  },
+  {
+    "region": "대구 수성구",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "수성구"
+  },
+  {
+    "region": "인천 미추홀구",
+    "expectedRegionId": "incheon",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "미추홀구"
   }
 ]

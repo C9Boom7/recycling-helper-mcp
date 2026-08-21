@@ -3,13 +3,65 @@
 [phase-9-metro-districts.md](phase-9-metro-districts.md)의 R1·R4를 먼저 끝내 놓고, R2(지역 데이터 수집)와
 R3(수수료 임포트)를 이어받을 세션이 URL·전화·확인일만 채우면 바로 `src/data/`에 붙일 수 있게 만든 문서다.
 
-이 세션은 컨테이너에서 돌았고 **분리배출.kr·law.go.kr·data.go.kr·구청 사이트가 전부 이그레스 프록시에서 막혀 있다.**
-그래서 신청 URL, 전화번호, `checkedAt`, 수수료 금액은 한 글자도 적지 않았다. 열어본 적 없는 페이지를 근거로
-적는 건 확신 있는 오답을 만드는 일이라, 전부 `"TODO: R2에서 채운다"`로 남겼다.
-`src/data/` 아래 파일도 건드리지 않았다 — 필수 필드가 빈 지역을 넣으면 `validate-data.mjs`가 즉시 깨진다.
+> **2026-08-21 갱신.** 이 문서를 쓴 세션은 이그레스가 막혀 URL·전화번호를 한 글자도 못 적었다.
+> 이어받은 세션은 망이 열려 있어 **8곳 중 5곳을 실제로 넣었다.** 아래 0절이 결과이고,
+> 1~4절은 넣기 전 기준값과 설계 검증 기록이라 그대로 둔다 — 회귀를 판단하려면 넣기 전 값이 남아 있어야 한다.
+> 8곳을 전제로 쓴 문장(2-1 표, 2-4 정리 목록, 4-4의 47.3%)은 5곳 기준으로 다시 읽어야 한다.
 
-대신 여기서만 할 수 있는 일을 했다. 기준값을 재고, id·별칭 설계를 리졸버에 직접 태워 검증하고,
-지금 서버가 이 질의들을 어떻게 처리하는지 전부 실측해 두었다.
+---
+
+## 0. 구현 결과 (2026-08-21)
+
+### 0-1. 넣은 5곳
+
+| 지역 | `id` | 신청 경로 | 직통 전화 |
+| --- | --- | --- | --- |
+| 부산 해운대구 | `haeundae_gu` | 대행업체 전화 접수(구청 안내 페이지) | 051-749-4462 |
+| 부산 부산진구 | `busanjin_gu` | 대행업체 네이버 스마트스토어(구청 안내 페이지) | 051-605-4462 |
+| 대구 북구 | `buk_gu_daegu` | 구청 통합예약 자체 신청 | 053-665-2727 |
+| 인천 남동구 | `namdong_gu` | 구 누리집 스티커 구입 | 032-453-2560 |
+| 인천 부평구 | `bupyeong_gu` | 구 폐기물배출신고 시스템 | 032-509-6610 |
+
+값은 전부 **실제로 연 페이지에서만** 옮겼다. 해운대구와 부산진구는 구청에 자체 신청 화면이 없고
+신청 안내와 품목별 수수료표가 한 페이지에 같이 있어 `applicationUrl`과 `feeUrl`이 같은 주소다.
+그 사정은 두 지역 `summary`에 적어 두었다.
+
+### 0-2. 미룬 3곳과 이유
+
+| 지역 | 막힌 곳 |
+| --- | --- |
+| 대구 달서구 | 신청·수수료·전화·폐건전지까지 다 모았는데 **구 단위 폐의약품 안내가 없다.** 구청 청소 페이지·재활용 페이지·대구시 환경 페이지를 다 열었지만 폐의약품 배출 방법이 실린 곳이 없었다. `specialCollections.medicine.method`가 standard 티어 필수라 지역째 미뤘다. |
+| 대전 서구 | 신청 시스템(`seogu.go.kr/waste`)과 품목별 수수료 조회, 폐형광등·폐전지, 자원순환과 042-288-3584까지 확인했다. **폐의약품 안내가 구 사이트 어디에도 없다** — 환경청소 메뉴 전체와 재활용품분리배출 본문을 확인했다. |
+| 광주 북구 | 대형폐기물은 ㈜녹색환경(062-572-1336) 전화 접수뿐이고 **품목별 수수료 URL이 없다.** 게다가 구 사이트가 스스로를 `전남광주통합특별시 북구`로 표기한다 — 저장소의 `gwangju`(광주광역시) 모델과 어긋나서, 광역 항목까지 함께 볼 문제라 이 PR에서 손대지 않았다. |
+
+미룬 3곳은 광역 티어 별칭을 건드리지 않았다. `daegu.districtAliases`의 `달서구`,
+`daejeon.prefixOnlyDistrictAliases`의 `서구`, `gwangju.prefixOnlyDistrictAliases`의 `북구`가
+그대로 남아 있어야 하고, 실제로 남겨 두었다.
+
+### 0-3. 지표
+
+`pnpm measure:region` 기준 **자치구 확정 30/79(38.0%) → 40/88(45.5%)**, 오매칭 0, 되묻기 0이다.
+입력이 79줄에서 88줄로 늘었다(기존 4줄 수정 + 9줄 추가).
+
+`pnpm local:test` 통과 — 324 품목 / **54 지역** / **103 지역 케이스** / **498 answer case**.
+warning 9건은 기존부터 있던 임포터 재실행 안내다.
+
+### 0-4. 실제로 바뀐 파일
+
+- `src/data/region-policies.json` — 자치구 5곳 추가, `busan`·`incheon`의 `districtAliases`에서
+  해운대구·부산진구·남동구·부평구 제거, `daegu.prefixOnlyDistrictAliases`에서 `북구` 제거
+- `logs/region-expansion-queries.example.jsonl` — 4줄 수정 + 9줄 추가(반례 `북구`는 `expectRefusal`)
+- `src/data/region-evaluation-cases.json` — 기존 3건 승격, 확정 4건·반례 5건 추가
+- `src/data/mcp-answer-cases.json` — `region_info_metro_fallback_battery_collection`을
+  `부산 사하구`로 옮기고(구 이름이 박힌 기대 문자열 넷을 함께 교체), `p9_` 11건 추가.
+  `부산` 광역 케이스는 새로 만들지 않고 기존 `region_metro_fallback_busan`의
+  `expectedTextExcludes`에 자치구 직통번호를 박았다 — 같은 tool/input 케이스는 validate가 막는다.
+- `docs/session-coordination.md`·`docs/source-coverage.md`·`docs/qa-runbook.md` — 카운트와 티어 집계
+
+### 0-5. R3(수수료 임포트)는 안 했다
+
+5곳 모두 `bulky-waste-fees.json` 행이 없다. 그래서 `get_disposal_steps`는 신청 경로와 전화까지만
+싣고 금액 줄은 안 붙는다. 광역 폴백보다는 훨씬 낫지만 관악구 수준은 아니다. 5-2가 그대로 남은 일이다.
 
 ---
 
@@ -410,11 +462,12 @@ district 티어에서 **넣으면 안 되는 것**:
 `expectedNamedSubRegion` 필드는 빼야 한다. 그 필드는 광역으로 착지했을 때 부를 이름을 보는 것이라
 자치구로 확정되면 볼 게 없다(`findNamedSubRegion`은 district 항목에 대해 항상 `undefined`를 준다).
 
-**새로 넣는 확정 케이스 8건:**
+**새로 넣는 확정 케이스 7건.** 해운대구는 위 3건에서 이미 고치므로 여기 또 적지 않는다 —
+같은 `region` 문자열이 두 벌 남아도 `test-region-matching.ts`는 배열을 그냥 순회할 뿐이라 잡히지 않고,
+`validate-data.mjs`가 `docs/session-coordination.md`와 대조하는 지역 평가 케이스 수만 조용히 어긋난다.
 
 ```json
-{ "region": "부산 해운대구", "expectedRegionId": "haeundae_gu",   "expectedLevel": "district", "expectedBulkyApplication": true }
-{ "region": "부산진구",      "expectedRegionId": "busanjin_gu",   "expectedLevel": "district", "expectedBulkyApplication": true }
+{ "region": "부산 부산진구", "expectedRegionId": "busanjin_gu",   "expectedLevel": "district", "expectedBulkyApplication": true }
 { "region": "대구 달서구",   "expectedRegionId": "dalseo_gu",     "expectedLevel": "district", "expectedBulkyApplication": true }
 { "region": "대구 북구",     "expectedRegionId": "buk_gu_daegu",  "expectedLevel": "district", "expectedBulkyApplication": true }
 { "region": "인천 남동구",   "expectedRegionId": "namdong_gu",    "expectedLevel": "district", "expectedBulkyApplication": true }
@@ -435,14 +488,14 @@ district 티어에서 **넣으면 안 되는 것**:
 { "region": "부산 북구",   "expectedRegionId": "busan",   "expectedLevel": "metro", "expectedNamedSubRegion": "북구" }
 { "region": "울산 북구",   "expectedRegionId": "ulsan",   "expectedLevel": "metro", "expectedNamedSubRegion": "북구" }
 { "region": "광주 서구",   "expectedRegionId": "gwangju", "expectedLevel": "metro", "expectedNamedSubRegion": "서구" }
-{ "region": "인천 서구",   "expectedRegionId": "incheon", "expectedLevel": "metro", "expectedNamedSubRegion": "서구" }
 { "region": "대전 동구",   "expectedRegionId": "daejeon", "expectedLevel": "metro", "expectedNamedSubRegion": "동구" }
-{ "region": "부산 중구",   "expectedRegionId": "busan",   "expectedLevel": "metro", "expectedNamedSubRegion": "중구" }
-{ "region": "대구 동구",   "expectedRegionId": "daegu",   "expectedLevel": "metro", "expectedNamedSubRegion": "동구" }
 { "region": "부산 사하구", "expectedRegionId": "busan",   "expectedLevel": "metro", "expectedNamedSubRegion": "사하구" }
 { "region": "대구 수성구", "expectedRegionId": "daegu",   "expectedLevel": "metro", "expectedNamedSubRegion": "수성구" }
 { "region": "인천 미추홀구","expectedRegionId": "incheon","expectedLevel": "metro", "expectedNamedSubRegion": "미추홀구" }
 ```
+
+`부산 중구`·`대구 동구`·`인천 서구`는 이 목록에서 뺐다. **셋 다 이미 파일에 글자까지 똑같이 들어 있고**,
+3-3에서 "그대로 통과해야 하는 것"으로 분류해 둔 바로 그 케이스들이다. 또 적으면 두 벌이 된다.
 
 맨 `북구`·`서구` 두 줄은 **스키마가 지금 그대로는 못 받는다.** `region-evaluation-cases.json`의 타입에는
 "확정되면 안 된다"를 적을 자리가 없다(`expectedStatus: "ambiguous"`는 되묻기 전용이다).
@@ -497,8 +550,12 @@ DoD가 이 파일로 재는 만큼 초안을 그대로 적어 둔다.
 append-only 원칙의 예외가 불가피하다. 두 가지 길이 있고 **후자를 권한다.**
 
 1. 이 케이스의 문구 기대값을 자치구 응답으로 갈아엎는다 → 광역 폴백 계약을 검증하던 케이스가 사라진다.
-2. `region`만 아직 미등록인 구로 옮긴다(`부산 사하구`가 맞다). 검증하던 계약은 그대로 살고,
+2. 아직 미등록인 구로 옮긴다(`부산 사하구`가 맞다). 검증하던 계약은 그대로 살고,
    해운대구는 아래 `p9_` 케이스로 새로 덮는다.
+   **인자만 바꿔서는 안 된다** — 이 케이스는 구 이름을 기대 문자열 네 군데에 직접 박아 뒀다.
+   `expectedTextIncludes`의 `"해운대구 상세 데이터는 아직 없어 부산광역시 광역 기준으로 안내합니다"`와
+   `"대형폐기물 신청 경로와 수수료는 해운대구 소관이니"`, `expectedTextExcludes`는 그대로 두고,
+   `expectedStructuredIncludes`의 `"\"region\":\"부산 해운대구\""`까지 넷을 함께 갈아야 스모크가 통과한다.
 
 신규 케이스:
 
@@ -690,17 +747,24 @@ for(const n of t) console.log(n, [...new Set(r.filter(x=>x.SGG_NM===n).map(x=>x.
 
 ### 5-3. 순서대로 정리한 작업 목록
 
+> 2026-08-21에 1~9·11단계를 5곳 기준으로 끝냈다(0절). 남은 것은 미룬 3곳의 R2와,
+> 5곳 전부에 해당하는 R3 수수료 임포트(10단계), 그리고 12·13단계다.
+
 1. `region-policies.json`에 8곳(또는 축소안 4곳) 추가 — 4-1 골격에 R2로 모은 값을 채운다.
 2. 같은 파일에서 광역 5곳의 `districtAliases`·`prefixOnlyDistrictAliases` 정리 — **2-4.**
 3. `pnpm check` — 여기서 걸리는 게 4-2 체크리스트의 미비다.
 4. `logs/region-expansion-queries.example.jsonl` 갱신 — **4-4.** 기존 4줄 수정 + 새 줄 추가.
 5. `pnpm measure:region` — 오매칭 0, 자치구 확정 38.0% 초과를 확인한다.
-6. `region-evaluation-cases.json` — 기존 3건 수정 + 확정 8건 + 반례 12건. **4-3.**
+6. `region-evaluation-cases.json` — 기존 3건 수정 + 확정 7건 + 반례 7건. **4-3.**
+   맨 `북구`·`서구`는 이 파일이 못 받으므로 4단계의 jsonl에 `expectRefusal`로만 넣는다.
 7. `mcp-answer-cases.json` — `region_info_metro_fallback_battery_collection`을 `부산 사하구`로 옮기고,
    `p9_` 케이스를 append한다. **4-5.**
 8. 문서 카운트 갱신 — `docs/session-coordination.md`(지역 수·지역 케이스 수·answer case 수 전부),
    `docs/source-coverage.md`. **4-2 마지막 항목.**
-9. `docs/qa-runbook.md:189`도 손본다 — "`해운대구`는 부산광역시로 착지한다"가 사실이 아니게 된다.
+9. `docs/qa-runbook.md` 두 줄을 손본다. 189줄은 "`해운대구`는 부산광역시로 착지한다"가 사실이 아니게 되고,
+   184줄은 티어 집계("49개 지역 / `full` 5곳 / `standard` 27곳 / `metro` 17곳")가 통째로 틀어진다.
+   **`validate-data.mjs`는 이 파일을 안 본다** — `source-coverage.md`와 `session-coordination.md`만 대조하므로
+   여기서 빠뜨리면 검사는 초록인데 운영 문서만 오답으로 남는다.
 10. R3 수수료 임포트 — **5-2.** 넣었으면 `pnpm fees:verify:rows`와 10행 눈 대조.
 11. `pnpm local:test` → `pnpm check:links` 전건 통과.
 12. `docs/prd/README.md`의 진행 상태 표와 `phase-9-metro-districts.md` 체크리스트를 갱신한다.
