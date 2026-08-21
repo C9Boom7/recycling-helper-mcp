@@ -14,6 +14,18 @@
   본선 사용자 투표에서 그대로 드러난다.
 - 같은 측정의 `question-backlog` 111개는 110개가 매칭된다(not_found 0.9%). 구멍은 확장 세트 쪽에만 있다.
 
+**not_found보다 나쁜 게 하나 섞여 있다.** 2026-08-21 실측:
+
+```
+변기 솔    (띄어쓰기) => toilet_bowl (변기) / bulky_waste_or_construction_waste / 79점
+변기솔     (붙여쓰기) => not_found
+화장실 청소솔          => dish_brush (설거지 솔) / 91점
+변기 청소솔            => dish_brush (설거지 솔) / 91점
+```
+
+솔 하나 버리려는 사람에게 **대형폐기물 신고 안내가 나간다.** 이건 커버리지 구멍이 아니라 오답이라
+편의성이 아니라 안정성 쪽 문제다. `toilet_brush` 품목을 넣으면 네 갈래가 한곳으로 모인다.
+
 ## 범위
 
 포함: `src/data/waste-items.json`, `src/data/evaluation-cases.json`, `src/data/mcp-answer-cases.json`, `docs/source-coverage.md`.
@@ -85,6 +97,8 @@
 `disposalType`은 `src/data/disposal-groups.json`에 있는 값만 쓴다. 새 갈래를 만들지 않는다 —
 갈래가 늘면 런타임 문구 분기가 따라 늘고, 그건 이 Phase의 범위 밖이다.
 
+`sourceRefs`도 빈 배열이면 validate가 막는다. `sources`와 같이 채운다.
+
 `src/data/evaluation-cases.json` — 품목 수와 **1:1로 맞춘다**(현재 324/324, validate가 검사한다).
 ```json
 { "query": "...", "expectedItemId": "...", "expectedDisposalType": "...", "notes": "..." }
@@ -100,6 +114,19 @@
 `verified`, `region_review_needed`, `needs_source`, `standard_import`). `validate-data.mjs`가 실제 데이터와 대조한다.
 
 `docs/session-coordination.md`의 Current State Snapshot 카운트도 같은 값으로 맞춘다.
+
+### R3b. 폴백을 기대하던 기존 회귀 케이스를 갱신한다
+
+품목을 넣으면 지금 not_found 폴백을 기대하는 케이스 셋이 깨져 스모크가 멈춘다.
+
+| 케이스 id | 질의 | 지금 기대값 |
+| --- | --- | --- |
+| `steps_fallback_toilet_brush` | `변기솔 버리는 법` | `초기 데이터에서 확실히 찾지 못했습니다` |
+| `steps_fallback_leather_belt` | `가죽 벨트 어떻게 버려?` | `초기 데이터에서 확실히 찾지 못했습니다` |
+| `classify_fallback_pet_food_bag` | `사료 포대 버리기` | `주요 재질별 한 줄 원칙` |
+
+셋 다 **지우지 말고 기대값을 확정 응답으로 바꾼다.** 그 질의가 어디로 가는지를 고정하는 자리는 그대로 있어야 한다.
+`classify_waste_item` 케이스는 structured 필드가 `id`가 아니라 `matchedItem`이다.
 
 ### R4. 검증
 
@@ -121,6 +148,8 @@ pnpm measure:utterances   # 추가 후에 다시
 - [ ] `pnpm local:test` 통과
 - [ ] 신규·수정 품목 전부 `sources` 1건 이상, `checkedAt`은 실제 확인일
 - [ ] 별칭을 추가한 품목마다 반례 케이스가 `mcp-answer-cases.json`에 있다
+- [ ] `변기 솔`·`화장실 청소솔`·`변기 청소솔`이 전부 `toilet_brush`로 모인다
+- [ ] 폴백을 기대하던 기존 케이스 3건을 지우지 않고 기대값만 갱신했다
 - [ ] `docs/source-coverage.md`와 `docs/session-coordination.md` 카운트가 데이터와 일치
 
 ## Phase 9와 병렬로 돌 때
@@ -149,5 +178,6 @@ Phase 9는 머지 전에 최신 main을 브랜치에 반영하고 카운트만 �
 - [ ] R1 판정 (별칭 / 신규)
 - [ ] R2 출처 조사
 - [ ] R3 데이터 반영
+- [ ] R3b 기존 케이스 갱신
 - [ ] R4 검증
 - [ ] PR 생성
