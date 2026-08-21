@@ -1942,5 +1942,35 @@
     "expectedItemId": "paper_shredder",
     "expectedDisposalType": "small_electronics_collection_or_bulky",
     "notes": "Phase 7 후속 배치. 세면대·세탁기로 되묻던 질의를 이 품목이 받는다."
+  },
+  {
+    "query": "플라스틱 양념통 분리수거 되나?",
+    "expectedItemId": "seasoning_container",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 8 품목 커버리지. 장류 용기는 재질에 맞게 플라스틱 또는 유리병으로 간다는 고추장 항목을 따라 재질 분기로 잡았습니다."
+  },
+  {
+    "query": "변기솔은 어떻게 버려?",
+    "expectedItemId": "toilet_brush",
+    "expectedDisposalType": "general",
+    "notes": "Phase 8 품목 커버리지. 띄어 쓴 '변기 솔'이 변기(대형폐기물)로 확정되던 오답을 함께 막습니다."
+  },
+  {
+    "query": "선크림 튜브 분리수거 돼?",
+    "expectedItemId": "sunscreen_tube",
+    "expectedDisposalType": "recycle_or_general_after_empty",
+    "notes": "Phase 8 품목 커버리지. 도포·첩합과 플라스틱 갈래를 핸드크림 두 항목에서 가져왔습니다."
+  },
+  {
+    "query": "가죽 벨트는 어떻게 버려?",
+    "expectedItemId": "belt",
+    "expectedDisposalType": "reuse_collection_or_general",
+    "notes": "Phase 8 품목 커버리지. 의류 항목이 잡화 예시로 벨트를 들고 있어 의류수거함 갈래로 잡았습니다."
+  },
+  {
+    "query": "젖병은 분리수거 돼?",
+    "expectedItemId": "baby_bottle",
+    "expectedDisposalType": "recycle_or_general_by_material",
+    "notes": "Phase 8 품목 커버리지. 실리콘 젖꼭지와 내열유리 몸체가 갈려 재질 분기로 잡았습니다."
   }
 ]
