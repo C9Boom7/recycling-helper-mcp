@@ -126,6 +126,19 @@ const CANARIES: Array<{ query: string; expectId: string }> = [
   { query: "냉장고 버리는데 냉장고 야채칸은 어떻게 하나요", expectId: "refrigerator" },
   // 병렬(`이불이랑 커버`)은 앞말도 물어본 물건이라 수식(`모니터용 받침대`)과 갈라야 한다.
   { query: "이불이랑 커버 같이 버려도 되나요?", expectId: "blanket" },
+  // 붙여 쓴 복합어의 꼬리가 같은 품목의 다른 이름이면 그 자리는 부품이 아니다.
+  { query: "전선케이블", expectId: "cable_wire" },
+  { query: "마우스충전기", expectId: "small_electronics" },
+  { query: "소쿠리채반", expectId: "colander" },
+  // 부품어를 설명하는 오타 히트는 살고(`정수끼`->정수기 필터), 못 하는 쪽은 걸린다.
+  { query: "정수끼 필터", expectId: "water_purifier_filter" },
+  { query: "냉장구 야채칸", expectId: "not_found" },
+  // 게이트에 걸린 구간 안에 통째로 든 짧은 이름도 같이 내려간다.
+  { query: "알약 포장재 커버", expectId: "not_found" },
+  { query: "화분 흙 커버", expectId: "not_found" },
+  // 구간 밖에서 따로 부른 이름은 그대로 남는다.
+  { query: "알약 포장재", expectId: "pill_blister_packaging" },
+  { query: "믹서기 칼날", expectId: "knife_blade" },
 ];
 
 console.log("");

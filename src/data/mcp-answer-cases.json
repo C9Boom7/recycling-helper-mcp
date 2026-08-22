@@ -10170,5 +10170,123 @@
     "expectedStructuredIncludes": [
       "\"found\":false"
     ]
+  },
+  {
+    "id": "part_compound_joined_cable_wire",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "전선케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_joined_small_electronics",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "마우스충전기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "part_compound_joined_colander",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소쿠리채반"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"채반\""
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_fridge_crisper",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장구 야채칸"
+    },
+    "expectedTextExcludes": [
+      "냉장고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_confusing_fridge_crisper",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "냉장구 야채칸"
+    },
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "냉장고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_purifier_filter",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "정수끼 필터"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"정수기 필터\""
+    ]
+  },
+  {
+    "id": "part_compound_inner_pill_packaging_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "알약 포장재 커버"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"알약 포장재 커버\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "## 폐의약품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_plant_soil_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "화분 흙 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_ironing_board_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "다리미판 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_canary_pill_packaging",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "알약 포장재"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"알약 포장재\""
+    ]
   }
 ]

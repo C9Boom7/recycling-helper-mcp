@@ -4,7 +4,7 @@
  *
  * 게이트 도입 **전** 사전 측정용이라 최종 규칙과 다르다. 여기 `firesOn`은 등장 자리를
  * 어절 첫머리로 제한하지도, 같은 품목의 다른 이름으로 자리를 늘리지도 않는다
- * (`src/data.ts`의 `itemIsPartCompoundModifier`). 발동 규모를 가늠한 기록으로만 읽어라.
+ * (`src/data.ts`의 `partCompoundGateOf`). 발동 규모를 가늠한 기록으로만 읽어라.
  */
 import { wasteItems, normalizeText } from "../../src/data.ts";
 import { particleStrippedForms } from "../../src/korean/query-tokenizer.ts";
