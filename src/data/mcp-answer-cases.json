@@ -6091,14 +6091,11 @@
       "itemName": "변기솔 버리는 법"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "주요 재질별 한 줄 원칙",
-      "일반쓰레기(종량제)"
+      "## 변기솔",
+      "종량제봉투"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"inferred\":false",
-      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+      "\"id\":\"toilet_brush\""
     ]
   },
   {
@@ -6108,12 +6105,11 @@
       "itemName": "가죽 벨트 어떻게 버려?"
     },
     "expectedTextIncludes": [
-      "초기 데이터에서 확실히 찾지 못했습니다",
-      "재질로 추정한 일반 원칙"
+      "## 벨트",
+      "의류수거함"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+      "\"id\":\"belt\""
     ]
   },
   {
@@ -6123,13 +6119,11 @@
       "itemName": "사료 포대 버리기"
     },
     "expectedTextIncludes": [
-      "주요 재질별 한 줄 원칙",
-      "플라스틱 용기류"
+      "분류 결과: 쌀포대"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false",
-      "\"inferred\":false",
-      "\"quickRule\""
+      "\"matchedItem\":\"쌀포대\"",
+      "\"matchedBy\":\"사료 포대\""
     ]
   },
   {
@@ -9518,5 +9512,360 @@
     "expectedRegionNotes": {
       "present": true
     }
+  },
+  {
+    "id": "p8_seasoning_container_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "플라스틱 양념통 분리수거 되나?"
+    },
+    "expectedTextIncludes": [
+      "## 양념통",
+      "플라스틱 수거함"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"seasoning_container\""
+    ]
+  },
+  {
+    "id": "p8_seasoning_container_glass_branch",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "유리 양념통"
+    },
+    "expectedTextIncludes": [
+      "## 양념통",
+      "유리병 수거함"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"seasoning_container\""
+    ]
+  },
+  {
+    "id": "p8_delivery_container_not_stolen",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "양념 묻은 배달용기"
+    },
+    "expectedTextIncludes": [
+      "## 배달 플라스틱 용기"
+    ],
+    "expectedTextExcludes": [
+      "## 양념통"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"plastic_food_container\""
+    ]
+  },
+  {
+    "id": "p8_toilet_brush_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기솔은 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 변기솔",
+      "종량제봉투"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_brush\""
+    ]
+  },
+  {
+    "id": "p8_toilet_brush_spaced_not_toilet_bowl",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기 솔 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 변기솔"
+    ],
+    "expectedTextExcludes": [
+      "대형폐기물로 신고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_brush\""
+    ]
+  },
+  {
+    "id": "p8_toilet_bowl_not_stolen",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "변기 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 변기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toilet_bowl\""
+    ]
+  },
+  {
+    "id": "p8_sunscreen_tube_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "선크림 튜브 분리수거 돼?"
+    },
+    "expectedTextIncludes": [
+      "## 선크림 튜브",
+      "도포·첩합"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sunscreen_tube\""
+    ]
+  },
+  {
+    "id": "p8_toothpaste_tube_not_stolen",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "치약 튜브"
+    },
+    "expectedTextIncludes": [
+      "## 치약 튜브"
+    ],
+    "expectedTextExcludes": [
+      "## 선크림 튜브"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toothpaste_tube\""
+    ]
+  },
+  {
+    "id": "p8_belt_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "가죽 벨트는 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 벨트",
+      "의류수거함"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"belt\""
+    ]
+  },
+  {
+    "id": "p8_fabric_belt_same_answer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "천 벨트"
+    },
+    "expectedTextIncludes": [
+      "## 벨트",
+      "의류수거함"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"belt\""
+    ]
+  },
+  {
+    "id": "p8_treadmill_belt_not_stolen",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "러닝머신 벨트"
+    },
+    "expectedTextIncludes": [
+      "## 운동기구"
+    ],
+    "expectedTextExcludes": [
+      "## 벨트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"exercise_machine\""
+    ]
+  },
+  {
+    "id": "p8_baby_bottle_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병은 분리수거 돼?"
+    },
+    "expectedTextIncludes": [
+      "## 젖병",
+      "종량제봉투"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_bottle\""
+    ]
+  },
+  {
+    "id": "p8_bottle_drying_rack_not_stolen",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 건조대"
+    },
+    "expectedTextIncludes": [
+      "## 빨래건조대"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"drying_rack\""
+    ]
+  },
+  {
+    "id": "p8_pet_food_sack_alias",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "사료 포대는 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 쌀포대",
+      "종량제봉투"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"rice_sack\"",
+      "\"matchedBy\":\"사료 포대\""
+    ]
+  },
+  {
+    "id": "p8_bottle_sterilizer_confirmed",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 소독기 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "## 젖병살균소독기",
+      "소형전기전자제품 전용수거함"
+    ],
+    "expectedTextExcludes": [
+      "플라스틱류로 배출합니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bottle_sterilizer\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "p8_bottle_warmer_same_item",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 워머"
+    },
+    "expectedTextIncludes": [
+      "## 젖병살균소독기",
+      "1599-0903"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bottle_sterilizer\""
+    ]
+  },
+  {
+    "id": "p8_baby_bottle_not_stolen_by_sterilizer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병"
+    },
+    "expectedTextIncludes": [
+      "## 젖병"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병살균소독기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_bottle\""
+    ]
+  },
+  {
+    "id": "p8_baby_bottle_nipple_still_baby_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 젖꼭지"
+    },
+    "expectedTextIncludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"baby_bottle\""
+    ]
+  },
+  {
+    "id": "p8_bare_nipple_falls_back",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖꼭지"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "p8_seat_belt_fallback_ask_for",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "안전벨트"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙",
+      "일반쓰레기(종량제)"
+    ],
+    "expectedTextExcludes": [
+      "## 벨트"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
+  },
+  {
+    "id": "p8_bottle_brush_not_baby_bottle",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 솔"
+    },
+    "expectedTextIncludes": [
+      "## 설거지 솔"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dish_brush\""
+    ]
+  },
+  {
+    "id": "p8_bottle_brush_alias_variant",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "젖병 브러시"
+    },
+    "expectedTextIncludes": [
+      "## 설거지 솔"
+    ],
+    "expectedTextExcludes": [
+      "## 젖병"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"dish_brush\""
+    ]
+  },
+  {
+    "id": "p8_pet_food_itself_not_sack",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "사료 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "초기 데이터에서 확실히 찾지 못했습니다",
+      "주요 재질별 한 줄 원칙"
+    ],
+    "expectedTextExcludes": [
+      "## 쌀포대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
+    ]
   }
 ]

@@ -148,15 +148,15 @@ pnpm measure:utterances   # 추가 후에 다시 (건수는 늘고, 100%는 그�
 
 ## 완료 기준 (DoD)
 
-- [ ] `pnpm measure:coverage`의 `coverage-expansion-utterances` **not_found 0/50**
-- [ ] `pnpm measure:utterances` **전건 100%, wrong 0, ambiguous 0** 유지
+- [x] `pnpm measure:coverage`의 `coverage-expansion-utterances` **not_found 0/50** — 반영 전 6/50
+- [x] `pnpm measure:utterances` **전건 100%, wrong 0, ambiguous 0** 유지 — 3,300/3,300
       (건수는 `품목 수 × 10`이라 품목을 넣으면 3,240에서 함께 늘어난다. 고정할 값은 비율이지 건수가 아니다)
-- [ ] `pnpm local:test` 통과
-- [ ] 신규·수정 품목 전부 `sources` 1건 이상, `checkedAt`은 실제 확인일
-- [ ] 별칭을 추가한 품목마다 반례 케이스가 `mcp-answer-cases.json`에 있다
-- [ ] `변기 솔`·`화장실 청소솔`·`변기 청소솔`이 전부 `toilet_brush`로 모인다
-- [ ] 폴백을 기대하던 기존 케이스 3건을 지우지 않고 기대값만 갱신했다
-- [ ] `docs/source-coverage.md`와 `docs/session-coordination.md` 카운트가 데이터와 일치
+- [x] `pnpm local:test` 통과 — 품목 330, answer case 510, 위젯 330/330
+- [x] 신규·수정 품목 전부 `sources` 1건 이상, `checkedAt`은 실제 확인일 — 2026-08-21에 연 품목사전 원문
+- [x] 별칭을 추가한 품목마다 반례 케이스가 `mcp-answer-cases.json`에 있다 — `사료`(내용물)와 `젖병`이 안 뺏기는지 각각 고정
+- [x] `변기 솔`·`화장실 청소솔`·`변기 청소솔`이 전부 `toilet_brush`로 모인다 — 셋 다 100점 정확 일치
+- [x] 폴백을 기대하던 기존 케이스 3건을 지우지 않고 기대값만 갱신했다
+- [x] `docs/source-coverage.md`와 `docs/session-coordination.md` 카운트가 데이터와 일치 — validate가 대조한다
 
 ## Phase 9와 병렬로 돌 때
 
@@ -181,9 +181,9 @@ Phase 9는 머지 전에 최신 main을 브랜치에 반영하고 카운트만 �
 
 ## 체크리스트
 
-- [ ] R1 판정 (별칭 / 신규)
-- [ ] R2 출처 조사
-- [ ] R3 데이터 반영
-- [ ] R3b 기존 케이스 갱신
-- [ ] R4 검증
-- [ ] PR 생성
+- [x] R1 판정 (별칭 / 신규) — 신규 6, 별칭 흡수 1. R2에서 양념통·벨트 판정이 뒤집혔다
+- [x] R2 출처 조사 — 여섯 건 모두 품목사전 원문 확인. 결과는 [phase-8-item-coverage-result.md](phase-8-item-coverage-result.md)
+- [x] R3 데이터 반영 — 품목 324 → 330
+- [x] R3b 기존 케이스 갱신 — 폴백 3건을 지우지 않고 기대값만 확정 매칭으로 바꿨다
+- [x] R4 검증 — `local:test` 통과, 확장 발화 not_found 0/50, 발화 내성 3,300건 100%(wrong·ambiguous 0)
+- [x] PR 생성 — PR #61 (리뷰 2라운드 반영까지 마쳤고, 머지는 저장소 주인 지시 대기)
