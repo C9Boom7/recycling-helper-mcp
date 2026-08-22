@@ -2485,8 +2485,8 @@
     "type": "region_gap",
     "status": "wont_fix",
     "priority": "high",
-    "observed": "사용자 결정에 따라 부산 해운대구 수거함 위치 탐색은 진행하지 않습니다. 미지원 지역에서는 기존 smoke로 주소를 지어내지 않고 공식 확인처로 안내합니다.",
-    "expectedAction": "제품 범위에서 제외하고, 기존 MCP answer smoke로 미지원 지역의 위치 단정 방지만 유지합니다.",
+    "observed": "사용자 결정에 따라 수거함 위치 탐색은 하지 않습니다. 2026-08-21 Phase 9에서 해운대구가 standard 티어로 들어와 폐건전지 배출 방법과 공동주택 수거 신청 번호까지는 안내하지만, 수거함 개별 주소는 여전히 담지 않고 동주민센터와 구청 확인처로 잇습니다.",
+    "expectedAction": "수거함 주소는 제품 범위에서 빼고, 상세 데이터가 없는 지역에서 위치를 단정하지 않는 방어만 MCP answer smoke로 유지합니다.",
     "candidateItemIds": [
       "battery"
     ],
@@ -2503,8 +2503,10 @@
       "reviewStatus: region_review_needed",
       "otherCandidates: nonwoven_bag/부직포 가방 matchedBy=부직포 장바구니는 의류수거함에 넣어도 돼 score=17; induction_cooktop_broken_glass/깨진 인덕션 유리 상판 matchedBy=인덕션 유리 상판 깨진 건 대형폐기물이야 score=10",
       "wontFixAt: 2026-07-05",
-      "wontFixReason: 사용자 결정에 따라 부산 해운대구 폐건전지 수거함 위치 탐색은 진행하지 않음",
-      "guardedBy: MCP answer case region_info_unknown_battery_collection"
+      "wontFixReason: 사용자 결정에 따라 폐건전지 수거함 개별 주소는 데이터로 담지 않음",
+      "wontFixReviewedAt: 2026-08-21",
+      "wontFixReviewNote: Phase 9에서 해운대구가 standard 티어로 등록되며 '미지원 지역'이라는 전제는 사라졌다. 위치를 담지 않는다는 결정 자체는 그대로 둔다",
+      "guardedBy: MCP answer case p9_haeundae_battery_collection"
     ]
   },
   {

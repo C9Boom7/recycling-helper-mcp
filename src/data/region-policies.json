@@ -3334,6 +3334,347 @@
     ]
   },
   {
+    "id": "haeundae_gu",
+    "name": "부산 해운대구",
+    "aliases": [
+      "해운대구",
+      "부산 해운대구",
+      "부산시 해운대구",
+      "부산광역시 해운대구",
+      "haeundae-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "busan",
+    "checkedAt": "2026-08-21",
+    "summary": "해운대구는 대형폐기물을 구청 홈페이지의 온라인 신청 화면에서 접수합니다. 이름과 연락처, 배출장소, 희망 배출일시, 배출품목을 적고 수집·운반업체를 고르면 그 업체가 전화로 수거일시를 알려줍니다. 전화로 접수하려면 대행업체인 민하산업(051-782-3511)이나 센텀환경(051-702-0111)에 바로 겁니다. 수수료는 신청할 때 내지 않고 수거 당일 업체가 현장에서 품목을 확인한 뒤 현금·카드·계좌이체로 받습니다. 그래서 배출 전에 붙일 스티커나 접수번호는 따로 나오지 않고, 영수증은 수거 현장에서 받습니다. 폐건전지와 폐형광등은 주택·빌라는 동주민센터에 내고 공동주택은 051-749-4451로 수거를 신청합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 참여 약국에 놓인 수거함에 배출합니다.",
+          "알약은 내용물만 모아서 배출하고, 가루약은 포장지를 뜯지 말고 그대로 냅니다. 물약은 새지 않게 밀봉하고, 안약이나 연고처럼 특수용기에 든 약은 겉 포장지만 벗겨 용기째 배출합니다.",
+          "의약외품과 건강기능식품은 폐의약품이 아니라서 수거함에 넣지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 녹슬지 않게 물기를 없애 폐건전지 전용수거함에 배출합니다. 주택과 빌라는 가까운 동주민센터에 내고, 공동주택은 모아 둔 뒤 051-749-4451로 수거를 신청합니다.",
+          "폐형광등은 다른 쓰레기와 철저히 갈라 깨지지 않게 폐형광등 전용수거함에 배출합니다. 공동주택은 같은 번호로 수거를 신청합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007003",
+      "feeUrl": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000",
+      "phone": "051-749-4462",
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "none"
+    },
+    "sources": [
+      {
+        "title": "해운대구 대형폐기물 배출 신청",
+        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007003",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "구청 자체 온라인 신청 화면. '대형폐기물 온라인 신청하기' 버튼과 인터넷 신청 절차(신청서 작성 → 이름·연락처·배출장소·희망배출일시·배출품목·수집운반업체 선택 → 처리업체 유선연락으로 수거일시 확인 → 수거 시 수수료 납부), 수수료를 신청 시 수납하지 않고 수거할 때 품목확인 후 현금·카드·계좌이체로 받는다는 안내, 담당 051-749-4462를 확인했다"
+      },
+      {
+        "title": "해운대구 대형폐기물이란?",
+        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "대형폐기물 정의와 처리 절차(배출신고 → 대행업체 접수 → 현장방문 품목확인 → 영수증 발급·수거), 대행업체 민하산업(782-3511)·센텀환경(702-0111) 접수 전화, 가전·가구·사무용품·주방욕실용품으로 나뉜 품목별 수수료표를 확인했다. 온라인 신청 버튼은 이 페이지가 아니라 배출 신청 페이지에 있다"
+      },
+      {
+        "title": "해운대구 재활용 가이드",
+        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014009000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐건전지·폐형광등 전용수거함 배출 요령과 공동주택 수거신청 번호 051-749-4451, 주택·빌라의 동주민센터 배출 기준"
+      },
+      {
+        "title": "해운대구 폐의약품 배출요령 및 수거함 위치",
+        "url": "https://www.haeundae.go.kr/board/view.do?boardId=BBS_0000038&menuCd=DOM_000000104001001000&paging=ok&startPage=2&searchType=DATA_TITLE&dataSid=3167609",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "2026-05-14 게시글. 알약·가루약·물약·특수용기 형태별 배출 방법과 참여 약국 수거함, 의약외품·건강기능식품 제외 기준"
+      },
+      {
+        "title": "해운대구 자원순환과",
+        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000101005020000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "청소지도팀이 대형폐기물 배출신고를 맡고 직통번호가 051-749-4462임을 확인했다. 구청 대표번호나 다른 팀 번호와 다르다"
+      }
+    ]
+  },
+  {
+    "id": "busanjin_gu",
+    "name": "부산 부산진구",
+    "aliases": [
+      "부산진구",
+      "부산 부산진구",
+      "부산시 부산진구",
+      "부산광역시 부산진구",
+      "부산 진구",
+      "부산시 진구",
+      "부산광역시 진구"
+    ],
+    "coverageTier": "standard",
+    "metroId": "busan",
+    "checkedAt": "2026-08-21",
+    "summary": "부산진구는 관내를 둘로 나눠 백양환경과 우리환경이 대형폐기물을 위탁 수거하고, 신청은 두 업체의 네이버 스마트스토어에서 받습니다. 구청에 자체 신청 화면이 없고 두 업체 링크와 품목별 수수료표가 안내 페이지 한 곳에 함께 실려 있어, 신청 경로와 수수료 조회가 같은 주소 한 줄로 나갑니다. 어느 업체가 맡는 동인지도 그 페이지 표에 적혀 있습니다. 신청한 뒤 희망한 날에 문 밖에 내놓으면 업체가 현장에 나와 품목을 확인하고 수수료를 받아 갑니다. 그래서 배출 전에 붙일 스티커나 접수번호는 따로 나오지 않습니다. 대행업체 근무시간과 휴무일은 위 안내 페이지에서 확인합니다. 폐의약품 수거함은 20개 동 주민센터와 보건소, 구청 1층 안내데스크에 있습니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 20개 동 주민센터와 보건소, 구청 1층 안내데스크에 놓인 수거함에 배출합니다.",
+          "알약은 포장재를 최대한 벗기고 내용물만 모아서 냅니다. 가루약은 포장지를 뜯지 말고 그대로 배출하고, 물약과 시럽은 흐르지 않게 한 통에 밀봉하거나 용기 마개를 닫아 그대로 냅니다. 연고와 안약은 겉 종이박스만 벗겨 용기째 배출합니다.",
+          "건강기능식품과 의약외품은 폐의약품이 아니라서 수거함에 넣지 않습니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 제품에서 전지를 분리해 공동주택·동 주민센터·대형마트에 놓인 수거함에 배출합니다. 전자제품 대리점이나 시계점의 역회수 경로로도 낼 수 있습니다.",
+          "폐형광등은 공동주택과 동 주민센터에 비치된 폐형광등 수거함에 배출합니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
+      "feeUrl": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
+      "phone": "051-605-4462",
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "none"
+    },
+    "sources": [
+      {
+        "title": "부산진구 대형폐기물처리 인터넷신청 및 수수료 안내",
+        "url": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "백양환경·우리환경 네이버 스마트스토어 접수 경로와 처리 절차, 대행업체 근무시간, 품목별 수수료표, 자원순환과 051-605-4462를 확인했다"
+      },
+      {
+        "title": "부산진구 재활용품 배출 및 분리수거요령",
+        "url": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002003",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐건전지 역회수 경로와 수거함 설치 장소, 폐형광등 수거함 배출 기준"
+      },
+      {
+        "title": "부산진구 폐의약품",
+        "url": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006008000",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "약 형태별 배출 방법과 20개 동 주민센터·보건소·구청 1층 수거함 위치, 건강기능식품·의약외품 제외 기준, 자원순환과 051-605-4464"
+      }
+    ]
+  },
+  {
+    "id": "buk_gu_daegu",
+    "name": "대구 북구",
+    "aliases": [
+      "대구 북구",
+      "대구시 북구",
+      "대구광역시 북구"
+    ],
+    "coverageTier": "standard",
+    "metroId": "daegu",
+    "checkedAt": "2026-08-21",
+    "summary": "대구 북구는 구청 통합예약에서 대형폐기물 배출을 직접 신청하고 품목별 수수료도 같은 시스템에서 조회합니다. 폐가전은 대형폐기물이 아니라 전국 무상수거(1599-0903)로 따로 신청합니다. 폐의약품은 동 행정복지센터와 구청, 약국, 보건소가 무상으로 받고, 폐건전지와 폐형광등은 아파트·동 행정복지센터·학교·금융기관 수거함에 내면 동 행정복지센터에서 생필품으로 바꿔 줍니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 각 동 행정복지센터와 구청, 약국, 보건소에서 무상으로 수거합니다.",
+          "알약은 밀봉되는 봉투에 모아서 내고, 가루약은 포장지를 뜯지 말고 그대로 배출합니다. 물약과 시럽은 한 병에 모을 수 있는 만큼 모아 새지 않게 밀봉하고, 안약·연고·바르는 물약은 겉 종이박스만 벗겨 용기째 냅니다.",
+          "쓰고 남은 농약처럼 다른 생활계 유해폐기물은 자원순환과(053-665-2586)에 수거를 신청합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 아파트와 동 주민센터, 학교, 금융기관, 할인점에 놓인 폐건전지 수거함에 배출합니다. 수은전지·산화은전지·니켈카드뮴전지가 대상입니다.",
+          "폐형광등은 포장재를 벗긴 뒤 아파트와 동 행정복지센터 등에 비치된 수거함에 배출합니다. 직관형·환형·안정기 내장형·콤팩트형 형광등과 LED 전구형·직관형이 대상입니다.",
+          "폐건전지와 폐형광등은 동 행정복지센터에서 생필품으로 바꿔 줍니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.buk.daegu.kr/reserve/index.do?menu_id=00002634",
+      "feeUrl": "https://www.buk.daegu.kr/reserve/index.do?menu_id=00002634&menu_link=%2Ffront%2Fbigwaste%2FfronBigwasteChargeView.do",
+      "phone": "053-665-2727",
+      "contactCheckedAt": "2026-08-21"
+    },
+    "sources": [
+      {
+        "title": "대구 북구 대형폐기물·폐가전배출",
+        "url": "https://www.buk.daegu.kr/index.do?menu_id=00001797",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "구청 통합예약 신청 경로와 폐가전 무상수거 1599-0903, 자원순환과 053-665-2727을 확인했다"
+      },
+      {
+        "title": "대구 북구 대형폐기물 수수료 조회",
+        "url": "https://www.buk.daegu.kr/reserve/index.do?menu_id=00002634&menu_link=%2Ffront%2Fbigwaste%2FfronBigwasteChargeView.do",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "연번·구분·품명·규격·수수료 5열 표. 냉장고 700ℓ 이상 15,000원, 침대(더블) 2인용 이상 구조물 8,000원, 피아노(그랜드) 25,000원 등을 확인했다"
+      },
+      {
+        "title": "대구 북구 생활계 유해폐기물",
+        "url": "https://www.buk.daegu.kr/index.do?menu_id=00003941",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐의약품 약 형태별 배출 방법과 무상수거 장소, 폐농약 등 수거신청 번호 053-665-2586"
+      },
+      {
+        "title": "대구 북구 재활용품 분리배출 안내",
+        "url": "https://www.buk.daegu.kr/index.do?menu_id=00001795",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐형광등·폐건전지 수거함 설치 장소와 대상 제품, 생필품 교환 사업, 재활용팀 053-665-2725"
+      }
+    ]
+  },
+  {
+    "id": "namdong_gu",
+    "name": "인천 남동구",
+    "aliases": [
+      "남동구",
+      "인천 남동구",
+      "인천시 남동구",
+      "인천광역시 남동구",
+      "namdong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "incheon",
+    "checkedAt": "2026-08-21",
+    "summary": "남동구는 구 누리집에서 대형폐기물을 신고하고 전자지불로 수수료를 낸 뒤 신고필증을 출력해 붙입니다. 프린터가 없으면 인증번호와 구입일자, 배출품목, 금액을 적어 붙여도 됩니다. 신고한 품목과 실제 배출품목의 금액이 다르면 수거하지 않으니 신고 내용을 맞춰야 합니다. 배출은 동별 지정요일을 따라 문전으로 냅니다. 폐의약품은 약국과 동 행정복지센터, 보건소 1층 수거함에 배출합니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "폐의약품은 가까운 약국과 각 동 행정복지센터, 보건소 1층 출입문 왼쪽에 놓인 수거함에 배출합니다.",
+          "알약과 캡슐은 포장지를 벗겨 알약만 비닐에 모아 밀폐하고, 가루약은 포장된 상태 그대로 냅니다. 물약과 시럽은 플라스틱병 하나에 모아서 배출하고, 안약과 연고는 2차 포장재인 종이갑만 벗겨 의약품만 냅니다.",
+          "유리병과 플라스틱 용기, 종이상자는 따로 분리배출하고 내용물만 배출합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐형광등은 단독주택은 동 행정복지센터 수거함에, 공동주택은 건물 안에 설치된 수거함에 배출합니다. 가정과 사무실에서 쓰던 형광등과 분리배출 대상 LED조명이 대상이고, 생활쓰레기와 섞이지 않게 지정된 장소에 깨지지 않게 냅니다.",
+          "폐건전지는 전지가 들어 있는 제품에서 전지를 분리해 전용 수거함에 배출합니다. 충전식 보조배터리까지 모두 대상이고, 단독주택은 동 행정복지센터, 공동주택은 건물 안 수거함과 남동자원순환가게에서 받습니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
+      "feeUrl": "https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp",
+      "phone": "032-453-2560",
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "receipt"
+    },
+    "sources": [
+      {
+        "title": "남동구 대형폐기물 배출 요령",
+        "url": "https://www.namdong.go.kr/main/area/clean/dumps.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "인터넷 신고와 신고필증 출력·인증번호 기재 방식, 신고 품목과 금액이 다르면 수거하지 않는 기준, 청소행정과 032-453-2560과 수거업체 도림환경 032-423-0008을 확인했다"
+      },
+      {
+        "title": "남동구 대형폐기물 배출 수수료 목록",
+        "url": "https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "품명·규격·단가 3열 표를 가전/가구/스포츠·악기 등 6개 분류로 제공한다. 침대 2인세트 25,000원, 보일러 6,000원, 탁구대 20,000원 등을 확인했다"
+      },
+      {
+        "title": "남동구 폐형광등 분리배출 및 처리요령",
+        "url": "https://www.namdong.go.kr/main/area/clean/recycle/fluorescent.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "단독주택·공동주택별 배출 장소와 대상 품목, 전지를 제품에서 분리해 내는 기준, 20개 동 수거함 위치"
+      },
+      {
+        "title": "남동구 보건소 가정 내 폐의약품 수거·처리 안내",
+        "url": "https://biz.namdong.go.kr/clinic/bbs/bbsMsgDetail.do?msg_seq=1942&bcd=clinic_news",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "2024-08-30 게시글. 약 형태별 배출 방법과 약국·동 행정복지센터·보건소 1층 수거 장소, 보건행정과 032-453-5083"
+      }
+    ]
+  },
+  {
+    "id": "bupyeong_gu",
+    "name": "인천 부평구",
+    "aliases": [
+      "부평구",
+      "인천 부평구",
+      "인천시 부평구",
+      "인천광역시 부평구",
+      "bupyeong-gu"
+    ],
+    "coverageTier": "standard",
+    "metroId": "incheon",
+    "checkedAt": "2026-08-21",
+    "summary": "부평구는 구 폐기물배출신고 시스템에서 대형폐기물을 직접 신청하고 품목별 수수료도 같은 시스템에서 조회합니다. 인터넷으로 신고하면 수수료가 약 7% 싸지만 결제는 모바일이 안 되고 PC에서 해야 합니다. 스티커는 지정판매소에서 사거나 인터넷 신청으로 받아 배출 전에 붙입니다. 산곡2동·부개2동 행정복지센터 키오스크나 '여기로' 앱으로도 신청할 수 있습니다. 단가표에 없는 품목은 기사가 현장을 보고 단가를 안내하며, 전문의료기기와 전자제품류는 대형폐기물로 수거하지 않습니다. 배출 요일과 시간은 동·주택 유형별로 갈려 이 데이터에는 넣지 않았습니다.",
+    "specialCollections": {
+      "medicine": {
+        "method": [
+          "가정에서 나온 불용의약품은 구청과 동 행정복지센터, 보건(지)소, 관내 약국에 놓인 수거함에 배출합니다. 모인 약은 보건소에서 한꺼번에 폐기합니다."
+        ]
+      },
+      "batteryAndFluorescentLamp": {
+        "method": [
+          "폐건전지는 부평구청과 동 행정복지센터, 공동주택에 놓인 수거함에 배출합니다. 리모컨·전동공구·무선청소기처럼 배터리를 뺄 수 있는 제품은 전지만 분리해 내고, 보조배터리·전자담배·무선이어폰처럼 일체형인 제품은 임의로 뜯지 말고 제품 그대로 냅니다.",
+          "부풀어 오르거나 흠집이 난 배터리는 랩으로 감아서 배출합니다. 전동킥보드나 파워뱅크처럼 수거함이 없는 제품은 이순환거버넌스(031-8014-5457)에 문의합니다.",
+          "폐형광등은 막대형·원형·나선형을 크기와 길이에 상관없이 모두 받습니다. 단독주택은 동 행정복지센터나 인근 공동주택 수거함에, 공동주택은 단지 안 수거함에 깨지지 않게 배출합니다. 깨진 형광등과 백열전구, 소형 조명기구는 수거하지 않으니 종량제봉투에 버립니다."
+        ]
+      }
+    },
+    "bulkyWaste": {
+      "applicationUrl": "https://waste.icbp.go.kr/icbp/load_page.asp",
+      "feeUrl": "https://waste.icbp.go.kr/icbp/load_bill.asp",
+      "phone": "032-509-6610",
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "sticker"
+    },
+    "sources": [
+      {
+        "title": "부평구 대형폐기물",
+        "url": "https://www.icbp.go.kr/main/life/clean/remove.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐기물배출신고 시스템과 '여기로' 앱, 행정복지센터 키오스크 접수 경로와 자원순환과 폐기물관리팀 032-509-6610을 확인했다. 스티커를 지정판매소에서 구입하거나 인터넷 신청 시 약 7% 할인받아 붙인다는 배출 전 부착 방식도 이 페이지에서 확인했다"
+      },
+      {
+        "title": "부평구 폐기물 신고 — 인터넷 배출 신고 수수료",
+        "url": "https://waste.icbp.go.kr/icbp/load_bill.asp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "연번·품목·규격·수수료 4열 단가표와 인터넷 신고 약 7% 할인, 단가표에 없는 품목은 현장에서 단가를 안내한다는 기준, 전문의료기기·전자제품류 제외를 확인했다"
+      },
+      {
+        "title": "부평구 폐형광등·전지류 배출",
+        "url": "https://www.icbp.go.kr/main/life/clean/recycle_battery.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "폐형광등 배출 대상과 단독·공동주택별 수거함, 깨진 형광등·백열전구 제외 기준, 폐건전지 수거 대상과 재활용팀 032-509-6630"
+      },
+      {
+        "title": "부평구 폐전지 분리 배출",
+        "url": "https://www.icbp.go.kr/main/life/clean/batteries.jsp",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "탈착형·일체형·회로 부착 배터리별 배출 방법과 부푼 배터리 처리, 수거함이 없는 제품의 문의처 이순환거버넌스"
+      },
+      {
+        "title": "부평구 부평1동 불용의약품 폐기 방법 안내",
+        "url": "https://www.icbp.go.kr/dong/bbs/bbsMsgDetail.do?msg_seq=106067&bcd=dong_notice&dong=bupyeong1&pgno=76",
+        "sourceType": "local_guidance",
+        "checkedAt": "2026-08-21",
+        "basis": "2023-02-20 게시글. 구청·동 행정복지센터·보건(지)소·관내 약국 수거함으로 모아 보건소에서 일괄 폐기한다는 경로"
+      }
+    ]
+  },
+  {
     "id": "seoul",
     "name": "서울특별시",
     "aliases": [
@@ -3366,9 +3707,7 @@
     ],
     "districtAliases": [
       "영도구",
-      "부산진구",
       "동래구",
-      "해운대구",
       "사하구",
       "금정구",
       "연제구",
@@ -3403,6 +3742,8 @@
     "aliases": [
       "대구",
       "대구시",
+      "대구광",
+      "대구광역",
       "대구광역시",
       "daegu"
     ],
@@ -3416,8 +3757,7 @@
       "중구",
       "동구",
       "서구",
-      "남구",
-      "북구"
+      "남구"
     ],
     "coverageTier": "metro",
     "checkedAt": "2026-08-14",
@@ -3444,8 +3784,6 @@
     "districtAliases": [
       "미추홀구",
       "연수구",
-      "남동구",
-      "부평구",
       "계양구",
       "강화군",
       "옹진군"
