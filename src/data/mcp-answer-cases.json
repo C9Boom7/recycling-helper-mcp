@@ -9209,7 +9209,8 @@
     "expectedTextExcludes": [
       "상세 데이터는 아직 없어",
       "부산광역시 광역 기준",
-      "시·군·구를 알려주시면"
+      "시·군·구를 알려주시면",
+      "인터넷 신청·수수료 조회:"
     ],
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"부산 해운대구\"",
@@ -9285,13 +9286,14 @@
     "expectedTextIncludes": [
       "부산 부산진구 지역 확인 안내",
       "문의/신청 안내 전화: 051-605-4462",
-      "인터넷 신청: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
-      "수수료 조회: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005"
+      "인터넷 신청·수수료 조회: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005"
     ],
     "expectedTextExcludes": [
       "상세 데이터는 아직 없어",
       "부산광역시 광역 기준",
-      "시·군·구를 알려주시면"
+      "시·군·구를 알려주시면",
+      "- 인터넷 신청: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
+      "- 수수료 조회: https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005"
     ],
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"부산 부산진구\"",

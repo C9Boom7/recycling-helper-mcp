@@ -1481,10 +1481,20 @@ export function formatRegionBulkyContactLines(region: RegionalPolicyData): strin
   const { bulkyWaste } = region;
   if (!bulkyWaste) return [];
 
+  // 구청에 자체 신청 화면이 없어 안내 페이지 한 곳이 신청 경로와 품목별
+  // 수수료표를 함께 싣는 지역이 있다(부산 부산진구). 두 값을 그대로 찍으면
+  // 똑같은 주소가 두 줄로 나가 사용자에게는 링크가 잘못 붙은 것처럼 보인다.
+  // 값이 같을 때만 한 줄로 합친다 — 주소가 다른 지역은 지금처럼 갈라 둔다.
+  const sharedContactUrl =
+    bulkyWaste.applicationUrl && bulkyWaste.applicationUrl === bulkyWaste.feeUrl
+      ? bulkyWaste.applicationUrl
+      : undefined;
+
   return [
     bulkyWaste.phone ? `- 문의/신청 안내 전화: ${bulkyWaste.phone}` : undefined,
-    bulkyWaste.applicationUrl ? `- 인터넷 신청: ${bulkyWaste.applicationUrl}` : undefined,
-    bulkyWaste.feeUrl ? `- 수수료 조회: ${bulkyWaste.feeUrl}` : undefined,
+    sharedContactUrl ? `- 인터넷 신청·수수료 조회: ${sharedContactUrl}` : undefined,
+    !sharedContactUrl && bulkyWaste.applicationUrl ? `- 인터넷 신청: ${bulkyWaste.applicationUrl}` : undefined,
+    !sharedContactUrl && bulkyWaste.feeUrl ? `- 수수료 조회: ${bulkyWaste.feeUrl}` : undefined,
   ].filter((line): line is string => line !== undefined);
 }
 
