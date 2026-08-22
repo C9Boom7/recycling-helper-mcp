@@ -539,6 +539,24 @@ function endsWithPartNoun(word: string): boolean {
 }
 
 /**
+ * 이름 뒤에 이것만 남았으면 어절이 끝난 것으로 치고 **다음 어절까지** 부품어를 찾는다.
+ *
+ * 남은 꼬리가 있다고 무조건 다음 어절을 넘겨다보면 안 된다. `이불이랑 커버 같이 버려도
+ * 되나요?`의 `이랑`은 접속조사라 "이불과 커버"이고, 이불도 물어본 물건이라 답으로 남아야
+ * 한다. 반대로 `모니터용 받침대`는 "모니터를 위한 받침대"라 물어본 물건은 받침대 하나다.
+ * 가르는 지점은 뒤에 오는 말이 앞말을 **수식**하느냐 앞말과 **나열**되느냐다.
+ *
+ * 그래서 뒷말이 머리임을 못 박는 두 낱말만 넣는다. `용`은 용도를 나타내는 접미사
+ * (`모니터용`), `의`는 관형격 조사(`믹서기의`)로 둘 다 앞말을 뒷말의 수식어로 내린다.
+ * 조사·어미는 여기 있으면 안 된다 — `이랑`·`은`·`는`은 앞말을 주제나 나열 대상으로
+ * 세우므로 앞말이 여전히 물어본 물건이다.
+ *
+ * 한 글자 차이로 게이트가 통째로 풀리던 자리다. `모니터용 받침대`·`냉장고용 커버`·
+ * `믹서기의 칼날`이 전부 앞 품목 96점 확정으로 새고 있었다.
+ */
+const MODIFIER_TAIL_SUFFIXES = new Set(["용", "의"]);
+
+/**
  * `end` 자리 **바로 뒤**가 부품어인가. 어절 안이면 남은 꼬리를, 어절 끝이면 다음 어절을 본다.
  *
  * 한국어는 뒷말이 물건의 정체를 쥔다. `모니터 받침대`의 머리는 받침대지 모니터가 아니라서,
@@ -556,7 +574,11 @@ function isFollowedByPartNoun(index: QueryWordIndex, end: number): boolean {
   if (wordIndex === -1) return false;
 
   const rest = index.words[wordIndex].slice(end - index.offsets[wordIndex]);
-  return rest ? endsWithPartNoun(rest) : endsWithPartNoun(index.words[wordIndex + 1] ?? "");
+  if (rest && !MODIFIER_TAIL_SUFFIXES.has(rest)) {
+    return endsWithPartNoun(rest);
+  }
+
+  return endsWithPartNoun(index.words[wordIndex + 1] ?? "");
 }
 
 /**
@@ -860,8 +882,12 @@ type MatchKind =
   | "target_mention";
 
 /**
- * 답이 될 수 없는 두 갈래. 점수도 처리도 같지만 종류는 갈라 둔다 — `findWasteItems`가
- * 오타 폴백으로 내려갈지 말지를 이 둘을 구별해서 정하기 때문이다.
+ * 답이 될 수 없는 두 갈래. 점수는 같지만 처리가 갈려서 종류를 나눠 둔다.
+ *
+ * `modifier_fragment`는 "질의가 덜 특정됐다"는 신호라 후보 목록에 남고, 이것만 걸렸을
+ * 때는 이름을 못 찾은 것이므로 `findWasteItems`가 오타 폴백으로 내려간다.
+ * `part_compound_fragment`는 반대로 이름을 찾았는데 그 물건이 아닌 것이라, 오타 폴백을
+ * 막고 결과에서 통째로 걷어낸다.
  */
 function isFragmentKind(kind: MatchKind): boolean {
   return kind === "modifier_fragment" || kind === "part_compound_fragment";
@@ -987,7 +1013,14 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
   // 물건이 아닌 것이라, 오타 티어로 내려보내면 자모가 비슷한 엉뚱한 품목을 짚는다.
   // 실제로 그렇게 샜다 — 게이트를 넣고 첫 측정에서 fuzzy_jamo 확정이 47건 나왔다.
   if (named.some((match) => match.matchKind !== "modifier_fragment")) {
-    return named.slice(0, limit);
+    // 게이트에 걸린 히트를 걷어내는 자리는 여기 한 곳뿐이다. 부르는 쪽마다 거르게 뒀더니
+    // 곧바로 빠뜨린 곳이 나왔다 — `소파 커버`에 `resolveWasteItem`은 not_found인데
+    // `findBestWasteItem`은 소파(36점)를 내놨고, 그 위에서 지역 매칭 테스트가 돌고 있었다.
+    //
+    // 거르기는 오타 티어 판정 **뒤**에 한다. 위 주석대로 게이트에 걸린 히트는 이름을 못
+    // 찾은 게 아니라 찾았는데 그 물건이 아닌 것이라, 오타 티어로 내려보내면 자모가 비슷한
+    // 엉뚱한 품목을 짚는다. 판정에는 넣고 결과에서만 뺀다.
+    return named.filter((match) => match.matchKind !== "part_compound_fragment").slice(0, limit);
   }
 
   // Typo matching is a fallback tier, not a competing signal. Running it only

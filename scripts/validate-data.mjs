@@ -249,6 +249,7 @@ if (!compoundPartNouns || typeof compoundPartNouns !== "object" || Array.isArray
   errors.push("compound-part-nouns.json must be an object of part noun -> reason");
 } else {
   const seenPartNouns = new Set();
+  const normalizedPartNouns = [];
   for (const [word, reason] of Object.entries(compoundPartNouns)) {
     const normalized = normalizeMatchText(word);
     if (normalized.length < 2) {
@@ -258,8 +259,22 @@ if (!compoundPartNouns || typeof compoundPartNouns !== "object" || Array.isArray
       errors.push(`compoundPartNouns["${word}"] duplicates another entry once normalized`);
     }
     seenPartNouns.add(normalized);
+    normalizedPartNouns.push([word, normalized]);
     if (!isNonEmptyString(reason)) {
       errors.push(`compoundPartNouns["${word}"] must carry a reason string`);
+    }
+  }
+
+  // 정규화 동일성만 보면 죽은 항목을 못 잡는다. `endsWithPartNoun`이 접미 일치라서
+  // `호스`가 이미 `배수호스`를 덮고 있었는데, 그 줄은 빼도 동작이 한 글자도 안 바뀌면서
+  // 읽는 사람에게는 "이건 따로 필요하다"는 잘못된 신호를 준다. 중복과 같은 사고라
+  // 같은 등급(error)으로 막는다.
+  for (const [word, normalized] of normalizedPartNouns) {
+    const covering = normalizedPartNouns.find(([, other]) => other.length < normalized.length && normalized.endsWith(other));
+    if (covering) {
+      errors.push(
+        `compoundPartNouns["${word}"] is already covered by "${covering[0]}" — matching is suffix-based, so this entry never changes behavior`,
+      );
     }
   }
 }

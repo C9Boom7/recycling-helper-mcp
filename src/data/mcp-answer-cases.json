@@ -9965,6 +9965,70 @@
     ]
   },
   {
+    "id": "part_compound_modifier_tail_monitor_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "모니터용 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_fridge_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장고용 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_printer_cable",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "프린터용 케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_blender_blade",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "믹서기의 칼날"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"칼날\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_cover_then_sofa",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 커버 말고 소파는 어떻게"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_fridge_then_crisper",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장고 버리는데 냉장고 야채칸은 어떻게 하나요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"냉장고\""
+    ]
+  },
+  {
     "id": "part_compound_canary_sofa_buy",
     "tool": "classify_waste_item",
     "arguments": {

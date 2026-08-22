@@ -121,6 +121,11 @@ const CANARIES: Array<{ query: string; expectId: string }> = [
   { query: "샤워기 호스 어떻게 버려요", expectId: "shower_head" },
   { query: "다리미 받침대 버리는 법", expectId: "ironing_board" },
   { query: "에어컨 실외기 어떻게 버려요", expectId: "air_conditioner" },
+  // 이름을 부른 자리가 하나라도 깨끗하면 게이트는 발동하지 않는다.
+  { query: "소파 커버 말고 소파는 어떻게", expectId: "sofa" },
+  { query: "냉장고 버리는데 냉장고 야채칸은 어떻게 하나요", expectId: "refrigerator" },
+  // 병렬(`이불이랑 커버`)은 앞말도 물어본 물건이라 수식(`모니터용 받침대`)과 갈라야 한다.
+  { query: "이불이랑 커버 같이 버려도 되나요?", expectId: "blanket" },
 ];
 
 console.log("");

@@ -874,13 +874,13 @@ async function handleGetDisposalSteps({
 }
 
 async function handleCheckConfusingItem({ itemName }: { itemName: string }): Promise<LoggedToolResult> {
-  // 부품어에 걸린 히트는 여기서도 결론이 될 수 없다. 이 툴은 `resolveWasteItem`을 안 거치고
-  // `findWasteItems`를 바로 부르는데, 그 사이로 `소파 커버` -> "1. 소파 / 결론: 대형폐기물로
-  // 신고한 뒤 배출합니다"가 번호 붙은 확정처럼 새어 나갔다.
+  // 이 툴은 `resolveWasteItem`을 안 거치고 `findWasteItems`를 바로 부른다. 부품어에 걸린
+  // 히트가 그 사이로 `소파 커버` -> "1. 소파 / 결론: 대형폐기물로 신고한 뒤 배출합니다"처럼
+  // 번호 붙은 확정으로 새어 나갔는데, 지금은 `findWasteItems`가 내보내기 전에 걷어낸다.
   //
-  // `modifier_fragment`는 일부러 남긴다. 그쪽은 "질의가 덜 특정됐다"는 신호라 헷갈림 후보로
-  // 보여 주는 게 맞다(src/data.ts의 MODIFIER_FRAGMENT_SCORE 주석).
-  let matches = findWasteItems(itemName, 3).filter((match) => match.matchKind !== "part_compound_fragment");
+  // `modifier_fragment`는 거기서도 일부러 남는다. 그쪽은 "질의가 덜 특정됐다"는 신호라
+  // 헷갈림 후보로 보여 주는 게 맞다(src/data.ts의 MODIFIER_FRAGMENT_SCORE 주석).
+  let matches = findWasteItems(itemName, 3);
   if (matches.length === 0) return unknownItemResult(itemName);
 
   // Typo guesses have to clear the same confirmation gate as the other tools.
