@@ -396,6 +396,44 @@ for (const testCase of regionEvaluationCases) {
   }
 }
 
+// `bulkyWaste.prePosting: "none"`이 **부착 문구만** 갈아끼우는지.
+//
+// 부착물 유무와 신청 기한은 다른 축인데, 이 갈래를 기한 분기보다 앞에 두면
+// `full` 티어를 `none`으로 표시하는 순간 직접 확인한 "배출 3일 전까지"가 조용히
+// 사라진다. 지금 실데이터에 `full` + `none` 조합이 없어 회귀 케이스로는 못 잡으니,
+// 조합이 생기는 날 사람 눈에 기대지 않으려고 여기서 픽스처로 직접 부른다.
+{
+  const sofa = findBestWasteItem("소파");
+  const base = regionalPolicies.find((policy) => policy.id === "gangnam_gu");
+  if (!sofa || !base || base.coverageTier !== "full") {
+    failures.push("prePosting guard lost its 강남구/소파 fixture");
+  } else {
+    const noPrePosting: RegionalPolicyData = {
+      ...base,
+      bulkyWaste: { ...base.bulkyWaste, prePosting: "none" },
+    };
+    const lines = formatRegionItemGuide(sofa.item, {
+      region: noPrePosting,
+      matchedBy: base.name,
+      level: "district",
+    });
+    const bulky = lines.find((line) => line.includes("대형생활폐기물은"));
+    if (!bulky) {
+      failures.push("prePosting guard: 대형폐기물 안내 줄을 못 찾았다");
+    } else {
+      if (!bulky.includes("배출 3일 전까지")) {
+        failures.push(`prePosting "none"이 full 티어의 확인된 기한을 삼켰다 — "${bulky}"`);
+      }
+      if (bulky.includes("접수증 또는 접수번호를 부착")) {
+        failures.push(`prePosting "none"인데 부착 문구가 그대로다 — "${bulky}"`);
+      }
+      if (!bulky.includes("접수증이나 접수번호를 붙이지 않고")) {
+        failures.push(`prePosting "none" 문구가 안 나갔다 — "${bulky}"`);
+      }
+    }
+  }
+}
+
 // `namedSubRegion`을 받아도 연락처를 걷어내는 건 metro 티어에서만이라는 것.
 //
 // 지금은 어느 호출부도 district 티어에 이 값을 넘기지 않아 런타임 경로로는 닿지

@@ -455,6 +455,7 @@ const regionPhoneFormat = /^(\d{2,4}-\d{3,4}-\d{4}|\d{4}-\d{4})$/;
 const MAX_FEE_ROWS_PER_ITEM = 12;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 const httpsUrl = /^https:\/\//;
+const prePostingKinds = new Set(["receipt", "sticker", "none"]);
 
 function collectionMethodIsFilled(collection) {
   return Array.isArray(collection?.method) && collection.method.some((method) => isNonEmptyString(method));
@@ -618,6 +619,14 @@ for (const [index, region] of regionalPolicies.entries()) {
   }
   if (region.bulkyWaste?.contactCheckedAt !== undefined && !isoDate.test(region.bulkyWaste.contactCheckedAt)) {
     errors.push(`${prefix}.bulkyWaste.contactCheckedAt must be YYYY-MM-DD`);
+  }
+
+  // 배출 전 부착물은 확인한 지역만 채운다. 값이 있으면 세 값 중 하나여야 하고,
+  // metro에는 애초에 `bulkyWaste`가 없으므로 자연히 걸리지 않는다.
+  if (region.bulkyWaste?.prePosting !== undefined && !prePostingKinds.has(region.bulkyWaste.prePosting)) {
+    errors.push(
+      `${prefix}.bulkyWaste.prePosting must be one of ${Array.from(prePostingKinds).join(", ")}`,
+    );
   }
 
   if (region.bulkyWaste?.phone !== undefined) {

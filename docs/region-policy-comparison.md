@@ -6,7 +6,7 @@
 
 ## Covered Regions
 
-2026-08-14 Phase 5에서 티어를 나눴다. 아래 비교표는 배출 요일까지 확인한 `full` 티어 5곳만 다룬다. `standard` 27곳과 `metro` 17곳은 담는 항목이 달라 같은 표로 비교하지 않는다.
+2026-08-14 Phase 5에서 티어를 나눴다. 아래 비교표는 배출 요일까지 확인한 `full` 티어 5곳만 다룬다. `standard` 32곳과 `metro` 17곳은 담는 항목이 달라 같은 표로 비교하지 않는다.
 
 | Region | Runtime ID | Tier | Status |
 | --- | --- | --- | --- |
