@@ -3366,7 +3366,8 @@
       "applicationUrl": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007003",
       "feeUrl": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007000",
       "phone": "051-749-4462",
-      "contactCheckedAt": "2026-08-21"
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "none"
     },
     "sources": [
       {
@@ -3441,7 +3442,8 @@
       "applicationUrl": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
       "feeUrl": "https://www.busanjin.go.kr/index.busanjin?menuCd=DOM_000000105006002005",
       "phone": "051-605-4462",
-      "contactCheckedAt": "2026-08-21"
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "none"
     },
     "sources": [
       {
@@ -3565,7 +3567,8 @@
       "applicationUrl": "https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
       "feeUrl": "https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp",
       "phone": "032-453-2560",
-      "contactCheckedAt": "2026-08-21"
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "receipt"
     },
     "sources": [
       {
@@ -3630,7 +3633,8 @@
       "applicationUrl": "https://waste.icbp.go.kr/icbp/load_page.asp",
       "feeUrl": "https://waste.icbp.go.kr/icbp/load_bill.asp",
       "phone": "032-509-6610",
-      "contactCheckedAt": "2026-08-21"
+      "contactCheckedAt": "2026-08-21",
+      "prePosting": "sticker"
     },
     "sources": [
       {

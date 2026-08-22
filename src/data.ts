@@ -99,6 +99,20 @@ export type RegionBulkyWaste = {
   feeUrl?: string;
   /** URL과 번호는 확인 시점이 달라서 지역 `checkedAt`과 따로 기록한다. */
   contactCheckedAt?: string;
+  /**
+   * 배출 전에 폐기물에 붙이는 것. **확인한 지역만 채운다.**
+   *
+   * 이 필드가 없으면 지금까지 쓰던 "접수증 또는 접수번호를 부착해" 문장이
+   * 그대로 나간다 — 서울 자치구 대부분이 실제로 그렇고, 32곳을 한꺼번에
+   * 조사하지 않아도 되도록 기본값을 바꾸지 않았다.
+   *
+   * `none`은 "확인해 보니 붙일 게 없다"는 뜻이지 "아직 안 봤다"가 아니다.
+   * 부산 해운대구·부산진구가 그렇다 — 신청하면 대행업체가 현장에 나와 품목을
+   * 확인하고 그 자리에서 수수료를 받으므로, 배출 전에 발급되는 접수증이
+   * 아예 없다. 그런데도 고정 문장이 붙어 "없는 접수번호를 붙이라"는 안내가
+   * 나가고 있었다.
+   */
+  prePosting?: "receipt" | "sticker" | "none";
 };
 
 export type RegionalPolicyData = {
@@ -1606,7 +1620,17 @@ export function formatRegionItemGuide(
     //   같이 늘어, 기한을 빼고 신청 URL이 정확한 기한으로 가는 경로를 맡긴다.
     const hasConfirmedDeadline = region.coverageTier === "full";
     const isMetro = region.coverageTier === "metro";
-    const bulkyLine = hasConfirmedDeadline
+
+    // 배출 전 부착물을 확인한 지역은 그 사실대로 쓴다. 확인 안 한 지역(값 없음)은
+    // 아래 기존 문장을 그대로 쓴다 — 기본값을 바꾸면 조사하지 않은 30곳까지
+    // 한꺼번에 다른 안내를 받게 된다.
+    const prePosting = region.bulkyWaste?.prePosting;
+    const noPrePosting = prePosting === "none";
+    const bulkyLine = noPrePosting && !isMetro
+      ? isBulkySecondaryRoute(item)
+        ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 전에 미리 신청합니다. 접수증이나 접수번호를 붙이지 않고 수거업체가 현장에서 품목을 확인합니다. 그 외에는 위 배출 방법을 따릅니다.`
+        : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. 접수증이나 접수번호를 붙이지 않고 수거업체가 현장에서 품목을 확인합니다.`
+      : hasConfirmedDeadline
       ? isBulkySecondaryRoute(item)
         ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
         : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`
