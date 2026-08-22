@@ -1631,24 +1631,34 @@ export function formatRegionItemGuide(
     const hasConfirmedDeadline = region.coverageTier === "full";
     const isMetro = region.coverageTier === "metro";
 
-    // 배출 전 부착물을 확인한 지역은 그 사실대로 쓴다. 확인 안 한 지역(값 없음)은
-    // 아래 기존 문장을 그대로 쓴다 — 기본값을 바꾸면 조사하지 않은 30곳까지
-    // 한꺼번에 다른 안내를 받게 된다.
-    const prePosting = region.bulkyWaste?.prePosting;
-    const noPrePosting = prePosting === "none";
-    const bulkyLine = noPrePosting && !isMetro
+    // 배출 전 부착물을 "없다"고 확인한 지역만 부착 문구를 갈아끼운다. 값이 없으면
+    // 지금까지 쓰던 문장 그대로다 — 기본값을 바꾸면 조사하지 않은 30곳까지 한꺼번에
+    // 다른 안내를 받는다.
+    //
+    // **부착물 유무와 신청 기한은 다른 축이다.** 이 갈래를 기한 분기보다 앞에 두면
+    // `full` 티어를 `none`으로 표시하는 순간 직접 확인한 "배출 3일 전까지"가 조용히
+    // 사라진다. 그래서 기한 분기는 그대로 두고 부착 문구만 바꿔 끼운다.
+    const noPrePosting = region.bulkyWaste?.prePosting === "none" && !isMetro;
+    const postingClause = noPrePosting
+      ? "접수증이나 접수번호를 붙이지 않고 수거업체가 현장에서 품목을 확인합니다."
+      : undefined;
+    const bulkyLine = hasConfirmedDeadline
       ? isBulkySecondaryRoute(item)
-        ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 전에 미리 신청합니다. 접수증이나 접수번호를 붙이지 않고 수거업체가 현장에서 품목을 확인합니다. 그 외에는 위 배출 방법을 따릅니다.`
-        : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. 접수증이나 접수번호를 붙이지 않고 수거업체가 현장에서 품목을 확인합니다.`
-      : hasConfirmedDeadline
-      ? isBulkySecondaryRoute(item)
-        ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
-        : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`
+        ? postingClause
+          ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청합니다. ${postingClause} 그 외에는 위 배출 방법을 따릅니다.`
+          : `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
+        : postingClause
+          ? `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청합니다. ${postingClause}`
+          : `- ${region.name} 대형생활폐기물은 배출 3일 전까지 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다.`
       : isBulkySecondaryRoute(item)
-        ? `- 대형폐기물에 해당할 때만 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
+        ? postingClause
+          ? `- ${region.name} 기준으로 대형폐기물에 해당할 때만 배출 전에 사전 신청합니다. ${postingClause} 그 외에는 위 배출 방법을 따릅니다.`
+          : `- 대형폐기물에 해당할 때만 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착합니다. 그 외에는 위 배출 방법을 따릅니다.`
         : isMetro
           ? "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
-          : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
+          : postingClause
+            ? `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. ${postingClause} 신청 기한은 아래 신청 경로에서 확인하세요.`
+            : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
 
     // 되묻기를 걷어내는 건 **metro 티어에서만**이다. 그 티어의 연락처 블록은
     // "거주 중인 시·군·구를 확인해야" 한 줄이 전부라 갈아끼워도 잃는 URL이 없지만,
