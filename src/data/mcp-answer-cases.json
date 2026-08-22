@@ -9867,5 +9867,426 @@
       "\"found\":false",
       "\"askFor\":[\"재질\",\"오염 여부\",\"크기\",\"지역\"]"
     ]
+  },
+  {
+    "id": "part_compound_monitor_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "모니터 받침대"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"모니터 받침대\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_sofa_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_toothpaste_tube_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "치약 튜브 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_bed_frame_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "침대 프레임 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_aircon_outdoor_unit_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "에어컨 실외기 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_desk_glass",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "책상 유리"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_tail_blender_blade",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "믹서기 칼날"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"칼날\""
+    ]
+  },
+  {
+    "id": "part_compound_tail_printer_cable",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "프린터 케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_tail_laptop_charger",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "노트북 충전기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_monitor_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "모니터용 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_fridge_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장고용 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_printer_cable",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "프린터용 케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_modifier_tail_blender_blade",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "믹서기의 칼날"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"칼날\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_cover_then_sofa",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 커버 말고 소파는 어떻게"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_fridge_then_crisper",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장고 버리는데 냉장고 야채칸은 어떻게 하나요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"냉장고\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_sofa_buy",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 살 거예요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_blanket_and_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "이불이랑 커버 같이 버려도 되나요?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"이불\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_aircon_outdoor_unit",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "에어컨 실외기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"에어컨\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_pot_lid",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냄비 유리뚜껑"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true"
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_purifier_filter",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "정수기 필터"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"정수기 필터\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_ironing_board",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "다리미 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"다리미판\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_sofa_question",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 살까요?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_umbrella_rib",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "우산살 버리는 법"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"우산\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_shower_hose",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "샤워기 호스 어떻게 버려요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"샤워기 헤드\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_bed_frame_disposal",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "침대 프레임 버리는 법"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"침대 프레임\""
+    ]
+  },
+  {
+    "id": "part_compound_confusing_sofa_cover",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "소파 커버"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"소파 커버\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "1. 소파"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_confusing_monitor_stand",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "모니터 받침대"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"모니터 받침대\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "1. 모니터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_joined_cable_wire",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "전선케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_joined_small_electronics",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "마우스충전기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "part_compound_joined_colander",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소쿠리채반"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"채반\""
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_fridge_crisper",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냉장구 야채칸"
+    },
+    "expectedTextExcludes": [
+      "냉장고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_confusing_fridge_crisper",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "냉장구 야채칸"
+    },
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "냉장고"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_typo_gate_purifier_filter",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "정수끼 필터"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"정수기 필터\""
+    ]
+  },
+  {
+    "id": "part_compound_inner_pill_packaging_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "알약 포장재 커버"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"알약 포장재 커버\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "## 폐의약품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_plant_soil_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "화분 흙 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_ironing_board_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "다리미판 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_inner_canary_pill_packaging",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "알약 포장재"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"알약 포장재\""
+    ]
   }
 ]

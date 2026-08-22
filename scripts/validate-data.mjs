@@ -9,6 +9,7 @@ const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.m
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
 const disposalGroupsPath = new URL("../src/data/disposal-groups.json", import.meta.url);
+const partNounsPath = new URL("../src/data/compound-part-nouns.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -20,6 +21,7 @@ const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
 const disposalGroups = JSON.parse(readFileSync(disposalGroupsPath, "utf8"));
+const compoundPartNouns = JSON.parse(readFileSync(partNounsPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
@@ -233,6 +235,47 @@ for (const [disposalType, label] of Object.entries(disposalGroups)) {
   }
   if (!usedDisposalTypes.has(disposalType)) {
     warnings.push(`disposalGroups["${disposalType}"] is not used by any waste item`);
+  }
+}
+
+// 부품어가 품목명이기도 한 건 막지 않는다. 오히려 그때가 제일 잘 맞는다 — `믹서기 칼날`
+// 에서 믹서기가 빠지면 칼날(knife_blade)이 그대로 답이 되고, `에어컨 리모컨`도 같은
+// 식으로 리모컨 쪽으로 간다.
+//
+// 1글자 금지는 실측으로 정한 것이라 검사로 못 박는다. `살`·`줄`은 용언 활용형과 겹쳐서
+// `소파 살 거예요`·`이불 줄 거예요` 같은 멀쩡한 발화를 not_found로 떨어뜨린다. 목록이
+// 늘 때 이걸 모르는 사람이 한 글자를 넣는 게 이 검사가 막으려는 사고다.
+if (!compoundPartNouns || typeof compoundPartNouns !== "object" || Array.isArray(compoundPartNouns)) {
+  errors.push("compound-part-nouns.json must be an object of part noun -> reason");
+} else {
+  const seenPartNouns = new Set();
+  const normalizedPartNouns = [];
+  for (const [word, reason] of Object.entries(compoundPartNouns)) {
+    const normalized = normalizeMatchText(word);
+    if (normalized.length < 2) {
+      errors.push(`compoundPartNouns["${word}"] must be at least 2 characters — one-syllable part nouns collide with verb stems`);
+    }
+    if (seenPartNouns.has(normalized)) {
+      errors.push(`compoundPartNouns["${word}"] duplicates another entry once normalized`);
+    }
+    seenPartNouns.add(normalized);
+    normalizedPartNouns.push([word, normalized]);
+    if (!isNonEmptyString(reason)) {
+      errors.push(`compoundPartNouns["${word}"] must carry a reason string`);
+    }
+  }
+
+  // 정규화 동일성만 보면 죽은 항목을 못 잡는다. `endsWithPartNoun`이 접미 일치라서
+  // `호스`가 이미 `배수호스`를 덮고 있었는데, 그 줄은 빼도 동작이 한 글자도 안 바뀌면서
+  // 읽는 사람에게는 "이건 따로 필요하다"는 잘못된 신호를 준다. 중복과 같은 사고라
+  // 같은 등급(error)으로 막는다.
+  for (const [word, normalized] of normalizedPartNouns) {
+    const covering = normalizedPartNouns.find(([, other]) => other.length < normalized.length && normalized.endsWith(other));
+    if (covering) {
+      errors.push(
+        `compoundPartNouns["${word}"] is already covered by "${covering[0]}" — matching is suffix-based, so this entry never changes behavior`,
+      );
+    }
   }
 }
 

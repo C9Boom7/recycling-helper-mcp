@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { tokenizeQuery } from "./korean/query-tokenizer.js";
+import { particleStrippedForms, tokenizeQuery } from "./korean/query-tokenizer.js";
 
 export type Confidence = "high" | "medium" | "low";
 export type SourceType = "official_guidance" | "local_guidance" | "law" | "safety_guidance" | "manual_review";
@@ -208,6 +208,7 @@ const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", im
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
 const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
 const disposalGroupPath = fileURLToPath(new URL("./data/disposal-groups.json", import.meta.url));
+const partNounPath = fileURLToPath(new URL("./data/compound-part-nouns.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
 export const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8")) as RegionalPolicyData[];
@@ -217,6 +218,34 @@ export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath,
 // 폴백으로 떨어진다("small_electronics_collection"이 어느 분기에도 안 걸리는 식).
 // 매핑을 데이터로 두고 validate-data.mjs가 전수 대응을 강제한다.
 export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")) as Record<string, string>;
+
+/**
+ * 품목명 뒤에 붙으면 **다른 물건**이 되는 부품·부속 낱말. 값은 왜 다른 물건인지의 근거다.
+ *
+ * 목록을 데이터로 두는 이유는 예외가 느는 방향 때문이다. `가스레인지 후드`·`화장대 거울`·
+ * `복사기 토너 카트리지`처럼 지금까지는 (품목 × 부품) 조합을 하나씩 손으로 막아 왔는데,
+ * 부품어 한 줄은 품목 수와 무관하게 한 번만 늘어난다 — `커버` 하나가 소파·이불·베개·
+ * 변기·옷걸이를 한꺼번에 덮는다.
+ *
+ * 1글자 부품어(`살`·`심`·`줄`·`선`·`캡`)는 일부러 없다. 용언 활용형과 겹쳐서 `소파 살
+ * 거예요`·`이불 줄 거예요` 같은 멀쩡한 발화를 깨뜨린다. `우산살`처럼 붙여 쓰는 것들은
+ * 이미 별칭으로 등록돼 있어 이 목록이 없어도 답이 나온다. `실외기`도 없다 — 에어컨
+ * 실외기는 에어컨과 같이 대형폐기물로 나가는 게 맞아 air_conditioner 별칭으로 뒀다.
+ *
+ * **넣고 빼는 기준은 "본체 카드가 그 부품의 배출 경로를 이미 짚는가"다.** 짚고 있으면
+ * 게이트는 이득 없이 맞던 답만 지운다. `뚜껑`이 그래서 빠졌다 — 전수로 보니 본체 카드
+ * 본문(요약·절차·주의)이 뚜껑을 언급하는 34개 품목이 전부 "뚜껑을 닫아 배출", "뚜껑은
+ * 분리해 플라스틱 수거함"처럼 처리까지 적고 있었고, `페트병 뚜껑`·`우유팩 뚜껑`·`볼펜
+ * 뚜껑`이 맞던 답을 잃었다. `냄비 유리뚜껑`·`변기커버`처럼 진짜로 다른 물건인 것들은
+ * 이미 별칭이라 빼도 답이 남는다.
+ *
+ * 남은 30개도 같은 방식으로 훑었다. 본문에 부품어가 나오는 조합은 대부분 "손잡이가
+ * 플라스틱이어도 본체는 고철"처럼 **본체의 복합재질을 설명하는 문장**이지 부품을 어디로
+ * 보내라는 안내가 아니라서 게이트가 그대로 맞다. 애매한 여섯 개(`커버`·`필터`·`케이스`·
+ * `패킹`·`스프링`·`트레이`)는 남긴 근거를 각 값에 적어 뒀다.
+ */
+export const compoundPartNouns = JSON.parse(readFileSync(partNounPath, "utf8")) as Record<string, string>;
+const partNounList = Object.keys(compoundPartNouns).map((word) => normalizeText(word));
 
 const materialGuidelineById = new Map(materialGuidelines.map((guideline) => [guideline.id, guideline]));
 
@@ -474,6 +503,195 @@ function queryTokens(query: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * 어절 경계와 정규화 문자열 위치를 함께 들고 있는다.
+ *
+ * 부품어 판정은 정규화 문자열만으로는 못 한다. `normalizeText`가 공백을 지워서
+ * `소파 살까요`가 `소파살까요`가 되는데, 여기서 소파 뒤 꼬리를 문자열로 떼면 `살까요`가
+ * 나오고 `살`에 걸린다. 어절이 어디서 끊겼는지를 알아야 `살까요`를 한 덩어리로 볼 수 있다.
+ */
+type QueryWordIndex = { words: string[]; offsets: number[] };
+
+function buildQueryWordIndex(query: string): QueryWordIndex {
+  const words = query
+    .split(/[^\p{L}\p{N}]+/gu)
+    .map((word) => normalizeText(word))
+    .filter(Boolean);
+  const offsets: number[] = [];
+  let running = 0;
+  for (const word of words) {
+    offsets.push(running);
+    running += word.length;
+  }
+
+  return { words, offsets };
+}
+
+/**
+ * 어절이 부품어로 끝나면 그 부품어를 돌려준다. 조사가 붙어 있을 수 있으니 떼어 가며 본다.
+ *
+ * 시작이 아니라 **끝**을 보는 게 중요하다. `냄비 유리뚜껑`의 `유리뚜껑`을 `뚜껑`으로
+ * 잡으려면 끝을 봐야 하고, 용언은 어미가 뒤에 붙으니 끝을 보는 쪽이 오히려 안전하다 —
+ * `살까요`는 `살`로 시작하지만 `살`로 끝나지는 않는다.
+ *
+ * 참/거짓이 아니라 낱말을 돌려주는 이유는 오타 티어 때문이다. 거기서는 "부품어가 있다"로
+ * 끝나지 않고 **어느** 부품어인지를 알아야 오타 히트가 그걸 설명하는지 볼 수 있다.
+ */
+function partNounTail(word: string): string | undefined {
+  if (!word) return undefined;
+  for (const form of particleStrippedForms(word)) {
+    for (const part of partNounList) {
+      if (form.length >= part.length && form.endsWith(part)) return part;
+    }
+  }
+
+  return undefined;
+}
+
+function endsWithPartNoun(word: string): boolean {
+  return partNounTail(word) !== undefined;
+}
+
+/**
+ * 이름 뒤에 이것만 남았으면 어절이 끝난 것으로 치고 **다음 어절까지** 부품어를 찾는다.
+ *
+ * 남은 꼬리가 있다고 무조건 다음 어절을 넘겨다보면 안 된다. `이불이랑 커버 같이 버려도
+ * 되나요?`의 `이랑`은 접속조사라 "이불과 커버"이고, 이불도 물어본 물건이라 답으로 남아야
+ * 한다. 반대로 `모니터용 받침대`는 "모니터를 위한 받침대"라 물어본 물건은 받침대 하나다.
+ * 가르는 지점은 뒤에 오는 말이 앞말을 **수식**하느냐 앞말과 **나열**되느냐다.
+ *
+ * 그래서 뒷말이 머리임을 못 박는 두 낱말만 넣는다. `용`은 용도를 나타내는 접미사
+ * (`모니터용`), `의`는 관형격 조사(`믹서기의`)로 둘 다 앞말을 뒷말의 수식어로 내린다.
+ * 조사·어미는 여기 있으면 안 된다 — `이랑`·`은`·`는`은 앞말을 주제나 나열 대상으로
+ * 세우므로 앞말이 여전히 물어본 물건이다.
+ *
+ * 한 글자 차이로 게이트가 통째로 풀리던 자리다. `모니터용 받침대`·`냉장고용 커버`·
+ * `믹서기의 칼날`이 전부 앞 품목 96점 확정으로 새고 있었다.
+ */
+const MODIFIER_TAIL_SUFFIXES = new Set(["용", "의"]);
+
+/**
+ * `end` 자리 **바로 뒤**가 부품어인가. 어절 안이면 남은 꼬리를, 어절 끝이면 다음 어절을 본다.
+ *
+ * 한국어는 뒷말이 물건의 정체를 쥔다. `모니터 받침대`의 머리는 받침대지 모니터가 아니라서,
+ * 모니터로 답하면 대형가전 무상방문수거를 안내하게 된다 — 실제로는 나무·플라스틱이다.
+ * 이름이 질의를 품는 방향은 이미 `scoreItemNames`가 머리 자리를 보고 가르는데
+ * (`generic_fragment` / `modifier_fragment`), 질의가 이름을 품는 방향에는 그 판정이
+ * 없었다. `가스레인지 후드`·`화장대 거울`·`복사기 토너 카트리지`를 하나씩 손으로 막아 온
+ * 게 전부 여기서 빠진 절반이다.
+ *
+ * 자리 하나만 보는 함수다. 자리를 어떻게 고르고 몇 자리를 봐야 하는지는
+ * `partCompoundGateOf`가 정한다.
+ */
+function isFollowedByPartNoun(index: QueryWordIndex, end: number): boolean {
+  const wordIndex = index.offsets.findIndex((offset, i) => end > offset && end <= offset + index.words[i].length);
+  if (wordIndex === -1) return false;
+
+  const rest = index.words[wordIndex].slice(end - index.offsets[wordIndex]);
+  if (rest && !MODIFIER_TAIL_SUFFIXES.has(rest)) {
+    return endsWithPartNoun(rest);
+  }
+
+  return endsWithPartNoun(index.words[wordIndex + 1] ?? "");
+}
+
+/**
+ * 이름이 `at`에서 시작할 때, **같은 품목의 이름으로 계속 설명되는 데까지** 끝을 늘린다.
+ *
+ * 두 가지를 이어 붙인다.
+ *  - 같은 자리에서 시작하는 더 긴 이름: `치약 튜브 커버`의 `치약`@0은 별칭 `치약 튜브`가
+ *    같은 자리를 더 길게 덮으므로 끝이 4로 간다.
+ *  - 바로 다음 어절이 같은 품목의 또 다른 이름으로 시작하는 경우: `에어컨 실외기 커버`의
+ *    `에어컨`@0은 다음 어절 `실외기`가 같은 품목의 별칭이라 끝이 6까지 간다.
+ *
+ * 두 번째가 없으면 짧은 별칭이 게이트를 그냥 빠져나간다. `에어컨`은 뒤가 `실외기`라
+ * 부품어를 안 물고, 그 자리를 깨끗하다고 보면 `에어컨 실외기 커버`가 96점 확정으로 나간다.
+ *
+ * 어절 경계는 따지지 않는다. 이어 붙이는 조건이 "같은 품목의 다른 이름이 그 자리에서
+ * **정확히** 시작한다"라 조사나 어미로 볼 수 없는 강한 신호라서다. 한때 어절 첫머리에서만
+ * 잇도록 막아 뒀는데, 그러면 붙여 쓴 복합어가 자기 머리 낱말에 걸린다 — `전선케이블`은
+ * `전선`에서 멈춰 뒤의 `케이블`을 남의 부품으로 읽고, 같은 품목의 이름인데도 not_found로
+ * 떨어졌다. `마우스충전기`·`소쿠리채반`도 같은 자리였다. 띄어쓰기로 답이 갈리면 안 된다.
+ */
+function extendNameOccurrence(normalizedQuery: string, names: IndexedName[], at: number): number {
+  let end = at;
+  for (;;) {
+    let longest = 0;
+    for (const { normalized } of names) {
+      if (normalized.length > longest && normalizedQuery.startsWith(normalized, end)) {
+        longest = normalized.length;
+      }
+    }
+    if (longest === 0) return end;
+    end += longest;
+  }
+}
+
+/** 질의 정규화 문자열에서 한 품목의 이름이 덮은 구간. 끝은 열린 구간이다. */
+type NameSpan = { start: number; end: number };
+
+/** 한 품목이 덮은 자리 전부와, 그 자리가 모두 부품어를 물었는지. */
+type PartCompoundGate = { gated: boolean; spans: NameSpan[] };
+
+/**
+ * 이 품목이 질의의 어디를 덮었고, 그 자리가 **전부** 부품어를 물고 있는가.
+ *
+ * 한 자리라도 깨끗하면(= 늘린 끝 뒤가 부품어가 아니면) 발동하지 않는다. `소파 커버 말고
+ * 소파는 어떻게`처럼 멀쩡하게 이름을 부른 자리가 섞여 있으면 지금 답을 그대로 둔다는 뜻이다.
+ *
+ * 예전에는 `Math.max`로 오른쪽 끝 자리 하나만 봤다. 그건 `에어컨 실외기 커버`에서 짧은
+ * 별칭이 새는 걸 막으려던 것인데, 애먼 발화까지 같이 지웠다 — `냉장고 버리는데 냉장고
+ * 야채칸은 어떻게 하나요`는 앞의 `냉장고`가 깨끗한데도 뒤의 `냉장고 야채칸` 자리 때문에
+ * not_found로 떨어졌다. 짧은 별칭 누수는 `extendNameOccurrence`가 자리를 늘려서 막고,
+ * 깨끗한 자리 판정은 전(全)자리로 되돌린다.
+ *
+ * 등장 자리는 어절 첫머리로 제한한다. 그러지 않으면 부품어 **안에** 우연히 박힌 이름이
+ * 깨끗한 자리로 잡힌다 — `침대 프레임 받침대`의 `받침대`에는 `침대`가 들어 있어서,
+ * 그 자리를 인정하면 뒤에 아무것도 없다는 이유로 게이트가 풀렸다.
+ *
+ * 걸렸는지만이 아니라 구간까지 돌려주는 이유는 `findWasteItems`가 품목 사이를 봐야 해서다
+ * (`isSwallowedByGatedSpan`).
+ */
+function partCompoundGateOf(normalizedQuery: string, index: QueryWordIndex, names: IndexedName[]): PartCompoundGate {
+  const wordStarts = new Set(index.offsets);
+  const starts = new Set<number>();
+
+  for (const { normalized } of names) {
+    if (!normalized) continue;
+    for (let at = normalizedQuery.indexOf(normalized); at !== -1; at = normalizedQuery.indexOf(normalized, at + 1)) {
+      if (wordStarts.has(at)) starts.add(at);
+    }
+  }
+
+  if (starts.size === 0) return { gated: false, spans: [] };
+
+  const spans = [...starts].map((at) => ({ start: at, end: extendNameOccurrence(normalizedQuery, names, at) }));
+  return { gated: spans.every((span) => isFollowedByPartNoun(index, span.end)), spans };
+}
+
+/**
+ * 게이트에 걸린 다른 품목의 구간이 이 품목의 자리를 **통째로** 삼켰는가.
+ *
+ * 품목 하나만 보는 판정으로는 못 잡는 갈래가 있다. `알약 포장재 커버`는 알약 포장재가
+ * 게이트에 걸리는데, 그 구간 안에 든 짧은 이름 `알약`이 폐의약품을 79점으로 확정해서
+ * 결과가 not_found가 아니라 **틀린 카드**로 나갔다. `화분 흙 커버`가 화분을,
+ * `기름 묻은 피자박스 커버`가 폐식용유를 내보내던 것도 같은 자리다.
+ *
+ * 삼켜졌다는 건 질의에서 그 이름을 부른 자리가 전부 더 긴 이름의 일부였다는 뜻이라,
+ * 사용자가 그 물건을 부른 적이 없다. 반대로 구간 밖에 자리가 하나라도 있으면
+ * (`믹서기 칼날`의 `칼날`, `노트북 충전기`의 `충전기`) 그건 따로 부른 것이라 그대로 둔다.
+ *
+ * 어절 첫머리 자리가 없는 품목은 판정을 건너뛴다. `아이스크림 통`의 `크림통`처럼 어절
+ * 중간에 우연히 박힌 것은 구간으로 견줄 자리가 없어서, 여기서 다룰 문제가 아니다.
+ */
+function isSwallowedByGatedSpan(gate: PartCompoundGate, gatedSpans: NameSpan[]): boolean {
+  if (gate.gated || gate.spans.length === 0) return false;
+
+  return gate.spans.every((span) =>
+    gatedSpans.some((gated) => gated.start <= span.start && span.end <= gated.end && gated.end - gated.start > span.end - span.start),
+  );
+}
+
 function stripShortAliasParticle(token: string): string {
   for (const suffix of SHORT_ALIAS_PARTICLE_SUFFIXES) {
     if (token.length > suffix.length && token.endsWith(suffix)) {
@@ -567,6 +785,8 @@ type ScoredQuery = {
   tokens: string[];
   /** 띄어쓰기·문장부호로만 자른 낱말 수. 질의가 한 낱말짜리인지 판단할 때 쓴다. */
   wordCount: number;
+  /** 어절 경계. 부품어 꼬리 판정이 쓴다. */
+  wordIndex: QueryWordIndex;
 };
 
 type FuzzyQuery = {
@@ -694,9 +914,30 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  * an exact, prefix, or standalone-token match, so only this one needs a tie check
  * in resolveWasteItem before it's safe to answer with confidence.
  */
-type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "modifier_fragment" | "fuzzy_jamo" | "target_mention";
+type MatchKind =
+  | "none"
+  | "exact"
+  | "query_contains_name"
+  | "short_alias_standalone"
+  | "generic_fragment"
+  | "modifier_fragment"
+  | "part_compound_fragment"
+  | "fuzzy_jamo"
+  | "target_mention";
 
-function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
+/**
+ * 답이 될 수 없는 두 갈래. 점수는 같지만 처리가 갈려서 종류를 나눠 둔다.
+ *
+ * `modifier_fragment`는 "질의가 덜 특정됐다"는 신호라 후보 목록에 남고, 이것만 걸렸을
+ * 때는 이름을 못 찾은 것이므로 `findWasteItems`가 오타 폴백으로 내려간다.
+ * `part_compound_fragment`는 반대로 이름을 찾았는데 그 물건이 아닌 것이라, 오타 폴백을
+ * 막고 결과에서 통째로 걷어낸다.
+ */
+function isFragmentKind(kind: MatchKind): boolean {
+  return kind === "modifier_fragment" || kind === "part_compound_fragment";
+}
+
+function scoreItemNames(query: ScoredQuery, indexed: IndexedItem, partCompoundGated: boolean): WasteMatch {
   const { raw, normalized: normalizedQuery, tokens: queryTokens } = query;
   const semanticBonus = scoreQuerySemanticSignals(raw, indexed.item);
   let bestScore = 0;
@@ -714,6 +955,12 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
       if (isLikelyDisposalTargetMention(raw, normalizedQuery, normalizedName)) {
         score = 20;
         kind = "target_mention";
+      } else if (partCompoundGated) {
+        // 이름 뒤에 부품어가 붙었으면 물어본 물건은 이 품목이 아니다. 짧은 별칭 경로도
+        // 같이 막아야 한다 — `소파 커버`가 79점(short_alias_standalone)으로 소파를
+        // 확정하던 것이 이 갈래다.
+        score = MODIFIER_FRAGMENT_SCORE;
+        kind = "part_compound_fragment";
       } else if (isShortAlias) {
         score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? SHORT_ALIAS_STANDALONE_BASE_SCORE + normalizedName.length : 0;
         kind = "short_alias_standalone";
@@ -749,7 +996,7 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   // material keywords in the query say nothing about which half of a compound
   // name was hit.
   const adjustedScore =
-    matchKind !== "modifier_fragment" && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
+    !isFragmentKind(matchKind) && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
       ? Math.min(99, bestScore + semanticBonus)
       : bestScore;
   return { item: indexed.item, score: adjustedScore, matchedBy, matchKind };
@@ -780,6 +1027,28 @@ function scoreItemTypos(query: FuzzyQuery, indexed: IndexedItem): WasteMatch {
   return { item: indexed.item, score: bestScore, matchedBy, matchKind: bestScore > 0 ? "fuzzy_jamo" : "none" };
 }
 
+/**
+ * 오타 히트가 질의 안의 부품어를 설명하는가.
+ *
+ * 이름 게이트(`partCompoundGateOf`)는 이름이 질의에 **정확히** 들어 있을 때만
+ * 걸린다. 오타 티어는 그 판정을 안 거치니까 머리 글자 하나만 틀리면 게이트가 통째로
+ * 없어졌다 — `냉장고 야채칸`은 not_found인데 `냉장구 야채칸`은 냉장고 확정으로 나가서
+ * 대형가전 무상방문수거 카드를 안내했다. 제대로 쓴 쪽이 더 안전한 답을 받는 건 뒤집힌 거다.
+ *
+ * 여기서는 이름이 없으니 자리를 못 짚는다. 대신 질의에 부품어로 끝나는 어절이 있는지 보고,
+ * 있으면 오타로 짚은 이름이 그 부품어로 끝나야 통과시킨다. `정수기 필터`처럼 부품어가
+ * 이름의 머리인 품목은 그대로 살고(`정수끼 필터` -> 정수기 필터), 부품을 설명하지 못하는
+ * 본체 추측은 걸린다. 부품어 어절이 아예 없으면 판정할 게 없으므로 `형광능` -> 형광등
+ * 같은 기존 오타 매칭은 손대지 않는다.
+ */
+function typoExplainsPartNouns(index: QueryWordIndex, match: WasteMatch): boolean {
+  const parts = index.words.map((word) => partNounTail(word)).filter((part): part is string => part !== undefined);
+  if (parts.length === 0) return true;
+
+  const normalizedName = normalizeText(match.matchedBy);
+  return parts.some((part) => normalizedName.endsWith(part));
+}
+
 function rankMatches(matches: WasteMatch[]): WasteMatch[] {
   return matches
     .filter((match) => match.score >= MIN_MATCH_SCORE)
@@ -797,13 +1066,35 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
     normalized: normalizedQuery,
     tokens: queryTokens(query),
     wordCount: normalizedTokens(query).length,
+    wordIndex: buildQueryWordIndex(query),
   };
-  const named = rankMatches(indexedItems.map((indexed) => scoreItemNames(scoredQuery, indexed)));
+  // 게이트 판정을 품목별 점수 매기기보다 먼저 돌린다. 걸린 품목의 구간을 다 모아야
+  // 그 구간에 삼켜진 다른 품목을 가려낼 수 있는데(`isSwallowedByGatedSpan`), 그건
+  // 품목 하나만 보는 `scoreItemNames` 안에서는 알 수 없는 정보다.
+  const gates = indexedItems.map((indexed) => partCompoundGateOf(normalizedQuery, scoredQuery.wordIndex, indexed.names));
+  const gatedSpans = gates.filter((gate) => gate.gated).flatMap((gate) => gate.spans);
+  const named = rankMatches(
+    indexedItems
+      .map((indexed, at) => ({ match: scoreItemNames(scoredQuery, indexed, gates[at].gated), gate: gates[at] }))
+      .filter(({ gate }) => !isSwallowedByGatedSpan(gate, gatedSpans))
+      .map(({ match }) => match),
+  );
   // Modifier hits alone do not count as a name hit: "에어컨" reaching only
   // "에어컨 리모컨" has still failed to name anything, so the typo tier below
   // must run exactly as it did before those hits were kept.
+  //
+  // 부품 복합어 히트는 반대다. `모니터 받침대`는 이름을 못 찾은 게 아니라 찾았는데 그
+  // 물건이 아닌 것이라, 오타 티어로 내려보내면 자모가 비슷한 엉뚱한 품목을 짚는다.
+  // 실제로 그렇게 샜다 — 게이트를 넣고 첫 측정에서 fuzzy_jamo 확정이 47건 나왔다.
   if (named.some((match) => match.matchKind !== "modifier_fragment")) {
-    return named.slice(0, limit);
+    // 게이트에 걸린 히트를 걷어내는 자리는 여기 한 곳뿐이다. 부르는 쪽마다 거르게 뒀더니
+    // 곧바로 빠뜨린 곳이 나왔다 — `소파 커버`에 `resolveWasteItem`은 not_found인데
+    // `findBestWasteItem`은 소파(36점)를 내놨고, 그 위에서 지역 매칭 테스트가 돌고 있었다.
+    //
+    // 거르기는 오타 티어 판정 **뒤**에 한다. 위 주석대로 게이트에 걸린 히트는 이름을 못
+    // 찾은 게 아니라 찾았는데 그 물건이 아닌 것이라, 오타 티어로 내려보내면 자모가 비슷한
+    // 엉뚱한 품목을 짚는다. 판정에는 넣고 결과에서만 뺀다.
+    return named.filter((match) => match.matchKind !== "part_compound_fragment").slice(0, limit);
   }
 
   // Typo matching is a fallback tier, not a competing signal. Running it only
@@ -812,7 +1103,10 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
   // and a well-spelled query never pays for the jamo Levenshtein scan.
   const fuzzyQuery = buildFuzzyQuery(scoredQuery);
   const typos = rankMatches(indexedItems.map((indexed) => scoreItemTypos(fuzzyQuery, indexed)));
-  return typos.slice(0, limit);
+  // 이름 게이트와 같은 판정을 오타 히트에도 건다. 되묻기 후보로도 안 남기는 이유는
+  // 이름 쪽과 결과를 맞추려는 것이다 — `냉장고 야채칸`이 not_found인데 `냉장구 야채칸`만
+  // "혹시 냉장고 찾으시나요?"로 나가면 오타가 오히려 더 많은 걸 얻는다.
+  return typos.filter((match) => typoExplainsPartNouns(scoredQuery.wordIndex, match)).slice(0, limit);
 }
 
 export function findBestWasteItem(query: string): WasteMatch | undefined {
@@ -898,7 +1192,7 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   // Modifier hits ride along as an under-specification signal only (see
   // MODIFIER_FRAGMENT_SCORE). They never become the answer.
   const modifierHits = matches.filter((match) => match.matchKind === "modifier_fragment");
-  const named = matches.filter((match) => match.matchKind !== "modifier_fragment");
+  const named = matches.filter((match) => !isFragmentKind(match.matchKind));
   if (named.length === 0) {
     return { status: "not_found" };
   }
