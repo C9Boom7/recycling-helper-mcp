@@ -240,7 +240,7 @@ async function attachmentText(attachment) {
  * 표 머리글을 찾는다. 별표 번호 머리표시에 기대지 않는다 — 종로구는
  * 묶음 파일 안에서 번호 없이 제목 줄만 나온다.
  */
-function findTableStart(lines) {
+export function findTableStart(lines) {
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i];
     if (line.length > 80) continue;
@@ -287,6 +287,14 @@ const TRAILING_COLUMN = /^(비\s*고|변경\s*사항)$/;
  * 바깥의 값이 꼬리 자리를 채우고 있으면 그건 여전히 미지원 형태다.
  */
 const TRAILING_VALUE = /^(품목|항목|규격|명칭|금액)?(추가|삭제|변경|세분화|신설)$|^(신규|삭제|변경)$/;
+/**
+ * 규격 칸에 적히는 값의 표시. 수치·단위·비교 표현만 좁게 본다 — `2인용`, `1m 이상`,
+ * `300ℓ~500ℓ`, `10kg이상` 처럼 치수가 들어간 낱말이다.
+ *
+ * 꼬리 열 판정에서 "이 토큰은 다음 행의 셀이다"를 가리는 데 쓴다. 넓게 잡으면
+ * 진짜 주석까지 규격으로 봐줘 판정이 무뎌지므로 일부러 좁게 뒀다.
+ */
+const SPEC_VALUE = /[0-9]|[㎝㎜㎏㎡ℓ]|인용|인승|이상|이하|미만|초과/;
 const FEE_COLUMN = /^(가\s*격|금\s*액|수수료(\(안\))?|부과\s*금액|처리비)$/;
 /** 행 번호 열. 선언돼 있으면 행 머리의 일련번호를 금액과 구분해야 한다. */
 const SEQUENCE_COLUMN = /^(연번|순번|번호)$/;
@@ -357,6 +365,37 @@ function laneCount(columns) {
 }
 
 /**
+ * 꼬리 열이 실제로 채워져 있는지 가릴 증거를 잰다.
+ *
+ * 재는 대상은 금액 바로 뒤 토큰(`trailingCounts`)이다. 꼬리 열이 비어 있으면 그
+ * 자리는 다음 행의 첫 셀이고, 채워져 있으면 같은 행의 꼬리 값이다. 둘을 가르는 축은
+ * **토큰이 어떤 종류인가**다.
+ *
+ * - 채워진 꼬리: 몇 안 되는 낱말이 표 전체에 되풀이된다. 개정 이력이든 운영 주석이든
+ *   같은 문구를 여러 행에 그대로 적기 때문이다. 규격 표현은 섞이지 않는다.
+ * - 빈 꼬리: 다음 행의 첫 셀이라 값이 매번 다르고, 되풀이되는 몇 개는 `2인용`·
+ *   `1m 이상`처럼 규격값이다.
+ *
+ * 그래서 **규격값이 아니면서 세 번 이상 되풀이되는 토큰**이 차지하는 비율을 증거로 쓴다.
+ * 표본 전체를 평균 내는 값이라 행 수가 변해도 흔들리지 않는다.
+ *
+ * 전에는 최다 토큰의 등장 횟수를 그대로 봤는데, 그건 평평한 분포에서 최댓값을
+ * 집는 것이라 분모가 줄면 비율이 저절로 올라간다. 은평이 4.1%로 5% 문턱에 붙어
+ * 있었고, 마포는 표본 15개에 최다 1회인데도 비율만 따지면 6.7%로 이미 문턱을
+ * 넘겨 횟수 하한에만 걸려 있었다. 조례가 조금만 개정돼도 뒤집히는 자리였다.
+ *
+ * 남는 구멍이 하나 있다. 꼬리 열이 **매 행 다른 자유 서술**로 채워져 있으면 되풀이가
+ * 안 잡혀 그냥 통과한다. 전 규칙도 못 잡던 형태이고 실제 대상 13곳에는 없다.
+ */
+function measureTrailingEvidence(trailingCounts, trailingSamples, declaresTrailing) {
+  const tokens = [...trailingCounts.entries()]
+    .filter(([token, count]) => count >= 3 && !SPEC_VALUE.test(token))
+    .sort((a, b) => b[1] - a[1]);
+  const samples = tokens.reduce((sum, [, count]) => sum + count, 0);
+  return { declaresTrailing, tokens, samples, trailingSamples, share: trailingSamples > 0 ? samples / trailingSamples : 0 };
+}
+
+/**
  * 5단계 — 표를 (품명, 규격, 금액) 행으로 만든다.
  *
  * 셀이 순차 텍스트로 나오므로, 금액 셀을 만날 때까지 쌓인 라벨을 보고
@@ -373,7 +412,7 @@ function laneCount(columns) {
  * 완벽하지 않다 — 셀 안에서 줄바꿈된 품명은 뒷줄만 남는다. 그래서 각 행에
  * `rawGroup`을 같이 저장해 검수 때 원본을 볼 수 있게 한다.
  */
-function parseFeeRows(lines, startIndex) {
+export function parseFeeRows(lines, startIndex) {
   const { columns, nextIndex } = readColumns(lines, startIndex);
   const feeIndex = columns.findIndex((column) => FEE_COLUMN.test(column));
   const sequenceIndex = columns.findIndex((column) => SEQUENCE_COLUMN.test(column));
@@ -515,27 +554,41 @@ function parseFeeRows(lines, startIndex) {
   // 열 이름만 보고 막으면 안 된다는 것도 그대로다. 성남시는 `비고`를 선언해놓고
   // 전 행을 비워뒀고, 그 표는 단순 규칙으로 정확히 읽힌다. 그래서 헤더 선언과
   // 데이터 증거를 모두 요구한다.
-  if (declaresTrailing) {
-    const [topToken, topCount] = [...trailingCounts.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
-    if (trailingSamples > 0 && topCount >= 5 && topCount / trailingSamples >= 0.05) {
-      const trailingNames = columns.slice(feeIndex + 1).join("·");
-      return {
-        rows: [],
-        columns,
-        trailingConsumed,
-        unsupportedForm: `금액 뒤 ${trailingNames} 열에 개정 이력 어휘 밖의 값이 채워져 있다 (예: "${topToken}" ${topCount}회)`,
-      };
-    }
+  const trailingEvidence = measureTrailingEvidence(trailingCounts, trailingSamples, declaresTrailing);
+  if (declaresTrailing && trailingEvidence.samples >= 5 && trailingEvidence.share >= 0.15) {
+    const trailingNames = columns.slice(feeIndex + 1).join("·");
+    const examples = trailingEvidence.tokens
+      .slice(0, 3)
+      .map(([token, count]) => `"${token}" ${count}회`)
+      .join(", ");
+    return {
+      rows: [],
+      columns,
+      trailingConsumed,
+      trailingEvidence,
+      unsupportedForm: `금액 뒤 ${trailingNames} 열에 개정 이력 어휘 밖의 값이 채워져 있다 (${examples} — 표본의 ${Math.round(trailingEvidence.share * 100)}%)`,
+    };
   }
 
-  return { rows, columns, trailingConsumed, unsupportedForm: null };
+  return { rows, columns, trailingConsumed, trailingEvidence, unsupportedForm: null };
 }
 
-function normalizeLines(text) {
+export function normalizeLines(text) {
   return text
     .split("\n")
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter((line) => line.length > 0);
+}
+
+/** 꼬리 증거를 덤프에 남길 만큼만 줄인다 — Map은 JSON.stringify가 빈 객체로 만든다. */
+function summarizeEvidence(evidence) {
+  if (!evidence?.declaresTrailing) return null;
+  return {
+    trailingSamples: evidence.trailingSamples,
+    samples: evidence.samples,
+    share: Number(evidence.share.toFixed(3)),
+    tokens: evidence.tokens.slice(0, 5).map(([token, count]) => `${token}×${count}`),
+  };
 }
 
 export async function collectRegion(target) {
@@ -591,12 +644,12 @@ export async function collectRegion(target) {
       });
       if (start < 0) continue;
 
-      const { rows, columns, trailingConsumed, unsupportedForm } = parseFeeRows(lines, start);
+      const { rows, columns, trailingConsumed, trailingEvidence, unsupportedForm } = parseFeeRows(lines, start);
       if (unsupportedForm) {
         // 표는 찾았는데 파서가 못 다루는 형태다. 원문은 남기고 사유를 보고한다 —
         // 그냥 넘기면 "표 없음"과 구별되지 않아 커버리지 착시가 생긴다.
         result.law = law;
-        result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
+        result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed, trailingEvidence: summarizeEvidence(trailingEvidence) };
         result.rawText = text;
         result.errors.push(`[${law.name}] ${attachment.title || "(제목 없음)"}: 열 구성 미지원 — ${unsupportedForm}`);
         return result;
@@ -611,7 +664,7 @@ export async function collectRegion(target) {
       }
 
       result.law = law;
-      result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed };
+      result.attachment = { ...attachment, header: lines[start], columns, trailingConsumed, trailingEvidence: summarizeEvidence(trailingEvidence) };
       result.rows = rows;
       result.rawText = text;
       return result;
@@ -659,9 +712,13 @@ async function main() {
     if (result.rows.length > 0) {
       const items = new Set(result.rows.map((row) => row.itemName)).size;
       const trailing = result.attachment?.trailingConsumed ?? 0;
+      const evidence = result.attachment?.trailingEvidence;
       console.log(
         `${result.rows.length}행 / 품명 ${items}종 — ${result.law.kind} 「${result.law.name}」 시행 ${result.law.effectiveDate}` +
-          (trailing > 0 ? ` (꼬리 칸 ${trailing}개 걷어냄)` : ""),
+          (trailing > 0 ? ` (꼬리 칸 ${trailing}개 걷어냄)` : "") +
+          // 판정이 문턱에 얼마나 붙어 있는지 재실행 때마다 보이게 한다. 이게 안 보여서
+          // 은평이 4.1%로 붙어 있는 걸 리뷰 때까지 아무도 몰랐다.
+          (evidence ? ` (꼬리 증거 ${Math.round(evidence.share * 100)}% / 문턱 15%)` : ""),
       );
     } else {
       console.log("표 없음");
