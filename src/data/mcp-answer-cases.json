@@ -10028,5 +10028,83 @@
       "\"found\":true",
       "\"matchedItem\":\"다리미판\""
     ]
+  },
+  {
+    "id": "part_compound_canary_sofa_question",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 살까요?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_umbrella_rib",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "우산살 버리는 법"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"우산\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_shower_hose",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "샤워기 호스 어떻게 버려요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"샤워기 헤드\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_bed_frame_disposal",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "침대 프레임 버리는 법"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"침대 프레임\""
+    ]
+  },
+  {
+    "id": "part_compound_confusing_sofa_cover",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "소파 커버"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"소파 커버\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "1. 소파"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_confusing_monitor_stand",
+    "tool": "check_confusing_item",
+    "arguments": {
+      "itemName": "모니터 받침대"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"모니터 받침대\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedTextExcludes": [
+      "헷갈림 체크",
+      "1. 모니터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
   }
 ]

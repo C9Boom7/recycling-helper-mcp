@@ -104,6 +104,9 @@ for (const [part, row] of sorted) {
  * 부품어를 문자열 꼬리로만 보면 용언 활용형에 걸린다 — `소파 살 거예요`의 `살`,
  * `이불 줄 거예요`의 `줄`. 그래서 1글자 부품어는 목록에 넣지 않았고, 넣지 않았다는
  * 사실을 여기서 회귀로 고정한다. 아래는 전부 지금 답이 유지돼야 한다.
+ *
+ * 여기 있는 발화는 mcp-answer-cases에도 같이 올려 뒀다. 측정 스크립트는 손으로 돌리는
+ * 물건이라 `local:test`가 안 건드리는데, 회귀 방어를 그 위에만 얹어 두면 아무도 안 본다.
  */
 const CANARIES: Array<{ query: string; expectId: string }> = [
   { query: "소파 살 거예요", expectId: "sofa" },
@@ -137,4 +140,15 @@ if (verbose && examples.length > 0) {
   console.log("");
   console.log("## open 갈래에서 앞 품목을 확정한 예");
   examples.forEach((example) => console.log(example));
+}
+
+// "회귀로 고정한다"고 적어 놓고 결과를 출력만 하면 고정이 아니다. 위 표는 눈으로 읽는
+// 지표지만 canary는 통과/실패가 갈리는 검사라 종료 코드로 내보낸다.
+//
+// 그래도 이 스크립트를 `check`에 넣지는 않았다. 표는 합격선이 없는 지표라 매번 40줄을
+// 흘리게 되고, 정작 합격선이 있는 canary는 mcp-answer-cases로 옮겨 `local:test`가 이미
+// 돌린다. 여기 종료 코드는 손으로 돌릴 때 실패를 놓치지 않으려는 안전장치다.
+if (canaryFails > 0) {
+  console.error(`\ncanary ${canaryFails}건이 깨졌다. 부품어 목록이나 게이트 규칙을 다시 봐라.`);
+  process.exit(1);
 }

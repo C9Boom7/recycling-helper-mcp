@@ -1,6 +1,10 @@
 /**
  * 부품어 게이트가 **기존 발화에서 발동하는지**만 미리 본다. 점수를 바꾸기 전에
  * 오발동 지점을 찾으려는 것이라, 여기서는 매칭 결과를 건드리지 않는다.
+ *
+ * 게이트 도입 **전** 사전 측정용이라 최종 규칙과 다르다. 여기 `firesOn`은 등장 자리를
+ * 어절 첫머리로 제한하지도, 같은 품목의 다른 이름으로 자리를 늘리지도 않는다
+ * (`src/data.ts`의 `itemIsPartCompoundModifier`). 발동 규모를 가늠한 기록으로만 읽어라.
  */
 import { wasteItems, normalizeText } from "../../src/data.ts";
 import { particleStrippedForms } from "../../src/korean/query-tokenizer.ts";

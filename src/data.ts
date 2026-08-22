@@ -231,6 +231,17 @@ export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")
  * 거예요`·`이불 줄 거예요` 같은 멀쩡한 발화를 깨뜨린다. `우산살`처럼 붙여 쓰는 것들은
  * 이미 별칭으로 등록돼 있어 이 목록이 없어도 답이 나온다. `실외기`도 없다 — 에어컨
  * 실외기는 에어컨과 같이 대형폐기물로 나가는 게 맞아 air_conditioner 별칭으로 뒀다.
+ *
+ * **넣고 빼는 기준은 "본체 카드가 그 부품의 배출 경로를 이미 짚는가"다.** 짚고 있으면
+ * 게이트는 이득 없이 맞던 답만 지운다. `뚜껑`이 그래서 빠졌다 — 전수로 보니 본체 카드가
+ * 뚜껑을 언급하는 33개 품목이 전부 "뚜껑을 닫아 배출", "뚜껑은 분리해 플라스틱 수거함"
+ * 처럼 처리까지 적고 있었고, `페트병 뚜껑`·`우유팩 뚜껑`·`볼펜 뚜껑`이 맞던 답을 잃었다.
+ * `냄비 유리뚜껑`·`변기커버`처럼 진짜로 다른 물건인 것들은 이미 별칭이라 빼도 답이 남는다.
+ *
+ * 나머지 31개도 같은 방식으로 훑었다. 본문에 부품어가 나오는 조합은 대부분 "손잡이가
+ * 플라스틱이어도 본체는 고철"처럼 **본체의 복합재질을 설명하는 문장**이지 부품을 어디로
+ * 보내라는 안내가 아니라서 게이트가 그대로 맞다. 애매한 여섯 개(`커버`·`필터`·`케이스`·
+ * `패킹`·`스프링`·`트레이`)는 남긴 근거를 각 값에 적어 뒀다.
  */
 export const compoundPartNouns = JSON.parse(readFileSync(partNounPath, "utf8")) as Record<string, string>;
 const partNounList = Object.keys(compoundPartNouns).map((word) => normalizeText(word));
@@ -528,7 +539,7 @@ function endsWithPartNoun(word: string): boolean {
 }
 
 /**
- * 이름이 나온 **모든 자리**의 바로 뒤가 부품어인가.
+ * `end` 자리 **바로 뒤**가 부품어인가. 어절 안이면 남은 꼬리를, 어절 끝이면 다음 어절을 본다.
  *
  * 한국어는 뒷말이 물건의 정체를 쥔다. `모니터 받침대`의 머리는 받침대지 모니터가 아니라서,
  * 모니터로 답하면 대형가전 무상방문수거를 안내하게 된다 — 실제로는 나무·플라스틱이다.
@@ -537,8 +548,8 @@ function endsWithPartNoun(word: string): boolean {
  * 없었다. `가스레인지 후드`·`화장대 거울`·`복사기 토너 카트리지`를 하나씩 손으로 막아 온
  * 게 전부 여기서 빠진 절반이다.
  *
- * 한 자리라도 부품어를 안 물고 있으면 발동하지 않는다. `소파 커버 말고 소파는 어떻게`
- * 처럼 멀쩡하게 이름을 부른 자리가 섞여 있으면 지금 동작을 그대로 둔다는 뜻이다.
+ * 자리 하나만 보는 함수다. 자리를 어떻게 고르고 몇 자리를 봐야 하는지는
+ * `itemIsPartCompoundModifier`가 정한다.
  */
 function isFollowedByPartNoun(index: QueryWordIndex, end: number): boolean {
   const wordIndex = index.offsets.findIndex((offset, i) => end > offset && end <= offset + index.words[i].length);
@@ -549,33 +560,70 @@ function isFollowedByPartNoun(index: QueryWordIndex, end: number): boolean {
 }
 
 /**
- * 이 품목이 질의에서 **가장 오른쪽까지 닿은 자리** 뒤가 부품어인가.
+ * 이름이 `at`에서 시작할 때, **같은 품목의 이름으로 계속 설명되는 데까지** 끝을 늘린다.
  *
- * 오른쪽 끝을 보는 건 한국어가 뒷말에 정체를 싣기 때문이다. 질의를 오른쪽까지 가장 많이
- * 설명한 이름이 "그 뒤는 부품이다"라고 말하면, 물어본 물건은 이 품목이 아니다.
+ * 두 가지를 이어 붙인다.
+ *  - 같은 자리에서 시작하는 더 긴 이름: `치약 튜브 커버`의 `치약`@0은 별칭 `치약 튜브`가
+ *    같은 자리를 더 길게 덮으므로 끝이 4로 간다.
+ *  - 바로 다음 어절이 같은 품목의 또 다른 이름으로 시작하는 경우: `에어컨 실외기 커버`의
+ *    `에어컨`@0은 다음 어절 `실외기`가 같은 품목의 별칭이라 끝이 6까지 간다.
  *
- * 이름 하나씩 따로 보면 안 된다. 짧은 별칭이 게이트를 우회한다 — `에어컨 실외기 커버`
- * 에서 별칭 `실외기`는 뒤에 `커버`를 물고 있어 걸리지만 별칭 `에어컨`은 뒤가 `실외기`라
- * 안 걸리고, 안 걸린 쪽이 96점으로 살아남는다. 실측에서 `치약`(치약 튜브),
- * `믹서기`(믹서기 칼날)처럼 26개 품목이 이 경로로 샜다.
+ * 두 번째가 없으면 짧은 별칭이 게이트를 그냥 빠져나간다. `에어컨`은 뒤가 `실외기`라
+ * 부품어를 안 물고, 그 자리를 깨끗하다고 보면 `에어컨 실외기 커버`가 96점 확정으로 나간다.
+ *
+ * 이어 붙이기는 어절 경계에서만 계속한다. 어절 중간에서 이름이 끝났다면 그 뒤는 조사나
+ * 다른 형태소라 다음 이름의 시작으로 볼 수 없다.
+ */
+function extendNameOccurrence(normalizedQuery: string, wordStarts: Set<number>, names: IndexedName[], at: number): number {
+  let end = at;
+  for (;;) {
+    let longest = 0;
+    for (const { normalized } of names) {
+      if (normalized.length > longest && normalizedQuery.startsWith(normalized, end)) {
+        longest = normalized.length;
+      }
+    }
+    if (longest === 0) return end;
+    end += longest;
+    if (!wordStarts.has(end)) return end;
+  }
+}
+
+/**
+ * 이 품목의 이름이 나온 자리가 **전부** 부품어를 물고 있는가.
+ *
+ * 한 자리라도 깨끗하면(= 늘린 끝 뒤가 부품어가 아니면) 발동하지 않는다. `소파 커버 말고
+ * 소파는 어떻게`처럼 멀쩡하게 이름을 부른 자리가 섞여 있으면 지금 답을 그대로 둔다는 뜻이다.
+ *
+ * 예전에는 `Math.max`로 오른쪽 끝 자리 하나만 봤다. 그건 `에어컨 실외기 커버`에서 짧은
+ * 별칭이 새는 걸 막으려던 것인데, 애먼 발화까지 같이 지웠다 — `냉장고 버리는데 냉장고
+ * 야채칸은 어떻게 하나요`는 앞의 `냉장고`가 깨끗한데도 뒤의 `냉장고 야채칸` 자리 때문에
+ * not_found로 떨어졌다. 짧은 별칭 누수는 `extendNameOccurrence`가 자리를 늘려서 막고,
+ * 깨끗한 자리 판정은 전(全)자리로 되돌린다.
  *
  * 등장 자리는 어절 첫머리로 제한한다. 그러지 않으면 부품어 **안에** 우연히 박힌 이름이
- * 오른쪽 끝을 차지한다 — `침대 프레임 받침대`의 `받침대`에는 `침대`가 들어 있어서,
+ * 깨끗한 자리로 잡힌다 — `침대 프레임 받침대`의 `받침대`에는 `침대`가 들어 있어서,
  * 그 자리를 인정하면 뒤에 아무것도 없다는 이유로 게이트가 풀렸다.
  */
 function itemIsPartCompoundModifier(normalizedQuery: string, index: QueryWordIndex, names: IndexedName[]): boolean {
   const wordStarts = new Set(index.offsets);
-  let furthestEnd = -1;
+  const starts = new Set<number>();
 
   for (const { normalized } of names) {
     if (!normalized) continue;
     for (let at = normalizedQuery.indexOf(normalized); at !== -1; at = normalizedQuery.indexOf(normalized, at + 1)) {
-      if (!wordStarts.has(at)) continue;
-      furthestEnd = Math.max(furthestEnd, at + normalized.length);
+      if (wordStarts.has(at)) starts.add(at);
     }
   }
 
-  return furthestEnd !== -1 && isFollowedByPartNoun(index, furthestEnd);
+  if (starts.size === 0) return false;
+  for (const at of starts) {
+    if (!isFollowedByPartNoun(index, extendNameOccurrence(normalizedQuery, wordStarts, names, at))) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function stripShortAliasParticle(token: string): string {
