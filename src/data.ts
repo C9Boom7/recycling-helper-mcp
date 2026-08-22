@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { tokenizeQuery } from "./korean/query-tokenizer.js";
+import { particleStrippedForms, tokenizeQuery } from "./korean/query-tokenizer.js";
 
 export type Confidence = "high" | "medium" | "low";
 export type SourceType = "official_guidance" | "local_guidance" | "law" | "safety_guidance" | "manual_review";
@@ -194,6 +194,7 @@ const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", im
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
 const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
 const disposalGroupPath = fileURLToPath(new URL("./data/disposal-groups.json", import.meta.url));
+const partNounPath = fileURLToPath(new URL("./data/compound-part-nouns.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
 export const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8")) as RegionalPolicyData[];
@@ -203,6 +204,22 @@ export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath,
 // 폴백으로 떨어진다("small_electronics_collection"이 어느 분기에도 안 걸리는 식).
 // 매핑을 데이터로 두고 validate-data.mjs가 전수 대응을 강제한다.
 export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")) as Record<string, string>;
+
+/**
+ * 품목명 뒤에 붙으면 **다른 물건**이 되는 부품·부속 낱말. 값은 왜 다른 물건인지의 근거다.
+ *
+ * 목록을 데이터로 두는 이유는 예외가 느는 방향 때문이다. `가스레인지 후드`·`화장대 거울`·
+ * `복사기 토너 카트리지`처럼 지금까지는 (품목 × 부품) 조합을 하나씩 손으로 막아 왔는데,
+ * 부품어 한 줄은 품목 수와 무관하게 한 번만 늘어난다 — `커버` 하나가 소파·이불·베개·
+ * 변기·옷걸이를 한꺼번에 덮는다.
+ *
+ * 1글자 부품어(`살`·`심`·`줄`·`선`·`캡`)는 일부러 없다. 용언 활용형과 겹쳐서 `소파 살
+ * 거예요`·`이불 줄 거예요` 같은 멀쩡한 발화를 깨뜨린다. `우산살`처럼 붙여 쓰는 것들은
+ * 이미 별칭으로 등록돼 있어 이 목록이 없어도 답이 나온다. `실외기`도 없다 — 에어컨
+ * 실외기는 에어컨과 같이 대형폐기물로 나가는 게 맞아 air_conditioner 별칭으로 뒀다.
+ */
+export const compoundPartNouns = JSON.parse(readFileSync(partNounPath, "utf8")) as Record<string, string>;
+const partNounList = Object.keys(compoundPartNouns).map((word) => normalizeText(word));
 
 const materialGuidelineById = new Map(materialGuidelines.map((guideline) => [guideline.id, guideline]));
 
@@ -460,6 +477,93 @@ function queryTokens(query: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * 어절 경계와 정규화 문자열 위치를 함께 들고 있는다.
+ *
+ * 부품어 판정은 정규화 문자열만으로는 못 한다. `normalizeText`가 공백을 지워서
+ * `소파 살까요`가 `소파살까요`가 되는데, 여기서 소파 뒤 꼬리를 문자열로 떼면 `살까요`가
+ * 나오고 `살`에 걸린다. 어절이 어디서 끊겼는지를 알아야 `살까요`를 한 덩어리로 볼 수 있다.
+ */
+type QueryWordIndex = { words: string[]; offsets: number[] };
+
+function buildQueryWordIndex(query: string): QueryWordIndex {
+  const words = query
+    .split(/[^\p{L}\p{N}]+/gu)
+    .map((word) => normalizeText(word))
+    .filter(Boolean);
+  const offsets: number[] = [];
+  let running = 0;
+  for (const word of words) {
+    offsets.push(running);
+    running += word.length;
+  }
+
+  return { words, offsets };
+}
+
+/**
+ * 어절이 부품어로 끝나는가. 조사가 붙어 있을 수 있으니 떼어 가며 본다.
+ *
+ * 시작이 아니라 **끝**을 보는 게 중요하다. `냄비 유리뚜껑`의 `유리뚜껑`을 `뚜껑`으로
+ * 잡으려면 끝을 봐야 하고, 용언은 어미가 뒤에 붙으니 끝을 보는 쪽이 오히려 안전하다 —
+ * `살까요`는 `살`로 시작하지만 `살`로 끝나지는 않는다.
+ */
+function endsWithPartNoun(word: string): boolean {
+  if (!word) return false;
+  return particleStrippedForms(word).some((form) => partNounList.some((part) => form.length >= part.length && form.endsWith(part)));
+}
+
+/**
+ * 이름이 나온 **모든 자리**의 바로 뒤가 부품어인가.
+ *
+ * 한국어는 뒷말이 물건의 정체를 쥔다. `모니터 받침대`의 머리는 받침대지 모니터가 아니라서,
+ * 모니터로 답하면 대형가전 무상방문수거를 안내하게 된다 — 실제로는 나무·플라스틱이다.
+ * 이름이 질의를 품는 방향은 이미 `scoreItemNames`가 머리 자리를 보고 가르는데
+ * (`generic_fragment` / `modifier_fragment`), 질의가 이름을 품는 방향에는 그 판정이
+ * 없었다. `가스레인지 후드`·`화장대 거울`·`복사기 토너 카트리지`를 하나씩 손으로 막아 온
+ * 게 전부 여기서 빠진 절반이다.
+ *
+ * 한 자리라도 부품어를 안 물고 있으면 발동하지 않는다. `소파 커버 말고 소파는 어떻게`
+ * 처럼 멀쩡하게 이름을 부른 자리가 섞여 있으면 지금 동작을 그대로 둔다는 뜻이다.
+ */
+function isFollowedByPartNoun(index: QueryWordIndex, end: number): boolean {
+  const wordIndex = index.offsets.findIndex((offset, i) => end > offset && end <= offset + index.words[i].length);
+  if (wordIndex === -1) return false;
+
+  const rest = index.words[wordIndex].slice(end - index.offsets[wordIndex]);
+  return rest ? endsWithPartNoun(rest) : endsWithPartNoun(index.words[wordIndex + 1] ?? "");
+}
+
+/**
+ * 이 품목이 질의에서 **가장 오른쪽까지 닿은 자리** 뒤가 부품어인가.
+ *
+ * 오른쪽 끝을 보는 건 한국어가 뒷말에 정체를 싣기 때문이다. 질의를 오른쪽까지 가장 많이
+ * 설명한 이름이 "그 뒤는 부품이다"라고 말하면, 물어본 물건은 이 품목이 아니다.
+ *
+ * 이름 하나씩 따로 보면 안 된다. 짧은 별칭이 게이트를 우회한다 — `에어컨 실외기 커버`
+ * 에서 별칭 `실외기`는 뒤에 `커버`를 물고 있어 걸리지만 별칭 `에어컨`은 뒤가 `실외기`라
+ * 안 걸리고, 안 걸린 쪽이 96점으로 살아남는다. 실측에서 `치약`(치약 튜브),
+ * `믹서기`(믹서기 칼날)처럼 26개 품목이 이 경로로 샜다.
+ *
+ * 등장 자리는 어절 첫머리로 제한한다. 그러지 않으면 부품어 **안에** 우연히 박힌 이름이
+ * 오른쪽 끝을 차지한다 — `침대 프레임 받침대`의 `받침대`에는 `침대`가 들어 있어서,
+ * 그 자리를 인정하면 뒤에 아무것도 없다는 이유로 게이트가 풀렸다.
+ */
+function itemIsPartCompoundModifier(normalizedQuery: string, index: QueryWordIndex, names: IndexedName[]): boolean {
+  const wordStarts = new Set(index.offsets);
+  let furthestEnd = -1;
+
+  for (const { normalized } of names) {
+    if (!normalized) continue;
+    for (let at = normalizedQuery.indexOf(normalized); at !== -1; at = normalizedQuery.indexOf(normalized, at + 1)) {
+      if (!wordStarts.has(at)) continue;
+      furthestEnd = Math.max(furthestEnd, at + normalized.length);
+    }
+  }
+
+  return furthestEnd !== -1 && isFollowedByPartNoun(index, furthestEnd);
+}
+
 function stripShortAliasParticle(token: string): string {
   for (const suffix of SHORT_ALIAS_PARTICLE_SUFFIXES) {
     if (token.length > suffix.length && token.endsWith(suffix)) {
@@ -553,6 +657,8 @@ type ScoredQuery = {
   tokens: string[];
   /** 띄어쓰기·문장부호로만 자른 낱말 수. 질의가 한 낱말짜리인지 판단할 때 쓴다. */
   wordCount: number;
+  /** 어절 경계. 부품어 꼬리 판정이 쓴다. */
+  wordIndex: QueryWordIndex;
 };
 
 type FuzzyQuery = {
@@ -680,7 +786,24 @@ function scoreQuerySemanticSignals(query: string, item: WasteItem): number {
  * an exact, prefix, or standalone-token match, so only this one needs a tie check
  * in resolveWasteItem before it's safe to answer with confidence.
  */
-type MatchKind = "none" | "exact" | "query_contains_name" | "short_alias_standalone" | "generic_fragment" | "modifier_fragment" | "fuzzy_jamo" | "target_mention";
+type MatchKind =
+  | "none"
+  | "exact"
+  | "query_contains_name"
+  | "short_alias_standalone"
+  | "generic_fragment"
+  | "modifier_fragment"
+  | "part_compound_fragment"
+  | "fuzzy_jamo"
+  | "target_mention";
+
+/**
+ * 답이 될 수 없는 두 갈래. 점수도 처리도 같지만 종류는 갈라 둔다 — `findWasteItems`가
+ * 오타 폴백으로 내려갈지 말지를 이 둘을 구별해서 정하기 때문이다.
+ */
+function isFragmentKind(kind: MatchKind): boolean {
+  return kind === "modifier_fragment" || kind === "part_compound_fragment";
+}
 
 function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   const { raw, normalized: normalizedQuery, tokens: queryTokens } = query;
@@ -688,6 +811,8 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   let bestScore = 0;
   let matchedBy = indexed.item.name;
   let matchKind: MatchKind = "none";
+
+  const partCompoundGated = itemIsPartCompoundModifier(normalizedQuery, query.wordIndex, indexed.names);
 
   for (const { name, normalized: normalizedName, isShortAlias } of indexed.names) {
     let score = 0;
@@ -700,6 +825,12 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
       if (isLikelyDisposalTargetMention(raw, normalizedQuery, normalizedName)) {
         score = 20;
         kind = "target_mention";
+      } else if (partCompoundGated) {
+        // 이름 뒤에 부품어가 붙었으면 물어본 물건은 이 품목이 아니다. 짧은 별칭 경로도
+        // 같이 막아야 한다 — `소파 커버`가 79점(short_alias_standalone)으로 소파를
+        // 확정하던 것이 이 갈래다.
+        score = MODIFIER_FRAGMENT_SCORE;
+        kind = "part_compound_fragment";
       } else if (isShortAlias) {
         score = hasStandaloneShortAliasMatch(queryTokens, normalizedName) ? SHORT_ALIAS_STANDALONE_BASE_SCORE + normalizedName.length : 0;
         kind = "short_alias_standalone";
@@ -735,7 +866,7 @@ function scoreItemNames(query: ScoredQuery, indexed: IndexedItem): WasteMatch {
   // material keywords in the query say nothing about which half of a compound
   // name was hit.
   const adjustedScore =
-    matchKind !== "modifier_fragment" && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
+    !isFragmentKind(matchKind) && bestScore > 0 && bestScore < HIGH_CONFIDENCE_SCORE
       ? Math.min(99, bestScore + semanticBonus)
       : bestScore;
   return { item: indexed.item, score: adjustedScore, matchedBy, matchKind };
@@ -783,11 +914,16 @@ export function findWasteItems(query: string, limit = 5): WasteMatch[] {
     normalized: normalizedQuery,
     tokens: queryTokens(query),
     wordCount: normalizedTokens(query).length,
+    wordIndex: buildQueryWordIndex(query),
   };
   const named = rankMatches(indexedItems.map((indexed) => scoreItemNames(scoredQuery, indexed)));
   // Modifier hits alone do not count as a name hit: "에어컨" reaching only
   // "에어컨 리모컨" has still failed to name anything, so the typo tier below
   // must run exactly as it did before those hits were kept.
+  //
+  // 부품 복합어 히트는 반대다. `모니터 받침대`는 이름을 못 찾은 게 아니라 찾았는데 그
+  // 물건이 아닌 것이라, 오타 티어로 내려보내면 자모가 비슷한 엉뚱한 품목을 짚는다.
+  // 실제로 그렇게 샜다 — 게이트를 넣고 첫 측정에서 fuzzy_jamo 확정이 47건 나왔다.
   if (named.some((match) => match.matchKind !== "modifier_fragment")) {
     return named.slice(0, limit);
   }
@@ -884,7 +1020,7 @@ export function resolveWasteItem(query: string): WasteQueryResolution {
   // Modifier hits ride along as an under-specification signal only (see
   // MODIFIER_FRAGMENT_SCORE). They never become the answer.
   const modifierHits = matches.filter((match) => match.matchKind === "modifier_fragment");
-  const named = matches.filter((match) => match.matchKind !== "modifier_fragment");
+  const named = matches.filter((match) => !isFragmentKind(match.matchKind));
   if (named.length === 0) {
     return { status: "not_found" };
   }

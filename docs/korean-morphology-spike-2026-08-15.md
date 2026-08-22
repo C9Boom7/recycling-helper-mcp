@@ -83,3 +83,15 @@
 `MATERIAL_QUERY_PATTERNS`, `CONDITION_QUERY_SIGNALS`, `DISPOSAL_CATEGORY_QUERIES`는
 한국어 처리가 아니라 배출 도메인 지식이다. "비닐이면 vinyl_film"은 어느 분석기도
 모른다. 이쪽 예외는 계속 데이터로 빼는 게 맞다 — `disposal-groups.json`처럼.
+
+## 후속 — 남은 오답은 형태소 문제가 아니었다 (2026-08-22)
+
+이 문서를 쓴 뒤에도 복합어 오답이 계속 나와서 다시 재 봤는데, 원인이 조사 처리 쪽이
+아니었다. 품목명 뒤에 부품·부속 낱말이 붙으면 다른 물건인데, **질의가 이름을 품는
+방향**에 머리 자리 판정이 없었다. `모니터 받침대`가 96점으로 모니터를, `소파 커버`가
+79점으로 소파를 확정하고 있었다.
+
+형태소 분석기는 이걸 못 고친다. `모니터 + 받침대`로 나누는 건 어느 분석기든 하지만
+"받침대가 머리라서 이건 모니터가 아니다"는 배출 도메인 지식이다. 여기서 필요한 건
+사전이 아니라 부품어 목록과 머리 자리 규칙이었고, [src/data/compound-part-nouns.json](../src/data/compound-part-nouns.json)과
+`scoreItemNames`의 게이트로 넣었다. 측정은 `pnpm measure:parts`에 있다.

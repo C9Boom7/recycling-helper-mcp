@@ -18,6 +18,7 @@
     "backlog:resolution": "pnpm build && node scripts/report-backlog-resolution.mjs",
     "measure:coverage": "tsx scripts/measure-coverage.ts",
     "measure:utterances": "tsx scripts/measure-utterance-robustness.ts",
+    "measure:parts": "tsx scripts/measure-part-compounds.ts",
     "backlog:auto": "node scripts/auto-backlog-queries.mjs",
     "backlog:auto:quality": "node scripts/auto-backlog-queries.mjs --input logs/quality-seed-queries.example.jsonl --region \"서울 강남구\"",
     "log:query": "node scripts/log-query.mjs",

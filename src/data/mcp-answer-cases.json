@@ -9191,5 +9191,166 @@
       "침대 1인용 세트(매트리스,침대틀,침대헤드): 14,000원",
       "침대 2인용 세트(매트리스,침대틀,침대헤드): 20,000원"
     ]
+  },
+  {
+    "id": "part_compound_monitor_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "모니터 받침대"
+    },
+    "expectedTextIncludes": [
+      "입력한 품목 \"모니터 받침대\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_sofa_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_toothpaste_tube_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "치약 튜브 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_bed_frame_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "침대 프레임 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_aircon_outdoor_unit_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "에어컨 실외기 커버"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_desk_glass",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "책상 유리"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ]
+  },
+  {
+    "id": "part_compound_tail_blender_blade",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "믹서기 칼날"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"칼날\""
+    ]
+  },
+  {
+    "id": "part_compound_tail_printer_cable",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "프린터 케이블"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"충전 케이블\""
+    ]
+  },
+  {
+    "id": "part_compound_tail_laptop_charger",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "노트북 충전기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_sofa_buy",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "소파 살 거예요"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"소파\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_blanket_and_cover",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "이불이랑 커버 같이 버려도 되나요?"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"이불\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_aircon_outdoor_unit",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "에어컨 실외기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"에어컨\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_pot_lid",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "냄비 유리뚜껑"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true"
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_purifier_filter",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "정수기 필터"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"정수기 필터\""
+    ]
+  },
+  {
+    "id": "part_compound_canary_registered_ironing_board",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "다리미 받침대"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"다리미판\""
+    ]
   }
 ]
