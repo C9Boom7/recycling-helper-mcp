@@ -308,8 +308,10 @@ for (const shorter of metroPolicies) {
   for (const longer of metroPolicies) {
     if (shorter.id === longer.id) continue;
 
-    for (const shortName of [shorter.name, ...shorter.aliases]) {
-      for (const longName of [longer.name, ...longer.aliases]) {
+    // `sharedAliases`도 본다. 나눠 쓰는 표기가 바로 이 스윕이 잡으려는 대상인데,
+    // 그걸 빼고 돌리면 **0쌍**이 돈다 — 실제로 그 상태로 통과하고 있었다.
+    for (const shortName of [shorter.name, ...shorter.aliases, ...(shorter.sharedAliases ?? [])]) {
+      for (const longName of [longer.name, ...longer.aliases, ...(longer.sharedAliases ?? [])]) {
         const short = normalizeText(shortName);
         const long = normalizeText(longName);
         if (!short || long === short || !long.startsWith(short)) continue;
@@ -324,6 +326,13 @@ for (const shorter of metroPolicies) {
       }
     }
   }
+}
+
+// 조건에 걸리는 쌍이 하나도 없으면 이 스윕은 아무 일도 안 한 것이다. 대상이 사라진 게
+// 아니라 목록을 잘못 훑고 있을 때가 대부분이라(별칭을 다른 필드로 옮기면 그렇게 된다)
+// 조용히 통과시키지 않는다.
+if (sharedPrefixSweep.pairs === 0) {
+  failures.push("cross-metro shared-prefix sweep ran 0 pairs — 별칭 목록을 훑는 자리가 맞는지 확인해라");
 }
 
 // 위 스윕의 반대편. 광역 표기 뒤에 아무 말이나 붙었다고 지목하면, 있지도 않은 지역을

@@ -576,17 +576,21 @@ for (const [index, region] of regionalPolicies.entries()) {
         }
         if (seen.has(alias)) errors.push(`${aliasPrefix} "${alias}" is duplicated`);
         seen.add(alias);
-        // 나눠 쓰는 이름이니 **다른 지역도 같은 이름을 들고 있어야** 한다. 한쪽이
-        // 자기 `aliases`로 갖고 있어도 되고(한쪽만 확정에 쓰는 경우), 양쪽 모두
-        // `sharedAliases`에 적어도 된다(이름만으로는 어느 쪽도 못 정하는 경우).
-        // 혼자 적어 두면 그 이름은 아무 데도 닿지 않는다.
+        // 나눠 쓰는 이름은 **답하는 광역이 전부 이 목록에 적어야** 한다. 한쪽만 적고
+        // 다른 쪽이 `aliases`로 들고 있으면, 표기만 들어온 질의가 완전 일치에서 양쪽에
+        // 걸리는데 되묻기 가드는 선언한 곳만 세어 발동하지 않는다 — 배열 순서가 답을
+        // 정하는 상태가 된다. 혼자 적어 두면 그 이름은 아무 데도 닿지 않는다.
         const exclusiveOwner = exclusiveNameOwners.get(alias);
         const alsoShared = regionalPolicies.some(
           (other) => other.id !== region.id && (other.sharedAliases ?? []).includes(alias),
         );
         if (exclusiveOwner === region.id) {
           errors.push(`${aliasPrefix} "${alias}" is already this region's own alias`);
-        } else if (!exclusiveOwner && !alsoShared) {
+        } else if (exclusiveOwner) {
+          errors.push(
+            `${aliasPrefix} "${alias}" is region ${exclusiveOwner}'s exclusive alias; every region that answers to a shared name must declare it in sharedAliases`,
+          );
+        } else if (!alsoShared) {
           errors.push(
             `${aliasPrefix} "${alias}" is not held by any other region; a shared name needs another region that answers to it`,
           );
