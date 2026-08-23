@@ -39,7 +39,10 @@ type DistrictDump = {
   url: string;
   collectedAt?: string;
   rows: DistrictRow[];
+  /** 표가 우리가 아는 모양이 아니라는 신호. 하나라도 있으면 그 지역을 통째로 건너뛴다. */
   warnings?: string[];
+  /** 늘 나오는 정상 제외(성동 무상수거 안내 행 등). 사람이 볼 필요가 없어 임포트를 막지 않는다. */
+  notes?: string[];
   errors: string[];
 };
 
@@ -95,6 +98,26 @@ for (const regionId of targets) {
   // 정말 바뀐 경우와 구분할 방법이 없으니, 지우는 쪽이 아니라 남기고 알리는 쪽을 고른다.
   if (dump.rows.length === 0) {
     console.error(`${regionId}: 수집된 행이 없다 (${dump.errors.join(" / ") || "사유 없음"}) — 기존 행을 그대로 둔다`);
+    failed.push(regionId);
+    continue;
+  }
+
+  // 수집이 경고를 냈으면 **행이 0일 때와 똑같이** 다룬다 — 넣지 않고 기존 행을 남긴다.
+  //
+  // 경고는 전부 "표가 우리가 아는 모양이 아니다"라는 뜻이다: 후보의 20%가 사라졌다,
+  // 선언된 rowspan이 실제와 다르다, 예상 못 한 colspan이 생겼다, 페이지가 상한에서
+  // 잘렸다. 이 상태에서 나오는 건 빈 결과가 아니라 **한 칸씩 밀린 그럴듯한 오답**이라,
+  // 아래 품명 판정과 갈래 게이트를 멀쩡히 통과해 잘못된 품명에 금액이 붙은 채로 들어간다.
+  // 사람이 원문을 보기 전에는 맞는지 틀린지 가릴 방법이 없다.
+  //
+  // stderr에만 찍고 넣는 쪽은 고르지 않았다. 로그는 다음 사람이 안 읽지만 데이터는 답변에
+  // 나가고, 이 트랙이 막으려던 실패가 바로 "확신 있는 오답"이다. 상시 발생하는 정상
+  // 제외는 수집 쪽에서 `notes`로 갈라 두어, 이 게이트가 멀쩡한 지역을 막지는 않는다.
+  const warnings = dump.warnings ?? [];
+  if (warnings.length > 0) {
+    console.error(`${regionId}: 수집 경고 ${warnings.length}건 — 기존 행을 그대로 둔다`);
+    for (const warning of warnings) console.error(`  ! ${warning}`);
+    console.error(`  원문을 확인하고 파서를 고친 뒤 다시 수집해라: node scripts/fetch-district-fees.mjs ${regionId}`);
     failed.push(regionId);
     continue;
   }
@@ -268,4 +291,9 @@ const merged = [
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((sum, schedule) => sum + schedule.fees.length, 0)}행`);
 if (missing.length > 0) console.log(`표가 없어 건너뛴 지역: ${missing.join(", ")}`);
-if (failed.length > 0) console.log(`이번에 넣지 못해 기존 행을 그대로 둔 지역: ${failed.join(", ")}`);
+if (failed.length > 0) {
+  // 건너뛴 지역을 종료 코드로 알린다. 예전에는 stdout 한 줄로 끝나서, 아홉 곳 중
+  // 하나가 빠진 실행과 전부 들어간 실행이 겉보기에 똑같았다.
+  console.error(`이번에 넣지 못해 기존 행을 그대로 둔 지역: ${failed.join(", ")}`);
+  process.exitCode = 1;
+}

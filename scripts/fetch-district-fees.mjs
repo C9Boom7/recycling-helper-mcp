@@ -179,7 +179,8 @@ function parseSdmTable(html) {
  *
  * 그래서 rowspan을 실제로 펴서 읽는다. 열마다 "앞 행에서 이어지는 값과 남은 횟수"를
  * 들고, 이어지는 값이 있으면 그 자리를 그것으로 채운 뒤 남은 셀을 왼쪽부터 밀어 넣는다.
- * HTML 표의 rowspan 복원 그대로다.
+ * HTML 표의 rowspan 복원 그대로다. `colspan`도 같이 편다 — 한 셀이 여러 열을 먹는데
+ * 한 칸으로 세면 그 행부터 격자가 통째로 어긋난다.
  */
 function parseRowspanTable(html) {
   const rows = [];
@@ -196,6 +197,8 @@ function parseRowspanTable(html) {
   let candidates = 0;
   /** 선언된 rowspan이 실제보다 커서 강제로 끊은 횟수. 조용히 넘기지 않고 보고한다. */
   let staleCarries = 0;
+  /** 데이터 영역에서 `colspan`을 만난 행 수. 지금 두 페이지에는 하나도 없다. */
+  let spannedRows = 0;
 
   // 행은 `</tr>`가 아니라 **다음 `<tr>`**에서 끊는다. 닫는 태그를 빠뜨린 표가 있다 —
   // 광주 북구는 화장대 둘째 행에 `</tr>`가 없어서, `</tr>`로 끊으면 그 행이 다음
@@ -206,19 +209,27 @@ function parseRowspanTable(html) {
     const cells = [...body.matchAll(/<(t[dh])([^>]*)>([\s\S]*?)<\/\1>/gi)].map((cell) => ({
       text: cellText(cell[3]),
       span: Math.max(1, Number(/rowspan\s*=\s*["']?(\d+)/i.exec(cell[2])?.[1] ?? 1)),
+      cols: Math.max(1, Number(/colspan\s*=\s*["']?(\d+)/i.exec(cell[2])?.[1] ?? 1)),
       header: cell[1].toLowerCase() === "th" && !/rowspan/i.test(cell[2]),
     }));
     if (cells.length === 0) continue;
     // 열 이름 줄. rowspan 없는 th만 골라내므로 `품목류` 묶음 머리(th + rowspan)는 안 걸린다.
+    // 머리글은 여기서 빠지므로 아래 colspan 집계에도 안 잡힌다 — `<th colspan="5">`는
+    // 표 제목일 뿐이고, 우리가 알고 싶은 건 데이터 영역에 낀 안내 행이다.
     if (cells.every((cell) => cell.header)) continue;
+    if (cells.some((cell) => cell.cols > 1)) spannedRows += 1;
+
+    /** 이 행이 격자에서 실제로 먹는 칸 수. colspan을 한 칸으로 세면 아래 계산이 어긋난다. */
+    const cellWidth = cells.reduce((sum, cell) => sum + cell.cols, 0);
 
     // 선언된 rowspan이 실제 행수보다 큰 표가 있다 — 광주 북구 `가구류`는 46이라고
     // 적혀 있는데 행은 45개다. 그대로 믿으면 묶음이 끝난 뒤에도 값이 하나 더 이어져
     // 다음 묶음의 머리가 한 칸 오른쪽으로 밀린다. 실제로 `생활용품`(품목류)이 품목별
     // 자리에 들어와 옷걸이부터 재봉틀까지 17개 품명이 통째로 어긋났다.
     //
-    // 남은 셀이 빈 자리보다 많으면 앞선 묶음이 이미 끝난 것이다. 선언값보다 이 행이
-    // 실제로 들고 온 셀을 믿는 쪽이 맞다.
+    // 이 행이 먹는 칸이 빈 자리보다 많으면 앞선 묶음이 이미 끝난 것이다. 선언값보다
+    // 이 행이 실제로 들고 온 셀을 믿는 쪽이 맞다. 개수가 아니라 `cellWidth`로 재는
+    // 이유는 colspan 하나가 여러 칸을 먹기 때문이다.
     //
     // 끊는 순서는 **오른쪽(안쪽 열)부터**다. 안쪽이 과다 선언된 쪽이 흔한데, 왼쪽부터
     // 끊으면 멀쩡한 바깥 열(품목류) carry가 날아가고 새 묶음 머리가 0열로 밀린다 —
@@ -226,7 +237,7 @@ function parseRowspanTable(html) {
     // 반대로 바깥 열이 과다 선언된 경우에는 그 행이 묶음 머리라 안쪽 carry가 이미
     // 비어 있어서, 오른쪽부터 훑어도 결국 같은 자리를 끊는다. 양쪽 모두 안전한 순서다.
     let freeColumns = COLUMNS - carry.filter(Boolean).length;
-    for (let column = COLUMNS - 1; column >= 0 && cells.length > freeColumns; column -= 1) {
+    for (let column = COLUMNS - 1; column >= 0 && cellWidth > freeColumns; column -= 1) {
       if (!carry[column]) continue;
       carry[column] = null;
       freeColumns += 1;
@@ -235,18 +246,28 @@ function parseRowspanTable(html) {
 
     const line = new Array(COLUMNS).fill("");
     let next = 0;
-    for (let column = 0; column < COLUMNS; column += 1) {
+    let column = 0;
+    while (column < COLUMNS) {
       if (carry[column]) {
         line[column] = carry[column].text;
         carry[column].left -= 1;
         if (carry[column].left <= 0) carry[column] = null;
+        column += 1;
         continue;
       }
       const cell = cells[next];
       next += 1;
-      if (!cell) continue;
-      line[column] = cell.text;
-      if (cell.span > 1) carry[column] = { text: cell.text, left: cell.span - 1 };
+      if (!cell) {
+        column += 1;
+        continue;
+      }
+      // colspan은 오른쪽 열까지 같은 값으로 채운다. 표 끝을 넘기면 거기서 자른다.
+      const width = Math.min(cell.cols, COLUMNS - column);
+      for (let offset = 0; offset < width; offset += 1) {
+        line[column + offset] = cell.text;
+        if (cell.span > 1) carry[column + offset] = { text: cell.text, left: cell.span - 1 };
+      }
+      column += width;
     }
 
     candidates += 1;
@@ -264,6 +285,13 @@ function parseRowspanTable(html) {
   }
   if (staleCarries > 0) {
     warnings.push(`선언된 rowspan이 실제 행수보다 큰 자리 ${staleCarries}곳을 끊었다 (원문 표의 오기)`);
+  }
+  // 격자는 위에서 폈으니 금액이 비고 칸으로 밀리지는 않는다. 그래도 경고는 남긴다 —
+  // 두 페이지 모두 데이터 영역에 colspan이 하나도 없어서, 하나라도 생겼다는 건 표
+  // 구조가 바뀌었다는 뜻이다. 전체 너비 안내 행이 늘었는지, 열이 통합됐는지는
+  // 원문을 봐야 갈린다. 임포터가 이 경고를 받으면 그 지역을 건너뛴다.
+  if (spannedRows > 0) {
+    warnings.push(`데이터 영역에 colspan이 든 행이 ${spannedRows}개 있다 — 표 구조가 바뀌었는지 원문을 확인해라`);
   }
 
   return { rows, warnings };
@@ -329,7 +357,10 @@ function parseGangnamTable(html) {
  */
 function parseSdPopup(html) {
   const rows = [];
-  const warnings = [];
+  // 무상수거 안내 행은 **경고가 아니라 기록**이다. 성동 표에는 늘 몇 줄씩 있어서,
+  // 이걸 `warnings`에 넣으면 임포터가 성동을 영영 건너뛴다 — 임포터는 경고가 붙은
+  // 지역을 건너뛰기 때문이다. 늘 나오는 정상 제외와, 표가 바뀌었다는 신호는 갈라 둔다.
+  const notes = [];
   for (const row of html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
     const cells = [...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => cell[1]);
     if (cells.length < 2) continue;
@@ -342,14 +373,14 @@ function parseSdPopup(html) {
         const parsed = splitTrailingSpec(text);
         // 무상수거를 가리키는 안내가 붙은 행은 금액을 싣지 않는다.
         if (parsed.freePickupNotice) {
-          warnings.push(`무상수거 안내가 붙어 제외: ${text.slice(0, 40)}`);
+          notes.push(`무상수거 안내가 붙어 제외: ${text.slice(0, 40)}`);
           continue;
         }
         rows.push({ itemName: parsed.itemName, spec: parsed.spec, feeKrw: fee });
       }
     }
   }
-  return { rows, warnings };
+  return { rows, warnings: [], notes };
 }
 
 /**
@@ -408,7 +439,21 @@ async function fetchGuro(baseUrl) {
   return { rows: unique, warnings };
 }
 
+/**
+ * 파서가 돌려주는 것은 두 갈래다.
+ *
+ * - `warnings`: **표가 우리가 아는 모양이 아니다.** 부분 누락, rowspan 오기, 예상 못 한
+ *   colspan, 잘린 페이지가 여기 든다. 임포터가 이걸 보면 그 지역을 통째로 건너뛴다.
+ * - `notes`: 늘 나오는 정상 제외. 성동의 무상수거 안내 행 같은 것이라 사람이 볼 필요가 없다.
+ *
+ * 둘을 한 배열에 섞으면 상시 발생하는 제외 때문에 임포터가 멀쩡한 지역을 영영 건너뛴다.
+ */
 async function collect(target) {
+  const result = await collectRaw(target);
+  return { rows: result.rows, warnings: result.warnings ?? [], notes: result.notes ?? [] };
+}
+
+async function collectRaw(target) {
   if (target.kind === "guro_list") return fetchGuro(target.url);
   const html = await fetchText(target.url);
   if (target.kind === "smartclean") return parseSmartclean(html);
@@ -432,11 +477,12 @@ async function main() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
   const targets = requested.length > 0 ? TARGETS.filter((target) => requested.includes(target.regionId)) : TARGETS;
   const failures = [];
+  const warned = [];
 
   for (const target of targets) {
     process.stdout.write(`${target.regionId} (${target.name}) ... `);
     try {
-      const { rows, warnings } = await collect(target);
+      const { rows, warnings, notes } = await collect(target);
       // 빈 결과를 성공으로 넘기지 않는다. 조용한 실패는 "그 지역엔 표가 없다"는
       // 커버리지 착시를 만든다 — 조례 트랙에서 실제로 겪었다.
       if (rows.length === 0) throw new Error("행을 하나도 못 뽑았다 (페이지 구조가 바뀌었을 수 있다)");
@@ -450,12 +496,17 @@ async function main() {
         collectedAt: new Date().toISOString().slice(0, 10),
         rows,
         warnings,
+        notes,
         errors: [],
       };
       writeFileSync(`${OUTPUT_DIR}/${target.regionId}.json`, `${JSON.stringify(result, null, 2)}\n`, "utf8");
       const items = new Set(rows.map((row) => row.itemName)).size;
       console.log(`${rows.length}행 / 품명 ${items}종${warnings.length ? ` (경고 ${warnings.length}건)` : ""}`);
-      for (const warning of warnings) console.log(`    ! ${warning}`);
+      // 경고는 stderr로 보낸다. 임포터가 그 지역을 건너뛰게 만드는 신호라, 성공 로그
+      // 사이에 파묻히면 안 된다. 상시 제외(`notes`)는 stdout에 그대로 둔다.
+      for (const warning of warnings) console.error(`    ! ${warning}`);
+      for (const note of notes) console.log(`    · ${note}`);
+      if (warnings.length > 0) warned.push(target.regionId);
     } catch (error) {
       // **실패한 덤프를 쓰지 않는다.** 예전엔 rows: []로 덮어써서, 일시적인 5xx 한 번에
       // 멀쩡히 받아 둔 표가 빈 파일이 됐다. 인제스트가 그걸 "행이 없다"로 읽는다.
@@ -470,6 +521,14 @@ async function main() {
     // 실패를 종료 코드로 알린다. `fees:fetch:district && import:district`로 이어 붙였을 때
     // 조용히 다음 단계로 넘어가면 낡은 덤프가 새 데이터인 척한다.
     console.error(`수집 실패: ${failures.join(", ")}`);
+    process.exitCode = 1;
+  }
+  if (warned.length > 0) {
+    // 경고도 종료 코드에 싣는다. 덤프는 썼지만 임포터가 그 지역을 건너뛰므로,
+    // 여기서 0을 돌려주면 "받았고 넣었다"로 읽힌다. `&&`로 이어 붙였을 때 임포트가
+    // 멈추는 편이 낫다 — 원문이 바뀐 상태로 넣는 것보다 안 넣는 쪽이 안전하다.
+    // 확인이 끝났으면 `import:district`를 따로 돌리면 된다(경고 없는 지역만 들어간다).
+    console.error(`경고가 붙어 임포트가 건너뛸 지역: ${warned.join(", ")}`);
     process.exitCode = 1;
   }
 }

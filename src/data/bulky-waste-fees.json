@@ -1879,11 +1879,6 @@
       "basis": "서울 노원구에서 제출한 대형폐기물 수수료 고시 770행 중 품목이 확정되는 행만 반영했습니다. 기준일은 지자체 제출일(CRTR_YMD)입니다.",
       "note": "오타 매칭·역방향 포함 매칭·수식어 위치 매칭·복수 품목 표기·옵션 요금 행은 제외했습니다."
     },
-    "preCapFeeRowCountByItemId": {
-      "blanket": 13,
-      "bed_frame": 17,
-      "mattress": 21
-    },
     "fees": [
       {
         "itemId": "picture_frame",
@@ -2674,13 +2669,6 @@
         "category": "가전제품류",
         "itemName": "가습기",
         "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "bottle_sterilizer",
-        "category": "가전제품류",
-        "itemName": "젖병소독기",
-        "spec": "가정용 소형",
         "feeKrw": 0
       },
       {
@@ -5468,13 +5456,6 @@
         "category": "생활용품류",
         "itemName": "장판",
         "spec": "3.3제곱미터 당",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "toy",
-        "category": "생활용품류",
-        "itemName": "인형+장난감류",
-        "spec": "봉제인형+플라스틱 장난감_가장 긴 면 50센티미터 미만 1개 당",
         "feeKrw": 1000
       },
       {
