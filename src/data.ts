@@ -1622,7 +1622,8 @@ export function formatRegionSourceList(region: RegionalPolicyData): string[] {
  * 배출 그룹 라벨에 든 갈래 이름 → 그 갈래를 다루는 지역 출처를 고르는 어휘. 제목과 basis에서
  * 찾는다. 라벨은 `disposal-groups.json`의 명시 매핑이고 "일반쓰레기/대형폐기물"처럼 `/`로
  * 잇는데, "특수/유해폐기물"은 이름 자체에 `/`가 있어 조각으로 가르지 않고 부분 문자열로 본다.
- * 여기 없는 라벨("지역 확인 필요")은 아무 출처도 고르지 않고 아래 대표 출처 폴백으로 떨어진다.
+ * 여기 없는 라벨("지역 확인 필요")은 고를 어휘 자체가 없는 경우라 거르지 않고 지역 출처를
+ * 전부 낸다 — 아래 `formatRegionSourceListForItem` 주석의 두 갈래를 보라.
  */
 const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> = [
   // "대형가전"(소형폐가전 무상수거 안내의 basis)에 걸리지 않게 폐기물까지 본다.
@@ -1637,9 +1638,18 @@ const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> 
   ["불연성", /불연성|마대|특수규격|PP|타지 않는/],
   ["음식물쓰레기", /음식물/],
   ["재활용", /재활용|분리배출|분리수거/],
-  // "쓰레기 배출"만 보면 음식물쓰레기 배출요일 페이지까지 걸린다. 일반쓰레기를 다루는
-  // 페이지는 제목이 "쓰레기배출안내"류라 그 모양과 낱말 자체로만 잡는다.
-  ["일반쓰레기", /일반쓰레기|생활쓰레기|쓰레기 ?배출 ?안내/],
+  // "쓰레기 배출"만 보면 음식물쓰레기 배출요일 페이지까지 걸린다. 그렇다고 제목 모양만
+  // 좁게 잡으면 같은 성격의 페이지를 절반쯤 놓친다 — `노원구 생활폐기물 배출안내`,
+  // `구로구 쓰레기배출요령`, `성남시 … 생활 쓰레기 분리배출 안내`가 다 빠져 있었다.
+  // 그래서 어휘는 넓히고 음식물·대형만 lookbehind로 뺀다.
+  //
+  // `(?<!대형 ?)`의 공백이 필요한 건 `중구 대형 생활폐기물 배출`처럼 띄어 쓴 제목 때문이다.
+  // 공백을 안 넣으면 그 제목이 일반쓰레기 출처로 넘어온다.
+  //
+  // 남는 구멍 하나는 알고 넘어간다. `송파구청 음식물쓰레기 배출요령/수수료`의 basis에
+  // "일반 생활쓰레기 대상 음식물 예외 품목"이 적혀 있어 제목이 아니라 basis로 걸린다.
+  // 실제로 일반쓰레기 기준을 설명하는 문장이라 낱말만으로는 가릴 수 없다.
+  ["일반쓰레기", /일반쓰레기|생활 ?쓰레기|(?<!대형 ?)생활폐기물 (분리)?(배출|수거)|(?<!음식물)쓰레기 ?(분리)?배출 ?(안내|요령)/],
 ];
 
 /**
@@ -1651,9 +1661,16 @@ const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> 
  * 지역 연락처 주소와 같은 출처도 함께 잡는다. 수수료를 실제로 실은 품목이면 그 표의 출처
  * (수수료 고시)도 더한다 — 표가 어디서 왔는지는 표를 보여준 응답에만 필요하다.
  *
- * 거른 결과가 비면 지역 대표 출처 1개만 남긴다. 빈 섹션을 만들지 않되, 품목과 무관한
- * 출처를 늘어놓지도 않는다. basis 문장은 출처마다 그대로 둔다 — 링크만 남기면 "왜 이
- * 출처인가"가 사라져 되묻기를 부른다.
+ * 거른 결과가 비었을 때는 두 갈래를 갈라야 한다(PR #70 리뷰 1라운드).
+ * - **고를 어휘가 아예 없을 때** — `LED등`의 `region_specific`은 라벨이 "지역 확인 필요"라
+ *   위 표에 걸리는 패턴이 하나도 없다. 이건 거른 게 아니라 무엇을 골라야 할지 모르는
+ *   것이라, 변경 전처럼 지역 출처를 전부 낸다. 대표 1개로 줄이면 `LED등` + `서울 도봉구`가
+ *   스마트클린 도봉(대형폐기물 신청 페이지)만 남고 `도봉구 폐형광등·폐건전지 배출안내`를
+ *   잃는다 — 정작 이 품목이 봐야 할 출처가 사라지는 셈이다.
+ * - **어휘는 있는데 아무것도 안 맞을 때** — 그 지역이 그 갈래를 다루는 페이지를 아직 안
+ *   실었다는 뜻이다. 빈 섹션을 만들지 않게 지역 대표 출처 1개로 닫는다.
+ *
+ * basis 문장은 출처마다 그대로 둔다 — 링크만 남기면 "왜 이 출처인가"가 사라져 되묻기를 부른다.
  */
 export function formatRegionSourceListForItem(region: RegionalPolicyData, item: WasteItem): string[] {
   const label = disposalGroupLabel(item.disposalType);
@@ -1669,7 +1686,8 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
   const feeSource = findBulkyWasteFees(region, item).length > 0 ? findBulkyWasteFeeSchedule(region)?.source : undefined;
   const sources = feeSource && !matched.some((source) => source.url === feeSource.url) ? [...matched, feeSource] : matched;
 
-  return (sources.length > 0 ? sources : region.sources.slice(0, 1)).map(formatRegionSourceLine);
+  if (sources.length > 0) return sources.map(formatRegionSourceLine);
+  return (patterns.length === 0 ? region.sources : region.sources.slice(0, 1)).map(formatRegionSourceLine);
 }
 
 /**
@@ -1690,18 +1708,54 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
  * - 신고·신청 경로: 인터넷 신청 주소가 적혔거나, 홈페이지·주민센터 신고를 안내했을 때.
  *   광역 착지("신청 경로와 수수료는 ○○시 공식 안내에서")는 경로를 준 게 아니라 남는다.
  * - 부착: 접수증·접수번호·신고필증 부착 여부를 말했을 때(안 붙인다는 안내도 답이다).
+ *
+ * 어휘가 맞아도 답이 아닌 자리가 둘 있어 `onlyWhen`으로 막는다(PR #70 리뷰 1라운드).
+ * 1. **"신고 대상 여부"는 "신고 방법"과 다른 질문이다.** 신청 주소를 줬다고 "이 품목이
+ *    대형폐기물이냐"에 답한 게 아니다. 대형폐기물이 보조 배출로인 품목(`도자기 그릇`)에
+ *    지역 안내가 하는 말은 "대형폐기물에 **해당할 때만** 신청한다"라, 해당 여부는 여전히
+ *    사용자 몫이다. 그래서 이 주제는 대형폐기물이 주 배출로인 품목에서만 답한 것으로 친다.
+ * 2. **부착 문구가 늘 확인된 사실은 아니다.** `formatRegionItemGuide`의 `bulkyLine`은
+ *    `bulkyWaste.prePosting`이 빈 지역에서도 "접수증 또는 접수번호를 부착"이라고 말하는데,
+ *    그건 조사한 값이 아니라 기본 문장이다(그쪽 주석 참조). 확인한 근거가 있는 지역
+ *    — `prePosting`이 채워졌거나 품목별 지역 안내가 부착 방식을 직접 적은 지역 — 에서만
+ *    답한 것으로 친다. 노원구 `매트리스`가 둘 다 아니라 "신고필증 부착 방식"이 남는다.
  */
-const CHECK_ITEM_TOPICS: Array<[topic: RegExp, answeredBy: RegExp]> = [
-  [/수수료/, /수수료 후보:|수수료 조회/],
-  [/신고 (방법|절차|대상|여부|기준)/, /인터넷 신청|홈페이지|주민센터/],
-  [/신고필증|부착/, /부착|붙이지 않/],
+type CheckItemTopic = {
+  topic: RegExp;
+  answeredBy: RegExp;
+  /** 어휘가 맞아도 이 조건이 거짓이면 답하지 않은 것으로 둔다. */
+  onlyWhen?: (item: WasteItem, regionMatch?: MatchedRegionPolicy) => boolean;
+};
+
+const CHECK_ITEM_TOPICS: CheckItemTopic[] = [
+  { topic: /수수료/, answeredBy: /수수료 후보:|수수료 조회/ },
+  { topic: /신고 (방법|절차)/, answeredBy: /인터넷 신청|홈페이지|주민센터/ },
+  {
+    topic: /신고 (대상|여부|기준)/,
+    answeredBy: /인터넷 신청|홈페이지|주민센터/,
+    onlyWhen: (item) => itemHasBulkyRoute(item) && !isBulkySecondaryRoute(item),
+  },
+  {
+    topic: /신고필증|부착/,
+    answeredBy: /부착|붙이지 않/,
+    onlyWhen: (item, regionMatch) =>
+      Boolean(regionMatch?.region.bulkyWaste?.prePosting) || Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item)),
+  },
 ];
 
-export function isCheckItemAnsweredByRegionGuide(checkItem: string, regionGuideLines: readonly string[]): boolean {
+export function isCheckItemAnsweredByRegionGuide(
+  checkItem: string,
+  regionGuideLines: readonly string[],
+  item: WasteItem,
+  regionMatch?: MatchedRegionPolicy,
+): boolean {
   if (mentionsCollectionDay(checkItem)) return false;
-  const topics = CHECK_ITEM_TOPICS.filter(([topic]) => topic.test(checkItem));
+  const topics = CHECK_ITEM_TOPICS.filter(({ topic }) => topic.test(checkItem));
   if (topics.length === 0) return false;
-  return topics.every(([, answeredBy]) => regionGuideLines.some((line) => answeredBy.test(line)));
+  return topics.every(
+    ({ answeredBy, onlyWhen }) =>
+      (!onlyWhen || onlyWhen(item, regionMatch)) && regionGuideLines.some((line) => answeredBy.test(line)),
+  );
 }
 
 export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem): RegionItemGuide | undefined {
@@ -2200,7 +2254,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     // 지역 안내가 바로 위에서 답한 항목은 다시 묻지 않는다(PRD phase-10 R2-b). 요일 항목은
     // `isCheckItemAnsweredByRegionGuide`가 손대지 않으므로 확인처가 붙는 자리는 그대로다.
     const checkItems = (item.regionPolicy?.checkItems ?? []).filter(
-      (checkItem) => !hasRegionGuide || !isCheckItemAnsweredByRegionGuide(checkItem, regionGuideLines),
+      (checkItem) => !hasRegionGuide || !isCheckItemAnsweredByRegionGuide(checkItem, regionGuideLines, item, regionMatch),
     );
     if (checkItems.length > 0)
       lines.push(...withCollectionDaySource(checkItems, regionMatch).map((checkItem) => `- 확인 항목: ${checkItem}`));

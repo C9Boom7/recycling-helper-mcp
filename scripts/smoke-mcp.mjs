@@ -880,8 +880,18 @@ async function runSmoke() {
       // R2-b: 지역 안내가 수수료표와 신청 경로를 냈으니 그 항목은 다시 묻지 않는다. 답하지 않은
       // 항목(배출 장소와 배출일)은 남는다.
       assert(!sizeText.includes("- 확인 항목: 품목별 수수료"), "노원구 매트리스: 수수료표를 내고도 '품목별 수수료'를 다시 묻는다");
-      assert(!sizeText.includes("- 확인 항목: 신고필증 부착 방식"), "노원구 매트리스: 부착 안내를 내고도 '신고필증 부착 방식'을 다시 묻는다");
       assert(sizeText.includes("- 확인 항목: 배출 장소와 배출일"), "노원구 매트리스: 지역 안내가 답하지 않은 확인 항목까지 사라졌다");
+      // 부착은 확인한 지역에서만 답한 것이다(PR #70 리뷰 1라운드). 노원구는 `prePosting`도
+      // 품목별 안내도 없어 지역 안내의 "접수증 또는 접수번호를 부착"이 조사한 값이 아니므로
+      // 항목이 남고, 품목별 안내가 부착 방식을 직접 적은 강남구에서는 빠진다.
+      assert(sizeText.includes("- 확인 항목: 신고필증 부착 방식"), "노원구 매트리스: 확인하지 않은 기본 문구를 근거로 '신고필증 부착 방식'을 지웠다");
+      const gangnamText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "매트리스", region: "서울 강남구" }, requestId++));
+      assert(gangnamText.includes("접수증 또는 접수번호를 품목별로 부착"), "강남구 매트리스: 품목별 지역 안내의 부착 문구가 사라졌다");
+      assert(!gangnamText.includes("- 확인 항목: 신고필증 부착 방식"), "강남구 매트리스: 부착 방식을 직접 적고도 '신고필증 부착 방식'을 다시 묻는다");
+      // "신고 대상 여부"는 "신고 방법"과 다른 질문이다. 대형폐기물이 보조 배출로인 품목에
+      // 지역 안내는 "해당할 때만 신청한다"고만 말하므로 해당 여부는 답하지 않은 것이다.
+      const ceramicText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "도자기 그릇", region: "서울 노원구" }, requestId++));
+      assert(ceramicText.includes("- 확인 항목: 대형폐기물 신고 대상 여부"), "노원구 도자기 그릇: 보조 배출로인데 '대형폐기물 신고 대상 여부'를 답한 것으로 쳤다");
 
       // R2-a: 지역 공식 출처는 품목 갈래에 맞는 것만. 대형폐기물 품목에 폐건전지 출처가 붙지 않고,
       // 수수료표를 실었으니 그 표의 출처(수수료 고시)가 선다.
@@ -898,6 +908,14 @@ async function runSmoke() {
       const batterySources = batteryText.slice(batteryText.indexOf("### 서울 마포구 공식 출처"));
       assert(batterySources.includes("폐형광등·폐건전지 수거함 배치 현황"), "마포구 건전지: 수거함 출처가 공식 출처에서 빠졌다");
       assert(!batterySources.includes("투명페트병 무인회수기"), "마포구 건전지: 품목과 무관한 출처가 공식 출처에 붙는다");
+
+      // R2-a 세 번째 갈래: 배출 그룹 라벨에 고를 어휘가 아예 없는 품목(`region_specific` →
+      // "지역 확인 필요")은 거를 근거가 없으니 지역 출처를 전부 낸다. 대표 1개로 줄이면
+      // 도봉구 sources[0]인 스마트클린 도봉만 남아 정작 이 품목이 봐야 할 수거함 안내를 잃는다.
+      const ledText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "LED등", region: "서울 도봉구" }, requestId++));
+      const ledSources = ledText.slice(ledText.indexOf("### 서울 도봉구 공식 출처"));
+      assert(ledSources.includes("도봉구 폐형광등·폐건전지 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목에서 지역 출처를 대표 1개로 잘라 수거함 안내를 잃었다");
+      assert(ledSources.includes("도봉구 생활폐기물 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목인데 지역 출처가 전부 나오지 않는다");
 
       // 품목별 지역 안내가 있는 지역(마포)은 연락처 블록을 안 거치므로 수수료 블록이 유일한
       // 링크 자리다 — 거기서는 두 주소가 그대로 한 번씩 나가야 한다.
