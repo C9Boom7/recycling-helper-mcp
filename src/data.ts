@@ -1452,8 +1452,9 @@ const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, Reg
 function splitLeadingMetro(
   policies: RegionalPolicyData[],
   normalizedQuery: string,
-): { metro: RegionalPolicyData; rest: string } | undefined {
+): Array<{ metro: RegionalPolicyData; rest: string }> {
   let best: { metro: RegionalPolicyData; rest: string } | undefined;
+  const splits: Array<{ metro: RegionalPolicyData; rest: string }> = [];
 
   for (const policy of policies) {
     if (regionMatchLevel(policy) !== "metro") continue;
@@ -1471,10 +1472,16 @@ function splitLeadingMetro(
       const rest = normalizedQuery.slice(normalizedName.length);
       if (!rest) continue;
       if (!best || rest.length < best.rest.length) best = { metro: policy, rest };
+      splits.push({ metro: policy, rest });
     }
   }
 
-  return best;
+  // 가장 짧게 남은 것들을 **전부** 돌려준다. 통합 이름을 두 광역이 나눠 쓰면 같은
+  // 표기가 양쪽에서 떨어져 나머지도 똑같아지는데, 하나만 골라 돌려주면 배열 순서가
+  // 답을 정한다 — 전라남도에 시·군이 등록돼도 `전남광주통합특별시 목포시`가 광주
+  // 쪽만 뒤지고 그 자치구를 지나친다.
+  if (!best) return [];
+  return splits.filter((split) => split.rest.length === best.rest.length);
 }
 
 export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?: string): RegionResolution {
@@ -1513,15 +1520,23 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
   // 양방향 접두 어느 쪽도 맞지 않아 자치구를 통째로 놓치고, 배출 요일까지 있는
   // full 티어 데이터가 광역 안내로 덮인다. 서울은 자치구마다 "서울 X구"·"서울시 X구"
   // 별칭을 전부 달아둬서 가려져 있을 뿐이라, 지역이 늘 때마다 같은 구멍이 난다.
-  const split = splitLeadingMetro(policies, normalizedQuery);
-  if (split) {
+  // 후보 광역이 여럿이면 각각의 자치구를 다 뒤지고, 딱 한 지역만 걸릴 때 확정한다.
+  // 두 광역에서 서로 다른 자치구가 걸리면 뒤에 붙은 이름이 답을 못 가른 것이라 되묻는다.
+  const splits = splitLeadingMetro(policies, normalizedQuery);
+  const withinSplits: MatchedRegionPolicy[] = [];
+  for (const split of splits) {
     const withinMetro = policies.filter((policy) => policy.metroId === split.metro.id);
     for (const [level, strength] of REGION_DISTRICT_ORDER) {
       if (level !== "district") continue;
       const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength), strength, split.rest);
-      if (match) return { status: "match", match };
+      if (match) {
+        if (!withinSplits.some((found) => found.region.id === match.region.id)) withinSplits.push(match);
+        break;
+      }
     }
   }
+  if (withinSplits.length === 1) return { status: "match", match: withinSplits[0] };
+  if (withinSplits.length > 1 && !ambiguous) ambiguous = withinSplits.slice(0, MAX_AMBIGUOUS_CANDIDATES);
 
   for (const [level, strength] of REGION_METRO_FALLBACK_ORDER) {
     const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength), strength, normalizedQuery);
