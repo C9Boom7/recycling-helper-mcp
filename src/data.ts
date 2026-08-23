@@ -1623,7 +1623,7 @@ export function formatRegionSourceList(region: RegionalPolicyData): string[] {
  * 찾는다. 라벨은 `disposal-groups.json`의 명시 매핑이고 "일반쓰레기/대형폐기물"처럼 `/`로
  * 잇는데, "특수/유해폐기물"은 이름 자체에 `/`가 있어 조각으로 가르지 않고 부분 문자열로 본다.
  * 여기 없는 라벨("지역 확인 필요")은 고를 어휘 자체가 없는 경우라 거르지 않고 지역 출처를
- * 전부 낸다 — 아래 `formatRegionSourceListForItem` 주석의 두 갈래를 보라.
+ * 전부 낸다 — 아래 `formatRegionSourceListForItem` 주석을 보라.
  */
 const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> = [
   // "대형가전"(소형폐가전 무상수거 안내의 basis)에 걸리지 않게 폐기물까지 본다.
@@ -1661,14 +1661,16 @@ const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> 
  * 지역 연락처 주소와 같은 출처도 함께 잡는다. 수수료를 실제로 실은 품목이면 그 표의 출처
  * (수수료 고시)도 더한다 — 표가 어디서 왔는지는 표를 보여준 응답에만 필요하다.
  *
- * 거른 결과가 비었을 때는 두 갈래를 갈라야 한다(PR #70 리뷰 1라운드).
- * - **고를 어휘가 아예 없을 때** — `LED등`의 `region_specific`은 라벨이 "지역 확인 필요"라
- *   위 표에 걸리는 패턴이 하나도 없다. 이건 거른 게 아니라 무엇을 골라야 할지 모르는
- *   것이라, 변경 전처럼 지역 출처를 전부 낸다. 대표 1개로 줄이면 `LED등` + `서울 도봉구`가
- *   스마트클린 도봉(대형폐기물 신청 페이지)만 남고 `도봉구 폐형광등·폐건전지 배출안내`를
- *   잃는다 — 정작 이 품목이 봐야 할 출처가 사라지는 셈이다.
- * - **어휘는 있는데 아무것도 안 맞을 때** — 그 지역이 그 갈래를 다루는 페이지를 아직 안
- *   실었다는 뜻이다. 빈 섹션을 만들지 않게 지역 대표 출처 1개로 닫는다.
+ * **거른 결과가 비면 지역 출처를 전부 낸다**(변경 전 동작). 비는 경위는 둘이지만 —
+ * 고를 어휘가 아예 없거나(`LED등`의 `region_specific`은 라벨이 "지역 확인 필요"라 위
+ * 표에 걸리는 패턴이 하나도 없다), 어휘는 있는데 그 지역이 그 갈래를 다루는 페이지를
+ * 아직 안 실었거나 — 둘 다 "무엇을 골라야 할지 모른다"로 끝나서 답이 같다.
+ *
+ * 한때 뒤쪽만 대표 1개(`sources[0]`)로 닫았다가 되돌렸다(PR #70 리뷰 3라운드).
+ * `sources[0]`이 그 지역의 대표 출처라는 전제였는데, 데이터를 보면 대부분 지역에서
+ * 그 자리는 대형폐기물 신청 페이지다 — 수거함 품목에 엉뚱한 출처 하나만 남는다.
+ * 앞쪽도 같은 이유로 전부를 낸다: `LED등` + `서울 도봉구`를 1개로 줄이면 스마트클린
+ * 도봉만 남고 `도봉구 폐형광등·폐건전지 배출안내`를 잃는다.
  *
  * basis 문장은 출처마다 그대로 둔다 — 링크만 남기면 "왜 이 출처인가"가 사라져 되묻기를 부른다.
  */
@@ -1689,8 +1691,7 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
   const alreadyListed = Boolean(feeSource?.url) && matched.some((source) => source.url === feeSource?.url);
   const sources = feeSource && !alreadyListed ? [...matched, feeSource] : matched;
 
-  if (sources.length > 0) return sources.map(formatRegionSourceLine);
-  return (patterns.length === 0 ? region.sources : region.sources.slice(0, 1)).map(formatRegionSourceLine);
+  return (sources.length > 0 ? sources : region.sources).map(formatRegionSourceLine);
 }
 
 /**
@@ -1734,6 +1735,13 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
  *    사라졌다(PR #70 리뷰 2라운드). 그래서 `prePosting === "none"`이거나 품목별 지역 안내가
  *    부착 방식을 직접 적은 지역에서만 답한 것으로 친다. 노원구 `매트리스`는 둘 다 아니라
  *    "신고필증 부착 방식"이 남는다. (`"sticker"` 문장을 실제로 내보내는 일은 별건이다.)
+ * 3. **지역 요약 줄은 근거가 아니다**(PR #70 리뷰 3라운드). `formatRegionItemGuide`의
+ *    마지막 갈래 — 대형폐기물도 수거함도 아닌 품목 — 은 `- {지역 요약}` 한 줄만 낸다.
+ *    그 요약은 그 지역 전체를 훑는 문장이라 이 품목과 상관없이 "수수료 조회"·"주민센터"
+ *    같은 낱말을 품는다. `스탠드 조명`(소형가전 수거함) + `서울 노원구`가 그 자리였다 —
+ *    연락처 블록도 수수료표도 안 나가는데 노원 요약의 "대형폐기물 신청과 수수료 조회를
+ *    스마트클린 노원에서", "동주민센터"에 걸려 "대형폐기물 신고 방법과 수수료"가 빠졌다.
+ *    그래서 판정 전에 요약으로 시작하는 줄을 뺀다(요일 확인처가 뒤에 붙으므로 startsWith).
  */
 type CheckItemTopic = {
   topic: RegExp;
@@ -1763,6 +1771,24 @@ const CHECK_ITEM_TOPICS: CheckItemTopic[] = [
 ];
 
 /**
+ * 괄호 안이 앞말을 풀어 쓴 게 아니라 **한정 질문**임을 알리는 어휘. 이런 항목은
+ * 아예 생략 후보로 보지 않는다(PR #70 리뷰 3라운드).
+ *
+ * 괄호를 떼고 보면 `킥보드`의 "품목별 수수료(일반·전동 구분)"가 "품목별 수수료"로
+ * 줄어 수수료표만 나갔다고 빠진다 — 그런데 이 항목이 정작 묻는 건 일반 킥보드와
+ * 전동 킥보드를 갈라 매기느냐다. 표가 그 답을 하지 않으니 항목을 남겨야 한다.
+ *
+ * 2026-08-24 데이터에서 괄호가 든 확인 항목은 22개인데, 여기 걸리는 건 `킥보드`
+ * 하나뿐이다. 나머지는 "대형폐기물 신고 방법(앱·주민센터)"·"불연성 전용
+ * 마대(봉투) 사용 여부와 판매처"처럼 앞말을 풀어 쓴 자리라 지금처럼 뗀다.
+ */
+const QUALIFYING_PARENTHETICAL = /구분|여부|기준|별도|제외/;
+
+function hasQualifyingParenthetical(checkItem: string): boolean {
+  return (checkItem.match(/\(([^)]*)\)/g) ?? []).some((group) => QUALIFYING_PARENTHETICAL.test(group));
+}
+
+/**
  * 확인 항목을 접속 조각으로 나눈다. 괄호 안은 앞말을 풀어 쓴 자리라 떼고 본다 —
  * "대형폐기물 신고 방법(앱·주민센터)"의 `·`까지 세면 조각이 셋으로 늘어난다.
  */
@@ -1781,14 +1807,19 @@ export function isCheckItemAnsweredByRegionGuide(
   regionMatch?: MatchedRegionPolicy,
 ): boolean {
   if (mentionsCollectionDay(checkItem)) return false;
+  if (hasQualifyingParenthetical(checkItem)) return false;
   const topics = CHECK_ITEM_TOPICS.filter(({ topic }) => topic.test(checkItem));
   if (topics.length === 0) return false;
   // 조각 하나라도 주제 밖이면 그 반쪽은 아직 답이 없다는 뜻이라 항목을 남긴다.
   const parts = splitCheckItemParts(checkItem);
   if (!parts.every((part) => CHECK_ITEM_TOPICS.some(({ topic }) => topic.test(part)))) return false;
+  // 지역 요약 줄은 근거로 세지 않는다. 위 주석의 세 번째 이유를 보라.
+  const answeringLines = regionMatch
+    ? regionGuideLines.filter((line) => !line.startsWith(`- ${regionMatch.region.summary}`))
+    : regionGuideLines;
   return topics.every(
     ({ answeredBy, onlyWhen }) =>
-      (!onlyWhen || onlyWhen(item, regionMatch)) && regionGuideLines.some((line) => answeredBy.test(line)),
+      (!onlyWhen || onlyWhen(item, regionMatch)) && answeringLines.some((line) => answeredBy.test(line)),
   );
 }
 
@@ -2131,12 +2162,24 @@ export type RegionItemGuideOptions = {
    * 켜고 끄는 것으로 연락처가 사라지는 일은 아래에서 막는다.
    */
   subRegionScopeAlreadyShown?: boolean;
+  /**
+   * 호출부가 이 블록 **위에서 이미 찍은** 신청·수수료 주소. 수수료 블록이 그 주소를
+   * 다시 적지 않게 그대로 넘긴다(PR #70 리뷰 3라운드).
+   *
+   * `get_region_disposal_info`가 이걸 넘긴다. 거기서는 호출부가 바로 위에서
+   * `formatRegionBulkyContactLines`로 같은 주소를 찍는데, 품목별 지역 안내가 있는
+   * 지역(강남·서초·송파·마포)은 아래 guide 갈래로 떨어져 수수료 블록이 그 주소를 다시
+   * 냈다 — 이 PR이 두 자리의 라벨을 `- 인터넷 신청:`·`- 수수료 조회:`로 통일하면서
+   * 글자까지 똑같은 줄이 두 번 나가게 됐다. `get_disposal_steps` 쪽 호출부는 넘기지
+   * 않는다. 거기서는 이 블록이 유일한 링크 자리라, 넘기면 링크가 통째로 사라진다.
+   */
+  shownUrls?: readonly string[];
 };
 
 export function formatRegionItemGuide(
   item: WasteItem,
   regionMatch?: MatchedRegionPolicy,
-  { namedSubRegion, subRegionScopeAlreadyShown }: RegionItemGuideOptions = {},
+  { namedSubRegion, subRegionScopeAlreadyShown, shownUrls = [] }: RegionItemGuideOptions = {},
 ): string[] {
   if (!regionMatch) return [];
 
@@ -2144,9 +2187,13 @@ export function formatRegionItemGuide(
   const guide = findRegionItemGuide(region, item);
   if (guide) {
     // 품목별 지역 안내는 주소를 안 찍으므로(강남은 "자원순환 종합포털에서"로 끝난다)
-    // 수수료 블록이 신청·수수료 링크를 온전히 낸다. 여기서 `shownUrls`를 넘기면
-    // 링크가 통째로 사라진다.
-    return [`- ${guide.summary}`, ...guide.steps.map((step) => `- ${region.name} 기준: ${step}`), ...formatBulkyWasteFeeLines(item, region)];
+    // 수수료 블록이 신청·수수료 링크를 낸다. 호출부가 응답 위쪽에서 같은 주소를 이미
+    // 찍었을 때만 `shownUrls`가 차 있고, 안 넘어오면(품목 툴) 둘 다 그대로 나간다.
+    return [
+      `- ${guide.summary}`,
+      ...guide.steps.map((step) => `- ${region.name} 기준: ${step}`),
+      ...formatBulkyWasteFeeLines(item, region, { shownUrls }),
+    ];
   }
 
   if (item.disposalType.includes("bulky")) {
@@ -2209,9 +2256,10 @@ export function formatRegionItemGuide(
             `- ${formatUnregisteredDistrictScope(region.name, namedSubRegion)} 대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 공식 안내에서 확인하세요.`,
           ];
     // 연락처 블록이 방금 찍은 주소는 수수료 블록 끝에서 다시 적지 않는다. 연락처
-    // 블록을 안 거친 갈래(광역 착지)는 빈 배열이라 수수료 블록이 주소를 그대로 낸다.
-    const shownUrls = usesRegionContactLines ? regionBulkyContactUrls(region) : [];
-    return [bulkyLine, ...contactLines, ...formatBulkyWasteFeeLines(item, region, { shownUrls })];
+    // 블록을 안 거친 갈래(광역 착지)는 호출부가 넘긴 것만 남아, 아무도 안 찍었으면
+    // 수수료 블록이 주소를 그대로 낸다.
+    const feeShownUrls = usesRegionContactLines ? [...shownUrls, ...regionBulkyContactUrls(region)] : shownUrls;
+    return [bulkyLine, ...contactLines, ...formatBulkyWasteFeeLines(item, region, { shownUrls: feeShownUrls })];
   }
 
   if (item.disposalType.includes("special_collection")) {

@@ -182,6 +182,14 @@ function regionSection(answerText) {
   return end >= 0 ? answerText.slice(start, end) : answerText.slice(start);
 }
 
+// `indexOf`가 -1이면 `slice(-1)`이 마지막 한 글자만 남겨, 블록이 통째로 사라져도
+// 뒤따르는 `includes` 단언이 조용히 통과한다. 자를 자리부터 단언한다.
+function sliceFrom(text, marker, context) {
+  const start = text.indexOf(marker);
+  assert(start >= 0, `${context}: 응답에 \`${marker}\` 블록이 없다`);
+  return text.slice(start);
+}
+
 function assertUrlShownOnce(answerText, url, context) {
   const count = countOccurrences(regionSection(answerText), url);
   assert(count >= 1, `${context}: ${url} 가 지역 블록에 없다 — 중복을 지우다가 링크를 없앴다`);
@@ -191,10 +199,17 @@ function assertUrlShownOnce(answerText, url, context) {
 // 같은 불변식을 structuredContent.regionNotes에 건다. 두 렌더링 모드가 같은 배열을 실으므로
 // 여기서 한 번만 보면 위젯 모드도 같이 닫힌다. 요일 확인처처럼 문장 안에 든 주소도 세므로,
 // 주소 하나가 두 줄에 걸리면 어느 쪽이든 걸린다.
+// 주소 뒤 문장부호는 떼고 본다. 요일 확인처는 "(URL, 확인일 …)" 꼴이라 쉼표가 딸려 와
+// 같은 주소가 다른 키로 잡혔다 — 중복을 잡으라고 만든 단언이 중복을 놓치고 있었다.
+function normalizeUrl(url) {
+  return url.replace(/[),.]+$/, "");
+}
+
 function assertRegionNotesUrlsUnique(notes, context) {
   const seen = new Map();
   for (const line of notes ?? []) {
-    for (const url of line.match(/https?:\/\/[^\s)]+/g) ?? []) {
+    for (const match of line.match(/https?:\/\/[^\s)]+/g) ?? []) {
+      const url = normalizeUrl(match);
       if (seen.has(url)) {
         throw new Error(`${context}: regionNotes에 같은 주소가 두 줄에 있다 — "${seen.get(url)}" / "${line}"`);
       }
@@ -913,6 +928,26 @@ async function runSmoke() {
         "해운대구 빨래건조대: 부착 주제 하나로 복합 항목을 지워 '배출 장소'까지 잃었다",
       );
 
+      // 지역 요약 줄은 근거가 아니다(PR #70 리뷰 3라운드). 소형가전 수거함 품목은
+      // `formatRegionItemGuide`의 마지막 갈래로 떨어져 `- {지역 요약}` 한 줄만 받는데,
+      // 노원 요약의 "수수료 조회"·"동주민센터"에 걸려 확인 항목이 빠지고 있었다.
+      const lampText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "스탠드 조명", region: "서울 노원구" }, requestId++));
+      assert(!lampText.includes("수수료 후보:"), "노원구 스탠드 조명: 수수료표가 나간다 — 픽스처가 더 이상 지역 요약만 받는 갈래를 타지 않는다");
+      assert(
+        lampText.includes("- 확인 항목: 대형폐기물 신고 방법과 수수료"),
+        "노원구 스탠드 조명: 지역 요약 문장의 낱말을 근거로, 답한 적 없는 확인 항목을 지웠다",
+      );
+
+      // 괄호 안이 한정 질문이면 항목을 지우지 않는다. "품목별 수수료(일반·전동 구분)"는
+      // 괄호를 떼면 "품목별 수수료"로 줄어 수수료표만으로 닫히는데, 정작 묻는 건
+      // 일반·전동을 갈라 매기느냐라 표가 그 답을 하지 않는다.
+      const scooterText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "킥보드", region: "서울 노원구" }, requestId++));
+      assert(scooterText.includes("수수료 후보:"), "노원구 킥보드: 수수료표가 없다 — 픽스처가 더 이상 이 갈래를 타지 않는다");
+      assert(
+        scooterText.includes("- 확인 항목: 품목별 수수료(일반·전동 구분)"),
+        "노원구 킥보드: 괄호를 떼면서 한정 질문까지 지워 일반·전동 구분을 잃었다",
+      );
+
       // 품목 안쪽 범위를 묻는 "별도 신고 여부"는 대형폐기물 해당 여부와 다른 질문이라
       // 신청 주소로 닫히지 않는다. 같은 응답에서 수수료·신고 방법은 그대로 빠져야 한다.
       const vanityText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "화장대", region: "서울 강서구" }, requestId++));
@@ -923,7 +958,7 @@ async function runSmoke() {
 
       // R2-a: 지역 공식 출처는 품목 갈래에 맞는 것만. 대형폐기물 품목에 폐건전지 출처가 붙지 않고,
       // 수수료표를 실었으니 그 표의 출처(수수료 고시)가 선다.
-      const sizeSources = sizeText.slice(sizeText.indexOf(`### ${SIZE_CASE.region} 공식 출처`));
+      const sizeSources = sliceFrom(sizeText, `### ${SIZE_CASE.region} 공식 출처`, "노원구 매트리스");
       assert(sizeSources.includes("전국대형폐기물수거수수료정보표준데이터"), "노원구 매트리스: 수수료표의 출처가 공식 출처에 없다");
       assert(!sizeSources.includes("폐형광등·폐건전지 배출안내"), "노원구 매트리스: 품목과 무관한 수거함 출처가 공식 출처에 붙는다");
 
@@ -933,7 +968,7 @@ async function runSmoke() {
 
       // R2-a 반대편: 수거함 품목에는 그 수거함 출처가 남는다.
       const batteryText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "건전지", region: "서울 마포구" }, requestId++));
-      const batterySources = batteryText.slice(batteryText.indexOf("### 서울 마포구 공식 출처"));
+      const batterySources = sliceFrom(batteryText, "### 서울 마포구 공식 출처", "마포구 건전지");
       assert(batterySources.includes("폐형광등·폐건전지 수거함 배치 현황"), "마포구 건전지: 수거함 출처가 공식 출처에서 빠졌다");
       assert(!batterySources.includes("투명페트병 무인회수기"), "마포구 건전지: 품목과 무관한 출처가 공식 출처에 붙는다");
 
@@ -941,16 +976,35 @@ async function runSmoke() {
       // "지역 확인 필요")은 거를 근거가 없으니 지역 출처를 전부 낸다. 대표 1개로 줄이면
       // 도봉구 sources[0]인 스마트클린 도봉만 남아 정작 이 품목이 봐야 할 수거함 안내를 잃는다.
       const ledText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "LED등", region: "서울 도봉구" }, requestId++));
-      const ledSources = ledText.slice(ledText.indexOf("### 서울 도봉구 공식 출처"));
+      const ledSources = sliceFrom(ledText, "### 서울 도봉구 공식 출처", "도봉구 LED등");
       assert(ledSources.includes("도봉구 폐형광등·폐건전지 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목에서 지역 출처를 대표 1개로 잘라 수거함 안내를 잃었다");
       assert(ledSources.includes("도봉구 생활폐기물 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목인데 지역 출처가 전부 나오지 않는다");
 
       // 품목별 지역 안내가 있는 지역(마포)은 연락처 블록을 안 거치므로 수수료 블록이 유일한
       // 링크 자리다 — 거기서는 두 주소가 그대로 한 번씩 나가야 한다.
       const mapo = regionPolicies.find((policy) => policy.name === "서울 마포구");
+      assert(mapo?.bulkyWaste?.applicationUrl && mapo.bulkyWaste.feeUrl, "마포구 픽스처에 bulkyWaste 신청·수수료 URL이 있어야 이 갈래를 볼 수 있다");
       const mapoText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "의자", region: "서울 마포구" }, requestId++));
       assertUrlShownOnce(mapoText, mapo.bulkyWaste.applicationUrl, "마포구 의자 text");
       assertUrlShownOnce(mapoText, mapo.bulkyWaste.feeUrl, "마포구 의자 text");
+
+      // 반대로 지역 툴에서는 호출부가 연락처 블록으로 같은 주소를 먼저 찍는다. 품목별 지역
+      // 안내가 있는 지역은 그 블록이 대형폐기물 갈래를 안 타 자체 중복 판정이 걸리지 않아,
+      // 라벨을 통일한 뒤로 같은 줄이 글자까지 똑같이 두 번 나갔다(PR #70 리뷰 3라운드).
+      // 판정 범위는 안내 본문까지다. 아래 "공식 확인처"는 basis 문장이 붙은 출처 목록이라
+      // 같은 주소가 한 번 더 들어도 안내의 반복이 아니다 — `assertUrlShownOnce`가 블록으로
+      // 좁히는 이유와 같다.
+      const mapoRegionText = resultText(
+        await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "의자" }, requestId++),
+      );
+      const mapoRegionBody = mapoRegionText.slice(0, mapoRegionText.indexOf("\n공식 확인처"));
+      assert(mapoRegionBody.length > 0, "마포구 의자 지역 툴: 응답에 `공식 확인처` 블록이 없다");
+      const mapoFeeUrlCount = countOccurrences(mapoRegionBody, mapo.bulkyWaste.feeUrl);
+      assert(mapoFeeUrlCount >= 1, "마포구 의자 지역 툴: 수수료 조회 주소가 본문에 없다 — 중복을 지우다가 링크를 없앴다");
+      assert(
+        mapoFeeUrlCount === 1,
+        `마포구 의자 지역 툴: 수수료 조회 주소가 본문에 ${mapoFeeUrlCount}번 나간다 — 연락처 블록과 수수료 블록이 같은 줄을 두 번 찍는다`,
+      );
     }
 
     const classify = await callTool(baseUrl, "classify_waste_item", { itemName: "일회용 마스크" }, requestId);
