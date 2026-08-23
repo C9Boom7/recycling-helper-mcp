@@ -31,7 +31,7 @@
 포함: `src/data/waste-items.json`, `src/data/evaluation-cases.json`, `src/data/mcp-answer-cases.json`, `docs/source-coverage.md`.
 
 **제외: 런타임 코드.** `src/server.ts`와 `src/data.ts`는 건드리지 않는다. 매칭 규칙을 손대면 발화 3,240건과
-품목 324건 회귀가 함께 흔들리고, 8/23 개발 완료까지 그 검증을 다시 돌릴 시간이 없다. Phase 6·7이 쓴 방식과 같다.
+품목 324건 회귀가 함께 흔들리고, 8/31 개발 완료까지 그 검증을 다시 돌릴 시간이 없다. Phase 6·7이 쓴 방식과 같다.
 
 ## 요구사항
 
