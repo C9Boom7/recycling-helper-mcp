@@ -888,10 +888,38 @@ async function runSmoke() {
       const gangnamText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "매트리스", region: "서울 강남구" }, requestId++));
       assert(gangnamText.includes("접수증 또는 접수번호를 품목별로 부착"), "강남구 매트리스: 품목별 지역 안내의 부착 문구가 사라졌다");
       assert(!gangnamText.includes("- 확인 항목: 신고필증 부착 방식"), "강남구 매트리스: 부착 방식을 직접 적고도 '신고필증 부착 방식'을 다시 묻는다");
+      // `prePosting`이 차 있어도 문장이 갈아끼워지는 건 `none`일 때뿐이다. 부평구는 `sticker`라
+      // 확인한 스티커 방식은 한 번도 안 나가는데 항목만 사라지고 있었다(PR #70 리뷰 2라운드).
+      const bupyeongText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "매트리스", region: "인천 부평구" }, requestId++));
+      assert(
+        bupyeongText.includes("- 확인 항목: 신고필증 부착 방식"),
+        "부평구 매트리스: 기본 부착 문구만 내보내면서 'sticker' 값을 근거로 '신고필증 부착 방식'을 지웠다",
+      );
+
       // "신고 대상 여부"는 "신고 방법"과 다른 질문이다. 대형폐기물이 보조 배출로인 품목에
       // 지역 안내는 "해당할 때만 신청한다"고만 말하므로 해당 여부는 답하지 않은 것이다.
       const ceramicText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "도자기 그릇", region: "서울 노원구" }, requestId++));
       assert(ceramicText.includes("- 확인 항목: 대형폐기물 신고 대상 여부"), "노원구 도자기 그릇: 보조 배출로인데 '대형폐기물 신고 대상 여부'를 답한 것으로 쳤다");
+
+      // 복합 항목의 반쪽이 주제 밖이면 항목을 남긴다. 해운대구는 `prePosting: "none"`이라 부착은
+      // 답했지만 "배출 장소"는 아무도 답하지 않았다 — 통째로 지우면 그 반쪽을 잃는다.
+      const dryingRackText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "빨래건조대", region: "부산 해운대구" }, requestId++));
+      assert(
+        dryingRackText.includes("접수증이나 접수번호를 붙이지 않고"),
+        "해운대구 빨래건조대: 확인한 'none' 부착 문구가 사라졌다 — 픽스처가 더 이상 이 갈래를 타지 않는다",
+      );
+      assert(
+        dryingRackText.includes("- 확인 항목: 배출 장소와 접수번호 부착 방식"),
+        "해운대구 빨래건조대: 부착 주제 하나로 복합 항목을 지워 '배출 장소'까지 잃었다",
+      );
+
+      // 품목 안쪽 범위를 묻는 "별도 신고 여부"는 대형폐기물 해당 여부와 다른 질문이라
+      // 신청 주소로 닫히지 않는다. 같은 응답에서 수수료·신고 방법은 그대로 빠져야 한다.
+      const vanityText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "화장대", region: "서울 강서구" }, requestId++));
+      assert(vanityText.includes("수수료 후보:"), "강서구 화장대: 수수료표가 없다 — 픽스처가 더 이상 이 갈래를 타지 않는다");
+      assert(vanityText.includes("- 확인 항목: 거울 별도 신고 여부"), "강서구 화장대: 품목 안쪽 범위를 묻는 항목을 신청 주소만으로 지웠다");
+      assert(!vanityText.includes("- 확인 항목: 품목별 수수료"), "강서구 화장대: 수수료표를 내고도 '품목별 수수료'를 다시 묻는다");
+      assert(!vanityText.includes("- 확인 항목: 대형폐기물 신고 방법"), "강서구 화장대: 신청 경로를 내고도 '대형폐기물 신고 방법'을 다시 묻는다");
 
       // R2-a: 지역 공식 출처는 품목 갈래에 맞는 것만. 대형폐기물 품목에 폐건전지 출처가 붙지 않고,
       // 수수료표를 실었으니 그 표의 출처(수수료 고시)가 선다.

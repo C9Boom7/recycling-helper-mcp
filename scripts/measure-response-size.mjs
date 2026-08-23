@@ -117,8 +117,10 @@ export function textSectionBytes(text) {
   for (const line of text.split("\n")) {
     const heading = /^#{2,3} (.+)$/.exec(line);
     if (heading) {
+      // 같은 제목이 두 번 나오면 뒤엣것이 앞엣것을 지우던 자리다. 섹션 바이트는
+      // 제목별 합계라야 하므로 리셋하지 않고 이어서 더한다.
       current = heading[1];
-      sections[current] = 0;
+      sections[current] ??= 0;
     }
     sections[current] = (sections[current] ?? 0) + bytes(line) + 1;
   }

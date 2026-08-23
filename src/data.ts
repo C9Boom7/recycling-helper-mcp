@@ -1684,7 +1684,10 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
   });
 
   const feeSource = findBulkyWasteFees(region, item).length > 0 ? findBulkyWasteFeeSchedule(region)?.source : undefined;
-  const sources = feeSource && !matched.some((source) => source.url === feeSource.url) ? [...matched, feeSource] : matched;
+  // 중복 판정은 주소가 있을 때만. 양쪽 `url`이 다 비면 `undefined === undefined`가 참이 되어
+  // 주소 없는 수수료 고시가 아무 출처 하나와 같은 것으로 묶여 조용히 빠진다.
+  const alreadyListed = Boolean(feeSource?.url) && matched.some((source) => source.url === feeSource?.url);
+  const sources = feeSource && !alreadyListed ? [...matched, feeSource] : matched;
 
   if (sources.length > 0) return sources.map(formatRegionSourceLine);
   return (patterns.length === 0 ? region.sources : region.sources.slice(0, 1)).map(formatRegionSourceLine);
@@ -1699,6 +1702,13 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
  * 다시 묻고 있었다. 항목이 말하는 주제를 전부 지역 안내 줄에서 찾을 수 있을 때만 뺀다 —
  * "대형폐기물 신고 방법과 수수료"처럼 주제가 둘이면 둘 다 답해야 빠진다. 요일이 든
  * 항목은 건드리지 않는다. `withCollectionDaySource`가 거기에 확인처를 붙이는 자리다.
+ *
+ * **주제를 못 알아본 반쪽은 항목을 지킨다.** 어휘가 하나만 걸려도 항목을 통째로 지우면
+ * 복합 항목의 모델링 안 된 절반이 조용히 사라진다 — `빨래건조대`의 "배출 장소와 접수번호
+ * 부착 방식"이 부착 주제만 잡혀 빠지면서 "배출 장소"까지 잃었다(PR #70 리뷰 2라운드).
+ * 그래서 항목을 접속 조각으로 나눠 **모든 조각이 어떤 주제에든 걸릴 때만** 생략 후보로
+ * 본다. "대형폐기물 신고 URL과 수수료"처럼 한 조각이라도 주제 밖이면 항목을 남긴다 —
+ * 주제 목록이 넓어지면 자연히 다시 생략 대상이 된다.
  *
  * 주제 판정은 지역 안내 줄의 어휘로 한다. 어떤 갈래가 답했는지를 데이터 플래그로 세면
  * 품목별 지역 안내(`itemGuides`)처럼 문장이 자유로운 갈래에서 어긋난다 — 실제로 적힌
@@ -1716,9 +1726,14 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
  *    사용자 몫이다. 그래서 이 주제는 대형폐기물이 주 배출로인 품목에서만 답한 것으로 친다.
  * 2. **부착 문구가 늘 확인된 사실은 아니다.** `formatRegionItemGuide`의 `bulkyLine`은
  *    `bulkyWaste.prePosting`이 빈 지역에서도 "접수증 또는 접수번호를 부착"이라고 말하는데,
- *    그건 조사한 값이 아니라 기본 문장이다(그쪽 주석 참조). 확인한 근거가 있는 지역
- *    — `prePosting`이 채워졌거나 품목별 지역 안내가 부착 방식을 직접 적은 지역 — 에서만
- *    답한 것으로 친다. 노원구 `매트리스`가 둘 다 아니라 "신고필증 부착 방식"이 남는다.
+ *    그건 조사한 값이 아니라 기본 문장이다(그쪽 주석 참조). 그러니 기준은 "`prePosting`이
+ *    채워졌는지"가 아니라 **렌더된 문장이 확인한 값을 담고 있는지**다. `bulkyLine`이 문장을
+ *    갈아끼우는 건 `prePosting`이 `"none"`일 때뿐이라, `"receipt"`·`"sticker"`는 값이
+ *    있어도 나가는 문장이 기본 문장 그대로다. 부평구(`"sticker"`) `매트리스`가 그 자리였다 —
+ *    스티커를 사서 붙인다는 확인된 방식은 한 번도 안 나가는데 "신고필증 부착 방식" 항목만
+ *    사라졌다(PR #70 리뷰 2라운드). 그래서 `prePosting === "none"`이거나 품목별 지역 안내가
+ *    부착 방식을 직접 적은 지역에서만 답한 것으로 친다. 노원구 `매트리스`는 둘 다 아니라
+ *    "신고필증 부착 방식"이 남는다. (`"sticker"` 문장을 실제로 내보내는 일은 별건이다.)
  */
 type CheckItemTopic = {
   topic: RegExp;
@@ -1731,7 +1746,11 @@ const CHECK_ITEM_TOPICS: CheckItemTopic[] = [
   { topic: /수수료/, answeredBy: /수수료 후보:|수수료 조회/ },
   { topic: /신고 (방법|절차)/, answeredBy: /인터넷 신청|홈페이지|주민센터/ },
   {
-    topic: /신고 (대상|여부|기준)/,
+    // "신고 여부"만 보면 품목 안쪽 범위를 묻는 항목까지 걸린다 — `화장대`의 "거울 별도
+    // 신고 여부"는 거울을 따로 접수하느냐는 질문이라 신청 주소로는 답이 안 된다.
+    // 데이터의 대형폐기물 해당 여부 항목은 전부 "대형(생활)폐기물 신고 …" 꼴이라
+    // 앞말까지 묶어 잡는다(PR #70 리뷰 2라운드).
+    topic: /대형(생활)?폐기물 신고 (대상|여부|기준)/,
     answeredBy: /인터넷 신청|홈페이지|주민센터/,
     onlyWhen: (item) => itemHasBulkyRoute(item) && !isBulkySecondaryRoute(item),
   },
@@ -1739,9 +1758,21 @@ const CHECK_ITEM_TOPICS: CheckItemTopic[] = [
     topic: /신고필증|부착/,
     answeredBy: /부착|붙이지 않/,
     onlyWhen: (item, regionMatch) =>
-      Boolean(regionMatch?.region.bulkyWaste?.prePosting) || Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item)),
+      regionMatch?.region.bulkyWaste?.prePosting === "none" || Boolean(regionMatch && findRegionItemGuide(regionMatch.region, item)),
   },
 ];
+
+/**
+ * 확인 항목을 접속 조각으로 나눈다. 괄호 안은 앞말을 풀어 쓴 자리라 떼고 본다 —
+ * "대형폐기물 신고 방법(앱·주민센터)"의 `·`까지 세면 조각이 셋으로 늘어난다.
+ */
+function splitCheckItemParts(checkItem: string): string[] {
+  return checkItem
+    .replace(/\([^)]*\)/g, " ")
+    .split(/와 |과 |, | 및 |·/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+}
 
 export function isCheckItemAnsweredByRegionGuide(
   checkItem: string,
@@ -1752,6 +1783,9 @@ export function isCheckItemAnsweredByRegionGuide(
   if (mentionsCollectionDay(checkItem)) return false;
   const topics = CHECK_ITEM_TOPICS.filter(({ topic }) => topic.test(checkItem));
   if (topics.length === 0) return false;
+  // 조각 하나라도 주제 밖이면 그 반쪽은 아직 답이 없다는 뜻이라 항목을 남긴다.
+  const parts = splitCheckItemParts(checkItem);
+  if (!parts.every((part) => CHECK_ITEM_TOPICS.some(({ topic }) => topic.test(part)))) return false;
   return topics.every(
     ({ answeredBy, onlyWhen }) =>
       (!onlyWhen || onlyWhen(item, regionMatch)) && regionGuideLines.some((line) => answeredBy.test(line)),
