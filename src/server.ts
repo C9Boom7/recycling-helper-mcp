@@ -38,6 +38,7 @@ import {
   itemRegionGuidance,
   needsCollectionDaySource,
   publicReviewMetadata,
+  regionBulkyContactUrls,
   resolveRegionalPolicy,
   resolveWasteItem,
   wasteItems,
@@ -385,11 +386,13 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   if (fees.length === 1) return `수수료 ${krw(min)} ${paren(fees[0].spec)}`;
 
   // 상한에 걸린 품목은 `fees.length`가 우리가 들고 있는 행 수지 규격 수가 아니다.
-  // 그냥 "규격 12종"이라고 쓰면 텍스트 답변은 "대표 12개만"이라고 밝히는데 카드만
+  // 그냥 "규격 12종"이라고 쓰면 텍스트 답변은 "대표 12행만"이라고 밝히는데 카드만
   // 12종이 전부인 척한다. 최저~최고 범위는 그대로 참이다 — 임포터가 잘라낼 때
-  // 양 끝 행을 남긴다.
+  // 양 끝 행을 남긴다. 잘린 쪽은 행으로 말한다 — 잘리기 전 숫자는 (고시명, 규격,
+  // 금액)으로 중복을 지운 행 수지 규격 종류 수가 아니라서다(노원 매트리스 21행은
+  // 고시명 3종 × 규격 ~7종).
   const rowTotal = findBulkyWasteFeeRowTotal(regionMatch.region, item);
-  const specDetail = rowTotal ? `규격 ${rowTotal}종 중 대표 ${fees.length}종` : `규격 ${fees.length}종`;
+  const specDetail = rowTotal ? `수수료표 ${rowTotal}행 중 대표 ${fees.length}행` : `규격 ${fees.length}종`;
   return `수수료 ${krw(min)}~${krw(max)} ${paren(specDetail)}`;
 }
 
@@ -651,7 +654,7 @@ function itemRegionCheckList(region: MatchedRegionPolicy | undefined, item?: Was
     ...(item.regionPolicy?.checkItems ?? []),
     ...(guide ? guide.steps : []),
     ...feeRows.map((fee) => `${fee.itemName} ${fee.spec} 수수료 ${fee.feeKrw.toLocaleString("ko-KR")}원`),
-    ...(feeRowTotal ? [`확인된 ${feeRowTotal}개 규격 중 대표 ${feeRows.length}개만 옮겼습니다 — 나머지 규격은 수수료 조회 페이지에서 확인`] : []),
+    ...(feeRowTotal ? [`수수료표 ${feeRowTotal}행 중 대표 ${feeRows.length}행만 옮겼습니다 — 나머지는 수수료 조회 페이지에서 확인`] : []),
   ].filter(Boolean);
 
   if (checks.length > 0) return withCollectionDaySource(Array.from(new Set(checks)), region);
@@ -1348,7 +1351,15 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
     match && regionMatch
-      ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion, subRegionScopeAlreadyShown: true }).join("\n")
+      ? formatRegionItemGuide(match.item, regionMatch, {
+          namedSubRegion,
+          subRegionScopeAlreadyShown: true,
+          // 바로 위 `bulkyLines`가 신청·수수료 주소를 이미 찍었으면 품목 블록의 수수료
+          // 줄에서는 뺀다. 품목별 지역 안내가 있는 지역(강남·서초·송파·마포)은 그 블록이
+          // 대형폐기물 갈래를 안 타서 자체 중복 판정이 걸리지 않아, 같은 줄이 글자까지
+          // 똑같이 두 번 나가고 있었다(PR #70 리뷰 3라운드).
+          shownUrls: bulkyLines.length > 0 && regionMatch ? regionBulkyContactUrls(regionMatch.region) : [],
+        }).join("\n")
       : undefined,
   ].filter(Boolean);
 
