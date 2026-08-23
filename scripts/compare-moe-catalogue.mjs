@@ -13,14 +13,20 @@
  * 출력: logs/moe-api/compare.json (전체 행), stdout 요약.
  * 실행: node scripts/compare-moe-catalogue.mjs
  */
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveWasteItem } from "../dist/data.js";
 
-const CATALOGUE = "logs/moe-api/catalogue.json";
-const OUT = "logs/moe-api/compare.json";
+// 스크립트 기준 경로다 — 수집기(`probe-moe-recycling-api.mjs`)도 같은 기준으로 쓰므로, 워크트리에서
+// 돌려도 그 워크트리의 catalogue.json과 그 워크트리의 dist/를 짝지어 본다.
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const CATALOGUE = resolve(repoRoot, "logs/moe-api/catalogue.json");
+const OUT = resolve(repoRoot, "logs/moe-api/compare.json");
 
-const cat = JSON.parse(readFileSync(resolve(CATALOGUE), "utf8")).items;
+const snapshot = JSON.parse(readFileSync(CATALOGUE, "utf8"));
+if (snapshot.complete === false) console.warn("경고: catalogue.json이 불완전하다(수집 중 실패/한도 초과). 아래 숫자는 하한이다.");
+const cat = snapshot.items;
 
 /** 그쪽 배출방법 라벨 → 거친 갈래. 라벨은 쉼표로 여러 개가 오므로 집합이다. */
 function theirBuckets(label) {
@@ -75,7 +81,8 @@ for (const { itemNm, dschgMthd } of cat) {
   }
   rows.push(row);
 }
-writeFileSync(resolve(OUT), JSON.stringify(rows, null, 2));
+mkdirSync(dirname(OUT), { recursive: true });
+writeFileSync(OUT, JSON.stringify(rows, null, 2));
 
 const matched = rows.filter((r) => r.status === "match");
 const conflicts = matched.filter((r) => !r.overlap);
