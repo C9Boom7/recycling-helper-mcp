@@ -658,6 +658,38 @@
     "expectedNamedSubRegion": "목포시"
   },
   {
+    "region": "전남광주통합특별시 목포시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "목포시"
+  },
+  {
+    "region": "전남광주통합특별시 여수시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "여수시"
+  },
+  {
+    "region": "전남광주 목포시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "목포시"
+  },
+  {
+    "region": "전남광주통합특별시 동구",
+    "expectedRegionId": "gwangju",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "동구"
+  },
+  {
+    "region": "전남광주통합특별시 어쩌구",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gwangju",
+      "jeonnam"
+    ]
+  },
+  {
     "region": "전라남도",
     "expectedRegionId": "jeonnam",
     "expectedLevel": "metro"

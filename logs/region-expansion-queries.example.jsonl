@@ -89,6 +89,8 @@
 {"query": "광주광역시 북구", "expectedRegionId": "buk_gu_gwangju", "expectedLevel": "district"}
 {"query": "전남광주통합특별시 북구", "expectedRegionId": "buk_gu_gwangju", "expectedLevel": "district", "note": "2026년 개칭 표기. `전남`이 전라남도 별칭이라 앞부분을 공유한다"}
 {"query": "전남광주통합특별시", "expectedRegionId": "gwangju", "expectedLevel": "metro"}
+{"query": "전남광주통합특별시 목포시", "expectedRegionId": "jeonnam", "expectedLevel": "metro", "note": "개칭 표기는 전남·광주가 나눠 쓴다. 뒤에 붙은 이름이 전남 시·군이면 전라남도다"}
+{"query": "전남광주통합특별시 광산구", "expectedRegionId": "gwangju", "expectedLevel": "metro", "note": "같은 표기라도 뒤에 광주 자치구가 붙으면 광주다"}
 {"query": "북구", "expectRefusal": true, "note": "대구·광주 북구를 넣어도 부산·울산 북구가 남아 확정 거부가 정답"}
 {"query": "부산 북구", "expectedRegionId": "busan", "expectedLevel": "metro"}
 {"query": "울산 북구", "expectedRegionId": "ulsan", "expectedLevel": "metro"}

@@ -481,6 +481,15 @@ const allDistrictAliases = new Set(
   regionalPolicies.flatMap((region) => (Array.isArray(region?.districtAliases) ? region.districtAliases : [])),
 );
 
+// `sharedAliases`가 진짜로 "나눠 쓰는 표기"인지 보려면 다른 지역이 그 표기를
+// 확정에 쓰고 있는지 알아야 한다. 이것도 앞뒤 순서를 안 타야 해서 미리 모은다.
+const exclusiveNameOwners = new Map();
+for (const region of regionalPolicies) {
+  for (const name of [region?.name, ...(Array.isArray(region?.aliases) ? region.aliases : [])]) {
+    if (isNonEmptyString(name) && !exclusiveNameOwners.has(name)) exclusiveNameOwners.set(name, region.id);
+  }
+}
+
 const regionIds = new Set();
 const districtAliasOwners = new Map();
 for (const [index, region] of regionalPolicies.entries()) {
@@ -547,6 +556,36 @@ for (const [index, region] of regionalPolicies.entries()) {
     }
   }
 
+  // 다른 광역과 나눠 쓰는 표기. 이 목록에 있다는 건 "이 표기만으로는 우리 쪽으로
+  // 확정하지 않는다"는 뜻이라, 확정에 쓰는 쪽이 반드시 따로 있어야 한다 — 아무도
+  // 안 쓰는 이름을 여기 적으면 그 표기는 어디로도 못 가고 조용히 사라진다.
+  if (region.sharedAliases !== undefined) {
+    if (!Array.isArray(region.sharedAliases) || region.sharedAliases.length === 0) {
+      errors.push(`${prefix}.sharedAliases must be a non-empty array when present`);
+    } else {
+      const ownNames = new Set([region.name, ...(Array.isArray(region.aliases) ? region.aliases : [])]);
+      const seen = new Set();
+      for (const [aliasIndex, alias] of region.sharedAliases.entries()) {
+        const aliasPrefix = `${prefix}.sharedAliases[${aliasIndex}]`;
+        if (!isNonEmptyString(alias)) {
+          errors.push(`${aliasPrefix} must be a non-empty string`);
+          continue;
+        }
+        if (ownNames.has(alias)) {
+          errors.push(`${aliasPrefix} "${alias}" also appears in name/aliases; a name is either exclusive or shared`);
+        }
+        if (seen.has(alias)) errors.push(`${aliasPrefix} "${alias}" is duplicated`);
+        seen.add(alias);
+        const owner = exclusiveNameOwners.get(alias);
+        if (!owner) {
+          errors.push(`${aliasPrefix} "${alias}" is not an alias of any other region; a shared name needs a region that resolves it`);
+        } else if (owner === region.id) {
+          errors.push(`${aliasPrefix} "${alias}" is already this region's own alias`);
+        }
+      }
+    }
+  }
+
   if (!isoDate.test(region.checkedAt ?? "")) errors.push(`${prefix}.checkedAt must be YYYY-MM-DD`);
   if (!isNonEmptyString(region.summary)) errors.push(`${prefix}.summary must be a non-empty string`);
   if (!regionCoverageTiers.has(tier)) {
@@ -575,6 +614,9 @@ for (const [index, region] of regionalPolicies.entries()) {
       errors.push(
         `${prefix}.prefixOnlyDistrictAliases must not be set on a district-level region; it lists 시·군·구 that fall back to a metro`,
       );
+    }
+    if (region.sharedAliases !== undefined) {
+      errors.push(`${prefix}.sharedAliases must not be set on a district-level region; 표기를 나눠 쓰는 건 광역 통합에서만 생긴다`);
     }
     if (!isNonEmptyString(region.metroId)) errors.push(`${prefix}.metroId is required for district-level regions`);
     else if (!metroRegionIds.has(region.metroId)) errors.push(`${prefix}.metroId references unknown metro region ${region.metroId}`);

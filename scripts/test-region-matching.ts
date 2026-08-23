@@ -6,6 +6,7 @@ import {
   findNamedSubRegion,
   findRegionItemGuide,
   formatRegionItemGuide,
+  normalizeText,
   regionalPolicies,
   resolveRegionalPolicy,
   resolveRegionalPolicyIn,
@@ -288,6 +289,43 @@ for (const metro of regionalPolicies) {
   }
 }
 
+/**
+ * 위 스윕이 만들 수 없는 조합. 저쪽은 광역을 **자기** 별칭과만 교차해서, 한 광역의
+ * 표기가 다른 광역의 영역을 덮는 상황이 아예 생기지 않는다. 실제로 그 구멍 때문에
+ * `전남광주통합특별시 목포시`가 전라남도 대신 광주로 가는 회귀가 `pnpm check`를
+ * 그대로 통과했다.
+ *
+ * 그렇다고 전 조합을 돌릴 수는 없다 — `부산 목포시`처럼 아무 관계 없는 짝은 부산으로
+ * 착지하는 게 맞아서 기대값을 적을 수가 없다. 실제로 문제가 되는 건 **한 광역의 표기가
+ * 다른 광역 표기의 앞부분일 때**뿐이다. 그때는 긴 표기로 시작한 질의가 양쪽 어디로도
+ * 읽히므로, 뒤에 붙은 시·군·구 이름의 주인이 답이다. 지금 데이터에서 이 조건에
+ * 걸리는 건 전남·광주 한 쌍뿐이라 조합도 폭발하지 않는다.
+ */
+const sharedPrefixSweep = { pairs: 0, queries: 0 };
+const metroPolicies = regionalPolicies.filter((region) => region.coverageTier === "metro");
+
+for (const shorter of metroPolicies) {
+  for (const longer of metroPolicies) {
+    if (shorter.id === longer.id) continue;
+
+    for (const shortName of [shorter.name, ...shorter.aliases]) {
+      for (const longName of [longer.name, ...longer.aliases]) {
+        const short = normalizeText(shortName);
+        const long = normalizeText(longName);
+        if (!short || long === short || !long.startsWith(short)) continue;
+
+        sharedPrefixSweep.pairs += 1;
+        for (const metro of [shorter, longer]) {
+          for (const alias of [...(metro.districtAliases ?? []), ...(metro.prefixOnlyDistrictAliases ?? [])]) {
+            sharedPrefixSweep.queries += 1;
+            checkNaming(`${longName} ${alias}`, metro.id, alias);
+          }
+        }
+      }
+    }
+  }
+}
+
 // 위 스윕의 반대편. 광역 표기 뒤에 아무 말이나 붙었다고 지목하면, 있지도 않은 지역을
 // 두고 "상세 데이터가 없다"고 답하게 된다 — 되묻는 지금보다 나쁘다. 목록에 있는
 // 이름에만 걸려야 한다.
@@ -506,5 +544,6 @@ if (failures.length > 0) {
 console.log(
   `Region matching test passed: ${expectations.length} fixture cases, ${regionEvaluationCases.length} region cases, ` +
     `${regionalPolicies.length} policies' aliases, ` +
-    `${namingSweep.standalone} sub-region names, ${namingSweep.prefixed} metro-prefixed combinations`,
+    `${namingSweep.standalone} sub-region names, ${namingSweep.prefixed} metro-prefixed combinations, ` +
+    `${sharedPrefixSweep.queries} cross-metro combinations from ${sharedPrefixSweep.pairs} shared-prefix alias pairs`,
 );

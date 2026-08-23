@@ -10444,5 +10444,46 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"전라남도\""
     ]
+  },
+  {
+    "id": "p9_jeonnam_city_under_merged_name",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "전남광주통합특별시 목포시"
+    },
+    "expectedTextIncludes": [
+      "전라남도 지역 확인 안내",
+      "목포시 상세 데이터는 아직 없어 전라남도 광역 기준으로 안내합니다"
+    ],
+    "expectedTextExcludes": [
+      "광주광역시",
+      "062-410-6523",
+      "거주 중인 시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"전라남도\"",
+      "\"regionStatus\":\"unregistered_district\"",
+      "\"coverageTier\":\"metro\""
+    ]
+  },
+  {
+    "id": "p9_gwangju_district_under_merged_name",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "전남광주통합특별시 광산구"
+    },
+    "expectedTextIncludes": [
+      "광주광역시 지역 확인 안내",
+      "광산구 상세 데이터는 아직 없어 광주광역시 광역 기준으로 안내합니다"
+    ],
+    "expectedTextExcludes": [
+      "전라남도",
+      "거주 중인 시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"광주광역시\"",
+      "\"regionStatus\":\"unregistered_district\"",
+      "\"coverageTier\":\"metro\""
+    ]
   }
 ]
