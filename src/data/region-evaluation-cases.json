@@ -599,6 +599,24 @@
     "expectedBulkyApplication": true
   },
   {
+    "region": "대구 달서구",
+    "expectedRegionId": "dalseo_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "달서구",
+    "expectedRegionId": "dalseo_gu",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "광주 북구",
+    "expectedRegionId": "buk_gu_gwangju",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
     "region": "부산 북구",
     "expectedRegionId": "busan",
     "expectedLevel": "metro",
@@ -609,6 +627,18 @@
     "expectedRegionId": "ulsan",
     "expectedLevel": "metro",
     "expectedNamedSubRegion": "북구"
+  },
+  {
+    "region": "광주 남구",
+    "expectedRegionId": "gwangju",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "남구"
+  },
+  {
+    "region": "대구 수성구",
+    "expectedRegionId": "daegu",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "수성구"
   },
   {
     "region": "부산 사하구",

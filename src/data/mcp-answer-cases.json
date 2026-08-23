@@ -10288,5 +10288,111 @@
       "\"found\":true",
       "\"matchedItem\":\"알약 포장재\""
     ]
+  },
+  {
+    "id": "p9_dalseo_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대구 달서구"
+    },
+    "expectedTextIncludes": [
+      "대구 달서구 지역 확인 안내",
+      "문의/신청 안내 전화: 053-667-2721",
+      "인터넷 신청: https://www.dalseo.daegu.kr/index.do?menu_id=00001415",
+      "수수료 조회: https://www.dalseo.daegu.kr/index.do?menu_id=00002025"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "대구광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대구 달서구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 지역 확인 안내",
+      "문의/신청 안내 전화: 062-410-6523",
+      "인터넷 신청·수수료 조회: https://bukgu.gwangju.kr/menu.es?mid=a10406070000"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "광주광역시 광역 기준",
+      "시·군·구를 알려주시면",
+      "- 인터넷 신청: https://bukgu.gwangju.kr/menu.es?mid=a10406070000",
+      "- 수수료 조회: https://bukgu.gwangju.kr/menu.es?mid=a10406070000"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"광주 북구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_gwangju_metro_no_district_leak",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "광주"
+    },
+    "expectedTextExcludes": [
+      "062-410-6523",
+      "bukgu.gwangju.kr",
+      "북구 지역 확인 안내"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"광주광역시\"",
+      "\"coverageTier\":\"metro\""
+    ]
+  },
+  {
+    "id": "p9_gwangju_nam_gu_stays_metro",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "광주 남구"
+    },
+    "expectedTextExcludes": [
+      "062-410-6523",
+      "bukgu.gwangju.kr"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"광주광역시\"",
+      "\"regionStatus\":\"unregistered_district\""
+    ]
+  },
+  {
+    "id": "p9_dalseo_medicine_collection",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대구 달서구",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "보건소와 지정약국, 동 행정복지센터"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대구 달서구\""
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_battery_exchange",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "광주 북구",
+      "itemName": "폐건전지"
+    },
+    "expectedTextIncludes": [
+      "새 건전지 1세트(2개)"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"광주 북구\""
+    ]
   }
 ]
