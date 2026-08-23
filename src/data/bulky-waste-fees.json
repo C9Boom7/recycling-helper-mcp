@@ -680,13 +680,6 @@
         "feeKrw": 1000
       },
       {
-        "itemId": "vacuum_cleaner",
-        "category": "가전제품류",
-        "itemName": "청소기",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
         "itemId": "bookshelf",
         "category": "가구류",
         "itemName": "책장(책꽂이)",
@@ -771,13 +764,6 @@
         "feeKrw": 2000
       },
       {
-        "itemId": "humidifier",
-        "category": "가전제품류",
-        "itemName": "가습기",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
         "itemId": "gas_range",
         "category": "가전제품류",
         "itemName": "가스레인지(전기오븐)",
@@ -797,13 +783,6 @@
         "itemName": "(입)간판",
         "spec": "긴 면 기준 100cm 당 (플라스틱 재질에 한함)",
         "feeKrw": 1000
-      },
-      {
-        "itemId": "blender",
-        "category": "가전제품류",
-        "itemName": "믹서기",
-        "spec": "모든규격",
-        "feeKrw": 0
       },
       {
         "itemId": "water_tank",
@@ -841,27 +820,6 @@
         "feeKrw": 4000
       },
       {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "마우스",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "키보드(컴퓨터용, PC용)",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "헤어 드라이기",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
         "itemId": "mannequin",
         "category": "기타",
         "itemName": "마네킹",
@@ -897,17 +855,24 @@
         "feeKrw": 15000
       },
       {
-        "itemId": "electric_heater",
-        "category": "가전제품류",
-        "itemName": "라디에이터",
-        "spec": "모든규격",
-        "feeKrw": 4000
-      },
-      {
         "itemId": "picnic_mat",
         "category": "생활용품류",
         "itemName": "돗자리",
         "spec": "긴 면 기준 100cm당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리",
+        "spec": "긴 면 기준 100cm당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "기타",
+        "itemName": "놀이매트",
+        "spec": "긴 면 기준 100cm 당",
         "feeKrw": 1000
       },
       {
@@ -944,27 +909,6 @@
         "itemName": "다리미판",
         "spec": "스텐드형",
         "feeKrw": 2000
-      },
-      {
-        "itemId": "electric_iron",
-        "category": "가전제품류",
-        "itemName": "다리미",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "기타",
-        "itemName": "놀이매트",
-        "spec": "긴 면 기준 100cm 당",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "laptop",
-        "category": "가전제품류",
-        "itemName": "노트북",
-        "spec": "모든규격",
-        "feeKrw": 0
       },
       {
         "itemId": "refrigerator",
@@ -1072,13 +1016,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "bidet",
-        "category": "가전제품류",
-        "itemName": "비데",
-        "spec": "모든규격",
-        "feeKrw": 0
-      },
-      {
         "itemId": "fire_extinguisher",
         "category": "기타",
         "itemName": "분말소화기",
@@ -1147,13 +1084,6 @@
         "itemName": "병풍",
         "spec": "2폭당",
         "feeKrw": 1000
-      },
-      {
-        "itemId": "wallpaper",
-        "category": "생활용품류",
-        "itemName": "벽지",
-        "spec": "긴 면 기준 100cm 당",
-        "feeKrw": 2000
       },
       {
         "itemId": "dining_table",
@@ -1380,27 +1310,6 @@
         "feeKrw": 7000
       },
       {
-        "itemId": "game_console",
-        "category": "가전제품류",
-        "itemName": "오락실 게임기",
-        "spec": "50cm 미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "game_console",
-        "category": "가전제품류",
-        "itemName": "오락실 게임기",
-        "spec": "50cm 이상",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "game_console",
-        "category": "가전제품류",
-        "itemName": "오락실 게임기",
-        "spec": "업소용(대형)",
-        "feeKrw": 12000
-      },
-      {
         "itemId": "arcade_machine",
         "category": "가전제품류",
         "itemName": "오락기",
@@ -1408,39 +1317,11 @@
         "feeKrw": 0
       },
       {
-        "itemId": "speaker",
-        "category": "가전제품류",
-        "itemName": "오디오스피커(개당)",
-        "spec": "높이1m미만",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "audio_system",
         "category": "가전제품류",
         "itemName": "오디오",
         "spec": "모든규격",
         "feeKrw": 0
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "긴 면이 50cm 이하",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "긴 면이 50cm 이상",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "긴 면이 100cm 이상",
-        "feeKrw": 5000
       },
       {
         "itemId": "massage_chair",
@@ -1548,25 +1429,11 @@
         "feeKrw": 4000
       },
       {
-        "itemId": "umbrella",
-        "category": "기타",
-        "itemName": "우산",
-        "spec": "모든규격",
-        "feeKrw": 500
-      },
-      {
         "itemId": "bathtub",
         "category": "생활용품류",
         "itemName": "욕조",
         "spec": "모든규격",
         "feeKrw": 7000
-      },
-      {
-        "itemId": "clothes_hanger",
-        "category": "가구류",
-        "itemName": "옷걸이(스텐드형, 벽걸이)",
-        "spec": "스탠드형, 벽걸이",
-        "feeKrw": 2000
       },
       {
         "itemId": "water_heating_mat",
@@ -1723,13 +1590,6 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "coffee_machine",
-        "category": "가전제품류",
-        "itemName": "커피메이커",
-        "spec": "폭 100cm 이상",
-        "feeKrw": 6000
-      },
-      {
         "itemId": "wheelchair",
         "category": "생활용품류",
         "itemName": "휠체어",
@@ -1842,20 +1702,6 @@
         "feeKrw": 20000
       },
       {
-        "itemId": "printer",
-        "category": "가전제품류",
-        "itemName": "프린터기(복합기)",
-        "spec": "높이 1m 미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "printer",
-        "category": "가전제품류",
-        "itemName": "프린터기(복합기)",
-        "spec": "높이 1m 이상",
-        "feeKrw": 10000
-      },
-      {
         "itemId": "partition",
         "category": "생활용품류",
         "itemName": "파티션(가림막)",
@@ -1879,49 +1725,12 @@
       "basis": "서울 노원구에서 제출한 대형폐기물 수수료 고시 770행 중 품목이 확정되는 행만 반영했습니다. 기준일은 지자체 제출일(CRTR_YMD)입니다.",
       "note": "오타 매칭·역방향 포함 매칭·수식어 위치 매칭·복수 품목 표기·옵션 요금 행은 제외했습니다."
     },
+    "preCapFeeRowCountByItemId": {
+      "blanket": 13,
+      "bed_frame": 17,
+      "mattress": 21
+    },
     "fees": [
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이20㎝미만",
-        "feeKrw": 500
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이50㎝미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이100㎝미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이150㎝미만",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이200㎝미만",
-        "feeKrw": 4000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "가구류",
-        "itemName": "액자",
-        "spec": "긴 면이200㎝이상",
-        "feeKrw": 5000
-      },
       {
         "itemId": "plastic_storage_box",
         "category": "가구류",
@@ -1991,55 +1800,6 @@
         "itemName": "장식장",
         "spec": "긴 면이200㎝이상",
         "feeKrw": 10000
-      },
-      {
-        "itemId": "cooking_pot",
-        "category": "기타",
-        "itemName": "냄비",
-        "spec": "일반",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "cooking_pot",
-        "category": "기타",
-        "itemName": "캠핑용 냄비(코펠)",
-        "spec": "세트당",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "cooking_pot",
-        "category": "기타",
-        "itemName": "냄비",
-        "spec": "전골,무쇠",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "frying_pan",
-        "category": "가전제품류",
-        "itemName": "전기프라이팬",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "frying_pan",
-        "category": "기타",
-        "itemName": "프라이팬",
-        "spec": "모든 규격",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "cutting_board",
-        "category": "기타",
-        "itemName": "도마",
-        "spec": "가정용",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "cutting_board",
-        "category": "기타",
-        "itemName": "도마",
-        "spec": "업소용",
-        "feeKrw": 2000
       },
       {
         "itemId": "rice_container",
@@ -2224,34 +1984,6 @@
         "feeKrw": 3000
       },
       {
-        "itemId": "speaker",
-        "category": "가전제품류",
-        "itemName": "스피커",
-        "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "speaker",
-        "category": "가전제품류",
-        "itemName": "오디오 스피커",
-        "spec": "높이1m이상",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "vacuum_cleaner",
-        "category": "가전제품류",
-        "itemName": "청소기",
-        "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "vacuum_cleaner",
-        "category": "가전제품류",
-        "itemName": "청소기",
-        "spec": "영업용",
-        "feeKrw": 3000
-      },
-      {
         "itemId": "paper_shredder",
         "category": "가전제품류",
         "itemName": "세단기",
@@ -2278,13 +2010,6 @@
         "itemName": "가스오븐레인지",
         "spec": "모든 규격",
         "feeKrw": 5000
-      },
-      {
-        "itemId": "coffee_machine",
-        "category": "가전제품류",
-        "itemName": "커피머신",
-        "spec": "1m미만",
-        "feeKrw": 3000
       },
       {
         "itemId": "vending_machine",
@@ -2462,94 +2187,10 @@
         "feeKrw": 7000
       },
       {
-        "itemId": "toaster",
-        "category": "가전제품류",
-        "itemName": "토스트기(토스터)",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "blender",
-        "category": "가전제품류",
-        "itemName": "믹서기",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "rice_cooker",
-        "category": "가전제품류",
-        "itemName": "전기밥솥",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
         "itemId": "gas_range",
         "category": "가전제품류",
         "itemName": "가스레인지",
         "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "laptop",
-        "category": "가전제품류",
-        "itemName": "노트북",
-        "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "printer",
-        "category": "가전제품류",
-        "itemName": "프린터",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "printer",
-        "category": "가전제품류",
-        "itemName": "복합기",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "컴퓨터 키보드",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "고데기",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "소형가전(파손,원형훼손,수거불가 등)",
-        "spec": "긴 면이30㎝미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "소형가전(파손,원형훼손,수거불가 등)",
-        "spec": "긴 면이60㎝미만",
-        "feeKrw": 2500
-      },
-      {
-        "itemId": "small_electronics",
-        "category": "가전제품류",
-        "itemName": "소형가전(파손,원형훼손,수거불가 등)",
-        "spec": "긴 면이1m미만",
-        "feeKrw": 4000
-      },
-      {
-        "itemId": "monitor",
-        "category": "가전제품류",
-        "itemName": "컴퓨터 모니터",
-        "spec": "가정용 소형(파손시TV로 신청)",
         "feeKrw": 0
       },
       {
@@ -2642,48 +2283,6 @@
         "itemName": "냉장고(1599-0903단일 무상 수거 품목)",
         "spec": "업소용(대형)",
         "feeKrw": 15000
-      },
-      {
-        "itemId": "bidet",
-        "category": "가전제품류",
-        "itemName": "전기비데",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "electric_iron",
-        "category": "가전제품류",
-        "itemName": "다리미",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "electric_heater",
-        "category": "가전제품류",
-        "itemName": "전기히터",
-        "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "humidifier",
-        "category": "가전제품류",
-        "itemName": "가습기",
-        "spec": "1m미만",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "electric_kettle",
-        "category": "가전제품류",
-        "itemName": "커피포트",
-        "spec": "가정용 소형",
-        "feeKrw": 0
-      },
-      {
-        "itemId": "electric_kettle",
-        "category": "가전제품류",
-        "itemName": "전기주전자",
-        "spec": "가정용 소형",
-        "feeKrw": 0
       },
       {
         "itemId": "bath_mat",
@@ -2784,6 +2383,41 @@
         "feeKrw": 5000
       },
       {
+        "itemId": "yoga_mat",
+        "category": "기타",
+        "itemName": "요가매트",
+        "spec": "1인용",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리",
+        "spec": "10㎏미만",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "기타",
+        "itemName": "요가매트",
+        "spec": "2인용 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리",
+        "spec": "20㎏미만",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "생활용품류",
+        "itemName": "돗자리",
+        "spec": "20㎏이상",
+        "feeKrw": 5000
+      },
+      {
         "itemId": "partition",
         "category": "생활용품류",
         "itemName": "칸막이",
@@ -2844,27 +2478,6 @@
         "category": "생활용품류",
         "itemName": "캐리어",
         "spec": "30인치 이상",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "긴 면이50㎝미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "긴 면이100㎝미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "긴 면이150㎝미만",
         "feeKrw": 3000
       },
       {
@@ -3393,13 +3006,6 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "shoes",
-        "category": "생활용품류",
-        "itemName": "신발",
-        "spec": "모든 규격",
-        "feeKrw": 1000
-      },
-      {
         "itemId": "flower_pot",
         "category": "생활용품류",
         "itemName": "화분(흙,식물 제외)",
@@ -3470,41 +3076,6 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "paint_can",
-        "category": "생활용품류",
-        "itemName": "빈 페인트통",
-        "spec": "10ℓ미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "paint_can",
-        "category": "생활용품류",
-        "itemName": "빈 페인트통",
-        "spec": "20ℓ미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "paint_can",
-        "category": "생활용품류",
-        "itemName": "빈 페인트통",
-        "spec": "20ℓ이상",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "wallpaper",
-        "category": "생활용품류",
-        "itemName": "벽지(모든 재질/다량의 공사,인테리어 폐기물 수거 불가)",
-        "spec": "10ℓ당",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "styrofoam",
-        "category": "생활용품류",
-        "itemName": "폐스티로폼(재활용불가)",
-        "spec": "10ℓ당",
-        "feeKrw": 1000
-      },
-      {
         "itemId": "mannequin",
         "category": "생활용품류",
         "itemName": "마네킹",
@@ -3516,27 +3087,6 @@
         "category": "생활용품류",
         "itemName": "마네킹",
         "spec": "높이1m이상",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "소형(높이50㎝미만)",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "중형(높이1m미만)",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "대형(높이1m이상)",
         "feeKrw": 5000
       },
       {
@@ -3643,20 +3193,6 @@
         "itemName": "전동자전거",
         "spec": "모든 규격",
         "feeKrw": 6000
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "기타",
-        "itemName": "요가매트",
-        "spec": "1인용",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "기타",
-        "itemName": "요가매트",
-        "spec": "2인용 이상",
-        "feeKrw": 2000
       },
       {
         "itemId": "toy",
@@ -3766,13 +3302,6 @@
         "itemName": "공기청정기",
         "spec": "높이 1M 이상",
         "feeKrw": 4000
-      },
-      {
-        "itemId": "humidifier",
-        "category": "가전제품류",
-        "itemName": "가습기",
-        "spec": "모든 규격",
-        "feeKrw": 3000
       },
       {
         "itemId": "television",
@@ -3887,27 +3416,6 @@
         "feeKrw": 4000
       },
       {
-        "itemId": "electric_heater",
-        "category": "가전제품류",
-        "itemName": "온풍기",
-        "spec": "66㎡ 미만",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "electric_heater",
-        "category": "가전제품류",
-        "itemName": "온풍기",
-        "spec": "66㎡ 이상",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "electric_heater",
-        "category": "가전제품류",
-        "itemName": "온풍기",
-        "spec": "264㎡ 이상",
-        "feeKrw": 8000
-      },
-      {
         "itemId": "air_conditioner",
         "category": "가전제품류",
         "itemName": "에어컨",
@@ -3961,20 +3469,6 @@
         "category": "가전제품류",
         "itemName": "석유난로",
         "spec": "모든 규격",
-        "feeKrw": 4000
-      },
-      {
-        "itemId": "vacuum_cleaner",
-        "category": "가전제품류",
-        "itemName": "청소기",
-        "spec": "가정용",
-        "feeKrw": 3000
-      },
-      {
-        "itemId": "vacuum_cleaner",
-        "category": "가전제품류",
-        "itemName": "청소기",
-        "spec": "업소용",
         "feeKrw": 4000
       },
       {
@@ -4517,20 +4011,6 @@
         "feeKrw": 8000
       },
       {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "1㎡미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "1㎡이상",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "large_trash_bin",
         "category": "생활용품류",
         "itemName": "쓰레기통",
@@ -4557,20 +4037,6 @@
         "itemName": "빨래건조대",
         "spec": "길이 1M 이상",
         "feeKrw": 2000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "길이 1M 미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "길이 1M 이상",
-        "feeKrw": 3000
       },
       {
         "itemId": "blind",
@@ -4883,20 +4349,6 @@
         "itemName": "텔레비전",
         "spec": "대각선 163센티미터 이상 214센티미터 미만",
         "feeKrw": 8000
-      },
-      {
-        "itemId": "speaker",
-        "category": "가전제품류",
-        "itemName": "오디오 스피커",
-        "spec": "가장 긴 면30센티미터 미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "speaker",
-        "category": "가전제품류",
-        "itemName": "오디오 스피커",
-        "spec": "가장 긴 면30센티미터 기준",
-        "feeKrw": 2000
       },
       {
         "itemId": "washing_machine",
@@ -5214,34 +4666,6 @@
         "feeKrw": 2000
       },
       {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "지름 30센티미터 미만",
-        "feeKrw": 500
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "벽시계",
-        "spec": "지름 30센티미터 이상",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "괘종시계",
-        "spec": "길이 1미터 미만",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "wall_clock",
-        "category": "생활용품류",
-        "itemName": "괘종시계",
-        "spec": "길이 1미터 이상",
-        "feeKrw": 3000
-      },
-      {
         "itemId": "plastic_storage_box",
         "category": "생활용품류",
         "itemName": "공간박스",
@@ -5270,39 +4694,11 @@
         "feeKrw": 4000
       },
       {
-        "itemId": "umbrella",
-        "category": "생활용품류",
-        "itemName": "우산",
-        "spec": "묶음 지름 20센티미터 이하",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "umbrella",
-        "category": "생활용품류",
-        "itemName": "우산",
-        "spec": "묶음 지름 30센티미터 이하",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "flower_pot",
         "category": "생활용품류",
         "itemName": "화분",
         "spec": "높이+직경 중 긴 면 기준 30센티미터 당",
         "feeKrw": 1000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "1제곱미터 미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "picture_frame",
-        "category": "생활용품류",
-        "itemName": "액자",
-        "spec": "1제곱미터 당",
-        "feeKrw": 2000
       },
       {
         "itemId": "fish_tank",
@@ -5417,34 +4813,6 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "일반가방",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "여행가방_20인치 미만",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "골프가방",
-        "feeKrw": 2000
-      },
-      {
-        "itemId": "handbag",
-        "category": "생활용품류",
-        "itemName": "가방",
-        "spec": "여행가방_20인치 이상",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "carpet",
         "category": "생활용품류",
         "itemName": "카펫",
@@ -5459,10 +4827,17 @@
         "feeKrw": 1000
       },
       {
-        "itemId": "cutting_board",
+        "itemId": "toy",
         "category": "생활용품류",
-        "itemName": "도마",
-        "spec": "제한사항 없음",
+        "itemName": "인형+장난감류",
+        "spec": "봉제인형+플라스틱 장난감_가장 긴 면 50센티미터 미만 1개 당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "생활용품류",
+        "itemName": "인형+장난감류",
+        "spec": "봉제인형+플라스틱 장난감_가장 긴 면 50센티미터 미만 1개 당",
         "feeKrw": 1000
       },
       {
@@ -5729,7 +5104,7 @@
   {
     "regionId": "seongnam_si",
     "regionName": "경기도 성남시",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://waste.isdc.co.kr/contents/content.php?cIdx=1",
     "feeUrl": "https://waste.isdc.co.kr/contents/order_item.php?cIdx=4",
     "phone": "031-729-3205",
@@ -5737,7 +5112,7 @@
       "title": "성남시 생활폐기물의 배출방법 및 수수료 등의 부과·징수에 관한 조례 [별표 1] 대형폐기물의품목및수수료기준(제2조,제4조, 제9조 관련)",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1862311",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「성남시 생활폐기물의 배출방법 및 수수료 등의 부과·징수에 관한 조례」(시행 2023-10-10) [별표 1] 대형폐기물의품목및수수료기준(제2조,제4조, 제9조 관련) \"대형폐기물의 품목 및 수수료 기준(제2조, 제4조 및 제9조 관련)\"에서 뽑았습니다. 조례 원문 175행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -6286,7 +5661,7 @@
   {
     "regionId": "jongno_gu",
     "regionName": "서울 종로구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.jongno.go.kr/waste/mo/web/order/insertAgreeForm.do",
     "feeUrl": "https://www.jongno.go.kr/waste/mo/web/expense/selectExpenseList.do",
     "phone": "02-2148-2376",
@@ -6294,7 +5669,7 @@
       "title": "서울특별시 종로구 폐기물 관리 조례 별표",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2096877",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 종로구 폐기물 관리 조례」(시행 2025-12-26) 별표 \"대형생활폐기물 수집․운반․처리 수수료 품목별 부과기준(제29조관련)\"에서 뽑았습니다. 조례 원문 122행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -6780,7 +6155,7 @@
   {
     "regionId": "gwangjin_gu",
     "regionName": "서울 광진구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.smartclean-gwangjin.kr/online/bulky/request",
     "feeUrl": "https://www.smartclean-gwangjin.kr/online/bulky/item",
     "phone": "02-450-1375",
@@ -6788,7 +6163,7 @@
       "title": "서울특별시 광진구 폐기물관리 조례 [별표] 1~6 (2025.5.7.)",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2034335",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 광진구 폐기물관리 조례」(시행 2025-05-07) [별표] 1~6 (2025.5.7.) \"대형생활폐기물 수집·운반수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 329행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -7897,7 +7272,7 @@
   {
     "regionId": "gangbuk_gu",
     "regionName": "서울 강북구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.gangbuk.go.kr/portal/lifeWaste/userWasteAplct/forInsert.do?menuNo=200292",
     "feeUrl": "https://www.gangbuk.go.kr/portal/bbs/B0000088/list.do?menuNo=200291",
     "phone": "02-901-6787",
@@ -7905,7 +7280,7 @@
       "title": "서울특별시 강북구 폐기물 관리 조례 별표 1-대형폐기물 수집,운반수수료 품목별 부과기준",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2115267",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 강북구 폐기물 관리 조례」(시행 2026-03-13) 별표 1-대형폐기물 수집,운반수수료 품목별 부과기준 \"대형폐기물 수집𐤟운반수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 313행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -8657,7 +8032,7 @@
   {
     "regionId": "dobong_gu",
     "regionName": "서울 도봉구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.dobong.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.dobong.go.kr/online/bulky/item",
     "phone": "02-2091-3266",
@@ -8665,7 +8040,7 @@
       "title": "서울특별시 도봉구 폐기물 관리 조례 [별표 1] 대형폐기물 품목 및 수수료",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2037461",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 도봉구 폐기물 관리 조례」(시행 2025-05-15) [별표 1] 대형폐기물 품목 및 수수료 \"대형폐기물 품목 및 수수료(제2조제7호 관련)\"에서 뽑았습니다. 조례 원문 713행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -9210,6 +8585,41 @@
         "feeKrw": 5000
       },
       {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "요가매트",
+        "spec": "1인용",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "돗자리",
+        "spec": "10㎏ 미만",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "요가매트",
+        "spec": "2인용 이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "돗자리",
+        "spec": "10㎏ 이상",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "돗자리",
+        "spec": "20㎏ 이상",
+        "feeKrw": 5000
+      },
+      {
         "itemId": "door_panel",
         "category": "bulky",
         "itemName": "문짝",
@@ -9497,20 +8907,6 @@
         "feeKrw": 4000
       },
       {
-        "itemId": "yoga_mat",
-        "category": "rubber_or_pvc_mat",
-        "itemName": "요가매트",
-        "spec": "1인용",
-        "feeKrw": 1000
-      },
-      {
-        "itemId": "yoga_mat",
-        "category": "rubber_or_pvc_mat",
-        "itemName": "요가매트",
-        "spec": "2인용 이상",
-        "feeKrw": 2000
-      },
-      {
         "itemId": "bicycle",
         "category": "vehicle_part",
         "itemName": "일반자전거",
@@ -9683,7 +9079,7 @@
   {
     "regionId": "eunpyeong_gu",
     "regionName": "서울 은평구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.ep.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.ep.go.kr/online/bulky/item",
     "phone": "02-351-7587",
@@ -9691,7 +9087,7 @@
       "title": "서울특별시 은평구 폐기물관리 조례 [별표 1-9] 폐기물관리조례",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2096973",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 은평구 폐기물관리 조례」(시행 2025-12-26) [별표 1-9] 폐기물관리조례 \"대형생활폐기물 수집․운반․처리수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 257행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -10821,7 +10217,7 @@
   {
     "regionId": "geumcheon_gu",
     "regionName": "서울 금천구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.geumcheon.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.geumcheon.go.kr/online/bulky/item",
     "phone": "02-2627-1476",
@@ -10829,7 +10225,7 @@
       "title": "서울특별시 금천구 폐기물 관리 조례 [별표 4] 대형폐기물 수집운반수수료 부과기준(제23조제1항제2호 관련)",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2106685",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 금천구 폐기물 관리 조례」(시행 2026-01-08) [별표 4] 대형폐기물 수집운반수수료 부과기준(제23조제1항제2호 관련) \"대형폐기물 수집ㆍ운반수수료 부과기준(제23조제1항제2호 관련)\"에서 뽑았습니다. 조례 원문 212행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -11311,6 +10707,13 @@
         "feeKrw": 1000
       },
       {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
+        "itemName": "돗자리",
+        "spec": "3.3㎡당",
+        "feeKrw": 1000
+      },
+      {
         "itemId": "blanket",
         "category": "textile_or_bulky",
         "itemName": "이불",
@@ -11609,7 +11012,7 @@
   {
     "regionId": "yeongdeungpo_gu",
     "regionName": "서울 영등포구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.ydp.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.ydp.go.kr/online/bulky/item",
     "phone": "02-2670-3486",
@@ -11617,7 +11020,7 @@
       "title": "서울특별시 영등포구 폐기물관리 조례 [별표 3] 대형폐기물 수집 운반수수료 부과 기준표",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2058285",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 영등포구 폐기물관리 조례」(시행 2025-07-17) [별표 3] 대형폐기물 수집 운반수수료 부과 기준표 \"대형폐기물 수집․운반수수료 부과 기준표(제27조제1항제2호 관련)\"에서 뽑았습니다. 조례 원문 324행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -12670,7 +12073,7 @@
   {
     "regionId": "dongjak_gu",
     "regionName": "서울 동작구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.dongjak.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.dongjak.go.kr/online/bulky/item",
     "phone": "02-820-1326",
@@ -12678,7 +12081,7 @@
       "title": "서울특별시 동작구 폐기물관리 조례 [별표 1] 대형폐기물 수집ㆍ운반수수료 품목별 부과 기준",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2067559",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 동작구 폐기물관리 조례」(시행 2025-09-18) [별표 1] 대형폐기물 수집ㆍ운반수수료 품목별 부과 기준 \"대형폐기물 수집․운반수수료 품목별 부과 기준(제23조제1항제2호 관련)\"에서 뽑았습니다. 조례 원문 254행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -13346,7 +12749,7 @@
   {
     "regionId": "gangdong_gu",
     "regionName": "서울 강동구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.gangdong.go.kr/web/newportal/largeWaste/apply/step1",
     "feeUrl": "https://www.gangdong.go.kr/web/newportal/largeWaste/code/list",
     "phone": "02-3425-5870",
@@ -13354,7 +12757,7 @@
       "title": "서울특별시 강동구 폐기물관리 조례 별표 1~4",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1890813",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 강동구 폐기물관리 조례」(시행 2023-12-27) 별표 1~4 \"대형폐기물 수집·운반수수료 품목별 부과기준(제29조제1항제2호 관련)\"에서 뽑았습니다. 조례 원문 232행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -13815,6 +13218,34 @@
         "feeKrw": 3000
       },
       {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "소형50cm미만",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "소형50cm이상",
+        "feeKrw": 2000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "대형높이90cm미만",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "대형높이90cm이상",
+        "feeKrw": 7000
+      },
+      {
         "itemId": "air_purifier",
         "category": "electronics",
         "itemName": "공기청정기",
@@ -14141,7 +13572,7 @@
   {
     "regionId": "jung_gu",
     "regionName": "서울 중구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.junggu.seoul.kr/content.do?cmsid=16063",
     "feeUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2042009",
     "phone": "02-3396-5453",
@@ -14149,7 +13580,7 @@
       "title": "서울특별시 중구 폐기물 관리 조례 [별표5] 대형생활폐기물 수수료(제32조제1항 관련)",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2042009",
       "sourceType": "law",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 중구 폐기물 관리 조례」(시행 2025-05-23) [별표5] 대형생활폐기물 수수료(제32조제1항 관련) \"[별표5] 대형생활폐기물 수수료(제32조제1항 관련)\"에서 뽑았습니다. 조례 원문 239행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -15041,7 +14472,7 @@
   {
     "regionId": "dongdaemun_gu",
     "regionName": "서울 동대문구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.ddm.go.kr/www/contents.do?key=82",
     "feeUrl": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1890205",
     "phone": "02-2127-4620",
@@ -15049,7 +14480,7 @@
       "title": "서울특별시 동대문구 폐기물 관리 조례 별표1 대형폐기물 수집운반수수료 품목별 부과 기준(제2조제5호 관련)",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=1890205",
       "sourceType": "law",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 동대문구 폐기물 관리 조례」(시행 2023-12-28) 별표1 대형폐기물 수집운반수수료 품목별 부과 기준(제2조제5호 관련) \"대형폐기물 수집․운반수수료 품목별 부과 기준(제2조제5호 관련)\"에서 뽑았습니다. 조례 원문 210행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -15717,7 +15148,7 @@
   {
     "regionId": "seongbuk_gu",
     "regionName": "서울 성북구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.sb.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.sb.go.kr/online/bulky/item",
     "phone": "1866-0554",
@@ -15725,9 +15156,13 @@
       "title": "서울 성북구 대형폐기물 수수료표",
       "url": "https://smartclean.sb.go.kr/online/bulky/item",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
-      "basis": "서울 성북구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 400행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
+      "checkedAt": "2026-08-23",
+      "basis": "서울 성북구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 399행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
+    },
+    "preCapFeeRowCountByItemId": {
+      "chair": 15,
+      "bed_frame": 13
     },
     "fees": [
       {
@@ -16616,7 +16051,7 @@
         "itemId": "mirror",
         "category": "glass_mixed",
         "itemName": "거울",
-        "spec": "거울(높이50cm이하 ~ 가로50cm 이하)",
+        "spec": "거울(높이50cm이하 ~ 가로50cm 이하)(프레임별도)",
         "feeKrw": 1000
       },
       {
@@ -16664,6 +16099,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "돗자리(대나무,왕골 )(1평당)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "돗자리(대나무,왕골 )(1평당)",
         "feeKrw": 3000
@@ -17331,7 +16773,7 @@
   {
     "regionId": "jungnang_gu",
     "regionName": "서울 중랑구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.smartclean-jungnang.kr/online/bulky/request",
     "feeUrl": "https://www.smartclean-jungnang.kr/online/bulky/item",
     "phone": "02-2094-1956",
@@ -17339,7 +16781,7 @@
       "title": "서울 중랑구 대형폐기물 수수료표",
       "url": "https://www.smartclean-jungnang.kr/online/bulky/item",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 중랑구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 296행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -17851,6 +17293,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "3.3㎡당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "3.3㎡당",
         "feeKrw": 1000
@@ -18581,7 +18030,7 @@
   {
     "regionId": "yangcheon_gu",
     "regionName": "서울 양천구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.yangcheon.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.yangcheon.go.kr/online/bulky/item",
     "phone": "02-2620-3420",
@@ -18589,9 +18038,13 @@
       "title": "서울 양천구 대형폐기물 수수료표",
       "url": "https://smartclean.yangcheon.go.kr/online/bulky/item",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 양천구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 268행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
+    },
+    "preCapFeeRowCountByItemId": {
+      "drawer_chest": 16,
+      "bookshelf": 15
     },
     "fees": [
       {
@@ -19908,7 +19361,7 @@
   {
     "regionId": "seodaemun_gu",
     "regionName": "서울 서대문구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.sdm.go.kr/civil/print/xpay/reg.do",
     "feeUrl": "https://www.sdm.go.kr/civil/print/waste/standards.do",
     "phone": "02-330-1376",
@@ -19916,7 +19369,7 @@
       "title": "서울 서대문구 대형폐기물 수수료표",
       "url": "https://www.sdm.go.kr/civil/print/waste/standards.do",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 서대문구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 218행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -20022,6 +19475,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "1 ㎡ 당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "1 ㎡ 당",
         "feeKrw": 1000
@@ -20419,6 +19879,13 @@
         "feeKrw": 2000
       },
       {
+        "itemId": "stuffed_toy",
+        "category": "textile_mixed",
+        "itemName": "인형류",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
         "itemId": "bicycle",
         "category": "vehicle_part",
         "itemName": "자전거",
@@ -20438,6 +19905,13 @@
         "itemName": "자전거",
         "spec": "아동용(2발)",
         "feeKrw": 3000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "모든 규격",
+        "feeKrw": 1000
       },
       {
         "itemId": "display_cabinet",
@@ -20633,7 +20107,7 @@
   {
     "regionId": "seongdong_gu",
     "regionName": "서울 성동구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.sd.go.kr/main/contents.do?key=1670",
     "feeUrl": "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html",
     "phone": "02-2286-5532",
@@ -20641,7 +20115,7 @@
       "title": "서울 성동구 대형폐기물 수수료표",
       "url": "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 성동구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 151행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -20670,6 +20144,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "3.3㎡당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "3.3㎡당",
         "feeKrw": 1000
@@ -21249,6 +20730,20 @@
         "feeKrw": 4000
       },
       {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대틀",
+        "spec": "1인용, 매트리스 별도",
+        "feeKrw": 5000
+      },
+      {
+        "itemId": "bed_frame",
+        "category": "bulky",
+        "itemName": "침대틀",
+        "spec": "2인용, 매트리스 별도",
+        "feeKrw": 7000
+      },
+      {
         "itemId": "vanity_table",
         "category": "furniture",
         "itemName": "화장대",
@@ -21312,34 +20807,6 @@
         "feeKrw": 5000
       },
       {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대틀",
-        "spec": "1인용, 매트리스 별도",
-        "feeKrw": 5000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "매트리스",
-        "spec": "1인용",
-        "feeKrw": 7000
-      },
-      {
-        "itemId": "bed_frame",
-        "category": "bulky",
-        "itemName": "침대틀",
-        "spec": "2인용, 매트리스 별도",
-        "feeKrw": 7000
-      },
-      {
-        "itemId": "mattress",
-        "category": "bulky",
-        "itemName": "매트리스",
-        "spec": "2인용",
-        "feeKrw": 10000
-      },
-      {
         "itemId": "exercise_machine",
         "category": "electronics_appliance",
         "itemName": "헬스기구",
@@ -21352,6 +20819,20 @@
         "itemName": "러닝머신",
         "spec": "모든 규격",
         "feeKrw": 20000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "매트리스",
+        "spec": "1인용",
+        "feeKrw": 7000
+      },
+      {
+        "itemId": "mattress",
+        "category": "bulky",
+        "itemName": "매트리스",
+        "spec": "2인용",
+        "feeKrw": 10000
       },
       {
         "itemId": "vending_machine",
@@ -21414,7 +20895,7 @@
   {
     "regionId": "guro_gu",
     "regionName": "서울 구로구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.guro.go.kr/www/addInfoExhaustAgree.do?key=2659",
     "feeUrl": "https://www.guro.go.kr/www/costList.do?key=3412",
     "phone": "02-860-2945",
@@ -21422,7 +20903,7 @@
       "title": "서울 구로구 대형폐기물 수수료표",
       "url": "https://www.guro.go.kr/www/costList.do?key=3412",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 구로구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 169행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -21820,6 +21301,20 @@
         "feeKrw": 2000
       },
       {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "인형 장난감류",
+        "spec": "3kg당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "stuffed_toy",
+        "category": "textile_mixed",
+        "itemName": "인형 장난감류",
+        "spec": "3kg당",
+        "feeKrw": 1000
+      },
+      {
         "itemId": "bicycle",
         "category": "vehicle_part",
         "itemName": "자전거",
@@ -22076,7 +21571,7 @@
   {
     "regionId": "gangnam_gu",
     "regionName": "서울 강남구",
-    "checkedAt": "2026-08-19",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA02010000.do",
     "feeUrl": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
     "phone": "1522-3833",
@@ -22084,7 +21579,7 @@
       "title": "서울 강남구 대형폐기물 수수료표",
       "url": "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-19",
+      "checkedAt": "2026-08-23",
       "basis": "서울 강남구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 213행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -23088,7 +22583,7 @@
   {
     "regionId": "mapo_gu",
     "regionName": "서울 마포구",
-    "checkedAt": "2026-08-19",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.mapo.go.kr/site/main/content/mapo05060506",
     "feeUrl": "https://www.mapo.go.kr/site/main/content/mapo05060502",
     "phone": "02-3153-9200",
@@ -23096,7 +22591,7 @@
       "title": "서울특별시 마포구 폐기물관리 조례 [별표1] 대형폐기물 배출수수료 품목별 부과기준",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2097023",
       "sourceType": "law",
-      "checkedAt": "2026-08-19",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 마포구 폐기물관리 조례」(시행 2025-12-26) [별표1] 대형폐기물 배출수수료 품목별 부과기준 \"대형폐기물 배출수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 214행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },

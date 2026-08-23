@@ -371,7 +371,13 @@ for (const regionId of targets) {
       (rule) => rule.from === verdict.itemId && rule.hint.test(hintText) && !(rule.deny?.test(hintText) ?? false),
     );
     const itemId = hint?.to ?? verdict.itemId;
-    if (!hasBulkyRoute(itemId)) {
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 구청 트랙만 이걸 하고 있어서
+    // 트랙마다 답이 갈렸다 — 마포 조례에 「돗자리 1m²당 1,000원」이 있는데도 요가매트가
+    // 금액을 통째로 잃었고, 같은 라벨을 구청 표로 받은 강남은 요가매트를 지켰다.
+    // 대형폐기물 갈래 문턱은 겸하는 품목까지 본 뒤 건다. 확정 품목에서 먼저 끊으면 그
+    // 품목이 갈래를 잃는 순간 겸하던 품목의 행까지 조용히 사라진다.
+    const targets = [itemId, ...alsoItemIds(itemName, itemId)].filter(hasBulkyRoute);
+    if (targets.length === 0) {
       note("not_bulky_route");
       continue;
     }
@@ -381,11 +387,7 @@ for (const regionId of targets) {
       continue;
     }
 
-    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 구청 트랙만 이걸 하고 있어서
-    // 트랙마다 답이 갈렸다 — 마포 조례에 「돗자리 1m²당 1,000원」이 있는데도 요가매트가
-    // 금액을 통째로 잃었고, 같은 라벨을 구청 표로 받은 강남은 요가매트를 지켰다.
-    for (const target of [itemId, ...alsoItemIds(itemName, itemId)]) {
-      if (!hasBulkyRoute(target)) continue;
+    for (const target of targets) {
       const list = grouped.get(target) ?? [];
       list.push({
         itemId: target,
