@@ -178,18 +178,32 @@ export const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?:
  * 벌리기가 「화 분(흙, 돌 제외)」처럼 앞 낱말에만 걸리기 때문이다.
  */
 function joinLetterSpacing(text: string): string {
-  const parts = /^([^(（]*?)(\s*[(（].*)?$/.exec(text);
+  const parts = /^([^(（]*?)(\s*[(（][\s\S]*)?$/.exec(text);
   if (!parts) return text;
   const head = parts[1] ?? "";
   const tail = parts[2] ?? "";
-  const tokens = head.split(" ").filter(Boolean);
-  if (tokens.length < 2 || tokens.some((token) => [...token].length !== 1)) return text;
-  return tokens.join("") + tail;
+  // 두 칸 이상은 낱말 경계다. 「모 든  규 격」은 낱말 둘이지 글자 넷이 아니다.
+  const words = head.split(/\s{2,}/).filter(Boolean);
+  const joined = words.map((word) => {
+    const tokens = word.split(/\s+/).filter(Boolean);
+    if (tokens.length < 2 || tokens.some((token) => [...token].length !== 1)) return null;
+    return tokens.join("");
+  });
+  if (joined.some((word) => word === null)) return text;
+  const head2 = joined.join(" ");
+  // 원문이 한 칸씩만 띄운 자리는 낱말 경계를 되살릴 근거가 없다 — 「모 든 규 격」은
+  // 「모든규격」으로 붙을 수밖에 없다. 다만 이 한 마디는 규격 칸이 빈 행에 임포터가
+  // 채워 넣는 기본값(`모든 규격`)과 같은 뜻이라, 표기만 그쪽에 맞춘다. 같은 화면에
+  // 「모든규격」과 「모든 규격」이 나란히 찍히는 것보다 낫다.
+  return (head2 === "모든규격" ? "모든 규격" : head2) + tail;
 }
 
 export function cleanLabel(text: string): string {
-  let out = text.replace(/\s+/g, " ").trim();
-  out = joinLetterSpacing(out);
+  // 자간 붙이기를 **공백을 줄이기 전에** 한다. 「모 든  규 격」은 낱말 사이만 두 칸인데,
+  // 먼저 한 칸으로 줄이면 그 경계가 사라져 「모든규격」이 된다 — 다른 지역이 쓰는
+  // 「모든 규격」과 갈린다.
+  let out = joinLetterSpacing(text.trim());
+  out = out.replace(/\s+/g, " ").trim();
   // 같은 품명을 여러 줄에 적을 때 뒤에 마침표를 붙여 구분하는 표가 있다 — 서대문
   // 「냉장고.」·「선풍기..」·「오디오..」. 답변에 그대로 찍히므로 떼어낸다. 품명 안쪽
   // 마침표(`1.5L` 같은)는 건드리지 않도록 끝에 붙은 것만 본다.

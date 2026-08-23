@@ -229,7 +229,16 @@ function parseRowspanTable(html) {
     // 열 이름 줄. rowspan 없는 th만 골라내므로 `품목류` 묶음 머리(th + rowspan)는 안 걸린다.
     // 머리글은 여기서 빠지므로 아래 colspan 집계에도 안 잡힌다 — `<th colspan="5">`는
     // 표 제목일 뿐이고, 우리가 알고 싶은 건 데이터 영역에 낀 안내 행이다.
-    if (cells.every((cell) => cell.header)) continue;
+    // 머리글도 격자에서는 한 행이라 carry를 줄인다. 표 중간에 머리글이 다시 찍히는
+    // 조판에서 그냥 넘기면 열린 묶음이 한 행 더 살아남아 다음 묶음부터 열이 밀린다.
+    if (cells.every((cell) => cell.header)) {
+      for (let column = 0; column < COLUMNS; column += 1) {
+        if (!carry[column]) continue;
+        carry[column].left -= 1;
+        if (carry[column].left <= 0) carry[column] = null;
+      }
+      continue;
+    }
     if (cells.some((cell) => cell.cols > 1)) spannedRows += 1;
 
     /** 이 행이 격자에서 실제로 먹는 칸 수. colspan을 한 칸으로 세면 아래 계산이 어긋난다. */

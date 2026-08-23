@@ -16989,7 +16989,9 @@
       "쇼파",
       "가죽 소파",
       "패브릭 소파",
-      "리클라이너 소파"
+      "리클라이너 소파",
+      "응접세트",
+      "응접셋트"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -17208,7 +17210,8 @@
     "aliases": [
       "장롱",
       "자개장",
-      "원목 옷장"
+      "원목 옷장",
+      "장농"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -18099,7 +18102,8 @@
       "티브이",
       "평면 TV",
       "LED TV",
-      "폐티비"
+      "폐티비",
+      "텔레비젼"
     ],
     "category": "electronics_appliance",
     "disposalType": "free_visit_collection_or_bulky",
@@ -18695,7 +18699,8 @@
     "aliases": [
       "철제 캐비닛",
       "사무용 캐비닛",
-      "수납 캐비닛"
+      "수납 캐비닛",
+      "캐비넷"
     ],
     "category": "furniture",
     "disposalType": "bulky_waste",
