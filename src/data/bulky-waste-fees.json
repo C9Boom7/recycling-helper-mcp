@@ -1879,6 +1879,11 @@
       "basis": "서울 노원구에서 제출한 대형폐기물 수수료 고시 770행 중 품목이 확정되는 행만 반영했습니다. 기준일은 지자체 제출일(CRTR_YMD)입니다.",
       "note": "오타 매칭·역방향 포함 매칭·수식어 위치 매칭·복수 품목 표기·옵션 요금 행은 제외했습니다."
     },
+    "preCapFeeRowCountByItemId": {
+      "blanket": 13,
+      "bed_frame": 17,
+      "mattress": 21
+    },
     "fees": [
       {
         "itemId": "picture_frame",
@@ -2669,6 +2674,13 @@
         "category": "가전제품류",
         "itemName": "가습기",
         "spec": "1m미만",
+        "feeKrw": 0
+      },
+      {
+        "itemId": "bottle_sterilizer",
+        "category": "가전제품류",
+        "itemName": "젖병소독기",
+        "spec": "가정용 소형",
         "feeKrw": 0
       },
       {
@@ -5456,6 +5468,13 @@
         "category": "생활용품류",
         "itemName": "장판",
         "spec": "3.3제곱미터 당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "toy",
+        "category": "생활용품류",
+        "itemName": "인형+장난감류",
+        "spec": "봉제인형+플라스틱 장난감_가장 긴 면 50센티미터 미만 1개 당",
         "feeKrw": 1000
       },
       {
@@ -9683,7 +9702,7 @@
   {
     "regionId": "eunpyeong_gu",
     "regionName": "서울 은평구",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.ep.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.ep.go.kr/online/bulky/item",
     "phone": "02-351-7587",
@@ -9691,7 +9710,7 @@
       "title": "서울특별시 은평구 폐기물관리 조례 [별표 1-9] 폐기물관리조례",
       "url": "https://www.law.go.kr/LSW/ordinInfoP.do?ordinSeq=2096973",
       "sourceType": "law",
-      "checkedAt": "2026-08-15",
+      "checkedAt": "2026-08-23",
       "basis": "조례 「서울특별시 은평구 폐기물관리 조례」(시행 2025-12-26) [별표 1-9] 폐기물관리조례 \"대형생활폐기물 수집․운반․처리수수료 품목별 부과기준\"에서 뽑았습니다. 조례 원문 257행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -15717,7 +15736,7 @@
   {
     "regionId": "seongbuk_gu",
     "regionName": "서울 성북구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.sb.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.sb.go.kr/online/bulky/item",
     "phone": "1866-0554",
@@ -15725,9 +15744,13 @@
       "title": "서울 성북구 대형폐기물 수수료표",
       "url": "https://smartclean.sb.go.kr/online/bulky/item",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
-      "basis": "서울 성북구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 400행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
+      "checkedAt": "2026-08-23",
+      "basis": "서울 성북구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 399행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
+    },
+    "preCapFeeRowCountByItemId": {
+      "chair": 15,
+      "bed_frame": 13
     },
     "fees": [
       {
@@ -16616,7 +16639,7 @@
         "itemId": "mirror",
         "category": "glass_mixed",
         "itemName": "거울",
-        "spec": "거울(높이50cm이하 ~ 가로50cm 이하)",
+        "spec": "거울(높이50cm이하 ~ 가로50cm 이하)(프레임별도)",
         "feeKrw": 1000
       },
       {
@@ -16664,6 +16687,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "돗자리(대나무,왕골 )(1평당)",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "돗자리(대나무,왕골 )(1평당)",
         "feeKrw": 3000
@@ -18581,7 +18611,7 @@
   {
     "regionId": "yangcheon_gu",
     "regionName": "서울 양천구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://smartclean.yangcheon.go.kr/online/bulky/request",
     "feeUrl": "https://smartclean.yangcheon.go.kr/online/bulky/item",
     "phone": "02-2620-3420",
@@ -18589,9 +18619,13 @@
       "title": "서울 양천구 대형폐기물 수수료표",
       "url": "https://smartclean.yangcheon.go.kr/online/bulky/item",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 양천구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 268행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
+    },
+    "preCapFeeRowCountByItemId": {
+      "drawer_chest": 16,
+      "bookshelf": 15
     },
     "fees": [
       {
@@ -19908,7 +19942,7 @@
   {
     "regionId": "seodaemun_gu",
     "regionName": "서울 서대문구",
-    "checkedAt": "2026-08-16",
+    "checkedAt": "2026-08-23",
     "applicationUrl": "https://www.sdm.go.kr/civil/print/xpay/reg.do",
     "feeUrl": "https://www.sdm.go.kr/civil/print/waste/standards.do",
     "phone": "02-330-1376",
@@ -19916,7 +19950,7 @@
       "title": "서울 서대문구 대형폐기물 수수료표",
       "url": "https://www.sdm.go.kr/civil/print/waste/standards.do",
       "sourceType": "local_guidance",
-      "checkedAt": "2026-08-16",
+      "checkedAt": "2026-08-23",
       "basis": "서울 서대문구 누리집에 게시된 품목별 수수료표에서 뽑았습니다. 원문 218행 중 우리 품목으로 확정되는 대형폐기물 행만 반영했습니다.",
       "note": "무상수거 행, 품명이 확정되지 않는 행, 대형폐기물 갈래가 없는 품목은 제외했습니다. 실제 부과액은 구청 접수 시 규격 판정에 따라 달라질 수 있습니다."
     },
@@ -20022,6 +20056,13 @@
       {
         "itemId": "picnic_mat",
         "category": "mixed_material",
+        "itemName": "돗자리",
+        "spec": "1 ㎡ 당",
+        "feeKrw": 1000
+      },
+      {
+        "itemId": "yoga_mat",
+        "category": "rubber_or_pvc_mat",
         "itemName": "돗자리",
         "spec": "1 ㎡ 당",
         "feeKrw": 1000
@@ -20419,6 +20460,13 @@
         "feeKrw": 2000
       },
       {
+        "itemId": "stuffed_toy",
+        "category": "textile_mixed",
+        "itemName": "인형류",
+        "spec": "모든 규격",
+        "feeKrw": 2000
+      },
+      {
         "itemId": "bicycle",
         "category": "vehicle_part",
         "itemName": "자전거",
@@ -20438,6 +20486,13 @@
         "itemName": "자전거",
         "spec": "아동용(2발)",
         "feeKrw": 3000
+      },
+      {
+        "itemId": "toy",
+        "category": "toy_mixed",
+        "itemName": "장난감류",
+        "spec": "모든 규격",
+        "feeKrw": 1000
       },
       {
         "itemId": "display_cabinet",
