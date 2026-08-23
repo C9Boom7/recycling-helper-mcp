@@ -217,10 +217,16 @@ function parseRowspanTable(html) {
     // 다음 묶음의 머리가 한 칸 오른쪽으로 밀린다. 실제로 `생활용품`(품목류)이 품목별
     // 자리에 들어와 옷걸이부터 재봉틀까지 17개 품명이 통째로 어긋났다.
     //
-    // 남은 셀이 빈 자리보다 많으면 앞선 묶음이 이미 끝난 것이다. 왼쪽부터 버린다.
-    // 선언값보다 이 행이 실제로 들고 온 셀을 믿는 쪽이 맞다.
+    // 남은 셀이 빈 자리보다 많으면 앞선 묶음이 이미 끝난 것이다. 선언값보다 이 행이
+    // 실제로 들고 온 셀을 믿는 쪽이 맞다.
+    //
+    // 끊는 순서는 **오른쪽(안쪽 열)부터**다. 안쪽이 과다 선언된 쪽이 흔한데, 왼쪽부터
+    // 끊으면 멀쩡한 바깥 열(품목류) carry가 날아가고 새 묶음 머리가 0열로 밀린다 —
+    // 1열에는 직전 품명이 그대로 남아 금액은 맞고 품명만 틀린 행이 묶음 끝까지 이어진다.
+    // 반대로 바깥 열이 과다 선언된 경우에는 그 행이 묶음 머리라 안쪽 carry가 이미
+    // 비어 있어서, 오른쪽부터 훑어도 결국 같은 자리를 끊는다. 양쪽 모두 안전한 순서다.
     let freeColumns = COLUMNS - carry.filter(Boolean).length;
-    for (let column = 0; column < COLUMNS && cells.length > freeColumns; column += 1) {
+    for (let column = COLUMNS - 1; column >= 0 && cells.length > freeColumns; column -= 1) {
       if (!carry[column]) continue;
       carry[column] = null;
       freeColumns += 1;

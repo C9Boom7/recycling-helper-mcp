@@ -134,16 +134,31 @@ for (const regionId of targets) {
     // 규격 칸이 다른 품목으로 확정되는 행은 넣지 않는다. 구청 표에도 「장판 /
     // 전기장판(1인용)」처럼 규격 자리에 다른 품목을 적는 칸이 있다.
     let itemId = verdict.itemId;
-    const hint = SPLIT_HINTS.find(
-      (rule) => rule.from === itemId && rule.hint.test(`${itemName} ${spec}`) && !(rule.deny?.test(`${itemName} ${spec}`) ?? false),
-    );
+    const hintText = `${itemName} ${spec}`;
+    // 낱말이 걸린 규칙과, 그중 `deny`를 통과한 규칙을 나눠 든다. `deny`는 "이 행은
+    // 옮기지 말고 원래 품목에 두라"는 뜻인데, 그 판정을 아래 규격 조각 검사에
+    // 넘겨주지 않으면 검사가 같은 낱말을 다시 보고 행을 통째로 버린다.
+    const triggered = SPLIT_HINTS.filter((rule) => rule.from === itemId && rule.hint.test(hintText));
+    const hint = triggered.find((rule) => !(rule.deny?.test(hintText) ?? false));
     if (hint) itemId = hint.to;
 
     if (!hint) {
+      // 여기까지 온 규칙은 전부 `deny`에 막힌 것들이다. 그 규칙이 가리키던 품목만
+      // 조각 검사에서 뺀다 — 광주 북구 「침대 / 2인용 매트리스 틀 / 9,000원」은
+      // 프레임 단독 행이라 `bed_frame`에 남아야 하는데, 조각 `매트리스`가
+      // `spec_names_other_item`으로 잡아 세 행이 통째로 사라졌다(6,000·9,000·6,000원).
+      // 검사 자체는 그대로 둔다. 규격 자리에 진짜 다른 품목이 오는 행
+      // (「장판 / 전기장판(1인용)」)은 여전히 걸러야 한다.
+      const denied = new Set(triggered.map((rule) => rule.to));
       let stolen = false;
       for (const candidate of specNameCandidates(spec)) {
         const specVerdict = classifyName(candidate, "spec_fragment");
-        if (specVerdict.ok && specVerdict.itemId !== itemId && hasBulkyRoute(specVerdict.itemId)) {
+        if (
+          specVerdict.ok &&
+          specVerdict.itemId !== itemId &&
+          !denied.has(specVerdict.itemId) &&
+          hasBulkyRoute(specVerdict.itemId)
+        ) {
           stolen = true;
           break;
         }
