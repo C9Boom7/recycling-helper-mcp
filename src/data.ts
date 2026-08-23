@@ -1824,7 +1824,11 @@ export function findBulkyWasteFees(region: RegionalPolicyData, item: WasteItem):
 export function findBulkyWasteFeeRowTotal(region: RegionalPolicyData, item: WasteItem): number | undefined {
   const total = findBulkyWasteFeeSchedule(region)?.preCapFeeRowCountByItemId?.[item.id];
   if (total === undefined) return undefined;
-  return total > findBulkyWasteFees(region, item).length ? total : undefined;
+  // 행이 하나도 안 나가는 품목에는 "대표 0개만"이라고 말할 자리가 없다. 품목의 대형폐기물
+  // 갈래가 빠지면 `findBulkyWasteFees`는 비는데 메타데이터는 남아 있어, 지역 체크리스트가
+  // "확인된 21개 규격 중 대표 0개만 옮겼습니다"를 찍게 된다.
+  const loaded = findBulkyWasteFees(region, item).length;
+  return loaded > 0 && total > loaded ? total : undefined;
 }
 
 function formatKrw(value: number): string {
