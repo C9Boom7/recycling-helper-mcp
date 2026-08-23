@@ -45,6 +45,7 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-31)을 Phase 7개로 나�
 | 7 | [phase-7-bulky-item-fee-expansion.md](phase-7-bulky-item-fee-expansion.md) | 복합명사 오매칭 교정, 대형폐기물 품목 확장, 표준데이터 수수료 임포트(용산·노원·강서·관악) | Phase 5 이후 — Phase 6과 지역 배타 분담 |
 | 8 | [phase-8-item-coverage.md](phase-8-item-coverage.md) | 확장 발화 not_found 6건 해소 (품목 데이터) | 없음 — Phase 9와 병렬 |
 | 9 | [phase-9-metro-districts.md](phase-9-metro-districts.md) | 광역시 자치구 확장 (부산·대구·인천·대전·광주) | 없음 — Phase 8과 병렬 |
+| 10 | [phase-10-response-size-region-notes.md](phase-10-response-size-region-notes.md) | 응답 크기 다이어트 — 지역 안내가 한 응답에 두 번 실리는 자리 제거 (런타임 변경) | 없음 — 8/29 기능 변경 마감 전 머지·재배포까지 끝내야 한다 |
 
 Phase 8·9는 2026-08-21 본선 심사기준 자체 평가에서 나온 구멍 둘을 메운다. 둘 다 **런타임 코드 무변경**이고 주 작업 영역이 갈린다 —
 Phase 8은 `waste-items.json` 계열, Phase 9는 `region-policies.json` 계열이다.
@@ -108,6 +109,7 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 7 | 완료 (PR #22 머지됨) | claude/phase7-r2-batch4 외 | 오매칭 13 → 0, 답변 가능 94/100, 품목 324개. 되묻기 5건 해소 배치까지 마쳐 ambiguous는 포괄어 4건만 남았다 |
 | 8 | 작업 완료, PR #61 리뷰 중 (머지 전) | claude/phase8-item-coverage | 확장 발화 50개 중 not_found 6 → 0, 품목 324 → 330. 신규 품목 6개(양념통·변기솔·선크림 튜브·벨트·젖병·젖병살균소독기)와 `rice_sack` 별칭 흡수(사료 포대). 발화 내성 3,300건 100% 유지 |
 | 9 | 미착수 | claude/phase9-metro-districts | 기초자치단체 32/226. 서울·경기 밖은 광역 폴백뿐 |
+| 10 | PRD 작성 (2026-08-23), 미착수 | — | 본선 이후 과제 1번을 되살렸다. 노원구 매트리스 텍스트 6.2KB → 4.5KB, 위젯 4.1KB → 3.5KB 목표. 8/27까지 리뷰 완료가 안 되면 이번 사이클에서 뺀다 |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
 
