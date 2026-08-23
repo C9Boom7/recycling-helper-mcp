@@ -207,15 +207,16 @@ for (const regionId of targets) {
       }
     }
 
-    if (!hasBulkyRoute(itemId)) {
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 하나만 남기면 나머지 품목은
+    // 금액을 통째로 잃는다 — 강남에서 요가매트·인형·장난감이 그랬다.
+    // 대형폐기물 갈래 문턱은 겸하는 품목까지 본 뒤 건다. 확정 품목에서 먼저 끊으면 그
+    // 품목이 갈래를 잃는 순간 겸하던 품목의 행까지 조용히 사라진다.
+    const targets = [itemId, ...alsoItemIds(itemName, itemId)].filter(hasBulkyRoute);
+    if (targets.length === 0) {
       note("not_bulky_route");
       continue;
     }
-
-    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 하나만 남기면 나머지 품목은
-    // 금액을 통째로 잃는다 — 강남에서 요가매트·인형·장난감이 그랬다.
-    for (const target of [itemId, ...alsoItemIds(itemName, itemId)]) {
-      if (!hasBulkyRoute(target)) continue;
+    for (const target of targets) {
       const list = grouped.get(target) ?? [];
       list.push({ itemId: target, category: itemCategory(target), itemName, spec, feeKrw: row.feeKrw });
       grouped.set(target, list);
