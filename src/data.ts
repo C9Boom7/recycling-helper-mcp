@@ -1292,14 +1292,57 @@ function regionCandidatesAt(
     if (regionMatchLevel(policy) !== level) continue;
     if (byRegionId.has(policy.id)) continue;
 
+    // 걸리는 표기가 여럿이면 가장 긴 것을 남긴다. 아래 longestPrefixWinner가
+    // 표기 길이로 후보를 가리므로, 여기서 짧은 쪽을 집으면 그 판정이 헛돈다.
+    let matchedBy: string | undefined;
     for (const name of regionMatchNames(policy)) {
       if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
-      byRegionId.set(policy.id, { region: policy, matchedBy: name, level });
-      break;
+      if (!matchedBy || normalizeText(name).length > normalizeText(matchedBy).length) matchedBy = name;
     }
+    if (matchedBy) byRegionId.set(policy.id, { region: policy, matchedBy, level });
   }
 
   return Array.from(byRegionId.values()).sort((a, b) => a.region.name.localeCompare(b.region.name, "ko"));
+}
+
+/**
+ * 질의 앞부분을 더 많이 먹은 표기가 이긴다. **강도 2에서만** 쓴다.
+ *
+ * 강도 2는 "질의가 지역 표기로 시작한다"라, 표기가 길수록 질의를 더 많이 설명한
+ * 것이다. `splitLeadingMetro`가 "경기도 분당구"에서 `경기`가 아니라 `경기도`를
+ * 떼는 것과 같은 원리다.
+ *
+ * 이게 없으면 광역 이름이 다른 광역 이름으로 시작할 때 둘 다 걸려 되묻는다.
+ * 2026년 광주광역시가 **전남광주통합특별시**로 바뀌면서 실제로 터졌다 —
+ * `전남`이 전라남도 별칭이라 `전남광주통합특별시 북구`가 전라남도로 착지했고,
+ * 새 이름을 광주 별칭에 넣자 이번엔 전라남도와 광주가 동시에 걸렸다.
+ *
+ * 강도 1(지역 표기가 질의로 시작)에는 쓰지 않는다. 그쪽은 길수록 질의에서 먼
+ * 이름이라 정반대다 — `강남`에 `강남구`와 더 긴 이름이 함께 걸리면 긴 쪽이
+ * 이길 이유가 없다.
+ *
+ * 동점이면 아무것도 고르지 않는다. 길이가 같은 두 표기는 어느 쪽이 더 구체적이라고
+ * 말할 근거가 없어, 되묻는 게 맞는 답이다.
+ */
+function longestPrefixWinner(candidates: MatchedRegionPolicy[]): MatchedRegionPolicy | undefined {
+  if (candidates.length < 2) return undefined;
+
+  let best = candidates[0];
+  let bestLength = normalizeText(best.matchedBy).length;
+  let tied = false;
+
+  for (const candidate of candidates.slice(1)) {
+    const length = normalizeText(candidate.matchedBy).length;
+    if (length > bestLength) {
+      best = candidate;
+      bestLength = length;
+      tied = false;
+    } else if (length === bestLength) {
+      tied = true;
+    }
+  }
+
+  return tied ? undefined : best;
 }
 
 /**
@@ -1377,8 +1420,17 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
 
   let ambiguous: MatchedRegionPolicy[] | undefined;
 
-  const consider = (candidates: MatchedRegionPolicy[]): MatchedRegionPolicy | undefined => {
+  const consider = (
+    candidates: MatchedRegionPolicy[],
+    strength?: RegionMatchStrength,
+  ): MatchedRegionPolicy | undefined => {
     if (candidates.length === 1) return candidates[0];
+    // 질의 앞부분을 더 많이 먹은 표기가 있으면 그건 후보가 여럿인 게 아니라
+    // 한쪽이 더 구체적인 것이다. 강도 2에서만 성립한다(longestPrefixWinner 주석).
+    if (strength === 2) {
+      const winner = longestPrefixWinner(candidates);
+      if (winner) return winner;
+    }
     // 되묻기는 더 앞선 단계가 전부 비었을 때만 쓴다. 약한 단계에서 후보가
     // 여럿이어도, 아직 안 본 단계에서 유일 확정이 나오면 그쪽이 이긴다.
     if (candidates.length > 1 && !ambiguous) ambiguous = candidates.slice(0, MAX_AMBIGUOUS_CANDIDATES);
@@ -1386,7 +1438,7 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
   };
 
   for (const [level, strength] of REGION_DISTRICT_ORDER) {
-    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength), strength);
     if (match) return { status: "match", match };
   }
 
@@ -1400,13 +1452,13 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
     const withinMetro = policies.filter((policy) => policy.metroId === split.metro.id);
     for (const [level, strength] of REGION_DISTRICT_ORDER) {
       if (level !== "district") continue;
-      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength));
+      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength), strength);
       if (match) return { status: "match", match };
     }
   }
 
   for (const [level, strength] of REGION_METRO_FALLBACK_ORDER) {
-    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength), strength);
     if (match) return { status: "match", match };
   }
 
