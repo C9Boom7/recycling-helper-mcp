@@ -36,6 +36,7 @@ const USER_AGENT =
  * - `sd_popup`: 성동 부과기준표 팝업. **금액이 행 머리**이고 품목이 그 아래 묶인다.
  * - `guro_list`: 구로 처리비용. 분류별로 페이지가 갈리고 서버가 그린 표다.
  * - `gn_table`: 강남 자원순환 종합포털. 서버가 그린 4열 표이고 셀에 열 이름 접두어가 붙는다.
+ * - `rowspan_table`: 광주 북구·대구 달서구. 서버가 그린 5열 표인데 앞 두 열이 `rowspan`으로 묶여 있다.
  */
 export const TARGETS = [
   { regionId: "seongbuk_gu", name: "서울 성북구", kind: "smartclean", url: "https://smartclean.sb.go.kr/online/bulky/item" },
@@ -48,6 +49,10 @@ export const TARGETS = [
   // 조판에서 침대 규격을 TV에 붙여 놓고 침대 품목은 한 행도 못 잡았다. `parseGangnamTable`
   // 주석에 실제로 나온 오행을 적어 뒀다.
   { regionId: "gangnam_gu", name: "서울 강남구", kind: "gn_table", url: "https://clean.gangnam.go.kr/use/biwa/USEBIWA01000000.do" },
+  // Phase 9(2026-08-23). 둘 다 서울 밖 광역시 자치구다.
+  // 광주 북구는 표준데이터에 아예 없고, 달서구는 209행이 있지만 규격 칸이 전부 비어 있다.
+  { regionId: "buk_gu_gwangju", name: "광주 북구", kind: "rowspan_table", url: "https://bukgu.gwangju.kr/menu.es?mid=a10406070000" },
+  { regionId: "dalseo_gu", name: "대구 달서구", kind: "rowspan_table", url: "https://www.dalseo.daegu.kr/index.do?menu_id=00002025" },
 ];
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -159,6 +164,103 @@ function parseSdmTable(html) {
     rows.push({ itemName: cells[0], spec, feeKrw: fee });
   }
   return { rows, warnings: [] };
+}
+
+/**
+ * `rowspan`으로 묶인 표. 광주 북구 「대형폐기물 품목 및 수수료 기준」이 이 꼴이다.
+ *
+ * `품목류 | 품목별 | 규격 | 부과금액(원) | 비고` 5열인데, 앞 두 열이 세로로 묶여 있다.
+ * 냉장고는 `<td rowspan="4">`로 한 번만 나오고 다음 세 행에는 아예 셀이 없다.
+ *
+ * 그래서 `tableRows`를 그대로 쓰면 안 된다. 그쪽은 rowspan 정보를 버리고 셀만 세는데,
+ * 이 표에서는 대부분의 행이 3칸(규격·금액·비고)으로 보여 품명 자리에 규격이, 규격
+ * 자리에 금액이 들어온다 — 0행이 아니라 **한 칸씩 밀린 그럴듯한 오답**이 나온다.
+ * `parseGangnamTable` 주석이 적어 둔 부분 누락과 같은 종류이되 더 나쁘다.
+ *
+ * 그래서 rowspan을 실제로 펴서 읽는다. 열마다 "앞 행에서 이어지는 값과 남은 횟수"를
+ * 들고, 이어지는 값이 있으면 그 자리를 그것으로 채운 뒤 남은 셀을 왼쪽부터 밀어 넣는다.
+ * HTML 표의 rowspan 복원 그대로다.
+ */
+function parseRowspanTable(html) {
+  const rows = [];
+  const warnings = [];
+
+  // 가장 큰 표 하나만 본다. 페이지에 안내용 작은 표가 함께 있어 섞이면 잡음이 된다.
+  const tables = [...html.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)].map((m) => m[0]);
+  const table = tables.sort((a, b) => b.length - a.length)[0];
+  if (!table) return { rows, warnings: ["표를 찾지 못했다"] };
+
+  const COLUMNS = 5;
+  /** 열별로 앞 행에서 이어지는 값. `{ text, left }`이고 `left`가 0이 되면 비운다. */
+  const carry = new Array(COLUMNS).fill(null);
+  let candidates = 0;
+  /** 선언된 rowspan이 실제보다 커서 강제로 끊은 횟수. 조용히 넘기지 않고 보고한다. */
+  let staleCarries = 0;
+
+  // 행은 `</tr>`가 아니라 **다음 `<tr>`**에서 끊는다. 닫는 태그를 빠뜨린 표가 있다 —
+  // 광주 북구는 화장대 둘째 행에 `</tr>`가 없어서, `</tr>`로 끊으면 그 행이 다음
+  // 거실장 행까지 통째로 삼킨다. 브라우저는 `<tr>`를 만나면 앞 행을 자동으로 닫으므로
+  // 화면과 우리가 읽는 것이 갈린다. 실제로 그 자리부터 열이 어긋났다.
+  for (const chunk of table.split(/<tr[^>]*>/i).slice(1)) {
+    const body = chunk.split(/<\/tr>/i)[0];
+    const cells = [...body.matchAll(/<(t[dh])([^>]*)>([\s\S]*?)<\/\1>/gi)].map((cell) => ({
+      text: cellText(cell[3]),
+      span: Math.max(1, Number(/rowspan\s*=\s*["']?(\d+)/i.exec(cell[2])?.[1] ?? 1)),
+      header: cell[1].toLowerCase() === "th" && !/rowspan/i.test(cell[2]),
+    }));
+    if (cells.length === 0) continue;
+    // 열 이름 줄. rowspan 없는 th만 골라내므로 `품목류` 묶음 머리(th + rowspan)는 안 걸린다.
+    if (cells.every((cell) => cell.header)) continue;
+
+    // 선언된 rowspan이 실제 행수보다 큰 표가 있다 — 광주 북구 `가구류`는 46이라고
+    // 적혀 있는데 행은 45개다. 그대로 믿으면 묶음이 끝난 뒤에도 값이 하나 더 이어져
+    // 다음 묶음의 머리가 한 칸 오른쪽으로 밀린다. 실제로 `생활용품`(품목류)이 품목별
+    // 자리에 들어와 옷걸이부터 재봉틀까지 17개 품명이 통째로 어긋났다.
+    //
+    // 남은 셀이 빈 자리보다 많으면 앞선 묶음이 이미 끝난 것이다. 왼쪽부터 버린다.
+    // 선언값보다 이 행이 실제로 들고 온 셀을 믿는 쪽이 맞다.
+    let freeColumns = COLUMNS - carry.filter(Boolean).length;
+    for (let column = 0; column < COLUMNS && cells.length > freeColumns; column += 1) {
+      if (!carry[column]) continue;
+      carry[column] = null;
+      freeColumns += 1;
+      staleCarries += 1;
+    }
+
+    const line = new Array(COLUMNS).fill("");
+    let next = 0;
+    for (let column = 0; column < COLUMNS; column += 1) {
+      if (carry[column]) {
+        line[column] = carry[column].text;
+        carry[column].left -= 1;
+        if (carry[column].left <= 0) carry[column] = null;
+        continue;
+      }
+      const cell = cells[next];
+      next += 1;
+      if (!cell) continue;
+      line[column] = cell.text;
+      if (cell.span > 1) carry[column] = { text: cell.text, left: cell.span - 1 };
+    }
+
+    candidates += 1;
+    const fee = toKrw(line[3]);
+    const itemName = line[1];
+    if (fee === null || !itemName) continue;
+    // 규격 칸이 비면 품명만 있는 행이다. 그대로 둔다 — 임포터가 품명으로 규격을 채운다.
+    rows.push({ itemName, spec: line[2], feeKrw: fee });
+  }
+
+  // 부분 누락을 잡는다. 0행일 때만 우는 가드로는 rowspan 복원이 어긋나 대부분이
+  // 조용히 빠지는 경우를 못 본다 — `parseGangnamTable`이 같은 이유로 후보를 먼저 센다.
+  if (candidates > 0 && rows.length < candidates * 0.8) {
+    warnings.push(`데이터 행 ${candidates}개 중 ${rows.length}개만 읽었다 — rowspan 복원을 확인할 것`);
+  }
+  if (staleCarries > 0) {
+    warnings.push(`선언된 rowspan이 실제 행수보다 큰 자리 ${staleCarries}곳을 끊었다 (원문 표의 오기)`);
+  }
+
+  return { rows, warnings };
 }
 
 /**
@@ -307,6 +409,7 @@ async function collect(target) {
   if (target.kind === "sdm_table") return parseSdmTable(html);
   if (target.kind === "gn_table") return parseGangnamTable(html);
   if (target.kind === "sd_popup") return parseSdPopup(html);
+  if (target.kind === "rowspan_table") return parseRowspanTable(html);
   throw new Error(`모르는 kind: ${target.kind}`);
 }
 

@@ -242,8 +242,14 @@ if (built.length === 0) {
 }
 
 // 다른 트랙이 넣은 지역과 이번에 실패한 지역은 건드리지 않는다.
-const managed = new Set(built.map((schedule) => schedule.regionId));
-const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)), ...built];
+// 이미 있던 지역은 **자리를 지킨다.** 예전에는 담당 지역을 걷어내고 끝에 다시 붙였는데,
+// 그러면 두 지역을 새로 넣어도 파일이 통째로 밀려 diff가 3만 줄이 된다. 실제 바뀐 행이
+// 넷인지 사백인지 리뷰에서 안 보이면 이 데이터의 안전장치 하나가 사라지는 셈이다.
+const byRegionId = new Map(built.map((schedule) => [schedule.regionId, schedule]));
+const merged = [
+  ...existing.map((schedule) => byRegionId.get(schedule.regionId) ?? schedule),
+  ...built.filter((schedule) => !existing.some((item) => item.regionId === schedule.regionId)),
+];
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((sum, schedule) => sum + schedule.fees.length, 0)}행`);
 if (missing.length > 0) console.log(`표가 없어 건너뛴 지역: ${missing.join(", ")}`);

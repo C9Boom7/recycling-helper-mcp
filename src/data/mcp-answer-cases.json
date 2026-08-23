@@ -10394,5 +10394,48 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"광주 북구\""
     ]
+  },
+  {
+    "id": "p9_dalseo_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉장고",
+      "region": "대구 달서구"
+    },
+    "expectedTextIncludes": [
+      "대구 달서구 대형생활폐기물 수수료 후보"
+    ],
+    "expectedTextExcludes": [
+      "대구광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서랍장",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "5단 이상: 7,000원"
+    ],
+    "expectedTextExcludes": [
+      "광주광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_mattress_not_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보"
+    ],
+    "expectedTextExcludes": [
+      "매트리스 틀"
+    ]
   }
 ]
