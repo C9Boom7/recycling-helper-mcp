@@ -117,15 +117,17 @@ for (const [gu, regionId, regionName] of TARGETS) {
     // 조례·구청 임포터와 같은 문턱. 대형폐기물 갈래가 없는 품목의 행은 런타임이
     // 어차피 안 읽고(`findBulkyWasteFees`), 남겨 두면 갈래가 바뀌는 순간 "수수료 0원"이
     // 답으로 나간다 — 노원구 「젖병소독기 / 가정용 소형 / 0원」이 그렇게 들어왔었다.
-    if (!hasBulkyRoute(itemId)) {
+    //
+    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다 — 관악구 「인형+장난감류」는
+    // 장난감으로만 확정돼 인형은 금액을 통째로 잃고 있었다. 구청·조례 임포터와 같다.
+    // 문턱은 확정 품목이 아니라 **겸하는 품목까지 본 뒤** 건다. 확정 품목에서 먼저 끊으면
+    // 그 품목이 갈래를 잃는 순간 겸하던 품목의 행까지 조용히 사라진다.
+    const targets = [itemId, ...alsoItemIds(row.LAR_WAS_NM, itemId)].filter(hasBulkyRoute);
+    if (targets.length === 0) {
       skipped.set("not_bulky_route", (skipped.get("not_bulky_route") ?? 0) + 1);
       continue;
     }
-
-    // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다 — 관악구 「인형+장난감류」는
-    // 장난감으로만 확정돼 인형은 금액을 통째로 잃고 있었다. 구청·조례 임포터와 같다.
-    for (const target of [itemId, ...alsoItemIds(row.LAR_WAS_NM, itemId)]) {
-      if (!hasBulkyRoute(target)) continue;
+    for (const target of targets) {
       const list = grouped.get(target) ?? [];
       list.push({ row, spec });
       grouped.set(target, list);
