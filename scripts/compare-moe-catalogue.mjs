@@ -29,7 +29,8 @@ if (snapshot.complete === false) console.warn("경고: catalogue.json이 불완�
 const cat = snapshot.items;
 
 /** 그쪽 배출방법 라벨 → 거친 갈래. 라벨은 쉼표로 여러 개가 오므로 집합이다. */
-function theirBuckets(label) {
+function theirBuckets(rawLabel) {
+  const label = typeof rawLabel === "string" ? rawLabel : "";
   const b = new Set();
   if (/종량제봉투/.test(label)) b.add("general");
   if (/대형폐기물/.test(label)) b.add("bulky");
@@ -52,13 +53,16 @@ function ourBuckets(disposalType) {
   if (/small_electronics|free_visit|takeback|special_collection/.test(disposalType)) b.add("ewaste");
   if (/food/.test(disposalType)) b.add("food");
   if (/nonburnable/.test(disposalType)) b.add("nonburnable");
-  if (/special|hazardous|region_specific|collection_point|reuse|construction|manufacturer/.test(disposalType)) b.add("special");
+  // `special` 부분일치는 `nonburnable_special_bag`·`bulky_waste_special_handling`까지 잡아 가짜 겹침을 만든다.
+  // 특수 수거는 `special_collection`으로만 본다.
+  if (/special_collection|hazardous|region_specific|collection_point|reuse|construction|manufacturer/.test(disposalType)) b.add("special");
   return b;
 }
 
 const rows = [];
 const stat = { match: 0, ambiguous: 0, not_found: 0 };
 for (const { itemNm, dschgMthd } of cat) {
+  if (typeof itemNm !== "string" || itemNm.length === 0) continue;
   const r = resolveWasteItem(itemNm);
   stat[r.status] = (stat[r.status] ?? 0) + 1;
   const row = { theirs: itemNm, theirMethod: dschgMthd, status: r.status };

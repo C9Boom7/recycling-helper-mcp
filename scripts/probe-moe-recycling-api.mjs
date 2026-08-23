@@ -50,7 +50,8 @@ function readKey() {
     if (named) return named.replace(/^export\s+/, "").slice("DATA_GO_KR_SERVICE_KEY=".length).replace(/^["']|["']$/g, "").trim();
     // 이름 없이 키만 한 줄 적어 둔 파일도 받는다. 포털 키 모양(base64/URL 인코딩 문자만, 40자 이상)인
     // 줄만 본다 — 아무 긴 줄이나 키로 잡아 외부로 보내면 안 된다.
-    const bare = lines.find((l) => !l.includes("=") && /^[A-Za-z0-9+/%_-]{40,}$/.test(l));
+    // 디코딩 키는 base64 패딩 `=`로 끝날 수 있으니 "이름=값" 모양만 제외한다.
+    const bare = lines.find((l) => !/^[A-Za-z_][A-Za-z0-9_]*=/.test(l) && /^[A-Za-z0-9+/%_-]{40,}={0,2}$/.test(l));
     if (bare) return bare;
   }
   return undefined;
@@ -104,6 +105,13 @@ function callOk(http, resultCode) {
 
 /** 응답 모양이 문서와 다를 수 있어 header/body를 넉넉하게 찾는다. */
 function unpack(body) {
+  // 게이트웨이 오류(키 누락·한도 초과 등)는 JSON이 아니라 XML로 온다. 그대로 두면 코드가 안 읽혀
+  // 한도 초과(22)를 못 알아보고 죽은 한도에 계속 친다.
+  if (typeof body?._raw === "string") {
+    const code = body._raw.match(/<returnReasonCode>\s*(\d+)\s*<\/returnReasonCode>/)?.[1];
+    const msg = body._raw.match(/<errMsg>([^<]*)<\/errMsg>/)?.[1] ?? body._raw.match(/<returnAuthMsg>([^<]*)<\/returnAuthMsg>/)?.[1];
+    return { resultCode: code, resultMsg: msg ?? body._raw.slice(0, 200), totalCount: undefined, items: [] };
+  }
   const root = body?.response ?? body;
   const header = Array.isArray(root?.header) ? root.header[0] : root?.header;
   const b = Array.isArray(root?.body) ? root.body[0] : root?.body;
@@ -237,6 +245,20 @@ async function enumerateCatalogue() {
       const r = await call("getItem", { pageNo: 1, numOfRows: 1000, itemNm: ch });
       calls += 1;
       const u = unpack(r.body);
+      // 한 쪽(1,000행)을 넘는 검색 문자는 다음 쪽도 받는다. 안 받으면 빠진 행의 음절이 탐색에 못 들어가는데
+      // complete는 true로 남는다.
+      const total = Number(u.totalCount ?? 0);
+      for (let page = 2; callOk(r.http, u.resultCode) && u.items.length < total && page <= 20; page += 1) {
+        const more = await call("getItem", { pageNo: page, numOfRows: 1000, itemNm: ch });
+        calls += 1;
+        const mu = unpack(more.body);
+        if (!callOk(more.http, mu.resultCode) || mu.items.length === 0) {
+          failures.push(`${ch} p${page}: http=${more.http} code=${mu.resultCode ?? "?"} ${mu.resultMsg ?? ""}`);
+          break;
+        }
+        u.items.push(...mu.items);
+        await sleep(REQUEST_DELAY_MS);
+      }
       if (!callOk(r.http, u.resultCode)) {
         // 실패한 음절은 다음 라운드에 다시 넣는다. 한도 초과(22)면 더 쳐 봐야 소용없으니 거기서 멈춘다.
         failures.push(`${ch}: http=${r.http} code=${u.resultCode ?? "?"} ${u.resultMsg ?? r.body?._error ?? ""}`);
@@ -250,9 +272,14 @@ async function enumerateCatalogue() {
         next.add(ch);
       }
       for (const it of u.items) {
-        if (!found.has(it.itemNm)) {
-          found.set(it.itemNm, it.dschgMthd);
-          for (const c of it.itemNm.toUpperCase()) if (SEARCHABLE.test(c) && !queried.has(c)) next.add(c);
+        const name = typeof it?.itemNm === "string" ? it.itemNm.trim() : "";
+        if (!name) {
+          failures.push(`${ch}: itemNm 없는 행 ${JSON.stringify(it).slice(0, 120)}`);
+          continue;
+        }
+        if (!found.has(name)) {
+          found.set(name, typeof it.dschgMthd === "string" ? it.dschgMthd : "");
+          for (const c of name.toUpperCase()) if (SEARCHABLE.test(c) && !queried.has(c)) next.add(c);
         }
       }
       // 중간 저장 — 도중에 죽어도 지금까지 모은 것은 남는다(complete=false로 표시된다).
