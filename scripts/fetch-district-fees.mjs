@@ -23,6 +23,8 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const OUTPUT_DIR = "data/district-fee-raw";
+/** 덤프 형식. `warnings`(표가 바뀌었다)와 `notes`(늘 나오는 제외)를 가른 판이 2다. */
+const DUMP_FORMAT = 2;
 const TIMEOUT_MS = 30_000;
 const REQUEST_DELAY_MS = 400;
 const USER_AGENT =
@@ -212,7 +214,18 @@ function parseRowspanTable(html) {
       cols: Math.max(1, Number(/colspan\s*=\s*["']?(\d+)/i.exec(cell[2])?.[1] ?? 1)),
       header: cell[1].toLowerCase() === "th" && !/rowspan/i.test(cell[2]),
     }));
-    if (cells.length === 0) continue;
+    if (cells.length === 0) {
+      // 셀이 하나도 없는 행도 격자에서는 한 행이다. 여백 `<tr></tr>`이나 `</td>`를
+      // 빠뜨린 조판에서 나온다. 그냥 넘기면 열린 묶음이 한 행 더 이어져 다음 묶음
+      // 머리부터 열이 통째로 밀리고, 이 경로에서는 경고도 안 뜬다. 광주 북구는 이미
+      // `</tr>`를 빠뜨린 표라 남 얘기가 아니다.
+      for (let column = 0; column < COLUMNS; column += 1) {
+        if (!carry[column]) continue;
+        carry[column].left -= 1;
+        if (carry[column].left <= 0) carry[column] = null;
+      }
+      continue;
+    }
     // 열 이름 줄. rowspan 없는 th만 골라내므로 `품목류` 묶음 머리(th + rowspan)는 안 걸린다.
     // 머리글은 여기서 빠지므로 아래 colspan 집계에도 안 잡힌다 — `<th colspan="5">`는
     // 표 제목일 뿐이고, 우리가 알고 싶은 건 데이터 영역에 낀 안내 행이다.
@@ -271,11 +284,23 @@ function parseRowspanTable(html) {
     }
 
     candidates += 1;
-    const fee = toKrw(line[3]);
+    // 규격과 금액을 한 칸에 몰아넣은 표가 있다 — 달서구 문갑은 규격 칸에 `원목`만 두고
+    // 금액 칸에 「100cm이상: 3,000」을 적는다. `toKrw`는 첫 숫자 뭉치를 읽으므로 그대로
+    // 두면 3,000원이 아니라 **100원**이 된다. 실제로 그 값이 데이터에 실려 있었다.
+    // 콜론 뒤가 금액이고 앞은 규격이라, 갈라서 규격 쪽에 이어 붙인다. 콜론이 없는
+    // 보통 행은 이 갈래를 타지 않는다.
+    let spec = line[2];
+    let feeCell = line[3];
+    const packed = /^(.*\S)\s*[:：]\s*([\d,]+)\s*$/.exec(feeCell);
+    if (packed) {
+      spec = [spec, packed[1].trim()].filter(Boolean).join(" ");
+      feeCell = packed[2];
+    }
+    const fee = toKrw(feeCell);
     const itemName = line[1];
     if (fee === null || !itemName) continue;
     // 규격 칸이 비면 품명만 있는 행이다. 그대로 둔다 — 임포터가 품명으로 규격을 채운다.
-    rows.push({ itemName, spec: line[2], feeKrw: fee });
+    rows.push({ itemName, spec, feeKrw: fee });
   }
 
   // 부분 누락을 잡는다. 0행일 때만 우는 가드로는 rowspan 복원이 어긋나 대부분이
@@ -488,6 +513,9 @@ async function main() {
       if (rows.length === 0) throw new Error("행을 하나도 못 뽑았다 (페이지 구조가 바뀌었을 수 있다)");
       const result = {
         regionId: target.regionId,
+        // 수집 형식. `warnings`/`notes`를 가른 뒤로 의미가 달라져, 임포터가 옛 덤프를
+        // 조용히 잘못 읽지 않도록 표시를 남긴다.
+        format: DUMP_FORMAT,
         name: target.name,
         kind: target.kind,
         url: target.url,

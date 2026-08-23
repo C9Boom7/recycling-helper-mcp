@@ -32,8 +32,12 @@ import {
 } from "./lib/bulky-item-match.js";
 
 type DistrictRow = { itemName: string; spec: string; feeKrw: number };
+/** `fetch-district-fees.mjs`의 `DUMP_FORMAT`과 같아야 한다. */
+const DUMP_FORMAT = 2;
+
 type DistrictDump = {
   regionId: string;
+  format?: number;
   name: string;
   kind: string;
   url: string;
@@ -113,6 +117,17 @@ for (const regionId of targets) {
   // stderr에만 찍고 넣는 쪽은 고르지 않았다. 로그는 다음 사람이 안 읽지만 데이터는 답변에
   // 나가고, 이 트랙이 막으려던 실패가 바로 "확신 있는 오답"이다. 상시 발생하는 정상
   // 제외는 수집 쪽에서 `notes`로 갈라 두어, 이 게이트가 멀쩡한 지역을 막지는 않는다.
+  // 형식 표시가 없으면 `warnings`/`notes`를 가르기 전에 받은 덤프다. 그때는 성동
+  // 무상수거 안내 같은 상시 제외가 `warnings`에 들어 있어, 아래 게이트가 멀쩡한 지역을
+  // 막는다. 조용히 건너뛰지 말고 다시 수집하라고 말한다.
+  if (dump.format !== DUMP_FORMAT) {
+    console.error(`${regionId}: 덤프가 옛 형식이다(format=${dump.format ?? "없음"}, 지금은 ${DUMP_FORMAT})`);
+    console.error(`  경고와 상시 제외를 가르기 전에 받은 것이라 그대로 읽으면 판정이 어긋난다.`);
+    console.error(`  다시 수집해라: node scripts/fetch-district-fees.mjs ${regionId}`);
+    failed.push(regionId);
+    continue;
+  }
+
   const warnings = dump.warnings ?? [];
   if (warnings.length > 0) {
     console.error(`${regionId}: 수집 경고 ${warnings.length}건 — 기존 행을 그대로 둔다`);

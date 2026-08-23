@@ -24173,7 +24173,7 @@
         "itemId": "spin_dryer",
         "category": "electronics_appliance",
         "itemName": "탈수기",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 3000
       },
       {
@@ -24194,42 +24194,42 @@
         "itemId": "gas_range",
         "category": "bulky_household",
         "itemName": "가스렌지",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 3000
       },
       {
         "itemId": "microwave",
         "category": "electronics",
         "itemName": "전자레인지",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 3000
       },
       {
         "itemId": "electric_fan",
         "category": "electronics_appliance",
         "itemName": "선풍기",
-        "spec": "일 반 용",
+        "spec": "일반용",
         "feeKrw": 3000
       },
       {
         "itemId": "electric_fan",
         "category": "electronics_appliance",
         "itemName": "선풍기",
-        "spec": "업 소 용",
+        "spec": "업소용",
         "feeKrw": 5000
       },
       {
         "itemId": "space_heater",
         "category": "electronics_appliance",
-        "itemName": "난 로",
-        "spec": "모 든 규 격",
+        "itemName": "난로",
+        "spec": "모든규격",
         "feeKrw": 4000
       },
       {
         "itemId": "copier",
         "category": "electronics_appliance",
         "itemName": "복사기",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 10000
       },
       {
@@ -24250,14 +24250,14 @@
         "itemId": "dishwasher",
         "category": "electronics_appliance",
         "itemName": "식기세척기",
-        "spec": "가 정 용",
+        "spec": "가정용",
         "feeKrw": 5000
       },
       {
         "itemId": "drawer_chest",
         "category": "bulky",
-        "itemName": "협 탁",
-        "spec": "모 든 규 격",
+        "itemName": "협탁",
+        "spec": "모든규격",
         "feeKrw": 4000
       },
       {
@@ -24291,14 +24291,14 @@
       {
         "itemId": "low_chest",
         "category": "furniture",
-        "itemName": "문 갑",
+        "itemName": "문갑",
         "spec": "4개 미만1세트(높이 1m 미만)",
         "feeKrw": 3000
       },
       {
         "itemId": "low_chest",
         "category": "furniture",
-        "itemName": "문 갑",
+        "itemName": "문갑",
         "spec": "4개 이상1세트(높이 1m 이상)",
         "feeKrw": 5000
       },
@@ -24354,70 +24354,70 @@
       {
         "itemId": "bookshelf",
         "category": "bulky",
-        "itemName": "책 장(책꽂이)",
+        "itemName": "책장(책꽂이)",
         "spec": "1.0×1.0m 내외",
         "feeKrw": 6000
       },
       {
         "itemId": "bookshelf",
         "category": "bulky",
-        "itemName": "책 장(책꽂이)",
+        "itemName": "책장(책꽂이)",
         "spec": "1.5×1.0m 내외",
         "feeKrw": 8000
       },
       {
         "itemId": "bookshelf",
         "category": "bulky",
-        "itemName": "책 장(책꽂이)",
+        "itemName": "책장(책꽂이)",
         "spec": "1.5×2.0m 내외",
         "feeKrw": 12000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "1인용 매트리스 틀",
         "feeKrw": 6000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "2인용 매트리스 틀(플라스틱 재질)",
         "feeKrw": 6000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "2인용 매트리스 틀",
         "feeKrw": 9000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "유아용 침대",
         "feeKrw": 10000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "1인용 침대(세트)",
         "feeKrw": 12000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "2인용 침대(세트)",
         "feeKrw": 17000
       },
       {
         "itemId": "bed_frame",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "어린이 2층 침대",
         "feeKrw": 20000
       },
@@ -24438,91 +24438,91 @@
       {
         "itemId": "mattress",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "1인용 매트리스",
         "feeKrw": 8000
       },
       {
         "itemId": "mattress",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "2인용 매트리스",
         "feeKrw": 11000
       },
       {
         "itemId": "mattress",
         "category": "bulky",
-        "itemName": "침 대",
+        "itemName": "침대",
         "spec": "2인용 2단 매트리스",
         "feeKrw": 15000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "밥 상",
+        "itemName": "밥상",
         "spec": "90cm×90cm 미만",
         "feeKrw": 2000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "식 탁(유리 제외)",
+        "itemName": "식탁(유리 제외)",
         "spec": "목재 6인용 미만",
         "feeKrw": 4000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "밥 상",
+        "itemName": "밥상",
         "spec": "90cm×90cm 이상",
         "feeKrw": 4000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "식 탁(유리 제외)",
+        "itemName": "식탁(유리 제외)",
         "spec": "목재 6인용 이상",
         "feeKrw": 6000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "식 탁(유리 제외)",
+        "itemName": "식탁(유리 제외)",
         "spec": "대리석 6인용 미만",
         "feeKrw": 10000
       },
       {
         "itemId": "dining_table",
         "category": "bulky",
-        "itemName": "식 탁(유리 제외)",
+        "itemName": "식탁(유리 제외)",
         "spec": "대리석 6인용 이상",
         "feeKrw": 15000
       },
       {
         "itemId": "rice_container",
         "category": "bulky_household",
-        "itemName": "쌀 통",
-        "spec": "일 반",
+        "itemName": "쌀통",
+        "spec": "일반",
         "feeKrw": 3000
       },
       {
         "itemId": "rice_container",
         "category": "bulky_household",
-        "itemName": "쌀 통",
+        "itemName": "쌀통",
         "spec": "다용도",
         "feeKrw": 5000
       },
       {
         "itemId": "chair",
         "category": "bulky",
-        "itemName": "의 자",
+        "itemName": "의자",
         "spec": "고정식 의자",
         "feeKrw": 2000
       },
       {
         "itemId": "chair",
         "category": "bulky",
-        "itemName": "의 자",
+        "itemName": "의자",
         "spec": "회전식 의자",
         "feeKrw": 3000
       },
@@ -24530,7 +24530,7 @@
         "itemId": "piano",
         "category": "bulky_household",
         "itemName": "피아노",
-        "spec": "올 겐",
+        "spec": "올겐",
         "feeKrw": 10000
       },
       {
@@ -24544,7 +24544,7 @@
         "itemId": "piano",
         "category": "bulky_household",
         "itemName": "피아노",
-        "spec": "그 랜 드",
+        "spec": "그랜드",
         "feeKrw": 25000
       },
       {
@@ -24565,28 +24565,28 @@
         "itemId": "sewing_machine",
         "category": "electronics_appliance",
         "itemName": "재봉틀",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 4000
       },
       {
         "itemId": "drying_rack",
         "category": "household_bulky_mixed",
         "itemName": "건조대",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 2000
       },
       {
         "itemId": "wheelchair",
         "category": "bulky_household",
         "itemName": "휠체어",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 2000
       },
       {
         "itemId": "lighting_fixture",
         "category": "electronics_appliance",
         "itemName": "조명기구",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 2000
       },
       {
@@ -24606,14 +24606,14 @@
       {
         "itemId": "door_panel",
         "category": "bulky",
-        "itemName": "문 짝",
+        "itemName": "문짝",
         "spec": "소(창문)",
         "feeKrw": 3000
       },
       {
         "itemId": "door_panel",
         "category": "bulky",
-        "itemName": "문 짝",
+        "itemName": "문짝",
         "spec": "대(방문)",
         "feeKrw": 5000
       },
@@ -24677,7 +24677,7 @@
         "itemId": "stroller",
         "category": "bulky",
         "itemName": "유모차",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 2000
       },
       {
@@ -24698,34 +24698,34 @@
         "itemId": "washbasin",
         "category": "bathroom_fixture",
         "itemName": "세면대",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 4000
       },
       {
         "itemId": "bathtub",
         "category": "bathroom_fixture",
-        "itemName": "욕 조",
-        "spec": "유 아",
+        "itemName": "욕조",
+        "spec": "유아",
         "feeKrw": 4000
       },
       {
         "itemId": "bathtub",
         "category": "bathroom_fixture",
-        "itemName": "욕 조",
-        "spec": "일 반",
+        "itemName": "욕조",
+        "spec": "일반",
         "feeKrw": 8000
       },
       {
         "itemId": "toilet_bowl",
         "category": "bathroom_fixture",
-        "itemName": "변 기",
-        "spec": "모 든 규 격",
+        "itemName": "변기",
+        "spec": "모든규격",
         "feeKrw": 5000
       },
       {
         "itemId": "vinyl_flooring",
         "category": "pvc_flooring",
-        "itemName": "장 판",
+        "itemName": "장판",
         "spec": "1평당(3.3㎡)",
         "feeKrw": 2000
       },
@@ -24753,14 +24753,14 @@
       {
         "itemId": "flower_pot",
         "category": "container_by_material",
-        "itemName": "화 분(흙, 돌 제외)",
+        "itemName": "화분(흙, 돌 제외)",
         "spec": "높이 70cm 미만",
         "feeKrw": 2000
       },
       {
         "itemId": "flower_pot",
         "category": "container_by_material",
-        "itemName": "화 분(흙, 돌 제외)",
+        "itemName": "화분(흙, 돌 제외)",
         "spec": "높이 70cm 이상",
         "feeKrw": 4000
       },
@@ -24768,7 +24768,7 @@
         "itemId": "partition",
         "category": "furniture",
         "itemName": "파티션",
-        "spec": "모 든 규 격",
+        "spec": "모든규격",
         "feeKrw": 3000
       },
       {
@@ -24795,21 +24795,21 @@
       {
         "itemId": "signboard",
         "category": "bulky_household",
-        "itemName": "간 판",
+        "itemName": "간판",
         "spec": "입간판",
         "feeKrw": 3000
       },
       {
         "itemId": "signboard",
         "category": "bulky_household",
-        "itemName": "간 판",
+        "itemName": "간판",
         "spec": "60×180cm 미만",
         "feeKrw": 5000
       },
       {
         "itemId": "signboard",
         "category": "bulky_household",
-        "itemName": "간 판",
+        "itemName": "간판",
         "spec": "60×180cm 이상",
         "feeKrw": 8000
       },
@@ -25136,15 +25136,29 @@
         "itemId": "low_chest",
         "category": "furniture",
         "itemName": "문갑",
-        "spec": "원목",
-        "feeKrw": 100
+        "spec": "원목 100cm미만",
+        "feeKrw": 2000
       },
       {
         "itemId": "low_chest",
         "category": "furniture",
         "itemName": "문갑",
-        "spec": "대리석",
-        "feeKrw": 100
+        "spec": "원목 100cm이상",
+        "feeKrw": 3000
+      },
+      {
+        "itemId": "low_chest",
+        "category": "furniture",
+        "itemName": "문갑",
+        "spec": "대리석 100cm미만",
+        "feeKrw": 6000
+      },
+      {
+        "itemId": "low_chest",
+        "category": "furniture",
+        "itemName": "문갑",
+        "spec": "대리석 100cm이상",
+        "feeKrw": 8000
       },
       {
         "itemId": "drawer_chest",

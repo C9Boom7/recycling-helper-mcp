@@ -167,8 +167,29 @@ export const SPLIT_HINTS: Array<{ from: string; hint: RegExp; to: string; deny?:
  * 「(장식장, 문갑 등)」이 `문갑 등)`으로 들어온다. 답변에 그대로 찍히는 문자열이라
  * 짝 없는 괄호만 떼어낸다. 안쪽 글자는 건드리지 않는다.
  */
+/**
+ * 자간을 벌리려고 글자마다 띄어 쓴 라벨을 붙인다. 광주 북구는 「모 든 규 격」·「침 대」·
+ * 「화 분(흙, 돌 제외)」로 적는데, 답변에 그대로 찍히는 문자열이라 다른 지역의
+ * 「모든 규격」과 나란히 놓이면 눈에 띈다.
+ *
+ * 판정은 좁게 둔다. **괄호 앞부분의 토막이 전부 한 글자일 때만** 붙인다.
+ * 「흙, 사기, (깨진)유리」·「싱크대 및 싱크 찬장」·「2인용 매트리스 틀」처럼 진짜 낱말
+ * 사이 공백은 토막이 한 글자가 아니라 걸리지 않는다. 괄호를 떼고 보는 이유는 자간
+ * 벌리기가 「화 분(흙, 돌 제외)」처럼 앞 낱말에만 걸리기 때문이다.
+ */
+function joinLetterSpacing(text: string): string {
+  const parts = /^([^(（]*?)(\s*[(（].*)?$/.exec(text);
+  if (!parts) return text;
+  const head = parts[1] ?? "";
+  const tail = parts[2] ?? "";
+  const tokens = head.split(" ").filter(Boolean);
+  if (tokens.length < 2 || tokens.some((token) => [...token].length !== 1)) return text;
+  return tokens.join("") + tail;
+}
+
 export function cleanLabel(text: string): string {
   let out = text.replace(/\s+/g, " ").trim();
+  out = joinLetterSpacing(out);
   // 같은 품명을 여러 줄에 적을 때 뒤에 마침표를 붙여 구분하는 표가 있다 — 서대문
   // 「냉장고.」·「선풍기..」·「오디오..」. 답변에 그대로 찍히므로 떼어낸다. 품명 안쪽
   // 마침표(`1.5L` 같은)는 건드리지 않도록 끝에 붙은 것만 본다.
