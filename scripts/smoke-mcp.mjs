@@ -3,6 +3,7 @@ import { once } from "node:events";
 import { readFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { createServer } from "node:net";
+import { measureResult } from "./measure-response-size.mjs";
 
 const HOST = "127.0.0.1";
 const PLAYMCP_ENDPOINT_HOSTS = [
@@ -114,6 +115,7 @@ const regionPoliciesPath = new URL("../dist/data/region-policies.json", import.m
 const answerCases = JSON.parse(readFileSync(answerCasesPath, "utf8"));
 const wasteItems = JSON.parse(readFileSync(wasteItemsPath, "utf8"));
 const regionPolicies = JSON.parse(readFileSync(regionPoliciesPath, "utf8"));
+const bulkyFeeSchedules = JSON.parse(readFileSync(new URL("../dist/data/bulky-waste-fees.json", import.meta.url), "utf8"));
 
 function assert(condition, message) {
   if (!condition) {
@@ -143,6 +145,63 @@ const NATIONAL_DAY_FALLBACK_URL = "region.do";
 // 얻고도 basis 어휘가 선택 정규식에 안 걸려 전국 안내로 남았고, 응답은 멀쩡해 보였다.
 // 지역이 늘거나 요일 출처를 더 채우면 이 숫자도 같이 올린다.
 const REGIONS_WITH_OWN_DAY_PAGE = 31;
+
+// PRD phase-10 R4: 지역 품목 응답의 크기 상한. 노원구 매트리스를 대표로 본다 — 수수료 행이
+// 상한(12행)까지 찬 품목이라 지역 품목 응답 가운데 가장 크다. 값은 `pnpm measure:size`가
+// 찍은 실측(텍스트 4,951B · 위젯 3,663B, 2026-08-23)에 10% 여유를 둔 것이다.
+// **넘으면 실패가 아니라 경고다.** 데이터 확장으로 수수료 행이 늘면 정당하게 넘을 수 있어서다.
+// 두 사이클 뒤 안정되면 실패로 올린다 — 그때 `console.warn`을 `assert`로 바꾼다.
+const RESPONSE_SIZE_WARN_BYTES = { text: 5_450, widget: 4_050 };
+const SIZE_CASE = { itemName: "매트리스", region: "서울 노원구" };
+
+function warnIfOversized(result, mode) {
+  const { total } = measureResult(result, { widgets: mode === "widget" });
+  const limit = RESPONSE_SIZE_WARN_BYTES[mode];
+  if (total > limit) {
+    console.warn(
+      `[size] get_disposal_steps ${JSON.stringify(SIZE_CASE)} ${mode} 모드 응답이 ${total}B — 경고 상한 ${limit}B를 넘었다. ` +
+        "수수료 행이 늘어 정당하게 커진 것인지 pnpm measure:size로 확인하고, 아니면 지역 블록에 중복이 다시 생긴 것이다.",
+    );
+  }
+  return total;
+}
+
+// PRD phase-10 R1-a: 지역 블록(`### 지역 확인 필요`) 안에서 신청·수수료 주소가 두 줄에 찍히면
+// 안 된다. 수수료 고시의 주소와 지역 연락처의 주소가 같으면(26곳 전부 그렇다) 한 번만 나간다.
+// 단, **한 번은 나가야 한다** — 줄이다가 링크를 없애는 회귀가 더 나쁘다. 판정 범위를 블록으로
+// 좁히는 건 `### {지역} 공식 출처`가 같은 주소를 출처 항목으로 한 번 더 들 수 있어서다 — 그건
+// basis 문장이 붙은 출처지 안내의 반복이 아니다.
+function countOccurrences(text, needle) {
+  return text.split(needle).length - 1;
+}
+
+function regionSection(answerText) {
+  const start = answerText.indexOf("### 지역 확인 필요");
+  assert(start >= 0, "응답에 `### 지역 확인 필요` 블록이 없다");
+  const end = answerText.indexOf("\n### ", start + 1);
+  return end >= 0 ? answerText.slice(start, end) : answerText.slice(start);
+}
+
+function assertUrlShownOnce(answerText, url, context) {
+  const count = countOccurrences(regionSection(answerText), url);
+  assert(count >= 1, `${context}: ${url} 가 지역 블록에 없다 — 중복을 지우다가 링크를 없앴다`);
+  assert(count === 1, `${context}: ${url} 가 지역 블록에 ${count}번 나간다 — 지역 블록의 자기 중복이 되살아났다`);
+}
+
+// 같은 불변식을 structuredContent.regionNotes에 건다. 두 렌더링 모드가 같은 배열을 실으므로
+// 여기서 한 번만 보면 위젯 모드도 같이 닫힌다. 요일 확인처처럼 문장 안에 든 주소도 세므로,
+// 주소 하나가 두 줄에 걸리면 어느 쪽이든 걸린다.
+function assertRegionNotesUrlsUnique(notes, context) {
+  const seen = new Map();
+  for (const line of notes ?? []) {
+    for (const url of line.match(/https?:\/\/[^\s)]+/g) ?? []) {
+      if (seen.has(url)) {
+        throw new Error(`${context}: regionNotes에 같은 주소가 두 줄에 있다 — "${seen.get(url)}" / "${line}"`);
+      }
+      seen.set(url, line);
+    }
+  }
+}
 
 async function getFreePort() {
   const server = createServer();
@@ -590,6 +649,7 @@ async function runAnswerCase(baseUrl, testCase, id) {
 
   assertStructuredKeys(result, testCase);
   assertRegionNotesExpectation(result, testCase);
+  assertRegionNotesUrlsUnique(result.structuredContent?.regionNotes, testCase.id);
 
   return result;
 }
@@ -787,6 +847,64 @@ async function runSmoke() {
     for (const answerCase of answerCases) {
       await runAnswerCase(baseUrl, answerCase, requestId);
       requestId += 1;
+    }
+
+    // PRD phase-10 — 지역 안내 중복 제거. 지역 품목 응답에서 같은 정보가 두 번 실리는 자리를
+    // 걷어냈고, 그 자리마다 "정보는 남아 있다"를 여기서 함께 잡는다.
+    {
+      const nowon = regionPolicies.find((policy) => policy.name === SIZE_CASE.region);
+      assert(nowon?.bulkyWaste?.applicationUrl && nowon?.bulkyWaste?.feeUrl, "size case needs 노원구 bulkyWaste URLs");
+      const sizeResult = await callTool(baseUrl, "get_disposal_steps", SIZE_CASE, requestId++);
+      const sizeText = resultText(sizeResult);
+      warnIfOversized(sizeResult, "text");
+
+      // R1-a: 연락처 블록이 찍은 주소를 수수료 블록이 다시 적지 않는다. 각각 정확히 한 번.
+      assertUrlShownOnce(sizeText, nowon.bulkyWaste.applicationUrl, "노원구 매트리스 text");
+      assertUrlShownOnce(sizeText, nowon.bulkyWaste.feeUrl, "노원구 매트리스 text");
+      assert(!sizeText.includes("- 신청 URL:") && !sizeText.includes("- 수수료 출처:"), "노원구 매트리스: 수수료 블록 끝의 옛 URL 줄이 되살아났다");
+
+      // R1-b: 수수료 행은 고시명 하나에 규격을 잇는다. 고시명이 행마다 반복되면 안 된다.
+      const feeRowLines = sizeText.split("\n").filter((line) => line.startsWith("  - (침대)매트리스"));
+      const distinctNames = new Set(feeRowLines.map((line) => line.slice(0, line.indexOf(":"))));
+      assert(feeRowLines.length > 0, "노원구 매트리스: 수수료 행이 없다");
+      assert(
+        feeRowLines.length === distinctNames.size,
+        `노원구 매트리스: 같은 고시명이 여러 줄에 흩어져 있다 — 고시명 묶기가 풀렸다:\n${feeRowLines.join("\n")}`,
+      );
+      // 잘린 사실은 규격 수가 아니라 행 수로 말한다(PR #66 리뷰 2라운드).
+      if (bulkyFeeSchedules.find((schedule) => schedule.regionId === nowon.id)?.preCapFeeRowCountByItemId?.mattress) {
+        assert(/수수료표 \d+행 중 대표 \d+행만 추렸습니다\. 전체 표는 수수료 조회 링크에서 확인하세요\./.test(sizeText), "노원구 매트리스: 잘린 행 안내가 행 단위가 아니거나 가리키는 링크 이름이 어긋난다");
+        assert(!/개 규격 중 대표/.test(sizeText), "노원구 매트리스: 잘린 행 안내가 '규격'으로 되돌아갔다");
+      }
+
+      // R2-b: 지역 안내가 수수료표와 신청 경로를 냈으니 그 항목은 다시 묻지 않는다. 답하지 않은
+      // 항목(배출 장소와 배출일)은 남는다.
+      assert(!sizeText.includes("- 확인 항목: 품목별 수수료"), "노원구 매트리스: 수수료표를 내고도 '품목별 수수료'를 다시 묻는다");
+      assert(!sizeText.includes("- 확인 항목: 신고필증 부착 방식"), "노원구 매트리스: 부착 안내를 내고도 '신고필증 부착 방식'을 다시 묻는다");
+      assert(sizeText.includes("- 확인 항목: 배출 장소와 배출일"), "노원구 매트리스: 지역 안내가 답하지 않은 확인 항목까지 사라졌다");
+
+      // R2-a: 지역 공식 출처는 품목 갈래에 맞는 것만. 대형폐기물 품목에 폐건전지 출처가 붙지 않고,
+      // 수수료표를 실었으니 그 표의 출처(수수료 고시)가 선다.
+      const sizeSources = sizeText.slice(sizeText.indexOf(`### ${SIZE_CASE.region} 공식 출처`));
+      assert(sizeSources.includes("전국대형폐기물수거수수료정보표준데이터"), "노원구 매트리스: 수수료표의 출처가 공식 출처에 없다");
+      assert(!sizeSources.includes("폐형광등·폐건전지 배출안내"), "노원구 매트리스: 품목과 무관한 수거함 출처가 공식 출처에 붙는다");
+
+      // R2-b 반대편: 광역 착지는 신청 경로를 준 게 아니라 '수수료'·'신고 방법' 항목을 남긴다.
+      const metroText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "소파", region: "청주시" }, requestId++));
+      assert(metroText.includes("- 확인 항목: 수수료"), "청주시 소파: 광역 착지인데 수수료 확인 항목이 빠졌다 — 답하지 않은 항목을 지웠다");
+
+      // R2-a 반대편: 수거함 품목에는 그 수거함 출처가 남는다.
+      const batteryText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "건전지", region: "서울 마포구" }, requestId++));
+      const batterySources = batteryText.slice(batteryText.indexOf("### 서울 마포구 공식 출처"));
+      assert(batterySources.includes("폐형광등·폐건전지 수거함 배치 현황"), "마포구 건전지: 수거함 출처가 공식 출처에서 빠졌다");
+      assert(!batterySources.includes("투명페트병 무인회수기"), "마포구 건전지: 품목과 무관한 출처가 공식 출처에 붙는다");
+
+      // 품목별 지역 안내가 있는 지역(마포)은 연락처 블록을 안 거치므로 수수료 블록이 유일한
+      // 링크 자리다 — 거기서는 두 주소가 그대로 한 번씩 나가야 한다.
+      const mapo = regionPolicies.find((policy) => policy.name === "서울 마포구");
+      const mapoText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "의자", region: "서울 마포구" }, requestId++));
+      assertUrlShownOnce(mapoText, mapo.bulkyWaste.applicationUrl, "마포구 의자 text");
+      assertUrlShownOnce(mapoText, mapo.bulkyWaste.feeUrl, "마포구 의자 text");
     }
 
     const classify = await callTool(baseUrl, "classify_waste_item", { itemName: "일회용 마스크" }, requestId);
@@ -1744,6 +1862,19 @@ async function runWidgetSmoke() {
     const regionalCard = JSON.stringify(parseWidgetPayload(regional, "regional match").widget);
     assert(regionalCard.includes("서울 강남구 기준"), "regional card is missing the matched region name");
     assert(!regionalCard.includes("거주 지역 기준 확인 필요"), "regional card should not ask for a region the user already gave");
+
+    // PRD phase-10 R4: 위젯 모드 크기 상한(경고). 카드의 수수료 줄은 잘린 행을 규격이 아니라
+    // 행으로 말해야 한다 — 텍스트 답변이 "대표 12행만"이라고 밝히는데 카드만 12종이 전부인
+    // 척하면 안 된다.
+    const sizeWidgetResult = await callTool(baseUrl, "get_disposal_steps", SIZE_CASE, requestId);
+    requestId += 1;
+    warnIfOversized(sizeWidgetResult, "widget");
+    const sizeFeeLine = cardTextValues(parseWidgetPayload(sizeWidgetResult, "노원구 매트리스 card").widget).find((value) => value.startsWith("수수료 "));
+    assert(sizeFeeLine, "노원구 매트리스 card is missing its fee line");
+    if (bulkyWasteFeeSchedules.find((schedule) => schedule.regionId === "nowon_gu")?.preCapFeeRowCountByItemId?.mattress) {
+      assert(/수수료표 \d+행 중 대표 \d+행/.test(sizeFeeLine), `노원구 매트리스 card: 잘린 행 안내가 행 단위가 아니다: ${sizeFeeLine}`);
+    }
+    assertRegionNotesUrlsUnique(sizeWidgetResult.structuredContent?.regionNotes, "노원구 매트리스 widget");
 
     const regionless = await callTool(baseUrl, "get_disposal_steps", { itemName: "책상의자" }, requestId);
     requestId += 1;

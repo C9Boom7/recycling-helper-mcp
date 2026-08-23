@@ -1607,13 +1607,101 @@ export function formatSourceList(item: WasteItem): string[] {
   return item.sourceRefs.map((source) => `- ${source}`);
 }
 
+function formatRegionSourceLine(source: WasteSource): string {
+  const url = source.url ? ` (${source.url})` : "";
+  const checkedAt = source.checkedAt ? `, 확인일: ${source.checkedAt}` : "";
+  const basis = source.basis ? ` - ${source.basis}` : "";
+  return `- ${source.title}${url}${checkedAt}${basis}`;
+}
+
 export function formatRegionSourceList(region: RegionalPolicyData): string[] {
-  return region.sources.map((source) => {
-    const url = source.url ? ` (${source.url})` : "";
-    const checkedAt = source.checkedAt ? `, 확인일: ${source.checkedAt}` : "";
-    const basis = source.basis ? ` - ${source.basis}` : "";
-    return `- ${source.title}${url}${checkedAt}${basis}`;
+  return region.sources.map(formatRegionSourceLine);
+}
+
+/**
+ * 배출 그룹 라벨에 든 갈래 이름 → 그 갈래를 다루는 지역 출처를 고르는 어휘. 제목과 basis에서
+ * 찾는다. 라벨은 `disposal-groups.json`의 명시 매핑이고 "일반쓰레기/대형폐기물"처럼 `/`로
+ * 잇는데, "특수/유해폐기물"은 이름 자체에 `/`가 있어 조각으로 가르지 않고 부분 문자열로 본다.
+ * 여기 없는 라벨("지역 확인 필요")은 아무 출처도 고르지 않고 아래 대표 출처 폴백으로 떨어진다.
+ */
+const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> = [
+  // "대형가전"(소형폐가전 무상수거 안내의 basis)에 걸리지 않게 폐기물까지 본다.
+  ["대형폐기물", /대형(생활)?폐기물/],
+  ["공사장폐기물", /공사장|건축/],
+  ["소형가전", /소형가전|소형 가전|전기전자|폐가전|가전/],
+  ["무상방문수거", /방문수거|폐가전|가전/],
+  // "수거함"만 보면 의류수거함·재활용품 분리수거함까지 걸린다. 품목 종류 낱말로 잡는다.
+  ["유해폐기물", /유해|형광등|건전지|전지|의약품|식용유|수은|체온계/],
+  ["전용수거함", /유해|형광등|건전지|전지|의약품|식용유|수은|체온계/],
+  ["재사용수거", /의류|헌옷|옷/],
+  ["불연성", /불연성|마대|특수규격|PP|타지 않는/],
+  ["음식물쓰레기", /음식물/],
+  ["재활용", /재활용|분리배출|분리수거/],
+  // "쓰레기 배출"만 보면 음식물쓰레기 배출요일 페이지까지 걸린다. 일반쓰레기를 다루는
+  // 페이지는 제목이 "쓰레기배출안내"류라 그 모양과 낱말 자체로만 잡는다.
+  ["일반쓰레기", /일반쓰레기|생활쓰레기|쓰레기 ?배출 ?안내/],
+];
+
+/**
+ * 품목에 맞는 지역 출처만 고른다 — `get_disposal_steps` 텍스트의 `### {지역} 공식 출처`용.
+ *
+ * 지역 출처 전부를 싣던 때는 노원구 매트리스에 폐의약품·폐건전지·재활용품 출처가 따라붙고
+ * 마포구 의자에 의류수거함·무인회수기 출처까지 1.3KB가 붙었다(PRD phase-10 R2-a). 품목의
+ * 배출 그룹 라벨로 거른다. 라벨 조각마다 위 어휘로 제목·basis를 보고, 대형폐기물 갈래는
+ * 지역 연락처 주소와 같은 출처도 함께 잡는다. 수수료를 실제로 실은 품목이면 그 표의 출처
+ * (수수료 고시)도 더한다 — 표가 어디서 왔는지는 표를 보여준 응답에만 필요하다.
+ *
+ * 거른 결과가 비면 지역 대표 출처 1개만 남긴다. 빈 섹션을 만들지 않되, 품목과 무관한
+ * 출처를 늘어놓지도 않는다. basis 문장은 출처마다 그대로 둔다 — 링크만 남기면 "왜 이
+ * 출처인가"가 사라져 되묻기를 부른다.
+ */
+export function formatRegionSourceListForItem(region: RegionalPolicyData, item: WasteItem): string[] {
+  const label = disposalGroupLabel(item.disposalType);
+  const patterns = REGION_SOURCE_TOPIC_PATTERNS.filter(([labelPart]) => label.includes(labelPart)).map(([, pattern]) => pattern);
+  const bulkyUrls = new Set(itemHasBulkyRoute(item) ? regionBulkyContactUrls(region) : []);
+
+  const matched = region.sources.filter((source) => {
+    if (source.url && bulkyUrls.has(source.url)) return true;
+    const haystack = `${source.title} ${source.basis ?? ""}`;
+    return patterns.some((pattern) => pattern.test(haystack));
   });
+
+  const feeSource = findBulkyWasteFees(region, item).length > 0 ? findBulkyWasteFeeSchedule(region)?.source : undefined;
+  const sources = feeSource && !matched.some((source) => source.url === feeSource.url) ? [...matched, feeSource] : matched;
+
+  return (sources.length > 0 ? sources : region.sources.slice(0, 1)).map(formatRegionSourceLine);
+}
+
+/**
+ * 지역 안내가 이미 답한 확인 항목인지 — `get_disposal_steps` 텍스트의 `- 확인 항목:` 줄을
+ * 거르는 판정(PRD phase-10 R2-b).
+ *
+ * `checkItems`는 지역을 모를 때 사용자가 직접 확인할 것을 적은 목록이라, 바로 위에서
+ * 지역 안내가 수수료표와 신청 경로를 냈는데도 "품목별 수수료"·"신고필증 부착 방식"을
+ * 다시 묻고 있었다. 항목이 말하는 주제를 전부 지역 안내 줄에서 찾을 수 있을 때만 뺀다 —
+ * "대형폐기물 신고 방법과 수수료"처럼 주제가 둘이면 둘 다 답해야 빠진다. 요일이 든
+ * 항목은 건드리지 않는다. `withCollectionDaySource`가 거기에 확인처를 붙이는 자리다.
+ *
+ * 주제 판정은 지역 안내 줄의 어휘로 한다. 어떤 갈래가 답했는지를 데이터 플래그로 세면
+ * 품목별 지역 안내(`itemGuides`)처럼 문장이 자유로운 갈래에서 어긋난다 — 실제로 적힌
+ * 줄이 그 말을 하는지가 "답했다"의 뜻에 가장 가깝다.
+ *
+ * - 수수료: 수수료표가 나갔거나 수수료 조회 주소가 적혔을 때.
+ * - 신고·신청 경로: 인터넷 신청 주소가 적혔거나, 홈페이지·주민센터 신고를 안내했을 때.
+ *   광역 착지("신청 경로와 수수료는 ○○시 공식 안내에서")는 경로를 준 게 아니라 남는다.
+ * - 부착: 접수증·접수번호·신고필증 부착 여부를 말했을 때(안 붙인다는 안내도 답이다).
+ */
+const CHECK_ITEM_TOPICS: Array<[topic: RegExp, answeredBy: RegExp]> = [
+  [/수수료/, /수수료 후보:|수수료 조회/],
+  [/신고 (방법|절차|대상|여부|기준)/, /인터넷 신청|홈페이지|주민센터/],
+  [/신고필증|부착/, /부착|붙이지 않/],
+];
+
+export function isCheckItemAnsweredByRegionGuide(checkItem: string, regionGuideLines: readonly string[]): boolean {
+  if (mentionsCollectionDay(checkItem)) return false;
+  const topics = CHECK_ITEM_TOPICS.filter(([topic]) => topic.test(checkItem));
+  if (topics.length === 0) return false;
+  return topics.every(([, answeredBy]) => regionGuideLines.some((line) => answeredBy.test(line)));
 }
 
 export function findRegionItemGuide(region: RegionalPolicyData, item: WasteItem): RegionItemGuide | undefined {
@@ -1775,21 +1863,39 @@ export function formatRegionBulkyContactLines(region: RegionalPolicyData): strin
   const { bulkyWaste } = region;
   if (!bulkyWaste) return [];
 
-  // 구청에 자체 신청 화면이 없어 안내 페이지 한 곳이 신청 경로와 품목별
-  // 수수료표를 함께 싣는 지역이 있다(부산 부산진구). 두 값을 그대로 찍으면
-  // 똑같은 주소가 두 줄로 나가 사용자에게는 링크가 잘못 붙은 것처럼 보인다.
-  // 값이 같을 때만 한 줄로 합친다 — 주소가 다른 지역은 지금처럼 갈라 둔다.
-  const sharedContactUrl =
-    bulkyWaste.applicationUrl && bulkyWaste.applicationUrl === bulkyWaste.feeUrl
-      ? bulkyWaste.applicationUrl
-      : undefined;
-
   return [
-    bulkyWaste.phone ? `- 문의/신청 안내 전화: ${bulkyWaste.phone}` : undefined,
-    sharedContactUrl ? `- 인터넷 신청·수수료 조회: ${sharedContactUrl}` : undefined,
-    !sharedContactUrl && bulkyWaste.applicationUrl ? `- 인터넷 신청: ${bulkyWaste.applicationUrl}` : undefined,
-    !sharedContactUrl && bulkyWaste.feeUrl ? `- 수수료 조회: ${bulkyWaste.feeUrl}` : undefined,
-  ].filter((line): line is string => line !== undefined);
+    ...(bulkyWaste.phone ? [`- 문의/신청 안내 전화: ${bulkyWaste.phone}`] : []),
+    ...formatBulkyUrlLines(bulkyWaste.applicationUrl, bulkyWaste.feeUrl),
+  ];
+}
+
+/**
+ * 대형폐기물 신청·수수료 주소 줄. 지역 연락처 블록과 수수료 블록이 같은 모양으로
+ * 찍어야 한 응답 안에서 "같은 줄이 이미 나갔는지"를 문자열 비교로 판단할 수 있다.
+ *
+ * 구청에 자체 신청 화면이 없어 안내 페이지 한 곳이 신청 경로와 품목별
+ * 수수료표를 함께 싣는 지역이 있다(부산 부산진구). 두 값을 그대로 찍으면
+ * 똑같은 주소가 두 줄로 나가 사용자에게는 링크가 잘못 붙은 것처럼 보인다.
+ * 값이 같을 때만 한 줄로 합친다 — 주소가 다른 지역은 지금처럼 갈라 둔다.
+ *
+ * `shownUrls`에 든 주소는 호출부가 같은 응답 안에서 이미 찍었다는 뜻이라 뺀다
+ * (PRD phase-10 R1-a). 값이 같을 때만 빠지므로, 수수료 고시의 주소와 지역
+ * 연락처의 주소가 다른 지역이 들어와도 링크가 사라지지 않는다.
+ */
+export function formatBulkyUrlLines(applicationUrl?: string, feeUrl?: string, shownUrls: readonly string[] = []): string[] {
+  const application = applicationUrl && !shownUrls.includes(applicationUrl) ? applicationUrl : undefined;
+  const fee = feeUrl && !shownUrls.includes(feeUrl) ? feeUrl : undefined;
+  if (application && application === fee) return [`- 인터넷 신청·수수료 조회: ${application}`];
+  return [
+    ...(application ? [`- 인터넷 신청: ${application}`] : []),
+    ...(fee ? [`- 수수료 조회: ${fee}`] : []),
+  ];
+}
+
+/** 지역 연락처 블록(`formatRegionBulkyContactLines`)이 찍는 주소들. 수수료 블록의 중복 판단에 쓴다. */
+export function regionBulkyContactUrls(region: RegionalPolicyData): string[] {
+  if (region.coverageTier === "metro") return [];
+  return [region.bulkyWaste?.applicationUrl, region.bulkyWaste?.feeUrl].filter((url): url is string => !!url);
 }
 
 export function findBulkyWasteFeeSchedule(region: RegionalPolicyData): BulkyWasteFeeSchedule | undefined {
@@ -1835,7 +1941,22 @@ function formatKrw(value: number): string {
   return `${value.toLocaleString("ko-KR")}원`;
 }
 
-export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicyData): string[] {
+export type BulkyWasteFeeLineOptions = {
+  /**
+   * 호출부가 같은 블록 앞쪽에서 이미 찍은 신청·수수료 주소. 여기 든 주소와 값이 같은
+   * 줄은 뒤에 다시 적지 않는다 — 수수료 고시 26곳 전부 `region.bulkyWaste`와 주소가
+   * 같아서(2026-08-23 확인) 안 거르면 모든 수수료 응답에 같은 주소 두 개가 두 번씩
+   * 나갔다(PRD phase-10 R1-a). 호출부가 주소를 안 찍었으면(품목별 지역 안내가 있는
+   * 지역) 비워 두고, 그때는 지금처럼 둘 다 적는다 — 이 블록이 유일한 링크 자리다.
+   */
+  shownUrls?: readonly string[];
+};
+
+export function formatBulkyWasteFeeLines(
+  item: WasteItem,
+  region: RegionalPolicyData,
+  { shownUrls = [] }: BulkyWasteFeeLineOptions = {},
+): string[] {
   const schedule = findBulkyWasteFeeSchedule(region);
   if (!schedule) return [];
 
@@ -1844,17 +1965,43 @@ export function formatBulkyWasteFeeLines(item: WasteItem, region: RegionalPolicy
 
   // "전체 N개"라고 쓰면 안 된다. N은 임포터가 품목 확정·중복 제거·충돌 제거를 마치고
   // 남긴 행 수지 고시에 실린 규격 수가 아니다(제외 기준은 source.note에 적혀 있다).
+  // 그래서 "규격 N종"이 아니라 행으로 말한다 — 노원 매트리스 21행은 고시명 3종 ×
+  // 규격 ~7종이라 규격 21종이 아니다.
   const rowTotal = findBulkyWasteFeeRowTotal(region, item);
 
   return [
     `- ${region.name} 대형생활폐기물 수수료 후보:`,
     ...(rowTotal
-      ? [`  - 확인된 ${rowTotal}개 규격 중 대표 ${fees.length}개만 추렸습니다. 전체 표는 수수료 출처에서 확인하세요.`]
+      ? [`  - 수수료표 ${rowTotal}행 중 대표 ${fees.length}행만 추렸습니다. 전체 표는 수수료 조회 링크에서 확인하세요.`]
       : []),
-    ...fees.map((fee) => `  - ${fee.itemName} ${fee.spec}: ${formatKrw(fee.feeKrw)}`),
-    `- 신청 URL: ${schedule.applicationUrl}`,
-    `- 수수료 출처: ${schedule.feeUrl}`,
+    ...formatBulkyWasteFeeRows(fees),
+    ...formatBulkyUrlLines(schedule.applicationUrl, schedule.feeUrl, shownUrls),
   ];
+}
+
+/**
+ * 수수료 행을 고시명 하나에 규격을 이어 붙여 적는다(PRD phase-10 R1-b).
+ *
+ * 한 줄에 한 행이던 때는 노원 매트리스 12행에서 `(침대)매트리스(라텍스/메모리폼)`이
+ * 여덟 번 반복됐다 — 900B 가운데 절반이 같은 고시명이었다. 고시명 순서는 처음 나온
+ * 차례(임포터가 금액순으로 남긴다), 규격은 그 안에서 원래 순서 그대로다. 규격이 비어
+ * 있거나 `-`인 행(빨래건조대 -: 1,000원)은 금액만 적는다 — "빨래건조대: - 1,000원"은
+ * 읽는 쪽에 틀린 표기로 보인다.
+ *
+ * 카드의 수수료 범위 줄(`buildRegionFeeLine`)은 `fees` 배열을 직접 읽으므로 이 모양과
+ * 무관하다.
+ */
+export function formatBulkyWasteFeeRows(fees: readonly BulkyWasteFee[]): string[] {
+  const groups = new Map<string, BulkyWasteFee[]>();
+  for (const fee of fees) {
+    const group = groups.get(fee.itemName);
+    if (group) group.push(fee);
+    else groups.set(fee.itemName, [fee]);
+  }
+  return Array.from(groups, ([itemName, rows]) => {
+    const specs = rows.map((fee) => (fee.spec && fee.spec !== "-" ? `${fee.spec} ${formatKrw(fee.feeKrw)}` : formatKrw(fee.feeKrw)));
+    return `  - ${itemName}: ${specs.join(" · ")}`;
+  });
 }
 
 /**
@@ -1907,9 +2054,11 @@ export function formatRegionItemGuide(
 
   const { region } = regionMatch;
   const guide = findRegionItemGuide(region, item);
-  const bulkyWasteFeeLines = formatBulkyWasteFeeLines(item, region);
   if (guide) {
-    return [`- ${guide.summary}`, ...guide.steps.map((step) => `- ${region.name} 기준: ${step}`), ...bulkyWasteFeeLines];
+    // 품목별 지역 안내는 주소를 안 찍으므로(강남은 "자원순환 종합포털에서"로 끝난다)
+    // 수수료 블록이 신청·수수료 링크를 온전히 낸다. 여기서 `shownUrls`를 넘기면
+    // 링크가 통째로 사라진다.
+    return [`- ${guide.summary}`, ...guide.steps.map((step) => `- ${region.name} 기준: ${step}`), ...formatBulkyWasteFeeLines(item, region)];
   }
 
   if (item.disposalType.includes("bulky")) {
@@ -1963,15 +2112,18 @@ export function formatRegionItemGuide(
     // district 티어에는 문의 전화·인터넷 신청·수수료 조회가 들어 있다.
     // `namedSubRegion`이 넘어오는 건 광역 착지 때뿐이라는 호출부 약속에 기대면,
     // 나중에 다른 툴로 넓히는 순간 그 셋이 소리 없이 사라진다 — 여기서 막는다.
-    const contactLines =
-      namedSubRegion && isMetro
-        ? subRegionScopeAlreadyShown
-          ? []
-          : [
-              `- ${formatUnregisteredDistrictScope(region.name, namedSubRegion)} 대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 공식 안내에서 확인하세요.`,
-            ]
-        : formatRegionBulkyContactLines(region);
-    return [bulkyLine, ...contactLines, ...bulkyWasteFeeLines];
+    const usesRegionContactLines = !(namedSubRegion && isMetro);
+    const contactLines = usesRegionContactLines
+      ? formatRegionBulkyContactLines(region)
+      : subRegionScopeAlreadyShown
+        ? []
+        : [
+            `- ${formatUnregisteredDistrictScope(region.name, namedSubRegion)} 대형폐기물 신청 경로와 수수료는 ${namedSubRegion} 공식 안내에서 확인하세요.`,
+          ];
+    // 연락처 블록이 방금 찍은 주소는 수수료 블록 끝에서 다시 적지 않는다. 연락처
+    // 블록을 안 거친 갈래(광역 착지)는 빈 배열이라 수수료 블록이 주소를 그대로 낸다.
+    const shownUrls = usesRegionContactLines ? regionBulkyContactUrls(region) : [];
+    return [bulkyLine, ...contactLines, ...formatBulkyWasteFeeLines(item, region, { shownUrls })];
   }
 
   if (item.disposalType.includes("special_collection")) {
@@ -2044,8 +2196,14 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     // 요일이 든 품목이 이 갈래로 떨어지는데, 지역 툴과 달리 "확인 항목: 배출 장소·요일"
     // 한 줄로 끝나 **어디서** 확인하는지가 빠져 있었다. 못 준다고 말해놓고 확인처를 안
     // 적는 그 모양이 호스트 모델의 되묻기를 부른 원인이라, 두 툴이 같게 닫아야 한다.
-    if (item.regionPolicy?.checkItems?.length)
-      lines.push(...withCollectionDaySource(item.regionPolicy.checkItems, regionMatch).map((checkItem) => `- 확인 항목: ${checkItem}`));
+    //
+    // 지역 안내가 바로 위에서 답한 항목은 다시 묻지 않는다(PRD phase-10 R2-b). 요일 항목은
+    // `isCheckItemAnsweredByRegionGuide`가 손대지 않으므로 확인처가 붙는 자리는 그대로다.
+    const checkItems = (item.regionPolicy?.checkItems ?? []).filter(
+      (checkItem) => !hasRegionGuide || !isCheckItemAnsweredByRegionGuide(checkItem, regionGuideLines),
+    );
+    if (checkItems.length > 0)
+      lines.push(...withCollectionDaySource(checkItems, regionMatch).map((checkItem) => `- 확인 항목: ${checkItem}`));
   } else if (needsAdvisoryRegionCheck && regionMatch) {
     lines.push("", "### 지역 참고");
     lines.push(
@@ -2072,7 +2230,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   lines.push("", "### 근거", ...formatSourceList(item));
 
   if (regionMatch && needsCriticalRegionCheck) {
-    lines.push("", `### ${regionMatch.region.name} 공식 출처`, ...formatRegionSourceList(regionMatch.region));
+    lines.push("", `### ${regionMatch.region.name} 공식 출처`, ...formatRegionSourceListForItem(regionMatch.region, item));
   }
 
   return lines.join("\n");
