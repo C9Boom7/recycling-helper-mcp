@@ -1300,6 +1300,28 @@ function regionMatchNames(policy: RegionalPolicyData, strength: RegionMatchStren
   return strength === 3 ? names : [...names, ...(policy.sharedAliases ?? [])];
 }
 
+/**
+ * `전남광주통합특별시 북구`처럼 **광역 표기 + 자치구**로 된 별칭에서, 질의가 아직
+ * 광역 부분도 다 못 넘었는데 강도 1로 그 자치구를 확정하는 것을 막는다.
+ *
+ * 강도 1은 "지역 표기가 질의로 시작"이라 잘려 들어온 입력을 받아 주는 자리인데,
+ * `[district, 1]`이 `[metro, 2]`보다 앞이라 광역까지 못 간다. 그래서 `전남광` 다섯
+ * 글자가 광주 북구로 단독 확정되고, 사용자가 대지도 않은 자치구의 대형폐기물
+ * 전화와 수수료가 확신 있게 나갔다.
+ *
+ * 조각 별칭을 손으로 나열하는 대신(광주광역시가 `광주광`·`광주광역`로 하던 방식)
+ * 구조로 막는다. 손으로 나열하면 새 표기마다 다섯 개씩 늘고, 무엇보다
+ * **`전남광`을 광주로 보내면 틀린다** — 광양시가 전라남도의 시다.
+ *
+ * 판정은 별칭 문자열만 본다. 마지막 공백 앞이 광역 부분이고, 질의가 그보다 길어야
+ * 자치구 쪽 글자에 닿은 것이다. 공백이 없는 별칭(`달서구`)에는 걸리지 않는다.
+ */
+function reachesDistrictPart(alias: string, normalizedQuery: string): boolean {
+  const lastSpace = alias.trimEnd().lastIndexOf(" ");
+  if (lastSpace < 0) return true;
+  return normalizedQuery.length > normalizeText(alias.slice(0, lastSpace)).length;
+}
+
 /** 한 레벨에서 주어진 강도로 매칭되는 지역들. 같은 지역이 여러 별칭으로 걸리면 하나로 접는다. */
 function regionCandidatesAt(
   policies: RegionalPolicyData[],
@@ -1320,6 +1342,7 @@ function regionCandidatesAt(
     let matchedBy: string | undefined;
     for (const name of regionMatchNames(policy, strength)) {
       if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
+      if (level === "district" && strength === 1 && !reachesDistrictPart(name, normalizedQuery)) continue;
       if (!matchedBy || normalizeText(name).length > normalizeText(matchedBy).length) matchedBy = name;
     }
     if (matchedBy) byRegionId.set(policy.id, { region: policy, matchedBy, level });
@@ -1435,7 +1458,12 @@ function splitLeadingMetro(
   for (const policy of policies) {
     if (regionMatchLevel(policy) !== "metro") continue;
 
-    for (const name of [policy.name, ...policy.aliases]) {
+    // `sharedAliases`도 뗀다. 안 그러면 통합 이름이 붙은 질의가 늘 한쪽 광역으로만
+    // split돼, 나눠 쓰는 다른 광역의 자치구를 통째로 지나친다. 지금은 전라남도에
+    // 등록된 자치구가 없어 `[metro, 2]`의 `remainderOwner`가 받아 주지만, 전남 시·군이
+    // 하나라도 들어오는 순간(이번 사이클에 광주 북구를 그렇게 넣었다) 그 자치구를
+    // 지나쳐 광역으로 내려앉고 "상세 데이터는 아직 없어"라고 잘못 말한다.
+    for (const name of [policy.name, ...policy.aliases, ...(policy.sharedAliases ?? [])]) {
       const normalizedName = normalizeText(name);
       if (!normalizedName || normalizedQuery === normalizedName) continue;
       if (!normalizedQuery.startsWith(normalizedName)) continue;

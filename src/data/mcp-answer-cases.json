@@ -10485,5 +10485,20 @@
       "\"regionStatus\":\"unregistered_district\"",
       "\"coverageTier\":\"metro\""
     ]
+  },
+  {
+    "id": "p9_truncated_merged_name_no_district",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "전남광"
+    },
+    "expectedTextExcludes": [
+      "062-410-6523",
+      "광주 북구 지역 확인 안내",
+      "bukgu.gwangju.kr"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"전라남도\""
+    ]
   }
 ]

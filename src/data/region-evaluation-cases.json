@@ -658,6 +658,22 @@
     "expectedNamedSubRegion": "목포시"
   },
   {
+    "region": "전남광",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "전남 광양시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "광양시"
+  },
+  {
+    "region": "광주북",
+    "expectedRegionId": "buk_gu_gwangju",
+    "expectedLevel": "district"
+  },
+  {
     "region": "전남광주통합특별시 목포시",
     "expectedRegionId": "jeonnam",
     "expectedLevel": "metro",
