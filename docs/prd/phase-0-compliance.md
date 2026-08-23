@@ -85,7 +85,7 @@ text 출력(마크다운)은 현행 유지 — 이미 정제된 형식이고 가
 
 ### R6. 툴 호출 로깅
 
-QA 기간(8/24~26) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다. 다만 운영에서는 이 로그를 볼 수 없다 — KC 콘솔에 컨테이너 로그 화면이 없어(2026-08-19 확인, 모니터링 탭의 Istio 지표뿐) 로컬로 띄운 서버의 stdout에서만 보인다. 운영 문의는 로컬 재현으로 로그를 받는다([qa-runbook 2절](../qa-runbook.md) 참고).
+QA 기간(9/1~9/11) 오류 대응과 발화 테스트 분석용. stdout에 한 줄 JSON으로 남긴다. 다만 운영에서는 이 로그를 볼 수 없다 — KC 콘솔에 컨테이너 로그 화면이 없어(2026-08-19 확인, 모니터링 탭의 Istio 지표뿐) 로컬로 띄운 서버의 stdout에서만 보인다. 운영 문의는 로컬 재현으로 로그를 받는다([qa-runbook 2절](../qa-runbook.md) 참고).
 
 - 늘 찍히는 필드: `ts, tool, status(match|partial|ambiguous|not_found|ok|error), ms`. 값이 있을 때만 붙는 필드: `matchedId, matchedRegion, regionStatus, score, matched/total(cleanup plan), fallbackTier, inputSource`. `status`가 `error`면 `errorName`과 (스택이 있으면) `errorAt` 한 줄이 대신 붙는다.
 - 호출자가 넘긴 문자열(`input`의 `itemName/region/items`, 오류 `message`)은 기본 로그에서 뺀다. `CALL_LOG_DETAILS=true`를 준 로컬 QA에서만 함께 찍는다 — 임의 문자열을 운영 쪽에 남기지 않기 위해서다.
