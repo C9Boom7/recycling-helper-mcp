@@ -1290,14 +1290,13 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
  * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
  * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
  *
- * `sharedAliases`는 **완전 일치에서만** 뺀다. 다른 광역과 나눠 쓰는 표기라
- * 그것만 덜렁 들어온 질의를 이 광역으로 확정할 근거가 못 되지만, 뒤에 시·군·구
- * 이름이 붙어 강도 2로 걸릴 때는 후보로 서야 `remainderOwner`가 뒤에 붙은
- * 이름을 보고 답을 가른다.
+ * `sharedAliases`도 그대로 넣는다. 나눠 쓰는 표기라 **양쪽이 함께 후보로 서는 것이
+ * 맞는 동작**이다. 뒤에 시·군·구 이름이 붙으면 `remainderOwner`가 그 이름의 주인을
+ * 고르고, 표기만 덜렁 들어오면 후보가 둘이라 되묻는다 — 이름만으로는 어느 광역인지
+ * 정해지지 않으니 그게 정직한 답이다. 맨 `고성군`을 되묻게 둔 것과 같은 기준이다.
  */
-function regionMatchNames(policy: RegionalPolicyData, strength: RegionMatchStrength): string[] {
-  const names = [policy.name, ...policy.aliases, ...(policy.districtAliases ?? [])];
-  return strength === 3 ? names : [...names, ...(policy.sharedAliases ?? [])];
+function regionMatchNames(policy: RegionalPolicyData): string[] {
+  return [policy.name, ...policy.aliases, ...(policy.districtAliases ?? []), ...(policy.sharedAliases ?? [])];
 }
 
 /**
@@ -1340,7 +1339,7 @@ function regionCandidatesAt(
     // 그대로 남아 아무도 알아보지 못한다 — 전라남도는 `전남`이 아니라
     // `전남광주통합특별시`를 떼야 `목포시`가 남는다.
     let matchedBy: string | undefined;
-    for (const name of regionMatchNames(policy, strength)) {
+    for (const name of regionMatchNames(policy)) {
       if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
       if (level === "district" && strength === 1 && !reachesDistrictPart(name, normalizedQuery)) continue;
       if (!matchedBy || normalizeText(name).length > normalizeText(matchedBy).length) matchedBy = name;
@@ -1491,6 +1490,24 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
   if (!normalizedQuery) return { status: "not_found" };
 
   let ambiguous: MatchedRegionPolicy[] | undefined;
+
+  // 나눠 쓰는 표기가 통째로 들어왔으면 그 자리에서 되묻는다. 뒤 단계까지 흘려보내면
+  // 광역 폴백에서 되살아난다 — `전남광주통합특별시`는 `전남`이 앞부분과 겹쳐 강도 2의
+  // 유일 후보가 되고, 그 표기를 함께 쓰는 광주를 제치고 전라남도로 확정돼 버린다.
+  // 이름만으로는 어느 광역인지 정해지지 않으니 확정할 근거가 없다.
+  const sharedOwners = policies.filter(
+    (policy) =>
+      regionMatchLevel(policy) === "metro" &&
+      (policy.sharedAliases ?? []).some((alias) => normalizeText(alias) === normalizedQuery),
+  );
+  if (sharedOwners.length > 1) {
+    return {
+      status: "ambiguous",
+      candidates: sharedOwners
+        .slice(0, MAX_AMBIGUOUS_CANDIDATES)
+        .map((policy) => ({ region: policy, matchedBy: policy.name, level: "metro" as const })),
+    };
+  }
 
   const consider = (
     candidates: MatchedRegionPolicy[],

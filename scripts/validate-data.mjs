@@ -576,11 +576,20 @@ for (const [index, region] of regionalPolicies.entries()) {
         }
         if (seen.has(alias)) errors.push(`${aliasPrefix} "${alias}" is duplicated`);
         seen.add(alias);
-        const owner = exclusiveNameOwners.get(alias);
-        if (!owner) {
-          errors.push(`${aliasPrefix} "${alias}" is not an alias of any other region; a shared name needs a region that resolves it`);
-        } else if (owner === region.id) {
+        // 나눠 쓰는 이름이니 **다른 지역도 같은 이름을 들고 있어야** 한다. 한쪽이
+        // 자기 `aliases`로 갖고 있어도 되고(한쪽만 확정에 쓰는 경우), 양쪽 모두
+        // `sharedAliases`에 적어도 된다(이름만으로는 어느 쪽도 못 정하는 경우).
+        // 혼자 적어 두면 그 이름은 아무 데도 닿지 않는다.
+        const exclusiveOwner = exclusiveNameOwners.get(alias);
+        const alsoShared = regionalPolicies.some(
+          (other) => other.id !== region.id && (other.sharedAliases ?? []).includes(alias),
+        );
+        if (exclusiveOwner === region.id) {
           errors.push(`${aliasPrefix} "${alias}" is already this region's own alias`);
+        } else if (!exclusiveOwner && !alsoShared) {
+          errors.push(
+            `${aliasPrefix} "${alias}" is not held by any other region; a shared name needs another region that answers to it`,
+          );
         }
       }
     }

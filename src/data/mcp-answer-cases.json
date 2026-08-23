@@ -10422,12 +10422,9 @@
       "region": "전남광주통합특별시"
     },
     "expectedTextExcludes": [
-      "전라남도",
-      "062-410-6523"
-    ],
-    "expectedStructuredIncludes": [
-      "\"matchedRegion\":\"광주광역시\"",
-      "\"coverageTier\":\"metro\""
+      "062-410-6523",
+      "bukgu.gwangju.kr",
+      "광주 북구 지역 확인 안내"
     ]
   },
   {

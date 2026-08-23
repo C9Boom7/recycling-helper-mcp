@@ -642,8 +642,11 @@
   },
   {
     "region": "전남광주통합특별시",
-    "expectedRegionId": "gwangju",
-    "expectedLevel": "metro"
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gwangju",
+      "jeonnam"
+    ]
   },
   {
     "region": "전남광주통합특별시 광산구",
