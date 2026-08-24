@@ -2467,8 +2467,18 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   const lines = [
     `## ${item.name}`,
     "",
-    `- 분류: ${item.category}`,
-    `- 배출 판단: ${item.disposalType}`,
+    // `category`는 카드에서 뺐다. 품목 330개에 값이 105가지고 그중 52개가 품목 하나에만
+    // 붙은 일회용 이름(`wax_mixed_container`·`mixed_vacuum_bottle`)이라, 사용자가 다른
+    // 품목과 견줄 수 있는 분류 체계가 아니다. 실제 쓰임도 `scoreItem`이
+    // 재질 질의에 가산점을 줄 때 부분 문자열로 훑는 게 전부다. 한글 라벨을 붙이는 건
+    // 106개를 통제 어휘로 묶어 계속 관리하겠다는 뜻인데, 그 대가로 얻는 줄이 바로
+    // 아래 `결론`보다 사용자에게 덜 말해 준다.
+    //
+    // `disposalType`도 같은 이유로 원본 대신 배출 그룹 라벨을 찍는다. 이름을 `배출
+    // 그룹`으로 맞춘 건 위젯 캡션·`classify_waste_item`·structuredContent의
+    // `disposalGroup`이 이미 그 이름으로 같은 값을 부르고 있어서다 — 툴만 갈아탄
+    // 사용자가 같은 값을 다른 이름으로 두 번 만나지 않게 한다.
+    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
     `- 결론: ${item.summary}`,
     `- 확신도: ${confidenceLabel(item.confidence)}`,
     `- 판단 범위: ${itemRegionGuidance(item)}`,

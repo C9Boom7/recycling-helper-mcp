@@ -1963,6 +1963,39 @@ async function runWidgetBuilderCases() {
 }
 
 /**
+ * 카드 머리말의 `- 키: 값` 줄에 영문 내부 키가 새지 않는지 카탈로그 전수로 본다.
+ *
+ * 이 자리는 세 번 같은 식으로 샜다 — `- 판단 조건:`이 조건 키를(PR #75), `- 분류:`가
+ * `category`를, `- 배출 판단:`이 `disposalType`을 그대로 찍었다. 셋 다 데이터가 아니라
+ * 렌더링 쪽 결함이라 `validate-data.mjs`의 매핑 전수 대응 검사로는 걸리지 않는다.
+ * 매핑이 멀쩡해도 그 매핑을 안 거치고 원본을 찍으면 그만이기 때문이다.
+ *
+ * 검사 기준은 `condition-labels.json` 라벨에 쓰는 것과 같다 — 한글이 한 글자도 없으면
+ * 사용자가 읽을 수 없는 값이 나간 것으로 본다. 머리말만 보는 이유는 아래 `### 배출 방법`
+ * 부터는 URL과 출처 제목이 섞이기 때문이고, 새 줄이 붙는 자리도 머리말이다.
+ */
+async function runItemCardLabelSweep() {
+  const { formatItemGuide, wasteItems } = await import("../dist/data.js");
+  const leaked = [];
+
+  for (const item of wasteItems) {
+    // 지역을 넘겨 지역 줄이 붙는 갈래까지 같은 렌더로 훑는다.
+    for (const region of [undefined, "서울 강남구"]) {
+      const header = formatItemGuide(item, region).split("\n").slice(1);
+      for (const line of header) {
+        if (line.startsWith("###")) break;
+        const field = /^- ([^:]+): (.+)$/.exec(line);
+        if (!field) continue;
+        if (!/[가-힣]/.test(field[2])) leaked.push(`${item.id} (region=${region ?? "없음"}): ${line}`);
+      }
+    }
+  }
+
+  assert(leaked.length === 0, `item card header leaked a non-Korean value:\n${leaked.slice(0, 5).join("\n")}`);
+  console.log(`Item card label sweep passed: ${wasteItems.length} items x 2 region modes`);
+}
+
+/**
  * Every item through the widget path once. The 183 get_disposal_steps answer
  * cases are pinned to WIDGET_ENABLED=false, so on their own they would only
  * cover a shape production never serves (R1 leaves widgets on by default) —
@@ -2344,5 +2377,6 @@ async function runWidgetSmoke() {
 }
 
 await runSmoke();
+await runItemCardLabelSweep();
 await runWidgetBuilderCases();
 await runWidgetSmoke();

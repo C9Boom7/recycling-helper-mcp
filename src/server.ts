@@ -872,10 +872,12 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     return widgetResult(matchedItemWidget(item, regionMatch, { region }), structured, log);
   }
 
+  // `- 세부 판단: ${item.disposalType}`가 여기 있었다. 바로 위 `배출 그룹`이 같은
+  // 값을 한국어로 이미 말하고 있어서 남는 건 영문 키뿐이었고, 모델이 원본 키를 볼
+  // 자리는 structuredContent의 `disposalType`으로 따로 있다.
   const text = [
     `분류 결과: ${item.name}`,
     `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
-    `- 세부 판단: ${item.disposalType}`,
     `- 결론: ${item.summary}`,
     `- 확신도: ${confidenceLabel(item.confidence)}`,
     `- 지역 영향: ${itemRegionCheckLabel(item)}`,
