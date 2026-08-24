@@ -1,43 +1,94 @@
 {
   "medicine": {
     "label": "폐의약품 수거함",
-    "patterns": ["폐의약품"],
-    "itemIds": ["medicine"],
+    "patterns": [
+      "폐의약품"
+    ],
+    "itemIds": [
+      "medicine"
+    ],
     "fallbackLine": "폐의약품은 약국·보건소·주민센터에 있는 전용 수거함에 넣습니다. 알약은 겉포장을 벗겨 알맹이만, 물약은 마개를 닫아 병째로 냅니다."
   },
   "battery_lamp": {
     "label": "폐건전지·폐형광등 수거함",
-    "patterns": ["전지 수거함", "형광등"],
-    "itemIds": ["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"],
+    "patterns": [
+      "전지 수거함",
+      "형광등"
+    ],
+    "itemIds": [
+      "battery",
+      "power_bank",
+      "fluorescent_lamp",
+      "led_lamp",
+      "incandescent_bulb"
+    ],
     "fallbackLine": "폐건전지와 폐형광등은 주민센터나 아파트 단지의 전용 수거함에 넣습니다. 깨진 형광등은 수거함에 넣지 말고 지자체 안내를 따르세요."
   },
   "clothing": {
     "label": "의류 수거함",
-    "patterns": ["의류"],
-    "itemIds": ["clothing", "shoes"],
+    "patterns": [
+      "의류"
+    ],
+    "itemIds": [
+      "clothing",
+      "shoes"
+    ],
     "fallbackLine": "입던 옷과 신발은 동네 의류수거함에 넣습니다. 이불이나 솜류는 받지 않는 곳이 많아 대형폐기물로 신고해야 할 수 있습니다."
   },
   "electronics": {
     "label": "폐휴대폰·소형가전 수거함",
-    "patterns": ["폐휴대폰", "소형가전", "중소형 수거함"],
-    "itemIds": ["mobile_phone", "small_electronics"],
+    "patterns": [
+      "폐휴대폰",
+      "소형가전",
+      "중소형 수거함"
+    ],
+    "itemIds": [
+      "mobile_phone",
+      "small_electronics"
+    ],
     "fallbackLine": "폐휴대폰과 소형가전은 주민센터·아파트의 소형가전 수거함에 넣고, 큰 가전은 폐가전 무상방문수거(1599-0903)를 신청합니다."
   },
   "pet_bottle": {
     "label": "투명페트병·캔 무인회수기",
-    "patterns": ["페트병", "무인회수기", "자동수거기"],
-    "itemIds": ["pet_bottle", "can"],
+    "patterns": [
+      "페트병",
+      "무인회수기",
+      "자동수거기"
+    ],
+    "itemIds": [
+      "pet_bottle",
+      "can"
+    ],
     "fallbackLine": "투명페트병은 라벨을 떼고 찌그러뜨려 뚜껑을 닫아 배출합니다. 무인회수기가 있는 동네는 거기 넣으면 포인트를 받습니다."
   },
   "food": {
     "label": "음식물류 배출기",
-    "patterns": ["음식물"],
-    "itemIds": ["mandarin_peel", "expired_flour", "spoiled_milk", "moldy_bread"],
+    "patterns": [
+      "음식물"
+    ],
+    "itemIds": [
+      "mandarin_peel",
+      "expired_flour",
+      "spoiled_milk",
+      "moldy_bread"
+    ],
     "fallbackLine": "음식물류는 전용 봉투나 단지 안 RFID 종량기에 버립니다. 뼈·껍데기처럼 딱딱한 것은 일반쓰레기입니다."
+  },
+  "cooking_oil": {
+    "label": "폐식용유 수거함",
+    "patterns": [
+      "식용유"
+    ],
+    "itemIds": [
+      "used_cooking_oil"
+    ],
+    "fallbackLine": "폐식용유는 전용 수거함에 붓고, 소량은 키친타월이나 응고제에 흡수시켜 종량제봉투로 버립니다. 하수구에 붓지 마세요."
   },
   "trash_bag": {
     "label": "종량제봉투 판매소",
-    "patterns": ["종량제봉투 판매소"],
+    "patterns": [
+      "종량제봉투 판매소"
+    ],
     "itemIds": [],
     "defaultExposed": false,
     "fallbackLine": "종량제봉투는 동네 마트나 편의점 판매소에서 삽니다. 지역마다 규격이 달라 거주 지자체 봉투를 써야 합니다."

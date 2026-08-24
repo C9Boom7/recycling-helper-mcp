@@ -1141,6 +1141,7 @@ const spotCategoryOrder = [
   "electronics",
   "pet_bottle",
   "food",
+  "cooking_oil",
   "trash_bag",
   "etc",
 ];

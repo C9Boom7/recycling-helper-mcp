@@ -2401,6 +2401,7 @@ const SPOT_FIXTURES = {
     { spotNm: "페트병·캔 무인회수기", addrBase: "서울특별시 노원구 노해로 480", addrDtl: "" },
     { spotNm: "음식물 RFID", addrBase: "서울특별시 노원구 상계로 300", addrDtl: "" },
     { spotNm: "음식물 RFID", addrBase: "서울특별시 노원구 상계로 320", addrDtl: "" },
+    { spotNm: "식용유 수거함", addrBase: "서울특별시 노원구 상계로 340", addrDtl: "" },
     // 기본 노출에서 빠지는 둘. 응답의 절반을 차지하는 종량제봉투와 이름만으로는 알 수 없는 기타.
     { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 상계로 11", addrDtl: "○○마트" },
     { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 상계로 13", addrDtl: "○○편의점" },
@@ -2450,7 +2451,8 @@ const SPOT_EXPECTED_SECTIONS = [
 const SPOT_SIZE_WARN_BYTES = { text: 1_580, total: 3_550 };
 
 // structuredContent 화이트리스트(PRD phase-12 R5). 세 갈래가 모양이 달라 따로 둔다.
-const SPOT_FOUND_KEYS = ["found", "dong", "region", "categories", "truncated", "source"];
+const SPOT_FOUND_KEYS = ["found", "dong", "region", "categories", "truncated", "omitted", "source"];
+const SPOT_OMITTED_KEYS = ["id", "label", "found"];
 const SPOT_CATEGORY_KEYS = ["id", "label", "spots"];
 const SPOT_SPOT_KEYS = ["name", "address"];
 const SPOT_FALLBACK_KEYS = ["found", "dong", "fallback"];
@@ -2481,6 +2483,9 @@ function assertSpotStructured(result, context) {
     }
     const total = structured.categories.reduce((sum, category) => sum + category.spots.length, 0);
     assert(total <= 12, `${context}: 전체 12곳 상한을 넘어 ${total}곳이 나갔다`);
+    for (const entry of structured.omitted ?? []) {
+      assertKeysWithin(entry, SPOT_OMITTED_KEYS, `${context} omitted[]`);
+    }
     return;
   }
 
@@ -2624,8 +2629,13 @@ async function runSpotSmoke() {
     }
     const shownSpots = successText.split("\n").filter((line) => line.startsWith("- ") && line.includes(" | "));
     assert(shownSpots.length === 12, `전체 12곳 상한이 안 지켜졌다 — ${shownSpots.length}곳이 나갔다`);
-    // 상한이 순서대로 채워졌다면 표 마지막 노출 묶음(음식물)이 잘린다. 실제 자료에는 두 곳 있다.
-    assert(!successText.includes("음식물류 배출기"), "전체 상한에 닿으면 표 뒤쪽 묶음부터 잘려야 한다");
+    // 상한이 순서대로 채워졌다면 표 뒤쪽 노출 묶음(음식물·식용유)이 잘린다. 실제 자료에는 있다.
+    assert(!successText.includes("### 음식물류 배출기"), "전체 상한에 닿으면 표 뒤쪽 묶음부터 잘려야 한다");
+    // 잘린 묶음은 "없는 것"이 아니라 "못 실은 것"으로 읽혀야 한다 — 리뷰 1라운드 지적.
+    assert(
+      successText.includes("자리가 모자라 음식물류 배출기 2곳 · 폐식용유 수거함 1곳은 싣지 못했습니다"),
+      `전체 상한이 지운 묶음을 밝히지 않았다:\n${successText}`,
+    );
     assert(!successText.includes("종량제봉투"), "종량제봉투 판매소는 기본 노출에서 빠진다");
     assert(!successText.includes("재활용정거장"), "기타 묶음은 노출하지 않는다");
     assert(
@@ -2643,6 +2653,14 @@ async function runSpotSmoke() {
       "묶음 순서가 표 순서와 다르다",
     );
     assert(success.structuredContent.truncated === undefined, "절단되지 않은 응답에 truncated가 실렸다");
+    assert(
+      JSON.stringify(success.structuredContent.omitted) ===
+        JSON.stringify([
+          { id: "food", label: "음식물류 배출기", found: 2 },
+          { id: "cooking_oil", label: "폐식용유 수거함", found: 1 },
+        ]),
+      `전체 상한이 지운 묶음이 structuredContent에 없다: ${JSON.stringify(success.structuredContent.omitted)}`,
+    );
 
     // 키가 응답 어디에도 실리면 안 된다. 키를 다루는 곳은 클라이언트 모듈 한 곳이다.
     const successPayload = JSON.stringify(success);
@@ -2755,6 +2773,12 @@ async function runSpotSmoke() {
     assert(!filteredText.includes("의류 수거함"), "품목이 확정되면 그 묶음만 내보낸다");
     assert(filtered.structuredContent.categories.length === 1, "품목 필터가 걸리면 묶음은 하나다");
 
+    // 리뷰 1라운드 지적: 폐식용유는 getSpot에 수거함이 실제로 오는데 묶음이 없어 폴백으로 떨어졌다.
+    const oilItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "식용유" });
+    const oilText = resultText(oilItem);
+    assert(oilText.includes("### 폐식용유 수거함 (1곳)"), `식용유 질의가 수거함 주소를 받지 못했다:\n${oilText}`);
+    assert(oilItem.structuredContent.categories.length === 1, "품목 필터가 걸리면 묶음은 하나다");
+
     const unknownItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "존재하지않는품목zzz" });
     const unknownItemText = resultText(unknownItem);
     assert(unknownItemText.includes("폐의약품 수거함"), "품목을 못 찾아도 전 묶음 요약으로 답한다");
@@ -2779,6 +2803,18 @@ async function runSpotSmoke() {
       invalidError = error;
     }
     assert(invalidError && String(invalidError.message).includes("법정동"), "dong 누락은 복구 안내가 붙은 -32602여야 한다");
+
+    // 공백만 온 dong도 스키마가 끊는다 — 통과하면 빈 addr로 업스트림 한도를 쓰고
+    // "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
+    const upstreamCallsBefore = upstream.requests.length;
+    let blankError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "find_disposal_spots", arguments: { dong: "   " } }, requestId++);
+    } catch (error) {
+      blankError = error;
+    }
+    assert(blankError && String(blankError.message).includes("법정동"), "공백 dong은 복구 안내가 붙은 -32602여야 한다");
+    assert(upstream.requests.length === upstreamCallsBefore, "공백 dong이 업스트림 호출을 쓰면 안 된다");
 
     // ⑥ 로그 — 세 status와 upstream 낱말이 실제로 찍히는지. 실패를 세는 유일한 자리다.
     const logExpectations = [

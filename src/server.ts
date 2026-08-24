@@ -339,7 +339,14 @@ const TOOL_DEFS: ToolDef[] = [
           description:
             "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; forms like 상계1동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
           inputShape: {
-            dong: z.string().min(1).max(40).describe("Korean legal-status neighborhood name (법정동), e.g. 상계동."),
+            // `.trim()`이 스키마 단계에서 공백을 걷는다 — " "가 통과하면 정규화 뒤 빈 addr로
+            // 업스트림 한도를 쓰고 "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
+            dong: z
+              .string()
+              .trim()
+              .min(1, "법정동 이름이 필요합니다 — 예: 상계동.")
+              .max(40)
+              .describe("Korean legal-status neighborhood name (법정동), e.g. 상계동."),
             region: optionalRegionParam,
             itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
           },
@@ -1758,7 +1765,9 @@ async function handleFindDisposalSpots({
 
   if (regionMatch) {
     const metroNames = metroPrefixNames(regionMatch.region);
-    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districtNames(regionMatch, namedSubRegion)));
+    // 행마다 다시 계산하지 않는다 — 한 호출에 최대 1,000행을 거른다.
+    const districts = districtNames(regionMatch, namedSubRegion);
+    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districts));
     regionLabel = regionMatch.region.name;
   } else {
     // 역추적 색인 없이 수렴만 본다(R4). 등록 지역 40곳짜리 색인으로 "이 동은 유일하다"를
@@ -1807,11 +1816,17 @@ async function handleFindDisposalSpots({
       : []
     : spotCategories.filter((category) => category.defaultExposed);
   const shown: Array<{ category: SpotCategory; rows: SpotRow[]; found: number }> = [];
+  // 전체 상한이 **통째로** 지운 묶음. 묶음당 상한은 "(N곳 중 M곳)"이 밝히지만, 묶음이
+  // 아예 빠지면 그 종류가 이 동에 없는 것처럼 읽힌다 — 그게 상한 표기를 둔 이유였다.
+  const omitted: Array<{ category: SpotCategory; found: number }> = [];
   let total = 0;
   for (const category of visible) {
-    if (total >= SPOT_TOTAL_LIMIT) break;
     const bucket = buckets.get(category.id) ?? [];
     if (bucket.length === 0) continue;
+    if (total >= SPOT_TOTAL_LIMIT) {
+      omitted.push({ category, found: bucket.length });
+      continue;
+    }
     const room = Math.min(SPOT_PER_CATEGORY_LIMIT, SPOT_TOTAL_LIMIT - total);
     shown.push({ category, rows: bucket.slice(0, room), found: bucket.length });
     total += Math.min(room, bucket.length);
@@ -1841,6 +1856,10 @@ async function handleFindDisposalSpots({
     "",
     // 절단은 사용자가 눈치챌 수 없는 유일한 실패라 한 줄로 밝힌다(R1).
     lookup.truncated ? "- 자료가 많아 일부만 표시했습니다." : undefined,
+    // 전체 상한이 지운 묶음도 같은 이유로 밝힌다 — 없는 게 아니라 못 실은 것이다.
+    omitted.length > 0
+      ? `- 자리가 모자라 ${omitted.map(({ category, found }) => `${category.label} ${found}곳`).join(" · ")}은 싣지 못했습니다. 품목을 정해 물으면 그 묶음을 바로 보여 드립니다.`
+      : undefined,
     "- 수거함 위치는 바뀔 수 있습니다. 방문 전 지자체 안내를 확인하세요.",
     `- 출처: ${SPOT_SOURCE_LABEL}`,
     // 빈 줄을 살려야 마지막 수거함 줄과 맺음말이 붙어 읽히지 않는다. `filter(Boolean)`을
@@ -1859,6 +1878,9 @@ async function handleFindDisposalSpots({
         spots: spots.map((spot) => ({ name: spot.spotNm, address: formatSpotAddress(spot) })),
       })),
       ...(lookup.truncated ? { truncated: true } : {}),
+      ...(omitted.length > 0
+        ? { omitted: omitted.map(({ category, found }) => ({ id: category.id, label: category.label, found })) }
+        : {}),
       source: SPOT_SOURCE_LABEL,
     },
     { ...baseLog, status: "spots", upstream: lookup.upstream },

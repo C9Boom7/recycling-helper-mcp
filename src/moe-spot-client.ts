@@ -148,7 +148,9 @@ function resultCodeOk(code: unknown): boolean {
   return code === "00" || code === "0" || code === "03" || code === "3";
 }
 
-type ParsedSpotBody = { rows: SpotRow[]; totalCount: number | undefined };
+type ParsedSpotBody = { rows: SpotRow[]; totalCount: number | undefined   /** 걸러내기 전(빈 행 제외 전) 행 수 — 절단 판정 기준. */
+  rawCount: number;
+};
 
 /**
  * 응답 본문 파싱. 실패는 전부 `undefined` 하나로 접는다.
@@ -185,7 +187,13 @@ function parseSpotBody(text: string): ParsedSpotBody | undefined {
         ? Number(totalCountValue)
         : undefined;
 
-  return { rows: rawRows.map(asRow).filter((row): row is SpotRow => row !== undefined), totalCount };
+  return {
+    rows: rawRows.map(asRow).filter((row): row is SpotRow => row !== undefined),
+    // 절단 판정은 걸러내기 **전** 행 수로 한다. `asRow`가 버린 빈 행 때문에 멀쩡한 응답이
+    // "일부만 표시"로 읽히면 안 된다 — 절단은 업스트림이 덜 준 것이지 우리가 거른 게 아니다.
+    rawCount: rawRows.filter((row) => row !== undefined && row !== null).length,
+    totalCount,
+  };
 }
 
 /**
@@ -195,12 +203,14 @@ function parseSpotBody(text: string): ParsedSpotBody | undefined {
  * 돌려주는 이유가 그것이다. 이 함수는 아무것도 로그로 찍지 않는다.
  */
 export async function findSpotsByDong(dong: string): Promise<SpotLookup> {
-  const url = `${baseUrl()}/getSpot?serviceKey=${serviceKeyParam(serviceKey())}&pageNo=1&numOfRows=${NUM_OF_ROWS}&addr=${encodeURIComponent(dong)}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   const startedAt = Date.now();
 
   try {
+    // URL 조립도 try 안이다 — 홀로 남은 서로게이트가 들어오면 `encodeURIComponent`가
+    // URIError를 던지는데, 그게 밖으로 새면 "던지지 않는다"는 이 함수의 계약(D2)이 깨진다.
+    const url = `${baseUrl()}/getSpot?serviceKey=${serviceKeyParam(serviceKey())}&pageNo=1&numOfRows=${NUM_OF_ROWS}&addr=${encodeURIComponent(dong)}`;
     const response = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
     const text = await response.text();
     const ms = Date.now() - startedAt;
@@ -213,7 +223,7 @@ export async function findSpotsByDong(dong: string): Promise<SpotLookup> {
      * 절단은 오류가 아니라 **특정 묶음이 통째로 빠진 완전해 보이는 답**으로 나타난다.
      * 사용자가 눈치챌 수 없는 유일한 실패라, 응답에 표시를 올리고 로그에도 남긴다.
      */
-    const truncated = parsed.totalCount !== undefined && parsed.totalCount > parsed.rows.length;
+    const truncated = parsed.totalCount !== undefined && parsed.totalCount > parsed.rawCount;
     return {
       ok: true,
       upstream: parsed.rows.length === 0 ? "empty" : truncated ? "truncated" : "ok",
