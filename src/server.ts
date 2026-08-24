@@ -14,7 +14,6 @@ import {
   collectionDayCheckLine,
   confidenceLabel,
   disposalGroupLabel,
-  feeRowLabel,
   findBulkyWasteFeeRowTotal,
   hasFeeSpec,
   isCheckItemAnsweredByRegionGuide,
@@ -406,7 +405,10 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   // 셈이라, 그때는 행으로 말한다(PR #74 리뷰 1라운드).
   const specDetail = rowTotal
     ? `수수료표 ${rowTotal}행 중 대표 ${fees.length}행`
-    : fees.some(hasFeeSpec)
+    : // 한 행이라도 규격 칸이 비어 있으면 "규격 N종"이 아니다. 마포구 `운동기구`는 세 행 중
+      // 둘만 규격을 대고(`러닝머신`은 `-`) 있어 `규격 3종`은 없는 구분을 하나 지어낸다.
+      // 섞인 조합이 마포 둘뿐이라 눈에 안 띄었다(PR #74 리뷰 3라운드).
+      fees.every(hasFeeSpec)
       ? `규격 ${fees.length}종`
       : `수수료표 ${fees.length}행`;
   return `수수료 ${krw(min)}~${krw(max)} ${paren(specDetail)}`;
@@ -685,29 +687,25 @@ function itemRegionCheckList(
   // 이 체크리스트도 수수료 행을 전부 펼친다. 상한에 걸린 품목이면 여기서도 잘리므로
   // 잘렸다는 사실을 같이 내보낸다. 출처 URL은 바로 위 `formatRegionBulkyContactLines`가
   // "수수료 조회"로 이미 찍는다 — 체크 항목은 한 줄짜리라 주소까지 넣지 않는다.
-  const feeRowTotal = findBulkyWasteFeeRowTotal(region.region, item);
-
-  // 위에 수수료 후보 블록이 찍혔으면 행을 하나씩 옮기지 않고 범위 한 줄로 접는다.
-  // **한 줄은 남겨야 한다** — 이 툴의 structuredContent에서 금액이 실리는 자리는
-  // `checkList`뿐이라(`regionFeeLine` 같은 필드가 없다), 통째로 지우면 구조화 출력만
-  // 읽는 모델이 수수료를 잃는다. 문구는 카드가 쓰는 `buildRegionFeeLine`을 그대로 쓴다.
+  // 수수료는 행을 하나씩 옮기지 않고 범위 한 줄로 접는다. 행을 펼치면 바로 위 `수수료 후보`
+  // 블록과 같은 값이 12줄까지 되풀이된다 — 노원구 `매트리스`에서 1,035B였다.
+  //
+  // **한 줄은 남겨야 한다.** 이 툴의 structuredContent에서 금액이 실리는 자리는 `checkList`뿐이라
+  // (`regionFeeLine` 같은 필드가 없다), 통째로 지우면 구조화 출력만 읽는 모델이 수수료를 잃는다.
+  // 문구는 카드가 쓰는 `buildRegionFeeLine`을 그대로 쓴다.
+  //
+  // 처음에는 "위에 블록이 찍혔을 때만" 접고 아니면 행을 펼치게 두었는데, 그 갈래는 도달하지
+  // 않는다 — 수수료가 붙는 품목은 배출 그룹 라벨에 대형폐기물이 들어가야 하고, 그런 키는
+  // 전부 `bulky`를 담고 있어 `formatRegionItemGuide`가 늘 블록을 낸다. 닿지 않는 갈래를 남기면
+  // 회귀가 그 위를 헛돈다(PR #74 리뷰 3라운드).
   //
   // 보조 배출로인 품목에는 카드·플랜과 같은 단서를 여기서도 단다. 안 그러면 `다리미판`처럼
   // 종량제봉투가 기본인 품목의 체크리스트만 금액을 조건 없이 말해, 같은 품목·지역에서
   // 툴마다 다른 말을 한다(PR #74 리뷰 2라운드).
-  const feeBlockShown = answeredLines.some((line) => line.includes("수수료 후보:"));
-  const feeSummary = feeBlockShown ? buildRegionFeeLine(item, region) : undefined;
+  const feeSummary = feeRows.length > 0 ? buildRegionFeeLine(item, region) : undefined;
   const feeChecks = feeSummary
-    ? [
-        isBulkySecondaryRoute(item)
-          ? `대형폐기물에 해당할 때만 ${feeSummary}`
-          : `품목별 ${feeSummary}`,
-      ]
-    : [
-        // 규격 칸이 빈 행은 고시명만 적는다 — `빨래건조대 - 수수료 1,000원`으로 나가던 자리다.
-        ...feeRows.map((fee) => `${feeRowLabel(fee)} 수수료 ${fee.feeKrw.toLocaleString("ko-KR")}원`),
-        ...(feeRowTotal ? [`수수료표 ${feeRowTotal}행 중 대표 ${feeRows.length}행만 옮겼습니다 — 나머지는 수수료 조회 페이지에서 확인`] : []),
-      ];
+    ? [isBulkySecondaryRoute(item) ? `대형폐기물에 해당할 때만 ${feeSummary}` : `품목별 ${feeSummary}`]
+    : [];
 
   // 걸러 낸 결과가 비면 거르기 전 목록을 그대로 쓴다. 빈 목록은 아래 폴백으로 떨어지는데,
   // 그 폴백은 품목을 모를 때 쓰는 일반 문장이라 **품목별 항목보다 나쁘다** — `변기커버`처럼
@@ -718,14 +716,24 @@ function itemRegionCheckList(
     (checkItem) => !isCheckItemAnsweredByRegionGuide(checkItem, answeredLines, item, region),
   );
 
+  // 품목별 안내의 steps는 위 블록과 겹치지만 **그대로 둔다.** 이 툴의 structuredContent에서
+  // 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라(위 수수료 한 줄을 남기는 이유와 같다),
+  // 여기서 빼면 구조화 출력만 읽는 호스트가 마포구 `의자`의 지역 안내를 통째로 잃는다.
+  // 텍스트에 두 번 나가는 값은 그 대가로 치른다 — 정보를 지우는 것보다 낫다(PR #74 리뷰 1라운드).
+  const otherChecks = [...(guide ? guide.steps : []), ...feeChecks];
+
+  // 되살리는 건 **목록 전체가 빌 때만**이다. 수수료 줄이나 안내 steps가 남아 있으면 목록은
+  // 이미 서 있으므로, 답해진 항목까지 되살리면 품목 툴이 지운 것을 이 툴만 다시 묻는다 —
+  // 노원구 `욕실 발매트`가 그 자리였다(PR #74 리뷰 3라운드).
+  //
+  // 그래도 남는 비대칭이 있다. 확인 항목이 하나뿐이고 그게 답해졌으며 수수료도 안내도 없는
+  // 품목(`변기커버`·`고양이 스크래처` 등 20조합)은 품목 툴이 `확인 항목:`을 아예 안 내는데
+  // 이 툴은 되살려 한 줄을 낸다. 두 툴이 **다르게 답하는** 게 아니라 이 툴이 한 줄 더 내는
+  // 쪽이라 그대로 둔다 — 이 툴의 `확인할 정보`는 제목이 늘 서는 뼈대라, 비우면 답이 끊긴
+  // 것처럼 보이고 일반 폴백으로 떨어지면 대형폐기물 품목에 수거함을 묻게 된다.
   const checks = [
-    ...(keptChecks.length > 0 ? keptChecks : declaredChecks),
-    // 품목별 안내의 steps는 위 블록과 겹치지만 **그대로 둔다.** 이 툴의 structuredContent에서
-    // 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라(위 수수료 한 줄을 남기는 이유와 같다),
-    // 여기서 빼면 구조화 출력만 읽는 호스트가 마포구 `의자`의 지역 안내를 통째로 잃는다.
-    // 텍스트에 두 번 나가는 값은 그 대가로 치른다 — 정보를 지우는 것보다 낫다(PR #74 리뷰 1라운드).
-    ...(guide ? guide.steps : []),
-    ...feeChecks,
+    ...(keptChecks.length > 0 || otherChecks.length > 0 ? keptChecks : declaredChecks),
+    ...otherChecks,
   ].filter(Boolean);
 
   if (checks.length > 0) return withCollectionDaySource(Array.from(new Set(checks)), region);

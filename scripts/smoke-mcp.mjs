@@ -1140,11 +1140,21 @@ async function runSmoke() {
       );
       assert(!dashMultiPlan.includes("규격 2종"), "마포구 피아노: 규격이 없는 두 행을 `규격 2종`이라고 부른다");
       assert(dashMultiPlan.includes("수수료표 2행"), "마포구 피아노: 규격 없는 여러 행을 행 수로 말하지 않는다");
+
+      // 규격을 대는 행과 안 대는 행이 섞인 조합도 본다 — 마포구 `운동기구`는 세 행 중 둘만
+      // 규격을 댄다(`러닝머신`이 `-`). 하나라도 비면 `규격 N종`은 없는 구분을 지어내는 셈이다.
+      const mixedSpecPlan = JSON.stringify(
+        await callTool(baseUrl, "make_cleanup_plan", { items: ["러닝머신"], region: "서울 마포구" }, requestId++),
+      );
+      assert(!mixedSpecPlan.includes("규격 3종"), "마포구 운동기구: 규격 칸이 빈 행까지 세어 `규격 3종`이라고 부른다");
+      assert(mixedSpecPlan.includes("수수료표 3행"), "마포구 운동기구: 규격이 섞인 행 묶음을 행 수로 말하지 않는다");
       for (const [label, payload] of [["지역 툴", dashRegion], ["품목 툴", dashSteps], ["cleanup plan", dashPlan]]) {
         const serialized = JSON.stringify(payload);
         assert(!serialized.includes("(-,"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`(-,\`로 나간다`);
         assert(!serialized.includes("(-)"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`(-)\`로 나간다`);
         assert(!serialized.includes("빨래건조대 - 수수료"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`빨래건조대 - 수수료\`로 나간다`);
+        // 규격 자리의 `-`만 잡는다. 앞에 공백이 오는 `  - 수수료 …`는 목록 불릿이라 정상이다.
+        assert(!/\S - 수수료 /.test(serialized), `마포구 빨래건조대 ${label}: 규격 자리에 \`-\`가 그대로 남았다`);
         assert(serialized.includes("1,000원"), `마포구 빨래건조대 ${label}: 금액이 사라졌다 — 표기를 고치다가 값을 지웠다`);
       }
     }

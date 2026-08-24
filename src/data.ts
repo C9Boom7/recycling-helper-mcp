@@ -2290,11 +2290,6 @@ export function hasFeeSpec(fee: BulkyWasteFee): boolean {
   return Boolean(spec) && spec !== "-";
 }
 
-/** 수수료 행을 `{고시명} {규격}` 한 마디로. 규격이 없는 행은 고시명만 남는다. */
-export function feeRowLabel(fee: BulkyWasteFee): string {
-  return hasFeeSpec(fee) ? `${fee.itemName} ${fee.spec}` : fee.itemName;
-}
-
 /**
  * 광역으로 착지했을 때만 질의가 지목한 시·군·구를 되짚는다.
  *
