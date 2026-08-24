@@ -1513,7 +1513,7 @@
     },
     "expectedTextIncludes": [
       "리빙박스",
-      "플라스틱 단일재질",
+      "- 판단 조건: 크기/부피 확인, 플라스틱 단일재질, 복합재질, 분리 필요",
       "대형폐기물",
       "- 기타 프라스틱류: 5kg 당 2,000원"
     ],
@@ -10764,6 +10764,207 @@
       "\"id\":\"cat_litter\"",
       "\"disposalGroup\":\"일반쓰레기/불연성\"",
       "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
+    "id": "p9_dalseo_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉장고",
+      "region": "대구 달서구"
+    },
+    "expectedTextIncludes": [
+      "대구 달서구 대형생활폐기물 수수료 후보",
+      "냉장고: 300ℓ미만 5,000원",
+      "700ℓ이상 15,000원"
+    ],
+    "expectedTextExcludes": [
+      "대구광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서랍장",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "서랍장: 4단 이하 5,000원 · 5단 이상 7,000원"
+    ],
+    "expectedTextExcludes": [
+      "광주광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_mattress_not_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "1인용 매트리스 8,000원",
+      "2인용 매트리스 11,000원"
+    ],
+    "expectedTextExcludes": [
+      "매트리스 틀 6,000원",
+      "매트리스 틀 9,000원"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_bed_frame_keeps_mattress_frame_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대틀",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "1인용 매트리스 틀 6,000원",
+      "2인용 매트리스 틀 9,000원"
+    ],
+    "expectedTextExcludes": [
+      "1인용 매트리스 8,000원"
+    ]
+  },
+  {
+    "id": "condition_label_bathroom_scale_digital_or_mechanical",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "체중계"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 디지털 방식, 기계식"
+    ],
+    "expectedTextExcludes": [
+      "digital",
+      "mechanical"
+    ]
+  },
+  {
+    "id": "condition_label_hairbrush_material_split",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "머리빗"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 플라스틱 단일재질, 나무/복합재질"
+    ],
+    "expectedTextExcludes": [
+      "plastic material",
+      "wood or composite"
+    ]
+  },
+  {
+    "id": "condition_label_fish_bone_food_waste_exception",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "생선가시"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 음식물쓰레기 제외 품목, 날카로움, 소량 예외 확인"
+    ],
+    "expectedTextExcludes": [
+      "food waste exception",
+      "small amount exception"
+    ]
+  },
+  {
+    "id": "condition_label_paper_core_region_day_specific",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "종이 심지"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 내용물 비움 필요, 종이류, 지역별 배출 요일, 분리 필요"
+    ],
+    "expectedTextExcludes": [
+      "region day specific"
+    ]
+  },
+  {
+    "id": "condition_label_pet_waste_tissue",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "반려동물 배설물 묻은 휴지"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 오염 여부 확인, 위생용품, 반려동물 배설물"
+    ],
+    "expectedTextExcludes": [
+      "pet waste"
+    ]
+  },
+  {
+    "id": "condition_label_injection_needle_drops_region_specific",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "자가주사기 주사바늘"
+    },
+    "expectedTextIncludes": [
+      "- 판단 조건: 날카로움, 안전 포장 필요",
+      "종량제봉투"
+    ],
+    "expectedTextExcludes": [
+      "region specific",
+      "유해/위험 품목",
+      "### 지역 확인 필요"
+    ]
+  },
+  {
+    "id": "p9_daejeon_seogu_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전 서구"
+    },
+    "expectedTextIncludes": [
+      "대전 서구 지역 확인 안내",
+      "문의/신청 안내 전화: 042-288-3584",
+      "인터넷 신청: https://www.seogu.go.kr/waste/main.do",
+      "수수료 조회: https://www.seogu.go.kr/waste/user/info/wasteCost.do?wMenuId=1010200"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "대전광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전 서구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_daejeon_seogu_medicine",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전 서구",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "관내 약국과 동 행정복지센터, 보건소"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전 서구\""
+    ]
+  },
+  {
+    "id": "p9_daejeon_metro_no_district_leak",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전"
+    },
+    "expectedTextExcludes": [
+      "042-288-3584",
+      "seogu.go.kr",
+      "대전 서구 지역 확인 안내"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전광역시\"",
+      "\"coverageTier\":\"metro\""
     ]
   }
 ]

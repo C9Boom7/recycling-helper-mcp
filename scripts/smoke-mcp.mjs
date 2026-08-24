@@ -153,6 +153,10 @@ const REGIONS_WITH_OWN_DAY_PAGE = 31;
 // 두 사이클 뒤 안정되면 실패로 올린다 — 그때 `console.warn`을 `assert`로 바꾼다.
 const RESPONSE_SIZE_WARN_BYTES = { text: 5_450, widget: 4_050 };
 const SIZE_CASE = { itemName: "매트리스", region: "서울 노원구" };
+// PRD phase-11 R4. 지역 툴은 위젯 경로가 없어 모드가 하나다. 값은 `pnpm measure:size` 실측
+// (4,961B, 2026-08-25)에 10% 여유를 둔 것이고, 여기도 실패가 아니라 경고로 시작한다.
+const REGION_TOOL_SIZE_WARN_BYTES = 5_460;
+const REGION_SIZE_CASE = { region: "서울 노원구", itemName: "매트리스" };
 
 function warnIfOversized(result, mode) {
   const { total } = measureResult(result, { widgets: mode === "widget" });
@@ -1005,6 +1009,154 @@ async function runSmoke() {
         mapoFeeUrlCount === 1,
         `마포구 의자 지역 툴: 수수료 조회 주소가 본문에 ${mapoFeeUrlCount}번 나간다 — 연락처 블록과 수수료 블록이 같은 줄을 두 번 찍는다`,
       );
+
+      // PRD phase-11 — 지역 툴 다이어트. `확인할 정보`는 사용자가 아직 확인해야 할 것의
+      // 목록인데, 같은 응답 위쪽이 이미 답한 것을 다시 싣고 있었다.
+      const regionSizeResult = await callTool(baseUrl, "get_region_disposal_info", REGION_SIZE_CASE, requestId++);
+      const regionSizeText = resultText(regionSizeResult);
+      const regionSizeTotal = measureResult(regionSizeResult, { widgets: false }).total;
+      if (regionSizeTotal > REGION_TOOL_SIZE_WARN_BYTES) {
+        console.warn(
+          `[size] get_region_disposal_info ${JSON.stringify(REGION_SIZE_CASE)} 응답이 ${regionSizeTotal}B — 경고 상한 ${REGION_TOOL_SIZE_WARN_BYTES}B를 넘었다. ` +
+            "수수료 행이나 지역 출처가 늘어 정당하게 커진 것인지 pnpm measure:size로 확인하고, 아니면 체크리스트에 중복이 다시 생긴 것이다.",
+        );
+      }
+
+      // R1·R2 공통: 지역 툴 응답에 글자 단위로 같은 줄이 두 번 있으면 안 된다. 연락처 블록이
+      // 두 번 찍히던 것과 체크리스트가 위 블록을 옮겨 적던 것이 한 단언에 함께 걸린다.
+      // 빈 줄만 뺀다. `확인할 정보`의 항목은 앞에 번호가 붙어(`1. `) 같은 값이라도 줄이 달라지므로
+      // 이 판정에 걸리지 않는다 — 체크리스트 안의 중복은 위 R2 단언들이 따로 잡는다.
+      const regionSizeLines = regionSizeText.split("\n").filter((line) => line.trim().length > 0);
+      const regionDuplicateLine = regionSizeLines.find(
+        (line, index) => regionSizeLines.indexOf(line) !== index,
+      );
+      assert(
+        !regionDuplicateLine,
+        `노원구 매트리스 지역 툴: 같은 줄이 두 번 나간다 — "${regionDuplicateLine}"`,
+      );
+
+      // R2-a: 수수료는 위 블록이 냈으니 체크리스트는 범위 한 줄로 접는다. **한 줄은 남아야
+      // 한다** — 이 툴의 structuredContent에서 금액이 실리는 자리는 checkList뿐이다.
+      const regionChecks = regionSizeResult.structuredContent?.checkList ?? [];
+      const regionFeeChecks = regionChecks.filter((check) => /수수료/.test(check) && /원/.test(check));
+      assert(
+        regionFeeChecks.length === 1,
+        `노원구 매트리스 지역 툴: 체크리스트의 금액 줄이 ${regionFeeChecks.length}개다 — 1개여야 한다: ${JSON.stringify(regionFeeChecks)}`,
+      );
+      assert(
+        /\d+원~[\d,]+원/.test(regionFeeChecks[0]),
+        `노원구 매트리스 지역 툴: 체크리스트 수수료 줄이 범위를 안 담았다: "${regionFeeChecks[0]}"`,
+      );
+      assert(regionSizeText.includes("수수료 후보:"), "노원구 매트리스 지역 툴: 위 수수료 후보 블록이 사라졌다 — 범위 한 줄이 가리킬 곳이 없다");
+
+      // R2-b: 품목별 안내의 steps는 위 블록과 겹쳐도 체크리스트에 남아야 한다 — 이 툴의
+      // structuredContent에서 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라, 빼면
+      // 구조화 출력만 읽는 호스트가 그 안내를 통째로 잃는다(PR #74 리뷰 1라운드).
+      const mapoRegionChecks =
+        (await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "의자" }, requestId++))
+          .structuredContent?.checkList ?? [];
+      const mapoGuide = mapo.itemGuides?.find((guide) => guide.itemIds.includes("chair"));
+      assert(mapoGuide, "마포구 의자 픽스처에 품목별 지역 안내가 있어야 이 갈래를 볼 수 있다");
+      for (const step of mapoGuide.steps) {
+        assert(
+          mapoRegionChecks.includes(step),
+          `마포구 의자 지역 툴: 품목별 안내가 structuredContent에서 사라졌다 — checkList가 그 유일한 자리다: "${step}"`,
+        );
+        assert(mapoRegionText.includes(step), `마포구 의자 지역 툴: 품목별 안내에서 "${step}"이 사라졌다`);
+      }
+
+      // R2-c: 두 툴이 같은 품목·지역에서 같은 확인 항목을 낸다. 호스트가 어느 툴을 고르느냐로
+      // 답이 갈리면 안 된다 — 지역 툴만 안 거르고 있었다.
+      //
+      // 한 쌍만 보면 안 된다. 지역 툴의 근거를 "실제로 찍힌 줄"로 잡았을 때 `스탠드 조명`처럼
+      // 대형폐기물이 아닌 품목이 지역 대형폐기물 블록에 걸려 항목을 잃었는데, 노원구 매트리스
+      // 한 쌍으로는 안 보였다(PR #74 리뷰 2라운드). 갈래가 다른 품목을 함께 본다.
+      const parityCases = [
+        REGION_SIZE_CASE, // 대형폐기물 주 배출로 + 수수료 있음
+        { region: "서울 노원구", itemName: "스탠드 조명" }, // 소형가전 — 지역 대형폐기물 블록과 무관
+        { region: "서울 노원구", itemName: "변기커버" }, // 확인 항목이 하나뿐이고 그게 위에서 답해진다
+        { region: "서울 마포구", itemName: "다리미판" }, // 대형폐기물이 보조 배출로
+        { region: "서울 마포구", itemName: "의자" }, // 품목별 지역 안내가 있는 지역
+      ];
+      for (const parityCase of parityCases) {
+        const parityRegion = await callTool(baseUrl, "get_region_disposal_info", parityCase, requestId++);
+        const parityChecks = parityRegion.structuredContent?.checkList ?? [];
+        assert(parityChecks.length > 0, `${JSON.stringify(parityCase)}: 지역 툴 체크리스트가 비었다`);
+        const parityStepsChecks = resultText(
+          await callTool(baseUrl, "get_disposal_steps", { itemName: parityCase.itemName, region: parityCase.region }, requestId++),
+        )
+          .split("\n")
+          .filter((line) => line.startsWith("- 확인 항목: "))
+          .map((line) => line.slice("- 확인 항목: ".length));
+        for (const check of parityStepsChecks) {
+          // 요일 줄은 두 툴이 붙이는 자리가 달라(품목 툴은 확인 항목, 지역 툴은 닫는 줄) 문구가
+          // 갈린다. 그 불변식은 아래 49곳 회귀가 따로 지킨다.
+          if (check.includes("요일")) continue;
+          assert(
+            parityChecks.includes(check),
+            `${JSON.stringify(parityCase)}: 품목 툴은 "${check}"을 묻는데 지역 툴 체크리스트에는 없다 — 두 툴의 답이 갈린다`,
+          );
+        }
+        // 걸러 낸 결과가 비어도 품목을 모를 때 쓰는 일반 폴백으로 되돌아가면 안 된다.
+        assert(
+          !parityChecks.includes("전용 수거함, 지정 수거처, 신고 또는 수수료 기준"),
+          `${JSON.stringify(parityCase)}: 품목별 확인 항목이 일반 폴백으로 바뀌었다 — 거른 결과가 비었을 때 거르기 전 목록으로 돌아가야 한다`,
+        );
+      }
+
+      // 보조 배출로 품목은 체크리스트의 금액에도 카드·플랜과 같은 단서가 붙어야 한다.
+      const secondaryChecks =
+        (await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "다리미판" }, requestId++))
+          .structuredContent?.checkList ?? [];
+      const secondaryFee = secondaryChecks.find((check) => /수수료 [\d,]+원/.test(check));
+      assert(secondaryFee, "마포구 다리미판 지역 툴: 체크리스트에 금액 줄이 없다");
+      assert(
+        secondaryFee.startsWith("대형폐기물에 해당할 때만"),
+        `마포구 다리미판 지역 툴: 보조 배출로인데 금액을 조건 없이 말한다 — 카드·플랜과 답이 갈린다: "${secondaryFee}"`,
+      );
+
+      // 연락처 블록을 위에서 찍었으면 기한 문장도 그 방향을 가리켜야 한다. `아래`로 남으면
+      // 아무것도 없는 곳을 가리킨다.
+      const deadlineLine = regionSizeText.split("\n").find((line) => line.includes("신청 기한은"));
+      if (deadlineLine) {
+        assert(
+          !deadlineLine.includes("아래 신청 경로"),
+          `노원구 매트리스 지역 툴: 신청 경로는 위에 있는데 기한 문장이 아래를 가리킨다: "${deadlineLine}"`,
+        );
+      }
+
+      // R3: 규격 칸이 빈 행(`-`)을 규격처럼 싣지 않는다. 세 경로를 한 자리에서 본다.
+      const dashRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "빨래건조대" }, requestId++);
+      const dashSteps = await callTool(baseUrl, "get_disposal_steps", { itemName: "빨래건조대", region: "서울 마포구" }, requestId++);
+      const dashPlan = await callTool(baseUrl, "make_cleanup_plan", { items: ["빨래건조대"], region: "서울 마포구" }, requestId++);
+      // 행이 여럿인데 규격이 전부 빈 경우도 본다 — 마포구 `피아노`는 `피아노`와
+      // `전자피아노(오르간)` 두 고시명이 규격 없이 금액만 다르다. 단일 행만 고치면 이쪽은
+      // `규격 2종`으로 남아 고시에 없는 구분을 지어낸다(PR #74 리뷰 1라운드).
+      //
+      // 이 문구를 내는 건 `buildRegionFeeLine`이라 텍스트 모드 `get_disposal_steps`에는 안 실린다.
+      // 렌더링 모드와 무관하게 그 함수를 타는 `make_cleanup_plan`으로 본다.
+      const dashMultiPlan = JSON.stringify(
+        await callTool(baseUrl, "make_cleanup_plan", { items: ["피아노"], region: "서울 마포구" }, requestId++),
+      );
+      assert(!dashMultiPlan.includes("규격 2종"), "마포구 피아노: 규격이 없는 두 행을 `규격 2종`이라고 부른다");
+      assert(dashMultiPlan.includes("수수료표 2행"), "마포구 피아노: 규격 없는 여러 행을 행 수로 말하지 않는다");
+
+      // 규격을 대는 행과 안 대는 행이 섞인 조합도 본다 — 마포구 `운동기구`는 세 행 중 둘만
+      // 규격을 댄다(`러닝머신`이 `-`). 하나라도 비면 `규격 N종`은 없는 구분을 지어내는 셈이다.
+      const mixedSpecPlan = JSON.stringify(
+        await callTool(baseUrl, "make_cleanup_plan", { items: ["러닝머신"], region: "서울 마포구" }, requestId++),
+      );
+      assert(!mixedSpecPlan.includes("규격 3종"), "마포구 운동기구: 규격 칸이 빈 행까지 세어 `규격 3종`이라고 부른다");
+      assert(mixedSpecPlan.includes("수수료표 3행"), "마포구 운동기구: 규격이 섞인 행 묶음을 행 수로 말하지 않는다");
+      for (const [label, payload] of [["지역 툴", dashRegion], ["품목 툴", dashSteps], ["cleanup plan", dashPlan]]) {
+        const serialized = JSON.stringify(payload);
+        assert(!serialized.includes("(-,"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`(-,\`로 나간다`);
+        assert(!serialized.includes("(-)"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`(-)\`로 나간다`);
+        assert(!serialized.includes("빨래건조대 - 수수료"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`빨래건조대 - 수수료\`로 나간다`);
+        // 규격 자리의 `-`만 잡는다. 앞에 공백이 오는 `  - 수수료 …`는 목록 불릿이라 정상이다.
+        assert(!/\S - 수수료 /.test(serialized), `마포구 빨래건조대 ${label}: 규격 자리에 \`-\`가 그대로 남았다`);
+        assert(serialized.includes("1,000원"), `마포구 빨래건조대 ${label}: 금액이 사라졌다 — 표기를 고치다가 값을 지웠다`);
+      }
     }
 
     const classify = await callTool(baseUrl, "classify_waste_item", { itemName: "일회용 마스크" }, requestId);

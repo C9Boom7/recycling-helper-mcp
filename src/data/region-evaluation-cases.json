@@ -617,6 +617,30 @@
     "expectedBulkyApplication": true
   },
   {
+    "region": "대전 서구",
+    "expectedRegionId": "seo_gu_daejeon",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "대전광역시 서구",
+    "expectedRegionId": "seo_gu_daejeon",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "대전 중구",
+    "expectedRegionId": "daejeon",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "중구"
+  },
+  {
+    "region": "부산 서구",
+    "expectedRegionId": "busan",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "서구"
+  },
+  {
     "region": "부산 북구",
     "expectedRegionId": "busan",
     "expectedLevel": "metro",

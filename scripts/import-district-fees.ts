@@ -32,14 +32,21 @@ import {
 } from "./lib/bulky-item-match.js";
 
 type DistrictRow = { itemName: string; spec: string; feeKrw: number };
+/** `fetch-district-fees.mjs`의 `DUMP_FORMAT`과 같아야 한다. */
+const DUMP_FORMAT = 2;
+
 type DistrictDump = {
   regionId: string;
+  format?: number;
   name: string;
   kind: string;
   url: string;
   collectedAt?: string;
   rows: DistrictRow[];
+  /** 표가 우리가 아는 모양이 아니라는 신호. 하나라도 있으면 그 지역을 통째로 건너뛴다. */
   warnings?: string[];
+  /** 늘 나오는 정상 제외(성동 무상수거 안내 행 등). 사람이 볼 필요가 없어 임포트를 막지 않는다. */
+  notes?: string[];
   errors: string[];
 };
 
@@ -99,6 +106,37 @@ for (const regionId of targets) {
     continue;
   }
 
+  // 수집이 경고를 냈으면 **행이 0일 때와 똑같이** 다룬다 — 넣지 않고 기존 행을 남긴다.
+  //
+  // 경고는 전부 "표가 우리가 아는 모양이 아니다"라는 뜻이다: 후보의 20%가 사라졌다,
+  // 선언된 rowspan이 실제와 다르다, 예상 못 한 colspan이 생겼다, 페이지가 상한에서
+  // 잘렸다. 이 상태에서 나오는 건 빈 결과가 아니라 **한 칸씩 밀린 그럴듯한 오답**이라,
+  // 아래 품명 판정과 갈래 게이트를 멀쩡히 통과해 잘못된 품명에 금액이 붙은 채로 들어간다.
+  // 사람이 원문을 보기 전에는 맞는지 틀린지 가릴 방법이 없다.
+  //
+  // stderr에만 찍고 넣는 쪽은 고르지 않았다. 로그는 다음 사람이 안 읽지만 데이터는 답변에
+  // 나가고, 이 트랙이 막으려던 실패가 바로 "확신 있는 오답"이다. 상시 발생하는 정상
+  // 제외는 수집 쪽에서 `notes`로 갈라 두어, 이 게이트가 멀쩡한 지역을 막지는 않는다.
+  // 형식 표시가 없으면 `warnings`/`notes`를 가르기 전에 받은 덤프다. 그때는 성동
+  // 무상수거 안내 같은 상시 제외가 `warnings`에 들어 있어, 아래 게이트가 멀쩡한 지역을
+  // 막는다. 조용히 건너뛰지 말고 다시 수집하라고 말한다.
+  if (dump.format !== DUMP_FORMAT) {
+    console.error(`${regionId}: 덤프가 옛 형식이다(format=${dump.format ?? "없음"}, 지금은 ${DUMP_FORMAT})`);
+    console.error(`  경고와 상시 제외를 가르기 전에 받은 것이라 그대로 읽으면 판정이 어긋난다.`);
+    console.error(`  다시 수집해라: node scripts/fetch-district-fees.mjs ${regionId}`);
+    failed.push(regionId);
+    continue;
+  }
+
+  const warnings = dump.warnings ?? [];
+  if (warnings.length > 0) {
+    console.error(`${regionId}: 수집 경고 ${warnings.length}건 — 기존 행을 그대로 둔다`);
+    for (const warning of warnings) console.error(`  ! ${warning}`);
+    console.error(`  원문을 확인하고 파서를 고친 뒤 다시 수집해라: node scripts/fetch-district-fees.mjs ${regionId}`);
+    failed.push(regionId);
+    continue;
+  }
+
   const region = regions.find((item) => item.id === regionId);
   if (!region?.bulkyWaste?.applicationUrl || !region.bulkyWaste.feeUrl || !region.bulkyWaste.phone) {
     throw new Error(`${regionId}: region-policies.json에 대형폐기물 신청 URL·수수료 URL·전화번호가 모두 있어야 합니다.`);
@@ -134,16 +172,31 @@ for (const regionId of targets) {
     // 규격 칸이 다른 품목으로 확정되는 행은 넣지 않는다. 구청 표에도 「장판 /
     // 전기장판(1인용)」처럼 규격 자리에 다른 품목을 적는 칸이 있다.
     let itemId = verdict.itemId;
-    const hint = SPLIT_HINTS.find(
-      (rule) => rule.from === itemId && rule.hint.test(`${itemName} ${spec}`) && !(rule.deny?.test(`${itemName} ${spec}`) ?? false),
-    );
+    const hintText = `${itemName} ${spec}`;
+    // 낱말이 걸린 규칙과, 그중 `deny`를 통과한 규칙을 나눠 든다. `deny`는 "이 행은
+    // 옮기지 말고 원래 품목에 두라"는 뜻인데, 그 판정을 아래 규격 조각 검사에
+    // 넘겨주지 않으면 검사가 같은 낱말을 다시 보고 행을 통째로 버린다.
+    const triggered = SPLIT_HINTS.filter((rule) => rule.from === itemId && rule.hint.test(hintText));
+    const hint = triggered.find((rule) => !(rule.deny?.test(hintText) ?? false));
     if (hint) itemId = hint.to;
 
     if (!hint) {
+      // 여기까지 온 규칙은 전부 `deny`에 막힌 것들이다. 그 규칙이 가리키던 품목만
+      // 조각 검사에서 뺀다 — 광주 북구 「침대 / 2인용 매트리스 틀 / 9,000원」은
+      // 프레임 단독 행이라 `bed_frame`에 남아야 하는데, 조각 `매트리스`가
+      // `spec_names_other_item`으로 잡아 세 행이 통째로 사라졌다(6,000·9,000·6,000원).
+      // 검사 자체는 그대로 둔다. 규격 자리에 진짜 다른 품목이 오는 행
+      // (「장판 / 전기장판(1인용)」)은 여전히 걸러야 한다.
+      const denied = new Set(triggered.map((rule) => rule.to));
       let stolen = false;
       for (const candidate of specNameCandidates(spec)) {
         const specVerdict = classifyName(candidate, "spec_fragment");
-        if (specVerdict.ok && specVerdict.itemId !== itemId && hasBulkyRoute(specVerdict.itemId)) {
+        if (
+          specVerdict.ok &&
+          specVerdict.itemId !== itemId &&
+          !denied.has(specVerdict.itemId) &&
+          hasBulkyRoute(specVerdict.itemId)
+        ) {
           stolen = true;
           break;
         }
@@ -243,9 +296,20 @@ if (built.length === 0) {
 }
 
 // 다른 트랙이 넣은 지역과 이번에 실패한 지역은 건드리지 않는다.
-const managed = new Set(built.map((schedule) => schedule.regionId));
-const merged = [...existing.filter((schedule) => !managed.has(schedule.regionId)), ...built];
+// 이미 있던 지역은 **자리를 지킨다.** 예전에는 담당 지역을 걷어내고 끝에 다시 붙였는데,
+// 그러면 두 지역을 새로 넣어도 파일이 통째로 밀려 diff가 3만 줄이 된다. 실제 바뀐 행이
+// 넷인지 사백인지 리뷰에서 안 보이면 이 데이터의 안전장치 하나가 사라지는 셈이다.
+const byRegionId = new Map(built.map((schedule) => [schedule.regionId, schedule]));
+const merged = [
+  ...existing.map((schedule) => byRegionId.get(schedule.regionId) ?? schedule),
+  ...built.filter((schedule) => !existing.some((item) => item.regionId === schedule.regionId)),
+];
 writeFileSync(FEES_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((sum, schedule) => sum + schedule.fees.length, 0)}행`);
 if (missing.length > 0) console.log(`표가 없어 건너뛴 지역: ${missing.join(", ")}`);
-if (failed.length > 0) console.log(`이번에 넣지 못해 기존 행을 그대로 둔 지역: ${failed.join(", ")}`);
+if (failed.length > 0) {
+  // 건너뛴 지역을 종료 코드로 알린다. 예전에는 stdout 한 줄로 끝나서, 아홉 곳 중
+  // 하나가 빠진 실행과 전부 들어간 실행이 겉보기에 똑같았다.
+  console.error(`이번에 넣지 못해 기존 행을 그대로 둔 지역: ${failed.join(", ")}`);
+  process.exitCode = 1;
+}

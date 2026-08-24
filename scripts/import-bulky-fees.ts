@@ -5,6 +5,13 @@
  * Phase 6이 자치법규 조례에서 가져오고, 골든셋 4곳(강남·서초·송파·마포)은 표준데이터가
  * 미수록이거나 모호도가 높아 기존 수기 데이터를 그대로 둔다.
  *
+ * **표준데이터가 늘 최선은 아니다.** 2026-08-23 실측으로 두 가지가 드러났다.
+ * 광주 북구·인천 부평구는 아예 미수록이고, 대구 달서구는 209행이 있지만 **규격 칸이
+ * 전부 비어 있다** — 냉장고가 5,000~20,000원 다섯 행인데 어느 크기인지 알 수 없다.
+ * 구청 표에는 「700ℓ이상 15,000」처럼 규격이 붙어 있어 Phase 9는 둘 다 구청 표
+ * 트랙(`fetch-district-fees.mjs`)으로 보냈다. 대상을 늘릴 때는 `TARGETS`에 넣기 전에
+ * 원본에 행이 있는지, 규격 칸이 채워져 있는지부터 본다.
+ *
  * 사전 준비:
  *   1. node scripts/fetch-bulky-fee-standard-data.mjs   (원본 22,831행 수집)
  *   2. pnpm build                                        (resolveWasteItem 사용)
@@ -34,11 +41,19 @@ const REGIONS_PATH = "src/data/region-policies.json";
 // 같은 값이어야 한다 — 손으로 넣은 행은 이 스크립트를 거치지 않으므로 검사는 거기에 있다.
 const MAX_FEE_ROWS = 12;
 
-const TARGETS: Array<[string, string, string]> = [
-  ["용산구", "yongsan_gu", "서울 용산구"],
-  ["노원구", "nowon_gu", "서울 노원구"],
-  ["강서구", "gangseo_gu", "서울 강서구"],
-  ["관악구", "gwanak_gu", "서울 관악구"],
+/**
+ * `[시도, 고시상 지역명, regionId, 표시명]`.
+ *
+ * 시도를 튜플에 둔다. 예전에는 필터에 `"서울"`이 박혀 있었는데, 그러면 광역시 구를
+ * 넣는 순간 한 행도 안 걸려 throw하고, `북구`·`서구`처럼 여러 광역시에 있는 이름은
+ * 네 곳의 행이 한 지역으로 뭉친다. 시도 값은 표준데이터의 `CTPV_NM` 접두어와 맞춘다
+ * (`서울특별시`·`대구광역시` 꼴이라 `서울`·`대구`로 충분하다).
+ */
+const TARGETS: Array<[string, string, string, string]> = [
+  ["서울", "용산구", "yongsan_gu", "서울 용산구"],
+  ["서울", "노원구", "nowon_gu", "서울 노원구"],
+  ["서울", "강서구", "gangseo_gu", "서울 강서구"],
+  ["서울", "관악구", "gwanak_gu", "서울 관악구"],
 ];
 
 
@@ -88,14 +103,14 @@ const regions = JSON.parse(readFileSync(REGIONS_PATH, "utf8")) as RegionalPolicy
 const existing = JSON.parse(readFileSync(FEES_PATH, "utf8")) as BulkyWasteFeeSchedule[];
 
 const built: BulkyWasteFeeSchedule[] = [];
-for (const [gu, regionId, regionName] of TARGETS) {
+for (const [sido, gu, regionId, regionName] of TARGETS) {
   const region = regions.find(r => r.id === regionId);
   if (!region?.bulkyWaste?.applicationUrl || !region.bulkyWaste.feeUrl || !region.bulkyWaste.phone) {
     throw new Error(`${regionId}: region-policies.json에 대형폐기물 신청 URL·수수료 URL·전화번호가 모두 있어야 합니다.`);
   }
 
-  const regionRows = rows.filter(r => r.CTPV_NM.startsWith("서울") && r.SGG_NM === gu);
-  if (regionRows.length === 0) throw new Error(`${gu}: 표준데이터에 행이 없습니다.`);
+  const regionRows = rows.filter(r => r.CTPV_NM.startsWith(sido) && r.SGG_NM === gu);
+  if (regionRows.length === 0) throw new Error(`${sido} ${gu}: 표준데이터에 행이 없습니다.`);
   // 지자체 제출 기준일. 수집일이 아니라 이 값을 써야 신선도가 정직하게 드러난다.
   const checkedAt = [...new Set(regionRows.map(r => r.CRTR_YMD))].sort().pop()!;
 
@@ -180,14 +195,20 @@ for (const [gu, regionId, regionName] of TARGETS) {
     fees,
   });
 
-  console.log(`${gu}: 원본 ${regionRows.length}행 → 품목 ${grouped.size}개 / fee ${fees.length}행`);
+  console.log(`${sido} ${gu}: 원본 ${regionRows.length}행 → 품목 ${grouped.size}개 / fee ${fees.length}행`);
   console.log(`  제외: ${JSON.stringify(Object.fromEntries(skipped))}`);
   if (rerouted.length) console.log(`  품목 재지정: ${rerouted.join(" / ")}`);
   if (trimmed.length) console.log(`  상한 적용: ${trimmed.join(", ")}`);
 }
 
 // 기존 지역(골든셋 4곳, Phase 6 결과)은 건드리지 않고 담당 지역만 갈아끼운다.
-const managed = new Set(built.map(s => s.regionId));
-const merged = [...existing.filter(s => !managed.has(s.regionId)), ...built];
+// 이미 있던 지역은 **자리를 지킨다.** 예전에는 담당 지역을 걷어내고 끝에 다시 붙였는데,
+// 그러면 두 지역을 새로 넣어도 파일이 통째로 밀려 diff가 3만 줄이 된다. 실제 바뀐 행이
+// 넷인지 사백인지 리뷰에서 안 보이면 이 데이터의 안전장치 하나가 사라지는 셈이다.
+const byRegionId = new Map(built.map(s => [s.regionId, s]));
+const merged = [
+  ...existing.map(s => byRegionId.get(s.regionId) ?? s),
+  ...built.filter(s => !existing.some(e => e.regionId === s.regionId)),
+];
 writeFileSync(FEES_PATH, JSON.stringify(merged, null, 2) + "\n");
 console.log(`\n${FEES_PATH}: 지역 ${merged.length}곳, fee ${merged.reduce((n, s) => n + s.fees.length, 0)}행`);

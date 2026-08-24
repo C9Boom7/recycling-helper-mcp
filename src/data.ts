@@ -224,6 +224,7 @@ const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", im
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
 const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
 const disposalGroupPath = fileURLToPath(new URL("./data/disposal-groups.json", import.meta.url));
+const conditionLabelPath = fileURLToPath(new URL("./data/condition-labels.json", import.meta.url));
 const partNounPath = fileURLToPath(new URL("./data/compound-part-nouns.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
@@ -234,6 +235,10 @@ export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath,
 // 폴백으로 떨어진다("small_electronics_collection"이 어느 분기에도 안 걸리는 식).
 // 매핑을 데이터로 두고 validate-data.mjs가 전수 대응을 강제한다.
 export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")) as Record<string, string>;
+// 조건 키도 같은 이유로 데이터에 둔다. 라벨이 빠지면 카드의 "판단 조건" 줄이 영문 키를
+// 그대로 내보내 `반려동물 배설물 묻은 휴지`가 "오염 여부 확인, 위생용품, pet waste"처럼
+// 반쪽만 한국어로 나갔다.
+export const conditionLabels = JSON.parse(readFileSync(conditionLabelPath, "utf8")) as Record<string, string>;
 
 /**
  * 품목명 뒤에 붙으면 **다른 물건**이 되는 부품·부속 낱말. 값은 왜 다른 물건인지의 근거다.
@@ -1660,32 +1665,10 @@ export function confidenceLabel(confidence: Confidence): string {
   }
 }
 
-const conditionLabels: Record<string, string> = {
-  bulky: "크기/부피 확인",
-  clean: "깨끗한 상태",
-  coated: "코팅 여부",
-  contaminated: "오염 여부 확인",
-  damaged: "파손됨",
-  electronics: "전자제품",
-  empty_required: "내용물 비움 필요",
-  food_contaminated: "음식물 오염",
-  hazardous: "유해/위험 품목",
-  hygiene: "위생용품",
-  liquid: "액체",
-  mixed_material: "복합재질",
-  manufacturer_takeback: "제조사 회수 확인",
-  nonburnable: "불연성 폐기물",
-  oily: "기름 오염",
-  pressurized: "압축/가스 용기",
-  remaining_content: "내용물 남음",
-  reusable: "재사용 가능 여부",
-  safe_wrap_required: "안전 포장 필요",
-  separate_parts: "분리 필요",
-  sharp: "날카로움",
-  small_item: "소형 품목",
-  textile: "섬유류",
-};
-
+/**
+ * 조건 라벨은 `condition-labels.json`의 명시 매핑으로만 정한다. 폴백은 영문 키를
+ * 그대로 노출하므로 도달하면 그 자체가 결함이고, validate가 전수 대응을 강제한다.
+ */
 export function conditionLabel(condition: string): string {
   return conditionLabels[condition] ?? condition.replaceAll("_", " ");
 }
@@ -2271,9 +2254,23 @@ export function formatBulkyWasteFeeRows(fees: readonly BulkyWasteFee[]): string[
     else groups.set(fee.itemName, [fee]);
   }
   return Array.from(groups, ([itemName, rows]) => {
-    const specs = rows.map((fee) => (fee.spec && fee.spec !== "-" ? `${fee.spec} ${formatKrw(fee.feeKrw)}` : formatKrw(fee.feeKrw)));
+    const specs = rows.map((fee) => (hasFeeSpec(fee) ? `${fee.spec} ${formatKrw(fee.feeKrw)}` : formatKrw(fee.feeKrw)));
     return `  - ${itemName}: ${specs.join(" · ")}`;
   });
+}
+
+/**
+ * 규격 칸이 실제로 값을 담고 있는지. 원문에 규격 구분이 없는 행은 임포터가 `-`나 빈
+ * 문자열로 들여오는데(2026-08-25 기준 14행, 마포 12·서대문 1 외), 그 값을 문장에 그대로
+ * 끼우면 `빨래건조대 - 수수료 1,000원`·`수수료 1,000원 (-, 2026-08-22 확인)`처럼 나간다.
+ * 규격이 하나뿐인 (지역, 품목) 10쌍이 위젯 카드와 `make_cleanup_plan`에서 그랬다.
+ *
+ * 판정을 여기 한 벌만 두는 건 이 값을 읽는 자리가 셋이라서다 — 수수료 행 묶기, 카드의
+ * 수수료 범위 줄, 지역 툴 체크리스트. 호출부마다 따로 쓰면 한쪽만 고쳐진다(PRD phase-11 R3).
+ */
+export function hasFeeSpec(fee: BulkyWasteFee): boolean {
+  const spec = fee.spec?.trim();
+  return Boolean(spec) && spec !== "-";
 }
 
 /**
@@ -2316,32 +2313,37 @@ export type RegionItemGuideOptions = {
    */
   subRegionScopeAlreadyShown?: boolean;
   /**
-   * 호출부가 이 블록 **위에서 이미 찍은** 신청·수수료 주소. 수수료 블록이 그 주소를
-   * 다시 적지 않게 그대로 넘긴다(PR #70 리뷰 3라운드).
+   * 호출부가 이 블록 **위에서** 그 지역의 대형폐기물 연락처 블록
+   * (`formatRegionBulkyContactLines` — 문의 전화·인터넷 신청·수수료 조회)을 이미 찍었으면 `true`.
    *
-   * `get_region_disposal_info`가 이걸 넘긴다. 거기서는 호출부가 바로 위에서
-   * `formatRegionBulkyContactLines`로 같은 주소를 찍는데, 품목별 지역 안내가 있는
-   * 지역(강남·서초·송파·마포)은 아래 guide 갈래로 떨어져 수수료 블록이 그 주소를 다시
-   * 냈다 — 이 PR이 두 자리의 라벨을 `- 인터넷 신청:`·`- 수수료 조회:`로 통일하면서
-   * 글자까지 똑같은 줄이 두 번 나가게 됐다. `get_disposal_steps` 쪽 호출부는 넘기지
-   * 않는다. 거기서는 이 블록이 유일한 링크 자리라, 넘기면 링크가 통째로 사라진다.
+   * `get_region_disposal_info`만 넘긴다. 거기서는 호출부가 `{지역} 대형폐기물` 제목 아래
+   * 그 블록을 찍는데, 아래 두 갈래가 같은 것을 다시 냈다 — bulky 갈래는 블록 세 줄을
+   * 통째로, guide 갈래는 수수료 블록 끝의 주소 두 줄을. Phase 10이 두 자리의 라벨을
+   * `- 인터넷 신청:`·`- 수수료 조회:`로 통일하면서 글자까지 똑같아졌다(PRD phase-11 R1).
+   *
+   * `get_disposal_steps` 쪽 호출부(`formatItemGuide`·`buildRegionNotes`)는 넘기지 않는다.
+   * 거기서는 이 블록이 전화번호와 링크가 나가는 **유일한** 자리라, 넘기는 순간 통째로 사라진다.
    */
-  shownUrls?: readonly string[];
+  contactLinesAlreadyShown?: boolean;
 };
 
 export function formatRegionItemGuide(
   item: WasteItem,
   regionMatch?: MatchedRegionPolicy,
-  { namedSubRegion, subRegionScopeAlreadyShown, shownUrls = [] }: RegionItemGuideOptions = {},
+  { namedSubRegion, subRegionScopeAlreadyShown, contactLinesAlreadyShown = false }: RegionItemGuideOptions = {},
 ): string[] {
   if (!regionMatch) return [];
 
   const { region } = regionMatch;
   const guide = findRegionItemGuide(region, item);
+  // 호출부가 위에서 연락처 블록을 찍었으면 그 블록이 낸 주소는 아래 수수료 블록에서 뺀다.
+  // 광역(`metro`)은 연락처 블록에 주소가 없어 빈 배열이라, 넘어오든 아니든 그대로 나간다.
+  const shownUrls = contactLinesAlreadyShown ? regionBulkyContactUrls(region) : [];
+
   if (guide) {
     // 품목별 지역 안내는 주소를 안 찍으므로(강남은 "자원순환 종합포털에서"로 끝난다)
-    // 수수료 블록이 신청·수수료 링크를 낸다. 호출부가 응답 위쪽에서 같은 주소를 이미
-    // 찍었을 때만 `shownUrls`가 차 있고, 안 넘어오면(품목 툴) 둘 다 그대로 나간다.
+    // 수수료 블록이 신청·수수료 링크를 낸다. 품목 툴에서는 그 둘이 그대로 나가고,
+    // 지역 툴에서만 위 연락처 블록과 겹치는 만큼 빠진다.
     return [
       `- ${guide.summary}`,
       ...guide.steps.map((step) => `- ${region.name} 기준: ${step}`),
@@ -2365,6 +2367,11 @@ export function formatRegionItemGuide(
     //   같이 늘어, 기한을 빼고 신청 URL이 정확한 기한으로 가는 경로를 맡긴다.
     const hasConfirmedDeadline = region.coverageTier === "full";
     const isMetro = region.coverageTier === "metro";
+
+    // "신청 기한은 **아래** 신청 경로에서"는 이 블록 뒤에 연락처가 따라온다는 전제다.
+    // 호출부가 이미 찍어서 여기서 안 찍을 때는 그 경로가 위에 있다 — 가리키는 방향을
+    // 안 맞추면 아무것도 없는 아래를 가리킨다(PR #74 리뷰 2라운드).
+    const applicationPathWhere = contactLinesAlreadyShown ? "위" : "아래";
 
     // 배출 전 부착물을 "없다"고 확인한 지역만 부착 문구를 갈아끼운다. 값이 없으면
     // 지금까지 쓰던 문장 그대로다 — 기본값을 바꾸면 조사하지 않은 30곳까지 한꺼번에
@@ -2392,8 +2399,8 @@ export function formatRegionItemGuide(
         : isMetro
           ? "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
           : postingClause
-            ? `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. ${postingClause} 신청 기한은 아래 신청 경로에서 확인하세요.`
-            : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
+            ? `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. ${postingClause} 신청 기한은 ${applicationPathWhere} 신청 경로에서 확인하세요.`
+            : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 ${applicationPathWhere} 신청 경로에서 확인하세요.`;
 
     // 되묻기를 걷어내는 건 **metro 티어에서만**이다. 그 티어의 연락처 블록은
     // "거주 중인 시·군·구를 확인해야" 한 줄이 전부라 갈아끼워도 잃는 URL이 없지만,
@@ -2402,7 +2409,12 @@ export function formatRegionItemGuide(
     // 나중에 다른 툴로 넓히는 순간 그 셋이 소리 없이 사라진다 — 여기서 막는다.
     const usesRegionContactLines = !(namedSubRegion && isMetro);
     const contactLines = usesRegionContactLines
-      ? formatRegionBulkyContactLines(region)
+      ? // 호출부가 위에서 같은 블록을 찍었으면 여기서는 안 찍는다. 지역 툴이 노원구
+        // `매트리스`에서 전화·신청·수수료 조회 세 줄을 글자 단위로 두 번 내던 자리다
+        // (PRD phase-11 R1). 품목 툴은 이 옵션을 넘기지 않아 종전대로 전부 나간다.
+        contactLinesAlreadyShown
+        ? []
+        : formatRegionBulkyContactLines(region)
       : subRegionScopeAlreadyShown
         ? []
         : [
@@ -2411,7 +2423,8 @@ export function formatRegionItemGuide(
     // 연락처 블록이 방금 찍은 주소는 수수료 블록 끝에서 다시 적지 않는다. 연락처
     // 블록을 안 거친 갈래(광역 착지)는 호출부가 넘긴 것만 남아, 아무도 안 찍었으면
     // 수수료 블록이 주소를 그대로 낸다.
-    const feeShownUrls = usesRegionContactLines ? [...shownUrls, ...regionBulkyContactUrls(region)] : shownUrls;
+    // 연락처 블록이 이 응답 어딘가에서 주소를 냈으면(여기서든 호출부에서든) 수수료 블록은 다시 안 적는다.
+    const feeShownUrls = usesRegionContactLines ? regionBulkyContactUrls(region) : shownUrls;
     return [bulkyLine, ...contactLines, ...formatBulkyWasteFeeLines(item, region, { shownUrls: feeShownUrls })];
   }
 

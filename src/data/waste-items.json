@@ -4275,6 +4275,7 @@
       "세종특별자치시 고양이 모래 분리배출 안내"
     ],
     "conditions": [
+      "pet_waste",
       "nonburnable"
     ],
     "regionPolicy": {
@@ -5274,8 +5275,8 @@
       "강남구 자원순환 종합포털 대형생활폐기물 안내"
     ],
     "conditions": [
-      "large_item",
-      "plastic",
+      "bulky",
+      "plastic_material",
       "mixed_material",
       "separate_parts"
     ],
@@ -17011,7 +17012,9 @@
       "쇼파",
       "가죽 소파",
       "패브릭 소파",
-      "리클라이너 소파"
+      "리클라이너 소파",
+      "응접세트",
+      "응접셋트"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -17230,7 +17233,8 @@
     "aliases": [
       "장롱",
       "자개장",
-      "원목 옷장"
+      "원목 옷장",
+      "장농"
     ],
     "category": "bulky",
     "disposalType": "bulky_waste",
@@ -18121,7 +18125,8 @@
       "티브이",
       "평면 TV",
       "LED TV",
-      "폐티비"
+      "폐티비",
+      "텔레비젼"
     ],
     "category": "electronics_appliance",
     "disposalType": "free_visit_collection_or_bulky",
@@ -18717,7 +18722,8 @@
     "aliases": [
       "철제 캐비닛",
       "사무용 캐비닛",
-      "수납 캐비닛"
+      "수납 캐비닛",
+      "캐비넷"
     ],
     "category": "furniture",
     "disposalType": "bulky_waste",
@@ -21895,7 +21901,8 @@
       "생활폐기물 분리배출 누리집 품목사전: 식용유 용기"
     ],
     "conditions": [
-      "empty_required"
+      "empty_required",
+      "plastic_container"
     ],
     "regionPolicy": {
       "scope": "national_default",
