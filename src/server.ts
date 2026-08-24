@@ -41,7 +41,6 @@ import {
   itemRegionGuidance,
   needsCollectionDaySource,
   publicReviewMetadata,
-  regionBulkyContactUrls,
   resolveRegionalPolicy,
   resolveWasteItem,
   wasteItems,
@@ -402,7 +401,14 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   // 금액)으로 중복을 지운 행 수지 규격 종류 수가 아니라서다(노원 매트리스 21행은
   // 고시명 3종 × 규격 ~7종).
   const rowTotal = findBulkyWasteFeeRowTotal(regionMatch.region, item);
-  const specDetail = rowTotal ? `수수료표 ${rowTotal}행 중 대표 ${fees.length}행` : `규격 ${fees.length}종`;
+  // 여러 행인데 규격 칸이 전부 빈 경우도 있다 — 마포구 `피아노`는 `피아노`와 `전자피아노(오르간)`
+  // 두 고시명이 규격 없이 금액만 다르다. 그걸 `규격 2종`이라고 쓰면 고시에 없는 구분을 지어내는
+  // 셈이라, 그때는 행으로 말한다(PR #74 리뷰 1라운드).
+  const specDetail = rowTotal
+    ? `수수료표 ${rowTotal}행 중 대표 ${fees.length}행`
+    : fees.some(hasFeeSpec)
+      ? `규격 ${fees.length}종`
+      : `수수료표 ${fees.length}행`;
   return `수수료 ${krw(min)}~${krw(max)} ${paren(specDetail)}`;
 }
 
@@ -699,8 +705,11 @@ function itemRegionCheckList(
     ...(item.regionPolicy?.checkItems ?? []).filter(
       (checkItem) => !isCheckItemAnsweredByRegionGuide(checkItem, answeredLines, item, region),
     ),
-    // 품목별 안내가 위에서 `- {지역} 기준: {step}`으로 이미 낸 문장은 옮기지 않는다.
-    ...(guide ? guide.steps.filter((step) => !answeredLines.some((line) => line.includes(step))) : []),
+    // 품목별 안내의 steps는 위 블록과 겹치지만 **그대로 둔다.** 이 툴의 structuredContent에서
+    // 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라(위 수수료 한 줄을 남기는 이유와 같다),
+    // 여기서 빼면 구조화 출력만 읽는 호스트가 마포구 `의자`의 지역 안내를 통째로 잃는다.
+    // 텍스트에 두 번 나가는 값은 그 대가로 치른다 — 정보를 지우는 것보다 낫다(PR #74 리뷰 1라운드).
+    ...(guide ? guide.steps : []),
     ...feeChecks,
   ].filter(Boolean);
 

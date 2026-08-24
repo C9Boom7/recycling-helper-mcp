@@ -1024,7 +1024,8 @@ async function runSmoke() {
 
       // R1·R2 공통: 지역 툴 응답에 글자 단위로 같은 줄이 두 번 있으면 안 된다. 연락처 블록이
       // 두 번 찍히던 것과 체크리스트가 위 블록을 옮겨 적던 것이 한 단언에 함께 걸린다.
-      // 빈 줄과 목록 번호가 붙은 줄은 제외한다 — 번호가 다르면 애초에 같은 줄이 아니다.
+      // 빈 줄만 뺀다. `확인할 정보`의 항목은 앞에 번호가 붙어(`1. `) 같은 값이라도 줄이 달라지므로
+      // 이 판정에 걸리지 않는다 — 체크리스트 안의 중복은 위 R2 단언들이 따로 잡는다.
       const regionSizeLines = regionSizeText.split("\n").filter((line) => line.trim().length > 0);
       const regionDuplicateLine = regionSizeLines.find(
         (line, index) => regionSizeLines.indexOf(line) !== index,
@@ -1048,7 +1049,9 @@ async function runSmoke() {
       );
       assert(regionSizeText.includes("수수료 후보:"), "노원구 매트리스 지역 툴: 위 수수료 후보 블록이 사라졌다 — 범위 한 줄이 가리킬 곳이 없다");
 
-      // R2-b: 품목별 안내의 steps는 위에 이미 찍혔으면 체크리스트로 옮기지 않는다.
+      // R2-b: 품목별 안내의 steps는 위 블록과 겹쳐도 체크리스트에 남아야 한다 — 이 툴의
+      // structuredContent에서 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라, 빼면
+      // 구조화 출력만 읽는 호스트가 그 안내를 통째로 잃는다(PR #74 리뷰 1라운드).
       const mapoRegionChecks =
         (await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "의자" }, requestId++))
           .structuredContent?.checkList ?? [];
@@ -1056,10 +1059,10 @@ async function runSmoke() {
       assert(mapoGuide, "마포구 의자 픽스처에 품목별 지역 안내가 있어야 이 갈래를 볼 수 있다");
       for (const step of mapoGuide.steps) {
         assert(
-          !mapoRegionChecks.includes(step),
-          `마포구 의자 지역 툴: 위 품목별 안내가 낸 문장을 체크리스트가 다시 싣는다 — "${step}"`,
+          mapoRegionChecks.includes(step),
+          `마포구 의자 지역 툴: 품목별 안내가 structuredContent에서 사라졌다 — checkList가 그 유일한 자리다: "${step}"`,
         );
-        assert(mapoRegionText.includes(step), `마포구 의자 지역 툴: 품목별 안내에서 "${step}"이 사라졌다 — 중복을 지우다가 정보를 지웠다`);
+        assert(mapoRegionText.includes(step), `마포구 의자 지역 툴: 품목별 안내에서 "${step}"이 사라졌다`);
       }
 
       // R2-c: 두 툴이 같은 품목·지역에서 같은 확인 항목을 낸다. 호스트가 어느 툴을 고르느냐로
@@ -1082,6 +1085,17 @@ async function runSmoke() {
       const dashRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "빨래건조대" }, requestId++);
       const dashSteps = await callTool(baseUrl, "get_disposal_steps", { itemName: "빨래건조대", region: "서울 마포구" }, requestId++);
       const dashPlan = await callTool(baseUrl, "make_cleanup_plan", { items: ["빨래건조대"], region: "서울 마포구" }, requestId++);
+      // 행이 여럿인데 규격이 전부 빈 경우도 본다 — 마포구 `피아노`는 `피아노`와
+      // `전자피아노(오르간)` 두 고시명이 규격 없이 금액만 다르다. 단일 행만 고치면 이쪽은
+      // `규격 2종`으로 남아 고시에 없는 구분을 지어낸다(PR #74 리뷰 1라운드).
+      //
+      // 이 문구를 내는 건 `buildRegionFeeLine`이라 텍스트 모드 `get_disposal_steps`에는 안 실린다.
+      // 렌더링 모드와 무관하게 그 함수를 타는 `make_cleanup_plan`으로 본다.
+      const dashMultiPlan = JSON.stringify(
+        await callTool(baseUrl, "make_cleanup_plan", { items: ["피아노"], region: "서울 마포구" }, requestId++),
+      );
+      assert(!dashMultiPlan.includes("규격 2종"), "마포구 피아노: 규격이 없는 두 행을 `규격 2종`이라고 부른다");
+      assert(dashMultiPlan.includes("수수료표 2행"), "마포구 피아노: 규격 없는 여러 행을 행 수로 말하지 않는다");
       for (const [label, payload] of [["지역 툴", dashRegion], ["품목 툴", dashSteps], ["cleanup plan", dashPlan]]) {
         const serialized = JSON.stringify(payload);
         assert(!serialized.includes("(-,"), `마포구 빨래건조대 ${label}: 규격 없는 행이 \`(-,\`로 나간다`);
