@@ -3856,11 +3856,11 @@
         "basis": "신고처(동 행정복지센터·구 누리집·「여기로」 앱)와 신고 → 수수료 납부 → 스티커·배출번호 기재 부착 → 수거업체 처리 절차, 자원순환과 042-288-3584"
       },
       {
-        "title": "대전 서구 대형폐기물 인터넷 배출신고",
-        "url": "https://www.seogu.go.kr/waste/main.do",
+        "title": "대전광역시 가정 내 폐의약품 배출 요령 안내",
+        "url": "https://www.daejeon.go.kr/drh/board/boardNormalView.do?boardId=normal_0096&menuSeq=1631&pageIndex=1&ntatcSeq=1438964404",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-25",
-        "basis": "홈페이지 접속 → 신고 → 수수료 확인 → 신고필증 출력 → 배출 절차와 품목·규격·금액 3열 수수료표(냉장고·TV·침대·소파 등)"
+        "basis": "2023-09-20 게시. 배출처는 동 행정복지센터·약국·보건소이고, 알약·가루약·물약·안약/연고별 배출 방법과 약봉투 분리·건강보조식품 제외까지 안내 이미지에 적혀 있다"
       },
       {
         "title": "대전 서구 폐형광등·폐전지 분리배출",
@@ -3870,11 +3870,11 @@
         "basis": "아파트·단독주택별 수거함 위치, 막대형·원형·콤팩트형 구분 배출, 깨진 형광등은 종량제봉투, 권역 업체 사전 전화 요청, 자원순환과 042-288-3552"
       },
       {
-        "title": "대전광역시 가정 내 폐의약품 배출 요령 안내",
-        "url": "https://www.daejeon.go.kr/drh/board/boardNormalView.do?boardId=normal_0096&menuSeq=1631&pageIndex=1&ntatcSeq=1438964404",
+        "title": "대전 서구 대형폐기물 인터넷 배출신고",
+        "url": "https://www.seogu.go.kr/waste/main.do",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-25",
-        "basis": "2023-09-20 게시. 배출처는 동 행정복지센터·약국·보건소이고, 알약·가루약·물약·안약/연고별 배출 방법과 약봉투 분리·건강보조식품 제외까지 안내 이미지에 적혀 있다"
+        "basis": "홈페이지 접속 → 신고 → 수수료 확인 → 신고필증 출력 → 배출 절차와 품목·규격·금액 3열 수수료표(냉장고·TV·침대·소파 등)"
       },
       {
         "title": "대전 서구 폐의약품 수거함 현황 (구 데이터포털 오픈API)",
