@@ -4282,8 +4282,8 @@
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
-      "regionCheckLevel": "advisory",
-      "reason": "불연성 종량제 마대 운영 여부와 이름이 지자체 조례마다 다릅니다. 가연성·불연성을 한 봉투로 받는 지자체도 있습니다.",
+      "regionCheckLevel": "required",
+      "reason": "벤토나이트·규사를 받는 불연성 종량제 마대의 운영 여부와 이름이 지자체 조례마다 다릅니다. 가연성·불연성을 한 봉투로 받는 지자체도 있습니다.",
       "checkItems": [
         "불연성 종량제 마대 운영 여부와 판매처",
         "품목별 지역 배출 기준",
@@ -8570,10 +8570,7 @@
       "scope": "region_specific",
       "needsRegionCheck": true,
       "regionCheckLevel": "advisory",
-      "reason": "기본 배출은 전국 공통으로 종량제봉투지만, 일부 지자체는 폐주사기 전용 수거함을 운영합니다.",
-      "checkItems": [
-        "폐주사기 전용 수거함 운영 여부"
-      ]
+      "reason": "기본 배출은 전국 공통으로 종량제봉투지만, 일부 지자체는 폐주사기 전용 수거함을 운영합니다."
     },
     "sources": [
       {
@@ -22005,26 +22002,32 @@
       "물기를 비우고 안쪽을 헹궈 말립니다.",
       "바닥과 겉면의 재질 표시를 확인합니다.",
       "플라스틱 한 가지면 플라스틱류, 금속 한 가지면 고철류로 배출합니다.",
-      "도자기이거나 여러 재질이 붙어 떨어지지 않으면 종량제봉투로 배출합니다."
+      "여러 재질이 붙어 떨어지지 않으면 종량제봉투로 배출합니다.",
+      "도자기나 유리 재질이면 불연성 폐기물이라 거주지의 불연성 마대 기준을 확인해 배출합니다."
     ],
     "cautions": [
       "칫솔은 여러 재질이 섞여 종량제봉투로 가는 별개 품목입니다. 꽂이와 함께 넣지 않습니다.",
-      "도자기·유리 재질은 재활용되지 않고, 지역에 따라 불연성 전용 마대를 쓰기도 합니다."
+      "도자기나 유리 재질은 재활용되지 않습니다. 뚝배기·사기그릇처럼 불연성 폐기물이라 거주지 기준을 확인해 배출합니다."
     ],
     "confidence": "medium",
-    "needsRegionCheck": false,
+    "needsRegionCheck": true,
     "sourceRefs": [
       "생활폐기물 분리배출 누리집 품목사전: 칫솔 꽂이(금속∙플라스틱)",
       "생활폐기물 분리배출 누리집 품목사전: 칫솔 꽂이(복합 재질)"
     ],
     "conditions": [
       "mixed_material",
-      "plastic_container"
+      "plastic_container",
+      "nonburnable"
     ],
     "regionPolicy": {
-      "scope": "national_default",
-      "needsRegionCheck": false,
-      "reason": "공식 품목사전이 재질별로 갈라 안내하며, 두 갈래 모두 전국 공통 기준입니다."
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "도자기·유리 재질은 불연성 폐기물이라, 불연성 전용 마대로 받는지 종량제봉투로 받는지가 지역마다 다릅니다.",
+      "checkItems": [
+        "도자기·유리의 불연성 폐기물 배출 기준",
+        "플라스틱류 배출 요일"
+      ]
     },
     "sources": [
       {
@@ -22044,7 +22047,7 @@
       }
     ],
     "review": {
-      "status": "verified",
+      "status": "region_review_needed",
       "reviewer": "moe-api-crosscheck",
       "lastReviewedAt": "2026-08-25",
       "notes": [
@@ -22067,7 +22070,7 @@
     "summary": "라돈이 검출된 침대와 매트리스는 일반 대형폐기물로 내놓지 않고, 제조사 회수(역회수)와 지자체 배출 방법을 함께 확인합니다.",
     "steps": [
       "제조사나 판매처에 회수 대상 제품인지 확인하고 회수를 요청합니다.",
-      "회수 절차가 진행되기 전까지는 사람이 오래 머무는 공간에서 떨어뜨리고 환기합니다.",
+      "회수 절차가 진행되기 전까지는 사람이 오래 머무는 공간에서 멀리 떨어진 곳에 두고 자주 환기합니다.",
       "제조사 회수가 어려우면 거주 지자체에 라돈 검출 제품 배출 방법을 문의합니다."
     ],
     "cautions": [

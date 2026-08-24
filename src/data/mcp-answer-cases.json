@@ -3263,7 +3263,7 @@
       "\"id\":\"cat_litter\"",
       "\"matchedBy\":\"벤토나이트\"",
       "\"disposalGroup\":\"일반쓰레기/불연성\"",
-      "\"regionCheckLevel\":\"참고\""
+      "\"regionCheckLevel\":\"필수\""
     ]
   },
   {
@@ -10583,7 +10583,8 @@
     },
     "expectedTextIncludes": [
       "칫솔꽂이",
-      "재질"
+      "재질",
+      "불연성"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"toothbrush_holder\""
@@ -10760,7 +10761,8 @@
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cat_litter\"",
-      "\"disposalGroup\":\"일반쓰레기/불연성\""
+      "\"disposalGroup\":\"일반쓰레기/불연성\"",
+      "\"regionCheckLevel\":\"필수\""
     ]
   }
 ]
