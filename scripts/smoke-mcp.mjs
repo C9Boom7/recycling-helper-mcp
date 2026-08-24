@@ -1067,17 +1067,61 @@ async function runSmoke() {
 
       // R2-c: 두 툴이 같은 품목·지역에서 같은 확인 항목을 낸다. 호스트가 어느 툴을 고르느냐로
       // 답이 갈리면 안 된다 — 지역 툴만 안 거르고 있었다.
-      const stepsChecks = resultText(await callTool(baseUrl, "get_disposal_steps", REGION_SIZE_CASE, requestId++))
-        .split("\n")
-        .filter((line) => line.startsWith("- 확인 항목: "))
-        .map((line) => line.slice("- 확인 항목: ".length));
-      for (const check of stepsChecks) {
-        // 요일 줄은 두 툴이 붙이는 자리가 달라(품목 툴은 확인 항목, 지역 툴은 닫는 줄) 문구가
-        // 갈린다. 그 불변식은 아래 49곳 회귀가 따로 지킨다.
-        if (check.includes("요일")) continue;
+      //
+      // 한 쌍만 보면 안 된다. 지역 툴의 근거를 "실제로 찍힌 줄"로 잡았을 때 `스탠드 조명`처럼
+      // 대형폐기물이 아닌 품목이 지역 대형폐기물 블록에 걸려 항목을 잃었는데, 노원구 매트리스
+      // 한 쌍으로는 안 보였다(PR #74 리뷰 2라운드). 갈래가 다른 품목을 함께 본다.
+      const parityCases = [
+        REGION_SIZE_CASE, // 대형폐기물 주 배출로 + 수수료 있음
+        { region: "서울 노원구", itemName: "스탠드 조명" }, // 소형가전 — 지역 대형폐기물 블록과 무관
+        { region: "서울 노원구", itemName: "변기커버" }, // 확인 항목이 하나뿐이고 그게 위에서 답해진다
+        { region: "서울 마포구", itemName: "다리미판" }, // 대형폐기물이 보조 배출로
+        { region: "서울 마포구", itemName: "의자" }, // 품목별 지역 안내가 있는 지역
+      ];
+      for (const parityCase of parityCases) {
+        const parityRegion = await callTool(baseUrl, "get_region_disposal_info", parityCase, requestId++);
+        const parityChecks = parityRegion.structuredContent?.checkList ?? [];
+        assert(parityChecks.length > 0, `${JSON.stringify(parityCase)}: 지역 툴 체크리스트가 비었다`);
+        const parityStepsChecks = resultText(
+          await callTool(baseUrl, "get_disposal_steps", { itemName: parityCase.itemName, region: parityCase.region }, requestId++),
+        )
+          .split("\n")
+          .filter((line) => line.startsWith("- 확인 항목: "))
+          .map((line) => line.slice("- 확인 항목: ".length));
+        for (const check of parityStepsChecks) {
+          // 요일 줄은 두 툴이 붙이는 자리가 달라(품목 툴은 확인 항목, 지역 툴은 닫는 줄) 문구가
+          // 갈린다. 그 불변식은 아래 49곳 회귀가 따로 지킨다.
+          if (check.includes("요일")) continue;
+          assert(
+            parityChecks.includes(check),
+            `${JSON.stringify(parityCase)}: 품목 툴은 "${check}"을 묻는데 지역 툴 체크리스트에는 없다 — 두 툴의 답이 갈린다`,
+          );
+        }
+        // 걸러 낸 결과가 비어도 품목을 모를 때 쓰는 일반 폴백으로 되돌아가면 안 된다.
         assert(
-          regionChecks.some((regionCheck) => regionCheck === check),
-          `노원구 매트리스: 품목 툴은 "${check}"을 묻는데 지역 툴 체크리스트에는 없다 — 두 툴의 답이 갈린다`,
+          !parityChecks.includes("전용 수거함, 지정 수거처, 신고 또는 수수료 기준"),
+          `${JSON.stringify(parityCase)}: 품목별 확인 항목이 일반 폴백으로 바뀌었다 — 거른 결과가 비었을 때 거르기 전 목록으로 돌아가야 한다`,
+        );
+      }
+
+      // 보조 배출로 품목은 체크리스트의 금액에도 카드·플랜과 같은 단서가 붙어야 한다.
+      const secondaryChecks =
+        (await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "다리미판" }, requestId++))
+          .structuredContent?.checkList ?? [];
+      const secondaryFee = secondaryChecks.find((check) => /수수료 [\d,]+원/.test(check));
+      assert(secondaryFee, "마포구 다리미판 지역 툴: 체크리스트에 금액 줄이 없다");
+      assert(
+        secondaryFee.startsWith("대형폐기물에 해당할 때만"),
+        `마포구 다리미판 지역 툴: 보조 배출로인데 금액을 조건 없이 말한다 — 카드·플랜과 답이 갈린다: "${secondaryFee}"`,
+      );
+
+      // 연락처 블록을 위에서 찍었으면 기한 문장도 그 방향을 가리켜야 한다. `아래`로 남으면
+      // 아무것도 없는 곳을 가리킨다.
+      const deadlineLine = regionSizeText.split("\n").find((line) => line.includes("신청 기한은"));
+      if (deadlineLine) {
+        assert(
+          !deadlineLine.includes("아래 신청 경로"),
+          `노원구 매트리스 지역 툴: 신청 경로는 위에 있는데 기한 문장이 아래를 가리킨다: "${deadlineLine}"`,
         );
       }
 

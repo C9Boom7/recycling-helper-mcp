@@ -2390,6 +2390,11 @@ export function formatRegionItemGuide(
     const hasConfirmedDeadline = region.coverageTier === "full";
     const isMetro = region.coverageTier === "metro";
 
+    // "신청 기한은 **아래** 신청 경로에서"는 이 블록 뒤에 연락처가 따라온다는 전제다.
+    // 호출부가 이미 찍어서 여기서 안 찍을 때는 그 경로가 위에 있다 — 가리키는 방향을
+    // 안 맞추면 아무것도 없는 아래를 가리킨다(PR #74 리뷰 2라운드).
+    const applicationPathWhere = contactLinesAlreadyShown ? "위" : "아래";
+
     // 배출 전 부착물을 "없다"고 확인한 지역만 부착 문구를 갈아끼운다. 값이 없으면
     // 지금까지 쓰던 문장 그대로다 — 기본값을 바꾸면 조사하지 않은 30곳까지 한꺼번에
     // 다른 안내를 받는다.
@@ -2416,8 +2421,8 @@ export function formatRegionItemGuide(
         : isMetro
           ? "- 대형생활폐기물은 배출 전에 사전 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 시·군·구마다 다릅니다."
           : postingClause
-            ? `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. ${postingClause} 신청 기한은 아래 신청 경로에서 확인하세요.`
-            : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 아래 신청 경로에서 확인하세요.`;
+            ? `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청합니다. ${postingClause} 신청 기한은 ${applicationPathWhere} 신청 경로에서 확인하세요.`
+            : `- ${region.name} 대형생활폐기물은 배출 전에 미리 신청하고 접수증 또는 접수번호를 부착해 배출합니다. 신청 기한은 ${applicationPathWhere} 신청 경로에서 확인하세요.`;
 
     // 되묻기를 걷어내는 건 **metro 티어에서만**이다. 그 티어의 연락처 블록은
     // "거주 중인 시·군·구를 확인해야" 한 줄이 전부라 갈아끼워도 잃는 URL이 없지만,

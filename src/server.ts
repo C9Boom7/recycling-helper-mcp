@@ -691,20 +691,35 @@ function itemRegionCheckList(
   // **한 줄은 남겨야 한다** — 이 툴의 structuredContent에서 금액이 실리는 자리는
   // `checkList`뿐이라(`regionFeeLine` 같은 필드가 없다), 통째로 지우면 구조화 출력만
   // 읽는 모델이 수수료를 잃는다. 문구는 카드가 쓰는 `buildRegionFeeLine`을 그대로 쓴다.
+  //
+  // 보조 배출로인 품목에는 카드·플랜과 같은 단서를 여기서도 단다. 안 그러면 `다리미판`처럼
+  // 종량제봉투가 기본인 품목의 체크리스트만 금액을 조건 없이 말해, 같은 품목·지역에서
+  // 툴마다 다른 말을 한다(PR #74 리뷰 2라운드).
   const feeBlockShown = answeredLines.some((line) => line.includes("수수료 후보:"));
   const feeSummary = feeBlockShown ? buildRegionFeeLine(item, region) : undefined;
   const feeChecks = feeSummary
-    ? [`품목별 ${feeSummary}`]
+    ? [
+        isBulkySecondaryRoute(item)
+          ? `대형폐기물에 해당할 때만 ${feeSummary}`
+          : `품목별 ${feeSummary}`,
+      ]
     : [
         // 규격 칸이 빈 행은 고시명만 적는다 — `빨래건조대 - 수수료 1,000원`으로 나가던 자리다.
         ...feeRows.map((fee) => `${feeRowLabel(fee)} 수수료 ${fee.feeKrw.toLocaleString("ko-KR")}원`),
         ...(feeRowTotal ? [`수수료표 ${feeRowTotal}행 중 대표 ${feeRows.length}행만 옮겼습니다 — 나머지는 수수료 조회 페이지에서 확인`] : []),
       ];
 
+  // 걸러 낸 결과가 비면 거르기 전 목록을 그대로 쓴다. 빈 목록은 아래 폴백으로 떨어지는데,
+  // 그 폴백은 품목을 모를 때 쓰는 일반 문장이라 **품목별 항목보다 나쁘다** — `변기커버`처럼
+  // 확인 항목이 하나뿐이고 그게 위에서 답해진 품목이 "전용 수거함, 지정 수거처, …"로
+  // 되돌아가, 대형폐기물 품목에 수거함을 묻고 수수료를 다시 묻는다(PR #74 리뷰 2라운드).
+  const declaredChecks = item.regionPolicy?.checkItems ?? [];
+  const keptChecks = declaredChecks.filter(
+    (checkItem) => !isCheckItemAnsweredByRegionGuide(checkItem, answeredLines, item, region),
+  );
+
   const checks = [
-    ...(item.regionPolicy?.checkItems ?? []).filter(
-      (checkItem) => !isCheckItemAnsweredByRegionGuide(checkItem, answeredLines, item, region),
-    ),
+    ...(keptChecks.length > 0 ? keptChecks : declaredChecks),
     // 품목별 안내의 steps는 위 블록과 겹치지만 **그대로 둔다.** 이 툴의 structuredContent에서
     // 지역별 품목 안내가 실리는 자리가 `checkList`뿐이라(위 수수료 한 줄을 남기는 이유와 같다),
     // 여기서 빼면 구조화 출력만 읽는 호스트가 마포구 `의자`의 지역 안내를 통째로 잃는다.
@@ -1421,11 +1436,20 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     itemGuideLines.length > 0 ? itemGuideLines.join("\n") : undefined,
   ].filter(Boolean);
 
-  // 체크리스트가 "위에서 이미 답한 것"을 가려내려면 그 위에 무엇이 찍혔는지 알아야 한다.
-  // 넘기는 건 대형폐기물 연락처 블록과 품목별 안내 블록뿐이다 — 지역 요약은 넘기지 않는다
-  // (지역 전체를 훑는 문장이라 낱말만 스쳐도 답한 것으로 잡힌다).
+  // 체크리스트가 "위에서 이미 답한 것"을 가려내는 근거.
+  //
+  // **렌더된 줄이 아니라 품목 툴이 쓰는 줄을 넘긴다.** 두 툴이 같은 품목·지역에서 같은 항목을
+  // 내야 하는데, 이 툴이 실제로 찍는 것은 그것과 두 군데 다르다 — 지역 대형폐기물 연락처
+  // 블록은 품목과 **무관하게** 늘 찍히고(`스탠드 조명`처럼 대형폐기물이 아닌 품목까지
+  // "신청 URL이 있으니 답했다"로 걸린다), 반대로 품목별 안내의 연락처는 위에서 찍었다고
+  // 여기서 빠져 있다. 둘 중 어느 쪽으로 기울어도 툴마다 답이 갈린다.
+  //
+  // 그래서 근거는 `formatItemGuide`가 쓰는 것과 같은 모양으로 한 번 더 만든다. 이 배열은
+  // 응답에 찍히지 않고 판정에만 쓰인다 — 대신 두 툴의 필터가 정의상 같아진다(PR #74 리뷰 2라운드).
+  const parityGuideLines =
+    match && regionMatch ? formatRegionItemGuide(match.item, regionMatch, { namedSubRegion }) : [];
   const checkList = closeCollectionDayMention(
-    itemRegionCheckList(regionMatch, match?.item, { answeredLines: [...bulkyLines, ...itemGuideLines] }),
+    itemRegionCheckList(regionMatch, match?.item, { answeredLines: parityGuideLines }),
     answerBodyLines.join("\n"),
     regionMatch,
   );
