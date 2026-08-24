@@ -177,7 +177,12 @@ function parseSpotBody(text: string): ParsedSpotBody | undefined {
 
   const responseBody = (Array.isArray(record.body) ? record.body[0] : record.body) as Record<string, unknown> | undefined;
   const items = (responseBody?.items as { item?: unknown } | unknown[] | undefined) ?? [];
-  const rawRows = Array.isArray(items) ? items : Array.isArray((items as { item?: unknown }).item) ? ((items as { item: unknown[] }).item) : [(items as { item?: unknown }).item];
+  let rawRows = Array.isArray(items) ? items : Array.isArray((items as { item?: unknown }).item) ? ((items as { item: unknown[] }).item) : [(items as { item?: unknown }).item];
+  // `items: [{ item: [...] }]` 이중 중첩도 온다 — 실측 스크립트가 실서버에서 이미 겪고
+  // 정규화해 둔 모양이다. 안 풀면 행이 0개로 읽혀 "이 동에는 없다"는 거짓 답이 된다.
+  if (rawRows.length === 1 && rawRows[0] !== null && typeof rawRows[0] === "object" && Array.isArray((rawRows[0] as { item?: unknown }).item)) {
+    rawRows = (rawRows[0] as { item: unknown[] }).item;
+  }
 
   const totalCountValue = responseBody?.totalCount;
   const totalCount =

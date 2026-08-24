@@ -12,7 +12,7 @@
   "battery_lamp": {
     "label": "폐건전지·폐형광등 수거함",
     "patterns": [
-      "전지 수거함",
+      "전지",
       "형광등"
     ],
     "itemIds": [

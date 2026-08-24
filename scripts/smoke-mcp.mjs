@@ -2389,6 +2389,8 @@ const SPOT_FIXTURES = {
     // 두 묶음 표기를 겸하는 실측 사례. 표 순서상 `battery_lamp`가 이겨야 한다.
     { spotNm: "폐형광등∙폐건전지 전용 배출함", addrBase: "서울특별시 노원구 한글비석로 220", addrDtl: "" },
     { spotNm: "폐건전지 수거함", addrBase: "서울특별시 노원구 상계로1길 10", addrDtl: "" },
+    // 표기가 붙은 지자체도 있다 — `전지` 패턴이 공백에 민감하면 이 행이 기타로 샌다.
+    { spotNm: "폐건전지수거함", addrBase: "서울특별시 노원구 상계로1길 20", addrDtl: "" },
     { spotNm: "의류 수거함", addrBase: "서울특별시 노원구 상계로 88", addrDtl: "" },
     { spotNm: "의류 수거함", addrBase: "서울특별시 노원구 상계로 92", addrDtl: "" },
     { spotNm: "의류수거함", addrBase: "서울특별시 노원구 동일로204길 12", addrDtl: "" },
@@ -2426,18 +2428,33 @@ const SPOT_FIXTURES = {
     { spotNm: "폐의약품 수거함", addrBase: "전라남도 여수시 서교동 12", addrDtl: "여수시보건소" },
   ],
   단건동: [{ spotNm: "폐의약품 수거함", addrBase: "충청북도 청주시 흥덕구 단건로 1", addrDtl: "단건동주민센터" }],
+  // 이름을 품은 이웃 구 — `부산 서구` 질의에 강서구 주소가 부분 문자열로 통과하면 안 된다.
+  경계동: [
+    { spotNm: "폐의약품 수거함", addrBase: "부산광역시 서구 구덕로 120", addrDtl: "서구보건소" },
+    { spotNm: "폐의약품 수거함", addrBase: "부산광역시 강서구 낙동북로 477", addrDtl: "강서구보건소" },
+  ],
+  // 이중 중첩 `items: [{ item: [...] }]` — 실서버가 이 모양을 실제로 낸다.
+  중첩동: [
+    { spotNm: "폐의약품 수거함", addrBase: "대전광역시 서구 둔산로 100", addrDtl: "서구보건소" },
+    { spotNm: "의류수거함", addrBase: "대전광역시 서구 둔산로 200", addrDtl: "" },
+  ],
   절단동: [
     { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 학동로 426", addrDtl: "강남구보건소" },
     { spotNm: "의류수거함", addrBase: "서울특별시 강남구 학동로 400", addrDtl: "" },
   ],
   느린동: [{ spotNm: "폐의약품 수거함", addrBase: "서울특별시 성동구 고산자로 270", addrDtl: "성동구보건소" }],
+  // 판매소·기타뿐인 동 — 노출 묶음이 하나도 없다.
+  판매소동: [
+    { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 판매로 1", addrDtl: "○○마트" },
+    { spotNm: "재활용정거장(이동식)", addrBase: "서울특별시 노원구 판매로 3", addrDtl: "" },
+  ],
   빈동: [],
 };
 
 /** 상계동 응답에서 기대하는 묶음과 개수. 표 순서·묶음당 3곳·전체 12곳이 한꺼번에 걸린다. */
 const SPOT_EXPECTED_SECTIONS = [
   "### 폐의약품 수거함 (2곳)",
-  "### 폐건전지·폐형광등 수거함 (4곳 중 3곳)",
+  "### 폐건전지·폐형광등 수거함 (5곳 중 3곳)",
   "### 의류 수거함 (5곳 중 3곳)",
   "### 폐휴대폰·소형가전 수거함 (3곳)",
   "### 투명페트병·캔 무인회수기 (2곳 중 1곳)",
@@ -2540,7 +2557,8 @@ function startMockUpstream() {
 
     const header = { resultCode: "00", resultMsg: "NORMAL SERVICE." };
     // 단건이면 배열이 아니라 객체로 온다 — 수거함이 한 곳뿐인 동에서만 터지는 자리다.
-    const items = rows.length === 1 ? { item: rows[0] } : { item: rows };
+    // 중첩동은 실서버가 내는 또 다른 모양(`items: [{ item: [...] }]`)을 재현한다.
+    const items = addr === "중첩동" ? [{ item: rows }] : rows.length === 1 ? { item: rows[0] } : { item: rows };
     // 1,000행 절단은 totalCount로만 드러난다.
     const totalCount = addr === "절단동" ? 2_000 : rows.length;
 
@@ -2726,6 +2744,14 @@ async function runSpotSmoke() {
       `되묻기 후보가 다르다: ${JSON.stringify(ask.structuredContent.regions)}`,
     );
 
+    // 지역을 대긴 했는데 못 알아들은 경우(맨 `중구`) — 그 사실을 밝히고 되묻는다.
+    const unresolvedRegion = await call({ dong: "서교동", region: "중구" });
+    const unresolvedText = resultText(unresolvedRegion);
+    assert(
+      unresolvedText.startsWith('말씀하신 지역 "중구"만으로는'),
+      `못 알아들은 지역을 밝히지 않고 지역을 또 물었다:\n${unresolvedText}`,
+    );
+
     // 같은 질의에 지역을 얹으면 오염이 걸러지고 답이 나간다.
     const askResolved = await call({ dong: "서교동", region: "서울 마포구" });
     const askResolvedText = resultText(askResolved);
@@ -2738,6 +2764,17 @@ async function runSpotSmoke() {
     const pollutionText = resultText(pollution);
     assert(pollutionText.includes("해운대구"), "해운대 주소가 빠졌다");
     assert(!pollutionText.includes("화성시"), "다른 시·도의 부분일치 주소가 섞였다");
+
+    // 이름을 품은 이웃 구 — 시·군·구는 어절 첫머리에서만 맞아야 한다.
+    const boundary = await call({ dong: "경계동", region: "부산 서구" });
+    const boundaryText = resultText(boundary);
+    assert(boundaryText.includes("부산광역시 서구"), "부산 서구 주소가 빠졌다");
+    assert(!boundaryText.includes("강서구"), "이름을 품은 이웃 구(강서구)가 부분 문자열로 통과했다");
+
+    // 이중 중첩 items — 안 풀면 행 0개로 읽혀 "이 동에는 없다"는 거짓 답이 된다.
+    const nested = await call({ dong: "중첩동", region: "대전 서구" });
+    assert(resultText(nested).includes("서구보건소"), `이중 중첩 응답이 비었다:\n${resultText(nested)}`);
+    assertSpotStructured(nested, "이중 중첩");
 
     // **구 이름만 보면 안 되는 갈래.** 자치구 이름은 광역시 여섯 곳에 흩어져 있다.
     const sameNameDistrict = await call({ dong: "중앙동", region: "광주 북구" });
@@ -2784,6 +2821,15 @@ async function runSpotSmoke() {
     assert(unknownItemText.includes("폐의약품 수거함"), "품목을 못 찾아도 전 묶음 요약으로 답한다");
     assert(unknownItemText.includes("의류 수거함"), "품목을 못 찾으면 필터 없이 간다");
     assert(!unknownItemText.includes("찾으시나요"), "장소 질문에 품목 되묻기로 답하지 않는다");
+
+    // 판매소·기타만 있는 동 — 행을 받아 놓고 "등록된 배출 장소가 없다"고 말하면 거짓이다.
+    const hiddenOnly = await call({ dong: "판매소동", region: "서울 노원구" });
+    const hiddenOnlyText = resultText(hiddenOnly);
+    assert(
+      hiddenOnlyText.startsWith("판매소동에서 전용 수거함류 배출 장소는 찾지 못했습니다"),
+      `숨은 묶음만 있는 동의 폴백 문구가 다르다:\n${hiddenOnlyText}`,
+    );
+    assert(hiddenOnly.structuredContent.found === false, "숨은 묶음만 있으면 성공 응답을 내지 않는다");
 
     // 수거함이 없는 품목(소파)은 억지로 다른 묶음을 보여 주는 대신 폴백으로 내려앉는다.
     const noCategoryItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "소파" });
