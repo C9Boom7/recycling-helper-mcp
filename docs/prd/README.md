@@ -47,6 +47,7 @@ Agentic Player 10 본선 추가 개발(2026-08-13 ~ 08-31)을 Phase 7개로 나�
 | 9 | [phase-9-metro-districts.md](phase-9-metro-districts.md) | 광역시 자치구 확장 (부산·대구·인천·대전·광주) | 없음 — Phase 8과 병렬 |
 | 10 | [phase-10-response-size-region-notes.md](phase-10-response-size-region-notes.md) | 응답 크기 다이어트 — 지역 안내가 한 응답에 두 번 실리는 자리 제거 (런타임 변경) | 없음 — 8/29 기능 변경 마감 전 머지·재배포까지 끝내야 한다 |
 | 11 | [phase-11-region-tool-response.md](phase-11-region-tool-response.md) | 지역 툴 응답 다이어트와 두 툴 정합 (런타임 변경) | Phase 10 이후 — 같은 함수를 손댄다 |
+| 12 | [phase-12-nearby-disposal-spots.md](phase-12-nearby-disposal-spots.md) | 동네 배출 장소 조회 툴 — 환경부 getSpot 연동(첫 외부 런타임 의존) | 8/26 재등록 경로 확인 → 8/27 리뷰 완료 → 8/29 머지·재배포·재등록. 하나라도 어긋나면 본선 이후로 |
 
 Phase 8·9는 2026-08-21 본선 심사기준 자체 평가에서 나온 구멍 둘을 메운다. 둘 다 **런타임 코드 무변경**이고 주 작업 영역이 갈린다 —
 Phase 8은 `waste-items.json` 계열, Phase 9는 `region-policies.json` 계열이다.
@@ -112,6 +113,7 @@ Phase 0 배포로 사이클을 한 번 완주해 연결·툴콜을 먼저 검증
 | 9 | **완료 — 8곳 전부** (PR #62·#67·#73) | claude/phase9-metro-districts 외 | 기초자치단체 32 → 40/226. 부산 해운대·부산진, 대구 북구·달서, 인천 남동·부평, 광주 북구, 대전 서구를 자치구로 승격했다. 마지막까지 막혀 있던 대전 서구는 폐의약품 출처가 **구 자체 데이터포털의 오픈API**와 **대전시 안내 게시글의 이미지** 두 곳으로 갈려 있었다 — 구청 메뉴만 훑어서는 둘 다 안 보인다([phase-9 문서](phase-9-metro-districts.md)). 수수료는 달서·광주 북구 둘만 구청 표 트랙으로 넣었다 |
 | 10 | 완료 (PR #70 머지됨) | claude/phase-10-region-dedup-e93818 | 본선 이후 과제 1번을 되살렸다. `get_disposal_steps` 노원구 매트리스 텍스트 6,464B → 4,996B, 위젯 4,194B → 3,663B(`pnpm measure:size`). 리뷰 3라운드에서 R2 어휘 매칭이 과하게 거르던 자리 14건을 되돌렸다. R3(텍스트 모드 `regionNotes` 제거)은 위젯이 본선 기본값이라 실사용 경로에 안 닿아 백로그로 되돌렸다 |
 | 11 | 구현 완료, PR 리뷰 대기 (2026-08-25) | claude/phase-10-followup-region-tool | [phase-11](phase-11-region-tool-response.md) — 지역 툴 응답 다이어트. `get_region_disposal_info` 노원구 매트리스 7,366B → 4,961B(−33%). 연락처 블록·수수료 행·품목별 안내 steps가 한 응답에 두 번 실리던 것을 걷고, `-` 규격이 카드와 cleanup plan에 새던 것과 두 툴 체크리스트가 갈리던 것을 닫았다 |
+| 12 | PRD 작성·리뷰 반영 (2026-08-25), 구현 착수 | claude/phase-12-nearby-spots | [phase-12](phase-12-nearby-disposal-spots.md) — find_disposal_spots 신설. 키 없으면 미등록이 곧 스위치, 실패는 묶음표 자립 폴백. 손절 1순위는 콘솔 재등록 경로(8/26) |
 
 각 세션은 Phase 완료 시 이 표와 담당 PRD 하단의 체크리스트를 갱신한다.
 
