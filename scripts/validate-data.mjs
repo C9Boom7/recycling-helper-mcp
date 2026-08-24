@@ -11,6 +11,7 @@ const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", i
 const disposalGroupsPath = new URL("../src/data/disposal-groups.json", import.meta.url);
 const conditionLabelsPath = new URL("../src/data/condition-labels.json", import.meta.url);
 const partNounsPath = new URL("../src/data/compound-part-nouns.json", import.meta.url);
+const spotCategoriesPath = new URL("../src/data/spot-categories.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
@@ -24,6 +25,7 @@ const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8
 const disposalGroups = JSON.parse(readFileSync(disposalGroupsPath, "utf8"));
 const conditionLabels = JSON.parse(readFileSync(conditionLabelsPath, "utf8"));
 const compoundPartNouns = JSON.parse(readFileSync(partNounsPath, "utf8"));
+const spotCategories = JSON.parse(readFileSync(spotCategoriesPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
 
@@ -1121,6 +1123,94 @@ for (const [index, question] of questionBacklog.entries()) {
         if (!isNonEmptyString(note)) errors.push(`${prefix}.notes[${noteIndex}] must be a non-empty string`);
       }
     }
+  }
+}
+
+/**
+ * PRD phase-12 R3 — `spotNm` 정규화 묶음표.
+ *
+ * **키 순서가 계약이다.** `폐형광등∙폐건전지 전용 배출함`처럼 두 묶음 표기를 겸하는 이름이
+ * 실제로 있어서 먼저 걸리는 묶음이 이기고, 전체 12곳 상한도 이 순서로 채운다. 순서가 바뀌면
+ * 응답이 조용히 달라지는데 스키마 검사만으로는 안 걸리므로 목록을 그대로 박아 둔다.
+ * 묶음을 더하거나 순서를 바꿀 때는 PRD 표와 이 배열을 함께 고친다.
+ */
+const spotCategoryOrder = [
+  "medicine",
+  "battery_lamp",
+  "clothing",
+  "electronics",
+  "pet_bottle",
+  "food",
+  "trash_bag",
+  "etc",
+];
+
+if (!spotCategories || typeof spotCategories !== "object" || Array.isArray(spotCategories)) {
+  throw new Error("src/data/spot-categories.json must contain an object map");
+}
+
+const spotCategoryIds = Object.keys(spotCategories);
+if (spotCategoryIds.join(",") !== spotCategoryOrder.join(",")) {
+  errors.push(
+    `spot-categories.json 키 순서가 계약과 다르다 — 기대: ${spotCategoryOrder.join(", ")} / 실제: ${spotCategoryIds.join(", ")}`,
+  );
+}
+
+const spotCategoryItemOwner = new Map();
+for (const [index, [id, category]] of Object.entries(spotCategories).entries()) {
+  const prefix = `spotCategories["${id}"]`;
+  const isCatchAll = index === spotCategoryIds.length - 1;
+
+  if (!isNonEmptyString(category.label)) {
+    errors.push(`${prefix}.label must be a non-empty string`);
+  } else if (!/[가-힣]/.test(category.label)) {
+    errors.push(`${prefix}.label must be a Korean label, got "${category.label}"`);
+  }
+
+  // 폴백 문장은 묶음표가 스스로 들고 있어야 한다. 지역 함수는 폐의약품·전지만 다뤄서,
+  // 의류·페트병·소형가전은 이 줄이 없으면 폴백에서 할 말이 사라진다(PRD phase-12 R5).
+  if (!isNonEmptyString(category.fallbackLine)) {
+    errors.push(`${prefix}.fallbackLine must be a non-empty string`);
+  } else if (!/[가-힣]/.test(category.fallbackLine)) {
+    errors.push(`${prefix}.fallbackLine must be a Korean sentence`);
+  }
+
+  if (!Array.isArray(category.patterns)) {
+    errors.push(`${prefix}.patterns must be an array`);
+  } else {
+    for (const [patternIndex, pattern] of category.patterns.entries()) {
+      if (!isNonEmptyString(pattern)) errors.push(`${prefix}.patterns[${patternIndex}] must be a non-empty string`);
+    }
+    // 마지막 묶음은 나머지를 전부 받는 자리라 패턴이 없어야 하고, 그 앞은 반드시 있어야 한다.
+    // 앞 묶음의 패턴이 비면 어떤 이름도 안 걸려 그 묶음이 통째로 죽는다.
+    if (isCatchAll && category.patterns.length > 0) {
+      errors.push(`${prefix}는 마지막 묶음(나머지 전부)이라 patterns가 비어 있어야 한다`);
+    }
+    if (!isCatchAll && category.patterns.length === 0) {
+      errors.push(`${prefix}.patterns가 비어 있어 이 묶음에는 어떤 장소도 걸리지 않는다`);
+    }
+  }
+
+  if (!Array.isArray(category.itemIds)) {
+    errors.push(`${prefix}.itemIds must be an array`);
+  } else {
+    for (const [itemIndex, itemId] of category.itemIds.entries()) {
+      if (!isNonEmptyString(itemId)) {
+        errors.push(`${prefix}.itemIds[${itemIndex}] must be a non-empty string`);
+      } else if (!ids.has(itemId)) {
+        errors.push(`${prefix}.itemIds[${itemIndex}] references unknown item ${itemId}`);
+      } else if (spotCategoryItemOwner.has(itemId)) {
+        // 품목 → 묶음 역인덱스는 먼저 나온 묶음이 이긴다. 같은 품목을 두 묶음이 적으면
+        // 뒤쪽은 조용히 지므로, 의도인지 실수인지 여기서 못 박는다.
+        errors.push(`${prefix}.itemIds[${itemIndex}] ${itemId}는 이미 ${spotCategoryItemOwner.get(itemId)}에 있다`);
+      } else {
+        spotCategoryItemOwner.set(itemId, id);
+      }
+    }
+  }
+
+  if (category.defaultExposed !== undefined && typeof category.defaultExposed !== "boolean") {
+    errors.push(`${prefix}.defaultExposed must be a boolean when present`);
   }
 }
 
