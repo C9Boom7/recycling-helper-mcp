@@ -10518,5 +10518,69 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"전라남도\""
     ]
+  },
+  {
+    "id": "p9_dalseo_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "냉장고",
+      "region": "대구 달서구"
+    },
+    "expectedTextIncludes": [
+      "대구 달서구 대형생활폐기물 수수료 후보",
+      "냉장고: 300ℓ미만 5,000원",
+      "700ℓ이상 15,000원"
+    ],
+    "expectedTextExcludes": [
+      "대구광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_fee_line",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "서랍장",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "서랍장: 4단 이하 5,000원 · 5단 이상 7,000원"
+    ],
+    "expectedTextExcludes": [
+      "광주광역시 광역 기준"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_mattress_not_frame",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "1인용 매트리스 8,000원",
+      "2인용 매트리스 11,000원"
+    ],
+    "expectedTextExcludes": [
+      "매트리스 틀 6,000원",
+      "매트리스 틀 9,000원"
+    ]
+  },
+  {
+    "id": "p9_gwangju_buk_bed_frame_keeps_mattress_frame_rows",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "침대틀",
+      "region": "광주 북구"
+    },
+    "expectedTextIncludes": [
+      "광주 북구 대형생활폐기물 수수료 후보",
+      "1인용 매트리스 틀 6,000원",
+      "2인용 매트리스 틀 9,000원"
+    ],
+    "expectedTextExcludes": [
+      "1인용 매트리스 8,000원"
+    ]
   }
 ]

@@ -151,13 +151,21 @@ const TARGETS = [
  *    SPLIT_HINTS로 근거를 확인한 쌍만 옮기고, 나머지는 넣지 않는다. 어느 쪽 행인지
  *    가릴 근거가 없는데 상위 품명 쪽으로 미는 것이 가장 나쁜 선택이다.
  */
-function usableRow(row: OrdinanceRow, itemId: string): { ok: boolean; reason?: string } {
+function usableRow(
+  row: OrdinanceRow,
+  itemId: string,
+  denied: ReadonlySet<string> = new Set(),
+): { ok: boolean; reason?: string } {
   if (row.free || row.feeKrw === 0) return { ok: false, reason: "free_row" };
 
   const spec = cleanLabel(row.spec);
   for (const candidate of specNameCandidates(spec)) {
     const verdict = classifyName(candidate, "spec_fragment");
-    if (verdict.ok && verdict.itemId !== itemId && hasBulkyRoute(verdict.itemId)) {
+    // `deny`가 "옮기지 말고 원래 품목에 두라"고 한 품목은 조각 검사에서 뺀다. 안 그러면
+    // 검사가 같은 낱말을 다시 보고 행을 통째로 버린다 — 구청 트랙에서 광주 북구
+    // 「침대 / 2인용 매트리스 틀」 세 행이 그렇게 사라졌다. 여기는 아직 그 표기가 든
+    // 조례가 없지만, 같은 함정을 트랙마다 따로 밟을 이유가 없다.
+    if (verdict.ok && verdict.itemId !== itemId && !denied.has(verdict.itemId) && hasBulkyRoute(verdict.itemId)) {
       return { ok: false, reason: "spec_names_other_item" };
     }
   }
@@ -367,10 +375,11 @@ for (const regionId of targets) {
     // 열거지 이 행의 성격이 아니라, 그대로 두면 같은 표의 접이식 침대까지 돌침대가 된다.
     const hintName = row.nameInherited ? itemName.replace(/[(（][^)）]*[)）]/g, " ").replace(/\s+/g, " ").trim() : itemName;
     const hintText = `${hintName} ${spec}`;
-    const hint = SPLIT_HINTS.find(
-      (rule) => rule.from === verdict.itemId && rule.hint.test(hintText) && !(rule.deny?.test(hintText) ?? false),
-    );
+    const triggered = SPLIT_HINTS.filter((rule) => rule.from === verdict.itemId && rule.hint.test(hintText));
+    const hint = triggered.find((rule) => !(rule.deny?.test(hintText) ?? false));
     const itemId = hint?.to ?? verdict.itemId;
+    // 낱말은 걸렸는데 `deny`가 막은 규칙들. 그 규칙이 가리키던 품목만 아래 조각 검사에서 뺀다.
+    const denied = new Set(hint ? [] : triggered.map((rule) => rule.to));
     // 한 줄이 두 품목을 겸하면 품목마다 한 행씩 만든다. 구청 트랙만 이걸 하고 있어서
     // 트랙마다 답이 갈렸다 — 마포 조례에 「돗자리 1m²당 1,000원」이 있는데도 요가매트가
     // 금액을 통째로 잃었고, 같은 라벨을 구청 표로 받은 강남은 요가매트를 지켰다.
@@ -381,7 +390,7 @@ for (const regionId of targets) {
       note("not_bulky_route");
       continue;
     }
-    const usable = usableRow(row, itemId);
+    const usable = usableRow(row, itemId, denied);
     if (!usable.ok) {
       note(usable.reason!);
       continue;

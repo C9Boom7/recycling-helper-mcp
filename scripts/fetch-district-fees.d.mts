@@ -8,6 +8,6 @@
 export declare const TARGETS: ReadonlyArray<{
   regionId: string;
   name: string;
-  kind: "smartclean" | "sdm_table" | "sd_popup" | "guro_list";
+  kind: "smartclean" | "sdm_table" | "sd_popup" | "guro_list" | "gn_table" | "rowspan_table";
   url: string;
 }>;
