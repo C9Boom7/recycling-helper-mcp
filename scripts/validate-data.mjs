@@ -261,10 +261,11 @@ for (const [index, item] of items.entries()) {
 for (const [condition, label] of Object.entries(conditionLabels)) {
   if (!isNonEmptyString(label)) {
     errors.push(`conditionLabels["${condition}"] must be a non-empty string`);
-  } else if (label === condition || label === condition.replaceAll("_", " ")) {
-    // 폴백 문자열을 라벨로 붙여 놓으면 검사는 통과하지만 사용자가 보는 줄은 그대로다.
-    // `PVC 재질`처럼 로마자를 섞는 라벨은 정상이라 한글 여부로는 가를 수 없다.
-    errors.push(`conditionLabels["${condition}"] must be a Korean label, not the key itself`);
+  } else if (!/[가-힣]/.test(label)) {
+    // 한글이 한 글자도 없으면 사용자가 보는 줄은 영문 키가 새던 때와 다를 게 없다.
+    // 폴백 문자열("pet waste")을 그대로 옮겨 적는 것도, 새 영문 라벨을 짓는 것도
+    // 여기서 함께 걸린다. `PVC 재질`처럼 로마자를 섞는 라벨은 한글이 있어 통과한다.
+    errors.push(`conditionLabels["${condition}"] must be a Korean label, got "${label}"`);
   }
   if (!usedConditions.has(condition)) {
     warnings.push(`conditionLabels["${condition}"] is not used by any waste item`);
