@@ -10582,5 +10582,58 @@
     "expectedTextExcludes": [
       "1인용 매트리스 8,000원"
     ]
+  },
+  {
+    "id": "p9_daejeon_seogu_bulky_contact",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전 서구"
+    },
+    "expectedTextIncludes": [
+      "대전 서구 지역 확인 안내",
+      "문의/신청 안내 전화: 042-288-3584",
+      "인터넷 신청: https://www.seogu.go.kr/waste/main.do",
+      "수수료 조회: https://www.seogu.go.kr/waste/user/info/wasteCost.do?wMenuId=1010200"
+    ],
+    "expectedTextExcludes": [
+      "상세 데이터는 아직 없어",
+      "대전광역시 광역 기준",
+      "시·군·구를 알려주시면"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전 서구\"",
+      "\"regionStatus\":\"district\"",
+      "\"coverageTier\":\"standard\""
+    ]
+  },
+  {
+    "id": "p9_daejeon_seogu_medicine",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전 서구",
+      "itemName": "폐의약품"
+    },
+    "expectedTextIncludes": [
+      "관내 약국과 동 행정복지센터, 보건소"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전 서구\""
+    ]
+  },
+  {
+    "id": "p9_daejeon_metro_no_district_leak",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "대전"
+    },
+    "expectedTextExcludes": [
+      "042-288-3584",
+      "seogu.go.kr",
+      "대전 서구 지역 확인 안내"
+    ],
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"대전광역시\"",
+      "\"coverageTier\":\"metro\""
+    ]
   }
 ]
