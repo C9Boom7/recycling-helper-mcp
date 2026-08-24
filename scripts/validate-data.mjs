@@ -9,6 +9,7 @@ const mcpAnswerCasesPath = new URL("../src/data/mcp-answer-cases.json", import.m
 const questionBacklogPath = new URL("../src/data/question-backlog.json", import.meta.url);
 const materialGuidelinesPath = new URL("../src/data/material-guidelines.json", import.meta.url);
 const disposalGroupsPath = new URL("../src/data/disposal-groups.json", import.meta.url);
+const conditionLabelsPath = new URL("../src/data/condition-labels.json", import.meta.url);
 const partNounsPath = new URL("../src/data/compound-part-nouns.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
@@ -21,6 +22,7 @@ const mcpAnswerCases = JSON.parse(readFileSync(mcpAnswerCasesPath, "utf8"));
 const questionBacklog = JSON.parse(readFileSync(questionBacklogPath, "utf8"));
 const materialGuidelines = JSON.parse(readFileSync(materialGuidelinesPath, "utf8"));
 const disposalGroups = JSON.parse(readFileSync(disposalGroupsPath, "utf8"));
+const conditionLabels = JSON.parse(readFileSync(conditionLabelsPath, "utf8"));
 const compoundPartNouns = JSON.parse(readFileSync(partNounsPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
@@ -235,6 +237,38 @@ for (const [disposalType, label] of Object.entries(disposalGroups)) {
   }
   if (!usedDisposalTypes.has(disposalType)) {
     warnings.push(`disposalGroups["${disposalType}"] is not used by any waste item`);
+  }
+}
+
+if (!conditionLabels || typeof conditionLabels !== "object" || Array.isArray(conditionLabels)) {
+  throw new Error("src/data/condition-labels.json must contain an object map");
+}
+
+// condition -> 한국어 라벨도 전수 대응이어야 한다. 빠지면 `conditionLabel`이 밑줄만 떼고
+// 영문 키를 그대로 내보내, 카드의 "판단 조건" 줄이 "오염 여부 확인, 위생용품, pet waste"
+// 처럼 반쪽만 한국어로 나간다. 폴백이라 조용히 새는 게 문제라 검사로 못 박는다.
+const usedConditions = new Set();
+for (const [index, item] of items.entries()) {
+  for (const condition of item.conditions ?? []) {
+    if (!isNonEmptyString(condition)) continue;
+    usedConditions.add(condition);
+    if (!isNonEmptyString(conditionLabels[condition])) {
+      errors.push(`${at(index, item.id, "conditions")} "${condition}" has no label in src/data/condition-labels.json`);
+    }
+  }
+}
+
+for (const [condition, label] of Object.entries(conditionLabels)) {
+  if (!isNonEmptyString(label)) {
+    errors.push(`conditionLabels["${condition}"] must be a non-empty string`);
+  } else if (!/[가-힣]/.test(label)) {
+    // 한글이 한 글자도 없으면 사용자가 보는 줄은 영문 키가 새던 때와 다를 게 없다.
+    // 폴백 문자열("pet waste")을 그대로 옮겨 적는 것도, 새 영문 라벨을 짓는 것도
+    // 여기서 함께 걸린다. `PVC 재질`처럼 로마자를 섞는 라벨은 한글이 있어 통과한다.
+    errors.push(`conditionLabels["${condition}"] must be a Korean label, got "${label}"`);
+  }
+  if (!usedConditions.has(condition)) {
+    warnings.push(`conditionLabels["${condition}"] is not used by any waste item`);
   }
 }
 

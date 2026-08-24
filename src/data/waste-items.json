@@ -5251,8 +5251,8 @@
       "강남구 자원순환 종합포털 대형생활폐기물 안내"
     ],
     "conditions": [
-      "large_item",
-      "plastic",
+      "bulky",
+      "plastic_material",
       "mixed_material",
       "separate_parts"
     ],
@@ -8541,8 +8541,7 @@
     "conditions": [
       "hazardous",
       "sharp",
-      "safe_wrap_required",
-      "region_specific"
+      "safe_wrap_required"
     ],
     "regionPolicy": {
       "scope": "local_collection_point",
