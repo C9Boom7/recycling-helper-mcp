@@ -629,6 +629,91 @@
     "expectedNamedSubRegion": "북구"
   },
   {
+    "region": "전남광주통합특별시 북구",
+    "expectedRegionId": "buk_gu_gwangju",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "전남광주 북구",
+    "expectedRegionId": "buk_gu_gwangju",
+    "expectedLevel": "district",
+    "expectedBulkyApplication": true
+  },
+  {
+    "region": "전남광주통합특별시",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gwangju",
+      "jeonnam"
+    ]
+  },
+  {
+    "region": "전남광주통합특별시 광산구",
+    "expectedRegionId": "gwangju",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "광산구"
+  },
+  {
+    "region": "전남 목포시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "목포시"
+  },
+  {
+    "region": "전남광",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro"
+  },
+  {
+    "region": "전남 광양시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "광양시"
+  },
+  {
+    "region": "광주북",
+    "expectedRegionId": "buk_gu_gwangju",
+    "expectedLevel": "district"
+  },
+  {
+    "region": "전남광주통합특별시 목포시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "목포시"
+  },
+  {
+    "region": "전남광주통합특별시 여수시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "여수시"
+  },
+  {
+    "region": "전남광주 목포시",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "목포시"
+  },
+  {
+    "region": "전남광주통합특별시 동구",
+    "expectedRegionId": "gwangju",
+    "expectedLevel": "metro",
+    "expectedNamedSubRegion": "동구"
+  },
+  {
+    "region": "전남광주통합특별시 어쩌구",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gwangju",
+      "jeonnam"
+    ]
+  },
+  {
+    "region": "전라남도",
+    "expectedRegionId": "jeonnam",
+    "expectedLevel": "metro"
+  },
+  {
     "region": "광주 남구",
     "expectedRegionId": "gwangju",
     "expectedLevel": "metro",

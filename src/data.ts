@@ -144,6 +144,22 @@ export type RegionalPolicyData = {
    * `metro` 항목에만 둔다.
    */
   prefixOnlyDistrictAliases?: string[];
+  /**
+   * 이 광역을 부르는 표기이긴 한데 **다른 광역도 같은 표기로 불리는** 이름들.
+   * 행정 통합으로 두 광역이 이름 하나를 나눠 쓸 때 생긴다 — 2026년 광주광역시와
+   * 전라남도가 누리집 기관명을 나란히 `전남광주통합특별시(구)…`로 바꿨다.
+   *
+   * **그 이름에 답하는 광역이 전부 이 목록에 적어야 한다.** 한쪽만 적고 다른 쪽은
+   * `aliases`에 두면, 표기만 덜렁 들어온 질의가 완전 일치에서 양쪽에 걸리는데
+   * 아래 되묻기 가드는 `sharedAliases`를 선언한 곳만 세어 발동하지 않는다.
+   * 그러면 배열 순서가 답을 정한다.
+   *
+   * 대신 두 곳에서 제 몫을 한다. 뒤에 시·군·구 이름이 붙은 질의에서는 후보로 서서
+   * `remainderOwner`가 그 이름의 주인을 고르게 하고(`전남광주통합특별시 목포시`는
+   * 전라남도), `findNamedSubRegion`에서는 떼어낼 광역 표기로 쓰여 남은 `목포시`를
+   * 지목하게 한다. `metro` 항목에만 둔다.
+   */
+  sharedAliases?: string[];
   coverageTier: RegionCoverageTier;
   /** 자치구·시가 속한 광역시도의 region id. `metro` 항목에는 없다. */
   metroId?: string;
@@ -1274,9 +1290,36 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
  *
  * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
  * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
+ *
+ * `sharedAliases`도 그대로 넣는다. 나눠 쓰는 표기라 **양쪽이 함께 후보로 서는 것이
+ * 맞는 동작**이다. 뒤에 시·군·구 이름이 붙으면 `remainderOwner`가 그 이름의 주인을
+ * 고르고, 표기만 덜렁 들어오면 후보가 둘이라 되묻는다 — 이름만으로는 어느 광역인지
+ * 정해지지 않으니 그게 정직한 답이다. 맨 `고성군`을 되묻게 둔 것과 같은 기준이다.
  */
 function regionMatchNames(policy: RegionalPolicyData): string[] {
-  return [policy.name, ...policy.aliases, ...(policy.districtAliases ?? [])];
+  return [policy.name, ...policy.aliases, ...(policy.districtAliases ?? []), ...(policy.sharedAliases ?? [])];
+}
+
+/**
+ * `전남광주통합특별시 북구`처럼 **광역 표기 + 자치구**로 된 별칭에서, 질의가 아직
+ * 광역 부분도 다 못 넘었는데 강도 1로 그 자치구를 확정하는 것을 막는다.
+ *
+ * 강도 1은 "지역 표기가 질의로 시작"이라 잘려 들어온 입력을 받아 주는 자리인데,
+ * `[district, 1]`이 `[metro, 2]`보다 앞이라 광역까지 못 간다. 그래서 `전남광` 다섯
+ * 글자가 광주 북구로 단독 확정되고, 사용자가 대지도 않은 자치구의 대형폐기물
+ * 전화와 수수료가 확신 있게 나갔다.
+ *
+ * 조각 별칭을 손으로 나열하는 대신(광주광역시가 `광주광`·`광주광역`로 하던 방식)
+ * 구조로 막는다. 손으로 나열하면 새 표기마다 다섯 개씩 늘고, 무엇보다
+ * **`전남광`을 광주로 보내면 틀린다** — 광양시가 전라남도의 시다.
+ *
+ * 판정은 별칭 문자열만 본다. 마지막 공백 앞이 광역 부분이고, 질의가 그보다 길어야
+ * 자치구 쪽 글자에 닿은 것이다. 공백이 없는 별칭(`달서구`)에는 걸리지 않는다.
+ */
+function reachesDistrictPart(alias: string, normalizedQuery: string): boolean {
+  const lastSpace = alias.trimEnd().lastIndexOf(" ");
+  if (lastSpace < 0) return true;
+  return normalizedQuery.length > normalizeText(alias.slice(0, lastSpace)).length;
 }
 
 /** 한 레벨에서 주어진 강도로 매칭되는 지역들. 같은 지역이 여러 별칭으로 걸리면 하나로 접는다. */
@@ -1292,14 +1335,74 @@ function regionCandidatesAt(
     if (regionMatchLevel(policy) !== level) continue;
     if (byRegionId.has(policy.id)) continue;
 
+    // 걸리는 표기가 여럿이면 가장 긴 것을 남긴다. 아래 remainderOwner가 질의에서
+    // matchedBy를 뗀 나머지를 보므로, 여기서 짧은 쪽을 집으면 나머지에 광역 표기가
+    // 그대로 남아 아무도 알아보지 못한다 — 전라남도는 `전남`이 아니라
+    // `전남광주통합특별시`를 떼야 `목포시`가 남는다.
+    let matchedBy: string | undefined;
     for (const name of regionMatchNames(policy)) {
       if (regionMatchStrength(normalizedQuery, normalizeText(name)) !== strength) continue;
-      byRegionId.set(policy.id, { region: policy, matchedBy: name, level });
-      break;
+      if (level === "district" && strength === 1 && !reachesDistrictPart(name, normalizedQuery)) continue;
+      if (!matchedBy || normalizeText(name).length > normalizeText(matchedBy).length) matchedBy = name;
     }
+    if (matchedBy) byRegionId.set(policy.id, { region: policy, matchedBy, level });
   }
 
   return Array.from(byRegionId.values()).sort((a, b) => a.region.name.localeCompare(b.region.name, "ko"));
+}
+
+/**
+ * 광역 표기를 이미 뗀 조각이 이 광역의 어느 시·군·구를 지목하는지. 가장 강하게
+ * 걸리는 이름 하나와 그 강도를 함께 돌려준다.
+ *
+ * 강도 기준은 지역 매칭과 같다. 앞부분으로만 겹치게 두어야 "부산 사상구"의
+ * 뒷조각이 엉뚱한 이름에 걸리지 않는다. 어느 목록을 걸지는 부르는 쪽이 정한다 —
+ * `prefixOnlyDistrictAliases`는 광역 표기를 실제로 뗀 조각에만 걸어야 한다.
+ */
+function bestSubRegionNameIn(
+  normalizedRest: string,
+  aliases: string[],
+): { alias: string; strength: RegionMatchStrength } | undefined {
+  let best: { alias: string; strength: RegionMatchStrength } | undefined;
+
+  for (const alias of aliases) {
+    const strength = regionMatchStrength(normalizedRest, normalizeText(alias));
+    if (!strength) continue;
+    if (!best || strength > best.strength) best = { alias, strength };
+  }
+
+  return best;
+}
+
+/**
+ * 강도 2에서 후보가 여럿이면 **남은 문자열을 알아보는 쪽**이 이긴다.
+ *
+ * 강도 2는 "질의가 지역 표기로 시작한다"라, 그 표기를 뗀 나머지는 사용자가 뒤에
+ * 덧붙인 말이다. 후보가 여럿이라는 건 앞의 표기가 두 광역을 함께 부른다는 뜻이고,
+ * 그럴 때 답을 가르는 건 뒤에 붙은 시·군·구 이름이다.
+ *
+ * 2026년 광주광역시가 **전남광주통합특별시**로 바뀌면서 실제로 필요해졌다. 앞의
+ * `전남광주통합특별시`는 전라남도로도 광주로도 읽히지만, 뒤에 `목포시`가 붙으면
+ * 전라남도고 `광산구`가 붙으면 광주다. 길이로 가르면(긴 표기가 이긴다) 두 질의가
+ * 나란히 광주로 가서 전남 22개 시·군이 통째로 광주에 넘어간다.
+ *
+ * 알아보는 후보가 둘 이상이거나 하나도 없으면 아무것도 고르지 않는다 — 뒤에 붙은
+ * 말이 답을 가르지 못한다는 뜻이라, 되묻는 게 맞다.
+ */
+function remainderOwner(candidates: MatchedRegionPolicy[], normalizedQuery: string): MatchedRegionPolicy | undefined {
+  let owner: MatchedRegionPolicy | undefined;
+
+  for (const candidate of candidates) {
+    // 광역 표기를 실제로 뗀 조각이라 `prefixOnlyDistrictAliases`까지 본다 —
+    // `findNamedSubRegion`이 뒷조각에 그 목록을 거는 것과 같은 근거다.
+    const names = [...(candidate.region.districtAliases ?? []), ...(candidate.region.prefixOnlyDistrictAliases ?? [])];
+    const rest = normalizedQuery.slice(normalizeText(candidate.matchedBy).length);
+    if (!rest || !bestSubRegionNameIn(rest, names)) continue;
+    if (owner) return undefined;
+    owner = candidate;
+  }
+
+  return owner;
 }
 
 /**
@@ -1349,13 +1452,19 @@ const REGION_METRO_FALLBACK_ORDER: ReadonlyArray<readonly [RegionMatchLevel, Reg
 function splitLeadingMetro(
   policies: RegionalPolicyData[],
   normalizedQuery: string,
-): { metro: RegionalPolicyData; rest: string } | undefined {
+): Array<{ metro: RegionalPolicyData; rest: string }> {
   let best: { metro: RegionalPolicyData; rest: string } | undefined;
+  const splits: Array<{ metro: RegionalPolicyData; rest: string }> = [];
 
   for (const policy of policies) {
     if (regionMatchLevel(policy) !== "metro") continue;
 
-    for (const name of [policy.name, ...policy.aliases]) {
+    // `sharedAliases`도 뗀다. 안 그러면 통합 이름이 붙은 질의가 늘 한쪽 광역으로만
+    // split돼, 나눠 쓰는 다른 광역의 자치구를 통째로 지나친다. 지금은 전라남도에
+    // 등록된 자치구가 없어 `[metro, 2]`의 `remainderOwner`가 받아 주지만, 전남 시·군이
+    // 하나라도 들어오는 순간(이번 사이클에 광주 북구를 그렇게 넣었다) 그 자치구를
+    // 지나쳐 광역으로 내려앉고 "상세 데이터는 아직 없어"라고 잘못 말한다.
+    for (const name of [policy.name, ...policy.aliases, ...(policy.sharedAliases ?? [])]) {
       const normalizedName = normalizeText(name);
       if (!normalizedName || normalizedQuery === normalizedName) continue;
       if (!normalizedQuery.startsWith(normalizedName)) continue;
@@ -1363,10 +1472,16 @@ function splitLeadingMetro(
       const rest = normalizedQuery.slice(normalizedName.length);
       if (!rest) continue;
       if (!best || rest.length < best.rest.length) best = { metro: policy, rest };
+      splits.push({ metro: policy, rest });
     }
   }
 
-  return best;
+  // 가장 짧게 남은 것들을 **전부** 돌려준다. 통합 이름을 두 광역이 나눠 쓰면 같은
+  // 표기가 양쪽에서 떨어져 나머지도 똑같아지는데, 하나만 골라 돌려주면 배열 순서가
+  // 답을 정한다 — 전라남도에 시·군이 등록돼도 `전남광주통합특별시 목포시`가 광주
+  // 쪽만 뒤지고 그 자치구를 지나친다.
+  if (!best) return [];
+  return splits.filter((split) => split.rest.length === best.rest.length);
 }
 
 export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?: string): RegionResolution {
@@ -1377,8 +1492,36 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
 
   let ambiguous: MatchedRegionPolicy[] | undefined;
 
-  const consider = (candidates: MatchedRegionPolicy[]): MatchedRegionPolicy | undefined => {
+  // 나눠 쓰는 표기가 통째로 들어왔으면 그 자리에서 되묻는다. 뒤 단계까지 흘려보내면
+  // 광역 폴백에서 되살아난다 — `전남광주통합특별시`는 `전남`이 앞부분과 겹쳐 강도 2의
+  // 유일 후보가 되고, 그 표기를 함께 쓰는 광주를 제치고 전라남도로 확정돼 버린다.
+  // 이름만으로는 어느 광역인지 정해지지 않으니 확정할 근거가 없다.
+  const sharedOwners = policies.filter(
+    (policy) =>
+      regionMatchLevel(policy) === "metro" &&
+      (policy.sharedAliases ?? []).some((alias) => normalizeText(alias) === normalizedQuery),
+  );
+  if (sharedOwners.length > 1) {
+    return {
+      status: "ambiguous",
+      candidates: sharedOwners
+        .slice(0, MAX_AMBIGUOUS_CANDIDATES)
+        .map((policy) => ({ region: policy, matchedBy: policy.name, level: "metro" as const })),
+    };
+  }
+
+  const consider = (
+    candidates: MatchedRegionPolicy[],
+    strength: RegionMatchStrength,
+    query: string,
+  ): MatchedRegionPolicy | undefined => {
     if (candidates.length === 1) return candidates[0];
+    // 뒤에 붙은 시·군·구 이름을 한쪽만 알아본다면 후보가 여럿인 게 아니라 답이
+    // 정해진 것이다. 강도 2에서만 성립한다(remainderOwner 주석).
+    if (strength === 2) {
+      const winner = remainderOwner(candidates, query);
+      if (winner) return winner;
+    }
     // 되묻기는 더 앞선 단계가 전부 비었을 때만 쓴다. 약한 단계에서 후보가
     // 여럿이어도, 아직 안 본 단계에서 유일 확정이 나오면 그쪽이 이긴다.
     if (candidates.length > 1 && !ambiguous) ambiguous = candidates.slice(0, MAX_AMBIGUOUS_CANDIDATES);
@@ -1386,7 +1529,7 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
   };
 
   for (const [level, strength] of REGION_DISTRICT_ORDER) {
-    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength), strength, normalizedQuery);
     if (match) return { status: "match", match };
   }
 
@@ -1395,18 +1538,26 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
   // 양방향 접두 어느 쪽도 맞지 않아 자치구를 통째로 놓치고, 배출 요일까지 있는
   // full 티어 데이터가 광역 안내로 덮인다. 서울은 자치구마다 "서울 X구"·"서울시 X구"
   // 별칭을 전부 달아둬서 가려져 있을 뿐이라, 지역이 늘 때마다 같은 구멍이 난다.
-  const split = splitLeadingMetro(policies, normalizedQuery);
-  if (split) {
+  // 후보 광역이 여럿이면 각각의 자치구를 다 뒤지고, 딱 한 지역만 걸릴 때 확정한다.
+  // 두 광역에서 서로 다른 자치구가 걸리면 뒤에 붙은 이름이 답을 못 가른 것이라 되묻는다.
+  const splits = splitLeadingMetro(policies, normalizedQuery);
+  const withinSplits: MatchedRegionPolicy[] = [];
+  for (const split of splits) {
     const withinMetro = policies.filter((policy) => policy.metroId === split.metro.id);
     for (const [level, strength] of REGION_DISTRICT_ORDER) {
       if (level !== "district") continue;
-      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength));
-      if (match) return { status: "match", match };
+      const match = consider(regionCandidatesAt(withinMetro, split.rest, level, strength), strength, split.rest);
+      if (match) {
+        if (!withinSplits.some((found) => found.region.id === match.region.id)) withinSplits.push(match);
+        break;
+      }
     }
   }
+  if (withinSplits.length === 1) return { status: "match", match: withinSplits[0] };
+  if (withinSplits.length > 1 && !ambiguous) ambiguous = withinSplits.slice(0, MAX_AMBIGUOUS_CANDIDATES);
 
   for (const [level, strength] of REGION_METRO_FALLBACK_ORDER) {
-    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength));
+    const match = consider(regionCandidatesAt(policies, normalizedQuery, level, strength), strength, normalizedQuery);
     if (match) return { status: "match", match };
   }
 
@@ -1442,6 +1593,10 @@ export function findRegionalPolicy(region?: string): MatchedRegionPolicy | undef
  * 뗀 나머지에서만 `prefixOnlyDistrictAliases`까지 본다. "부산 중구"는 앞의
  * "부산"이 이미 광역을 확정했으므로 남은 "중구"를 지목하는 데 위험이 없지만,
  * 맨 "중구"는 어느 광역인지 모른 채 답하는 것이라 되물어야 한다.
+ *
+ * 떼어낼 표기에는 `sharedAliases`도 넣는다. 그러지 않으면 `전남광주통합특별시
+ * 목포시`에서 전라남도가 `전남`밖에 못 떼어 `광주통합특별시목포시`가 남고,
+ * 방금 목포시라고 말한 사람에게 다시 시·군·구를 묻게 된다.
  */
 export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): string | undefined {
   const districtAliases = metro.districtAliases ?? [];
@@ -1451,7 +1606,9 @@ export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): 
   const normalizedQuery = normalizeText(region);
   if (!normalizedQuery) return undefined;
 
-  const ownNames = new Set([metro.name, ...metro.aliases].map((name) => normalizeText(name)).filter(Boolean));
+  const ownNames = new Set(
+    [metro.name, ...metro.aliases, ...(metro.sharedAliases ?? [])].map((name) => normalizeText(name)).filter(Boolean),
+  );
 
   // 이 광역의 표기를 실제로 떼어낸 조각들. "떼어낸 게 있다" 자체가 뒤에서 근거로
   // 쓰이므로 질의 전체와 갈라 둔다.
@@ -1462,9 +1619,8 @@ export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): 
     if (rest) strippedTargets.push(rest);
   }
 
-  // 강도 기준은 지역 매칭과 같다. 앞부분으로만 겹치게 두어야 "부산 사상구"의
-  // 뒷조각이 엉뚱한 이름에 걸리지 않는다. 목록에 있는 이름에만 걸리므로
-  // "부산 어쩌구"의 "어쩌구"는 아무것도 지목하지 못한다.
+  // 목록에 있는 이름에만 걸리므로 "부산 어쩌구"의 "어쩌구"는 아무것도 지목하지
+  // 못한다.
   //
   // 광역 자신을 부르는 표기는 아예 후보에서 뺀다. 안 그러면 "제주"가 접두
   // 조각으로 "제주시"에 걸려, 도 전체를 물은 사람에게 시 하나를 지목했다고
@@ -1472,11 +1628,8 @@ export function findNamedSubRegion(metro: RegionalPolicyData, region?: string): 
   let best: { alias: string; strength: RegionMatchStrength } | undefined;
   const consider = (target: string, aliases: string[]): void => {
     if (ownNames.has(target)) return;
-    for (const alias of aliases) {
-      const strength = regionMatchStrength(target, normalizeText(alias));
-      if (!strength) continue;
-      if (!best || strength > best.strength) best = { alias, strength };
-    }
+    const hit = bestSubRegionNameIn(target, aliases);
+    if (hit && (!best || hit.strength > best.strength)) best = hit;
   };
 
   for (const target of [normalizedQuery, ...strippedTargets]) consider(target, districtAliases);
