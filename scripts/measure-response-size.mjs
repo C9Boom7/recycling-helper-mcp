@@ -32,6 +32,15 @@ export const MEASURE_CASES = [
   { label: "부산 해운대구 소파", tool: "get_disposal_steps", args: { itemName: "소파", region: "부산 해운대구" } },
   { label: "지역 없음 매트리스", tool: "get_disposal_steps", args: { itemName: "매트리스" } },
   { label: "classify 노원구 매트리스", tool: "classify_waste_item", args: { itemName: "매트리스", region: "서울 노원구" } },
+  // #69로 수수료가 생긴 광역 자치구. 자치구가 늘 때 크기가 어떻게 따라 오는지 본다.
+  { label: "광주 북구 매트리스", tool: "get_disposal_steps", args: { itemName: "매트리스", region: "광주 북구" } },
+  { label: "대구 달서구 소파", tool: "get_disposal_steps", args: { itemName: "소파", region: "대구 달서구" } },
+  // PRD phase-11. 이 툴은 위젯 경로가 없어 두 모드가 같은 응답을 낸다 — 표에 두 줄로 찍히지만
+  // 값이 같은 게 정상이다. 지역 툴이 응답 중 가장 크다는 걸 표에서 바로 보이게 넣는다.
+  { label: "지역 노원구 매트리스", tool: "get_region_disposal_info", args: { region: "서울 노원구", itemName: "매트리스" } },
+  { label: "지역 마포구 의자", tool: "get_region_disposal_info", args: { region: "서울 마포구", itemName: "의자" } },
+  { label: "지역 광주 북구 매트리스", tool: "get_region_disposal_info", args: { region: "광주 북구", itemName: "매트리스" } },
+  { label: "지역 강남구 (품목 없음)", tool: "get_region_disposal_info", args: { region: "서울 강남구" } },
 ];
 
 function bytes(value) {
@@ -189,6 +198,9 @@ function printTable(rows) {
 }
 
 function printSections(rows) {
+  // 섹션 분해는 `##`·`###` 제목을 쓰는 `get_disposal_steps`에만 한다. 지역 툴은 블록 제목이
+  // 맨 줄이라(`확인할 정보`) 같은 규칙으로 못 자른다 — 그쪽은 합계만 보고, 블록별 내역이
+  // 필요하면 PRD phase-11의 표처럼 그때 따로 잰다.
   console.log("\n텍스트 모드 섹션별 바이트 (get_disposal_steps):");
   for (const row of rows) {
     if (row.mode !== "text" || row.tool !== "get_disposal_steps") continue;
