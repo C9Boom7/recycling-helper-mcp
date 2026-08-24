@@ -326,8 +326,8 @@
   {
     "query": "벤토나이트 모래",
     "expectedItemId": "cat_litter",
-    "expectedDisposalType": "general",
-    "notes": "사용한 반려동물 모래는 변기 배출을 피하고 일반쓰레기로 안내해야 합니다."
+    "expectedDisposalType": "general_or_nonburnable_by_material",
+    "notes": "2026-08-25 환경부 사전 대조. 벤토나이트·규사는 불연성 마대, 두부모래는 종량제봉투로 재질에 따라 갈립니다."
   },
   {
     "query": "양념 묻은 배달 플라스틱 용기",
@@ -638,8 +638,8 @@
   {
     "query": "주사바늘 달린 자가주사기는 어떻게 버려?",
     "expectedItemId": "home_injection_needle",
-    "expectedDisposalType": "hazardous_sharps_collection_contact_required",
-    "notes": "자가주사기 주사바늘은 일반쓰레기나 재활용품이 아니라 안전 용기 밀봉 후 보건소·처방기관·약국·지자체 회수 기준 확인으로 안내해야 합니다."
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "2026-08-25 환경부 사전 대조로 뒤집었습니다. 품목사전이 가정 배출 주사기를 폐의약품도 의료폐기물도 아니라고 명시하고 밀봉 후 종량제봉투로 안내합니다."
   },
   {
     "query": "인덕션 유리 상판 깨진 건 대형폐기물이야?",
