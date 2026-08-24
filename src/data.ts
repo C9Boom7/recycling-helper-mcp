@@ -224,6 +224,7 @@ const regionPolicyPath = fileURLToPath(new URL("./data/region-policies.json", im
 const bulkyWasteFeePath = fileURLToPath(new URL("./data/bulky-waste-fees.json", import.meta.url));
 const materialGuidelinePath = fileURLToPath(new URL("./data/material-guidelines.json", import.meta.url));
 const disposalGroupPath = fileURLToPath(new URL("./data/disposal-groups.json", import.meta.url));
+const conditionLabelPath = fileURLToPath(new URL("./data/condition-labels.json", import.meta.url));
 const partNounPath = fileURLToPath(new URL("./data/compound-part-nouns.json", import.meta.url));
 
 export const wasteItems = JSON.parse(readFileSync(dataPath, "utf8")) as WasteItem[];
@@ -234,6 +235,10 @@ export const materialGuidelines = JSON.parse(readFileSync(materialGuidelinePath,
 // 폴백으로 떨어진다("small_electronics_collection"이 어느 분기에도 안 걸리는 식).
 // 매핑을 데이터로 두고 validate-data.mjs가 전수 대응을 강제한다.
 export const disposalGroups = JSON.parse(readFileSync(disposalGroupPath, "utf8")) as Record<string, string>;
+// 조건 키도 같은 이유로 데이터에 둔다. 라벨이 빠지면 카드의 "판단 조건" 줄이 영문 키를
+// 그대로 내보내 `반려동물 배설물 묻은 휴지`가 "오염 여부 확인, 위생용품, pet waste"처럼
+// 반쪽만 한국어로 나갔다.
+export const conditionLabels = JSON.parse(readFileSync(conditionLabelPath, "utf8")) as Record<string, string>;
 
 /**
  * 품목명 뒤에 붙으면 **다른 물건**이 되는 부품·부속 낱말. 값은 왜 다른 물건인지의 근거다.
@@ -1660,32 +1665,10 @@ export function confidenceLabel(confidence: Confidence): string {
   }
 }
 
-const conditionLabels: Record<string, string> = {
-  bulky: "크기/부피 확인",
-  clean: "깨끗한 상태",
-  coated: "코팅 여부",
-  contaminated: "오염 여부 확인",
-  damaged: "파손됨",
-  electronics: "전자제품",
-  empty_required: "내용물 비움 필요",
-  food_contaminated: "음식물 오염",
-  hazardous: "유해/위험 품목",
-  hygiene: "위생용품",
-  liquid: "액체",
-  mixed_material: "복합재질",
-  manufacturer_takeback: "제조사 회수 확인",
-  nonburnable: "불연성 폐기물",
-  oily: "기름 오염",
-  pressurized: "압축/가스 용기",
-  remaining_content: "내용물 남음",
-  reusable: "재사용 가능 여부",
-  safe_wrap_required: "안전 포장 필요",
-  separate_parts: "분리 필요",
-  sharp: "날카로움",
-  small_item: "소형 품목",
-  textile: "섬유류",
-};
-
+/**
+ * 조건 라벨은 `condition-labels.json`의 명시 매핑으로만 정한다. 폴백은 영문 키를
+ * 그대로 노출하므로 도달하면 그 자체가 결함이고, validate가 전수 대응을 강제한다.
+ */
 export function conditionLabel(condition: string): string {
   return conditionLabels[condition] ?? condition.replaceAll("_", " ");
 }

@@ -8541,8 +8541,7 @@
     "conditions": [
       "hazardous",
       "sharp",
-      "safe_wrap_required",
-      "region_specific"
+      "safe_wrap_required"
     ],
     "regionPolicy": {
       "scope": "local_collection_point",
