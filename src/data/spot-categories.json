@@ -19,8 +19,7 @@
       "battery",
       "power_bank",
       "fluorescent_lamp",
-      "led_lamp",
-      "incandescent_bulb"
+      "led_lamp"
     ],
     "fallbackLine": "폐건전지와 폐형광등은 주민센터나 아파트 단지의 전용 수거함에 넣습니다. 깨진 형광등은 수거함에 넣지 말고 지자체 안내를 따르세요."
   },

@@ -1810,7 +1810,7 @@ const REGION_SOURCE_TOPIC_PATTERNS: Array<[labelPart: string, pattern: RegExp]> 
  *
  * basis 문장은 출처마다 그대로 둔다 — 링크만 남기면 "왜 이 출처인가"가 사라져 되묻기를 부른다.
  */
-export function formatRegionSourceListForItem(region: RegionalPolicyData, item: WasteItem): string[] {
+export function regionSourcesForItem(region: RegionalPolicyData, item: WasteItem): WasteSource[] {
   const label = disposalGroupLabel(item.disposalType);
   const patterns = REGION_SOURCE_TOPIC_PATTERNS.filter(([labelPart]) => label.includes(labelPart)).map(([, pattern]) => pattern);
   const bulkyUrls = new Set(itemHasBulkyRoute(item) ? regionBulkyContactUrls(region) : []);
@@ -1827,7 +1827,25 @@ export function formatRegionSourceListForItem(region: RegionalPolicyData, item: 
   const alreadyListed = Boolean(feeSource?.url) && matched.some((source) => source.url === feeSource?.url);
   const sources = feeSource && !alreadyListed ? [...matched, feeSource] : matched;
 
-  return (sources.length > 0 ? sources : region.sources).map(formatRegionSourceLine);
+  return sources.length > 0 ? sources : region.sources;
+}
+
+export function formatRegionSourceListForItem(region: RegionalPolicyData, item: WasteItem): string[] {
+  return regionSourcesForItem(region, item).map(formatRegionSourceLine);
+}
+
+/**
+ * 품목 없이 수거함류 안내가 필요할 때 고르는 출처. `sources[0]`을 그냥 집으면 자치구
+ * 대부분에서 대형폐기물 신청 페이지가 잡힌다 — 수거함을 찾다 실패한 사람에게 줄 링크가
+ * 아니다. 수거함·분리배출을 말하는 출처를 먼저 찾고, 없으면 전체를 그대로 돌려준다.
+ */
+export function regionCollectionSources(region: RegionalPolicyData): WasteSource[] {
+  const matched = region.sources.filter((source) => /수거함|분리배출|분리수거|재활용/.test(`${source.title} ${source.basis ?? ""}`));
+  return matched.length > 0 ? matched : region.sources;
+}
+
+export function formatRegionSourceLines(sources: WasteSource[]): string[] {
+  return sources.map(formatRegionSourceLine);
 }
 
 /**

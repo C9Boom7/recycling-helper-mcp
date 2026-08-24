@@ -2723,6 +2723,11 @@ async function runSpotSmoke() {
     assert(emptyText.includes("약국"), "품목이 확정됐으면 그 묶음의 일반 안내 한 줄이 붙는다");
     assertSpotStructured(empty, "0건 폴백");
     assert(Array.isArray(empty.structuredContent.fallback.regionSources), "지역이 있으면 공식 확인처가 실린다");
+    // sources[0]을 그냥 집으면 자치구 대부분에서 대형폐기물 신청 페이지가 잡힌다 — 품목 주제로 골라야 한다.
+    assert(
+      empty.structuredContent.fallback.regionSources.every((source) => !/대형/.test(source.title)),
+      `폐의약품 폴백의 확인처가 품목과 무관하다: ${JSON.stringify(empty.structuredContent.fallback.regionSources)}`,
+    );
     assert(isNonEmptyText(empty.structuredContent.fallback.itemLine), "품목이 확정되면 itemLine이 실린다");
 
     // 지역 없이 0건이어도 폴백이 비면 안 된다 — 이쪽이 이 툴의 기본 시나리오다.
@@ -2751,6 +2756,15 @@ async function runSpotSmoke() {
       unresolvedText.startsWith('말씀하신 지역 "중구"만으로는'),
       `못 알아들은 지역을 밝히지 않고 지역을 또 물었다:\n${unresolvedText}`,
     );
+
+    // 지역 필터가 행을 전부 거르면 "이 동에는 없다"가 아니라 지역·동 불일치로 말한다.
+    const filteredAll = await call({ dong: "서교동", region: "서울 노원구" });
+    const filteredAllText = resultText(filteredAll);
+    assert(
+      filteredAllText.startsWith('서울 노원구에서 "서교동" 주소를 찾지 못했습니다'),
+      `지역 필터 전멸을 "등록된 배출 장소 없음"으로 말했다:\n${filteredAllText}`,
+    );
+    assert(filteredAll.structuredContent.found === false, "지역 필터 전멸은 성공 응답이 아니다");
 
     // 같은 질의에 지역을 얹으면 오염이 걸러지고 답이 나간다.
     const askResolved = await call({ dong: "서교동", region: "서울 마포구" });
@@ -2830,6 +2844,13 @@ async function runSpotSmoke() {
       `숨은 묶음만 있는 동의 폴백 문구가 다르다:\n${hiddenOnlyText}`,
     );
     assert(hiddenOnly.structuredContent.found === false, "숨은 묶음만 있으면 성공 응답을 내지 않는다");
+
+    // 백열전구는 형광등 수거함에 넣으면 안 되는 품목이다(waste-items 카드가 그렇게 말한다).
+    // battery_lamp 묶음에 물려 있으면 이 툴이 같은 서버의 그 카드와 반대말을 한다.
+    const bulbItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "백열전구" });
+    const bulbText = resultText(bulbItem);
+    assert(bulbItem.structuredContent.found === false, "백열전구가 형광등 수거함 주소를 받으면 안 된다");
+    assert(!bulbText.includes("폐건전지·폐형광등"), "백열전구 응답에 형광등 수거함이 실렸다");
 
     // 수거함이 없는 품목(소파)은 억지로 다른 묶음을 보여 주는 대신 폴백으로 내려앉는다.
     const noCategoryItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "소파" });

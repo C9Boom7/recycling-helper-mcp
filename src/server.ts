@@ -30,6 +30,9 @@ import {
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceList,
+  formatRegionSourceLines,
+  regionCollectionSources,
+  regionSourcesForItem,
   formatUnregisteredDistrictScope,
   inferMaterialCategories,
   isBulkySecondaryRoute,
@@ -1680,17 +1683,25 @@ function spotFallbackResult(params: {
   category?: SpotCategory;
   /** 품목이 확정됐을 때 그 이름. 0건 문장이 무엇을 못 찾았는지 밝히는 데 쓴다. */
   itemLabel?: string;
+  /** 품목이 확정됐을 때 그 품목. 지역 출처를 품목 주제로 고르는 데 쓴다. */
+  item?: WasteItem;
   /** 행은 받았는데 전부 노출하지 않는 묶음(판매소·기타)이었던 경우. */
   hiddenOnly?: boolean;
+  /** 행은 받았는데 지역 필터가 전부 거른 경우 — 동과 지역이 안 맞는 신호다. */
+  regionFilteredAll?: boolean;
   log: ToolLogMeta;
 }): LoggedToolResult {
-  const { dong, reason, regionMatch, category, itemLabel, hiddenOnly, log } = params;
-  // 텍스트와 structuredContent가 **같은 출처를 같은 순서로** 실어야 한다.
-  // `formatRegionSourceList`가 `region.sources`를 순서 그대로 옮기므로 두 slice가 짝을 이룬다.
-  const regionSources = regionMatch ? regionMatch.region.sources.slice(0, SPOT_MAX_REGION_SOURCES) : [];
-  const regionSourceLines = regionMatch
-    ? formatRegionSourceList(regionMatch.region).slice(0, SPOT_MAX_REGION_SOURCES)
+  const { dong, reason, regionMatch, category, itemLabel, item, hiddenOnly, regionFilteredAll, log } = params;
+  // 텍스트와 structuredContent가 **같은 출처를 같은 순서로** 실어야 한다 — 같은 배열에서 나온다.
+  // `sources[0]`을 그냥 집으면 자치구 대부분에서 대형폐기물 신청 페이지가 잡힌다. 품목이
+  // 있으면 그 품목의 주제로, 없으면 수거함·분리배출을 말하는 출처로 고른다.
+  const regionSources = regionMatch
+    ? (item ? regionSourcesForItem(regionMatch.region, item) : regionCollectionSources(regionMatch.region)).slice(
+        0,
+        SPOT_MAX_REGION_SOURCES,
+      )
     : [];
+  const regionSourceLines = formatRegionSourceLines(regionSources);
 
   // 두 갈래의 첫 문장을 가른다. 조회에 성공했는데 한 곳도 없었던 경우까지 "확인하지
   // 못했습니다"라고 하면, 우리가 실제로 확인한 사실을 안 한 것처럼 말하는 셈이다.
@@ -1699,11 +1710,13 @@ function spotFallbackResult(params: {
   const opening =
     reason === "upstream"
       ? `${dong}의 배출 장소를 지금 조회하지 못했습니다. 대신 이렇게 확인할 수 있습니다.`
-      : itemLabel
-        ? `${dong}에서 ${itemLabel} 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`
-        : hiddenOnly
-          ? `${dong}에서 전용 수거함류 배출 장소는 찾지 못했습니다. 이렇게 확인해 보세요.`
-          : `${dong}에 등록된 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`;
+      : regionFilteredAll && regionMatch
+        ? `${regionMatch.region.name}에서 "${dong}" 주소를 찾지 못했습니다. 다른 지역에 같은 이름의 동이 있을 수 있으니 동 이름과 지역이 맞는지 확인해 주세요.`
+        : itemLabel
+          ? `${dong}에서 ${itemLabel} 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`
+          : hiddenOnly
+            ? `${dong}에서 전용 수거함류 배출 장소는 찾지 못했습니다. 이렇게 확인해 보세요.`
+            : `${dong}에 등록된 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`;
 
   const lines = [
     opening,
@@ -1766,6 +1779,7 @@ async function handleFindDisposalSpots({
       reason: "upstream",
       regionMatch,
       category: itemCategory,
+      item: matchedItem,
       log: { ...baseLog, status: "spots_fallback", upstream: lookup.upstream },
     });
   }
@@ -1853,9 +1867,13 @@ async function handleFindDisposalSpots({
       regionMatch,
       category: itemCategory,
       itemLabel: matchedItem?.name,
+      item: matchedItem,
       // 필터를 통과한 행이 있는데 전부 숨긴 묶음(판매소·기타)이면 "없다"가 아니라
       // "전용 수거함은 못 찾았다"다 — 판매소가 응답의 절반을 차지하는 동이 실제로 있다.
       hiddenOnly: rows.length > 0,
+      // 지역 필터가 행을 전부 걸렀으면 "이 동에는 없다"가 아니라 "이 지역에서는 못 찾았다"다 —
+      // 서교동 107행이 노원구 필터에 전멸하는 조합이 실제로 있다.
+      regionFilteredAll: rows.length === 0 && lookup.rows.length > 0 && Boolean(regionMatch),
       log: { ...baseLog, status: "spots_fallback", upstream: lookup.upstream },
     });
   }

@@ -129,7 +129,10 @@ function serviceKeyParam(key: string): string {
 }
 
 function baseUrl(): string {
-  return (process.env.MOE_API_BASE_URL ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
+  // 값이 있되 비어 있으면(빈 문자열·공백) 없는 것으로 본다 — 그대로 쓰면 상대 URL이 되어
+  // fetch가 던지고, 그 실패가 "http"로 접혀 영구 폴백이 되는데 런북의 http 행은 다른 원인을 가리킨다.
+  const raw = process.env.MOE_API_BASE_URL;
+  return (raw && raw.trim() ? raw.trim() : DEFAULT_BASE_URL).replace(/\/+$/, "");
 }
 
 function asRow(value: unknown): SpotRow | undefined {
