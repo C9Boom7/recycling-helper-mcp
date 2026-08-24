@@ -2006,7 +2006,7 @@
   {
     "query": "칫솔꽂이 어떻게 버려?",
     "expectedItemId": "toothbrush_holder",
-    "expectedDisposalType": "recycle_or_general_by_material",
+    "expectedDisposalType": "recycle_or_general_or_nonburnable_by_material",
     "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 칫솔로 확정되던 자리."
   },
   {

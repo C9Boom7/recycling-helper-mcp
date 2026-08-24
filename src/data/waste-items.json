@@ -4275,9 +4275,7 @@
       "세종특별자치시 고양이 모래 분리배출 안내"
     ],
     "conditions": [
-      "pet_waste",
-      "nonburnable",
-      "mixed_material"
+      "nonburnable"
     ],
     "regionPolicy": {
       "scope": "region_specific",
@@ -8563,8 +8561,7 @@
     ],
     "conditions": [
       "sharp",
-      "safe_wrap_required",
-      "medicine"
+      "safe_wrap_required"
     ],
     "regionPolicy": {
       "scope": "region_specific",
@@ -21898,8 +21895,7 @@
       "생활폐기물 분리배출 누리집 품목사전: 식용유 용기"
     ],
     "conditions": [
-      "empty_required",
-      "plastic_container"
+      "empty_required"
     ],
     "regionPolicy": {
       "scope": "national_default",
@@ -21996,8 +21992,8 @@
       "칫솔 스탠드"
     ],
     "category": "utensil_material_specific",
-    "disposalType": "recycle_or_general_by_material",
-    "summary": "칫솔꽂이는 재질에 따라 갈립니다. 플라스틱이나 금속 한 가지로만 되어 있으면 해당 수거함으로, 여러 재질이 붙어 있으면 종량제봉투로 배출합니다.",
+    "disposalType": "recycle_or_general_or_nonburnable_by_material",
+    "summary": "칫솔꽂이는 재질에 따라 갈립니다. 플라스틱이나 금속 한 가지면 해당 수거함으로, 여러 재질이 붙어 있으면 종량제봉투로, 도자기·유리면 불연성 폐기물로 배출합니다.",
     "steps": [
       "물기를 비우고 안쪽을 헹궈 말립니다.",
       "바닥과 겉면의 재질 표시를 확인합니다.",
@@ -22017,7 +22013,6 @@
     ],
     "conditions": [
       "mixed_material",
-      "plastic_container",
       "nonburnable"
     ],
     "regionPolicy": {
@@ -22084,8 +22079,7 @@
     ],
     "conditions": [
       "hazardous",
-      "bulky",
-      "region_specific"
+      "bulky"
     ],
     "regionPolicy": {
       "scope": "region_specific",

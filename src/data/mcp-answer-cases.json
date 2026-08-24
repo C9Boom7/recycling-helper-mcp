@@ -10587,7 +10587,8 @@
       "불연성"
     ],
     "expectedStructuredIncludes": [
-      "\"id\":\"toothbrush_holder\""
+      "\"id\":\"toothbrush_holder\"",
+      "\"disposalGroup\":\"재활용/일반쓰레기/불연성\""
     ]
   },
   {
