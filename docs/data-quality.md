@@ -18,32 +18,18 @@
 
 ## Condition Tags
 
-자주 쓰는 태그:
+`conditions`는 같은 품목이라도 배출 판단을 가르는 상태를 적는 자리다. `오염 여부 확인`, `내용물 비움 필요`처럼 사용자가 직접 확인해야 할 것을 가리키고, 배출 방법 자체는 `steps`에 쓴다.
 
-- `clean`: 깨끗한 상태일 때 재활용 가능
-- `coated`: 코팅 여부가 판단에 영향
-- `contaminated`: 오염 여부가 판단에 영향
-- `food_contaminated`: 음식물, 국물, 소스 오염
-- `oily`: 기름 오염
-- `empty_required`: 내용물을 비우거나 헹궈야 함
-- `remaining_content`: 내용물이 남아 있으면 배출 판단이 달라짐
-- `mixed_material`: 복합재질
-- `separate_parts`: 라벨, 뚜껑, 펌프 등 부품 분리 필요
-- `damaged`: 파손 상태
-- `safe_wrap_required`: 안전 포장 필요
-- `sharp`: 날카로운 품목
-- `pressurized`: 가스/압축 용기
-- `hazardous`: 유해 또는 화재 위험 품목
-- `hygiene`: 위생용품
-- `electronics`: 전자제품
-- `bulky`: 대형폐기물 가능성
-- `liquid`: 액체류
-- `nonburnable`: 불연성 폐기물
-- `manufacturer_takeback`: 제조사 회수 프로그램 확인 필요
-- `reusable`: 재사용 가능 여부가 판단에 영향
-- `textile`: 섬유류
+태그와 한글 라벨의 짝은 `src/data/condition-labels.json` 한 곳에만 둔다. 카드의 `- 판단 조건:` 줄은 이 매핑을 그대로 찍으므로, 라벨이 빠지면 영문 키가 사용자에게 그대로 나간다.
 
-새 태그가 필요하면 lowercase snake_case로 추가한다.
+새 태그를 쓸 때는 두 가지를 함께 한다.
+
+1. 품목의 `conditions`에 lowercase snake_case로 넣는다.
+2. `condition-labels.json`에 한글 라벨을 붙인다. 어투는 기존 라벨을 따라 짧은 명사구로 맞춘다.
+
+`validate-data.mjs`가 둘의 전수 대응을 강제한다. 라벨 없는 태그를 쓰면 error, 아무 품목도 안 쓰는 라벨이 남아 있으면 warning이다.
+
+뜻이 다른 태그로 이미 덮이는 상태라면 태그를 새로 만들기 전에 카드를 렌더해 본다. 카드의 다른 줄이 이미 같은 말을 하고 있으면 태그를 붙이는 쪽이 오히려 군더더기다 — `자가주사기 주사바늘`의 `region_specific`이 그랬다. `판단 범위` 줄과 `지역 확인 필요` 블록이 이미 지역 확인을 말하고 있어서 태그를 뺐다.
 
 ## Review Status
 
