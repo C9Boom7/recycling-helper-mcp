@@ -215,13 +215,13 @@ find_disposal_spots(dong: string, region?: string, itemName?: string)
 ## 완료 기준 (DoD)
 
 - [ ] 선행: 재등록 경로 확인 (8/26, 사람)
-- [ ] R1 클라이언트 — 타임아웃 2.5s·오류 접기·키 두 형태·단건 정규화·totalCount·키 비노출
-- [ ] R2 입력 계약 — 행정동 숫자 정규화, itemName 3상태 처리
-- [ ] R3 `spot-categories.json`(순서 계약·`fallbackLine` 포함) + validate 스키마
-- [ ] R4 필터 — region은 광역+구 동시 일치, 무region은 수렴 판정, 미수렴 되묻기
-- [ ] R5 3갈래 — 성공(상한 규칙·절단 표시)·폴백(3요소, 지역 없이 완결)·되묻기 + structuredContent 화이트리스트
-- [ ] R6 `_log`·env·description
-- [ ] R7 목 업스트림 6갈래 + env 고정 + 크기 경고 상한, 기존 601건 무변경, `pnpm local:test` 통과
+- [x] R1 클라이언트 — [src/moe-spot-client.ts](../../src/moe-spot-client.ts). 타임아웃 2,500ms·재시도 없음, 실패 넷(타임아웃·HTTP·게이트웨이 XML·비정상 resultCode)을 `timeout`/`http` 두 낱말로 접기, 키 두 형태(`%` 있으면 그대로), 단건 `items.item` 객체 정규화, `totalCount` 절단 플래그. 키는 URL에만 실리고 반환값·로그·응답 어디에도 없다
+- [x] R2 입력 계약 — `X숫자동` → `X동` 한 규칙(`제`도 함께 뗀다), `itemName`은 `match`면 그 묶음만·`ambiguous`/`not_found`면 필터 없이. **확정됐는데 걸리는 묶음이 없는 품목(`소파`)은 폴백으로 내려앉는다** — 필터를 슬쩍 푸는 대신
+- [x] R3 [src/data/spot-categories.json](../../src/data/spot-categories.json) 8묶음(순서 계약·`fallbackLine`·`defaultExposed`) + validate 스키마(키 순서 대조, `itemIds` 존재·중복 금지, 마지막 묶음만 patterns 빈 배열)
+- [x] R4 필터 — `region`이 있으면 광역(주소 접두)과 시·군·구가 **함께** 맞아야 남기고, 없으면 시·군·구가 하나로 수렴할 때만 답한다. 미수렴이면 되묻기
+- [x] R5 3갈래 — 성공(묶음당 3곳·전체 12곳·표 순서로 채우기·절단 한 줄)·폴백(전국 경로 + 지역 확인처 + 품목 한 줄, 지역 없이도 완결)·되묻기. structuredContent 세 모양 전부 스모크 화이트리스트에 등록
+- [x] R6 `_log`에 `status`(`spots`/`spots_fallback`/`spots_ask`)·`upstream`·`upstreamMs`, env 둘, description(법정동 요구·트리거 예 셋·`get_disposal_steps` 대비 문구, 1,024자 안)
+- [x] R7 목 업스트림 6갈래 + 절단·정규화·품목 필터·키 인코딩 두 형태까지, 스모크 spawn env에 키 고정(기본 빈 값), 크기 경고 상한 신설(text 1,433B 실측). 기존 601건 무변경, `pnpm local:test` 통과
 - [ ] 머지 → 재배포 → **재등록** → Preview 실발화 2건 (8/29 전)
 
 ## 진행 상태
@@ -231,3 +231,9 @@ find_disposal_spots(dong: string, region?: string, itemName?: string)
   묶음표 자립형으로 재설계, `region-dong.json` 역추적 트랙 제거(부분 색인 위의 유일성 판정이 오염을 확정하는 문제),
   타임아웃 1.5s → 2.5s, totalCount·단건 정규화·키 인코딩·스모크 env 고정 추가, 개수 상한 충돌 해소.
   실측 수치 출처는 [moe-recycling-api-2026-08-24.md](../moe-recycling-api-2026-08-24.md) 2장 추가분으로 정리.
+- 2026-08-25 — R1~R7·D1~D3 구현 (브랜치 `claude/phase-12-nearby-spots`). 새 파일 둘(`src/moe-spot-client.ts`,
+  `src/data/spot-categories.json`), `TOOL_DEFS`는 키가 있을 때만 여섯 번째 항목을 붙인다. 스모크는 `node:http` 목
+  업스트림을 띄워 성공·타임아웃·0건·되묻기·단건 정규화·절단·동음 오염 세 갈래(`우동`·`서교동`·`중앙동`)·키 두 형태를
+  고정하고, 키 없는 실행에서 툴이 목록에도 디스패치에도 없는지 함께 본다. 상계동 성공 응답은 text 1,433B(목표 2.5KB 안).
+  기존 answer case 601건은 손대지 않았다. `pnpm local:test` 통과.
+  PRD와 다르게 간 셋은 PR 본문 "구현 노트"에 적었다 — 폴백 지도 링크 주소, 0건 폴백의 첫 문장, `trash_bag`의 빈 `itemIds`.
