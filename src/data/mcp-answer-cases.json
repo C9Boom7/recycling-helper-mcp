@@ -11004,5 +11004,29 @@
       "https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
       "남동구 폐형광등 분리배출 및 처리요령"
     ]
+  },
+  {
+    "id": "region_source_order_seongdong_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성동구",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"서울 성동구\"",
+      "성동구 폐형광등·건전지 분리배출"
+    ]
+  },
+  {
+    "id": "region_source_order_bucheon_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 부천시",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 부천시\"",
+      "부천시보건소 가정 내 폐의약품 올바른 폐기방법 안내"
+    ]
   }
 ]
