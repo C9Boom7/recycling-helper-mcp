@@ -318,10 +318,12 @@ const TOOL_DEFS: ToolDef[] = [
       // find_disposal_spots의 dong과 같은 이유로 `.trim()`을 스키마에 둔다 — `"  "`가
       // 통과하면 핸들러가 다듬은 뒤엔 빈 문자열이라, `""은(는) 아직 상세 지역 데이터가
       // 없습니다`와 앞이 빈 머리글이 응답으로 나간다. 여기서 -32602 복구 안내로 끝낸다.
+      // min에 커스텀 메시지를 달지 않는다 — 사용자 문구는 describeArgumentIssue의
+      // too_small 갈래(ARGUMENT_RECOVERY_HINTS.region)가 정하고, 여기 문자열은 읽히지 않는다.
       region: z
         .string()
         .trim()
-        .min(1, "지역 이름이 필요합니다 — 예: 서울 강남구.")
+        .min(1)
         .max(80)
         .describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),

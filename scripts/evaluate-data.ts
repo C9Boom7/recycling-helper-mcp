@@ -110,6 +110,9 @@ const materialInferenceExpectations: Array<{ query: string; expected: string[] }
   // 사용자가 직접 댄 재질은 게이트와 무관하다. 걸린 이름(소파)만 지우고 남은 말을 훑는다.
   { query: "비닐 소파 커버", expected: ["vinyl_film"] },
   { query: "플라스틱 소파 커버", expected: ["plastic_container"] },
+  // 재질 낱말이 걸린 품목의 복합 별칭("가죽 소파") 안에 있으면 이름과 함께 지워진다.
+  // 커튼·수건처럼 걸린 이름 자체가 재질 낱말인 경우와 같은 갈래로, 메뉴 폴백이 받는다.
+  { query: "가죽 소파 커버", expected: [] },
 ];
 
 for (const { query, expected } of materialInferenceExpectations) {
