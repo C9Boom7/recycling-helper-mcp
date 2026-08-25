@@ -101,6 +101,10 @@ const STRUCTURED_KEY_WHITELIST = {
     "ambiguousCandidates",
     "defaultSummary",
     "checkList",
+    // 대형폐기물 신청·수수료 주소와 문의 전화. 본문에는 늘 찍히지만 구조화에는 담는
+    // 자리가 없어, 전에는 `officialSources` 세 자리 중 하나를 같은 주소로 써야만
+    // 구조화만 읽는 호스트에 닿았다. 그 경쟁 때문에 12곳에서 수거함 안내가 밀렸다.
+    "bulkyWasteContact",
     "officialSources",
   ],
 };
@@ -1005,7 +1009,9 @@ async function runSmoke() {
 
       // R2-a 세 번째 갈래: 배출 그룹 라벨에 고를 어휘가 아예 없는 품목(`region_specific` →
       // "지역 확인 필요")은 거를 근거가 없으니 지역 출처를 전부 낸다. 대표 1개로 줄이면
-      // 도봉구 sources[0]인 스마트클린 도봉만 남아 정작 이 품목이 봐야 할 수거함 안내를 잃는다.
+      // 도봉구 sources[0] 하나만 남아 이 품목이 봐야 할 다른 안내를 잃는다 — 그 자리가 무엇인지는
+      // 출처 순서에 달려 있어(2026-08-25 순서 정리로 바뀌었다) 지역 출처를 전부 내는 이 갈래
+      // 자체가 안전장치다.
       const ledText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "LED등", region: "서울 도봉구" }, requestId++));
       const ledSources = sliceFrom(ledText, "### 서울 도봉구 공식 출처", "도봉구 LED등");
       assert(ledSources.includes("도봉구 폐형광등·폐건전지 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목에서 지역 출처를 대표 1개로 잘라 수거함 안내를 잃었다");
@@ -1278,6 +1284,31 @@ async function runSmoke() {
     //
     // 이름이 실제로 그 지역으로 매칭됐는지부터 본다. 광역으로 폴백하거나 되묻기로 빠지면
     // 다른 지역의 요일 줄을 놓고 아래 단언이 전부 통과해, 49곳을 돈다는 이 루프가 헛돈다.
+    const GUIDE_KINDS = [
+      { label: "폐의약품", re: /의약품/, field: "medicine" },
+      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/, field: "batteryAndFluorescentLamp" },
+    ];
+    // 본문은 수거함 안내를 말하는데 그 근거 출처가 하나도 없는 자리. 순서로는 못 고치고
+    // 출처를 찾아야 하는 일이라 이 PR에서 닫지 못했다. 조용히 넘기지 않고 이름을 남긴다 —
+    // **줄어야 할 목록이지 늘어야 할 목록이 아니다.** 새 지역이 같은 상태로 들어오면
+    // 위 단언에서 걸린다. 사유와 진행은 `docs/data-decision-backlog.md`에 있다.
+    const KNOWN_GUIDE_SOURCE_GAPS = new Set([
+      "songpa_gu:batteryAndFluorescentLamp",
+      "mapo_gu:medicine",
+      "seongnam_si:medicine",
+      "jongno_gu:medicine",
+      "jongno_gu:batteryAndFluorescentLamp",
+      "yongsan_gu:batteryAndFluorescentLamp",
+      "gwangjin_gu:medicine",
+      "gangbuk_gu:medicine",
+      "dobong_gu:medicine",
+      "eunpyeong_gu:medicine",
+      "gangseo_gu:batteryAndFluorescentLamp",
+      "geumcheon_gu:batteryAndFluorescentLamp",
+      "yeongdeungpo_gu:medicine",
+      "dongjak_gu:medicine",
+      "gangdong_gu:medicine",
+    ]);
     let ownDayPageCount = 0;
     for (const policy of regionPolicies) {
       const dayResult = await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++);
@@ -1285,6 +1316,43 @@ async function runSmoke() {
         dayResult.structuredContent?.matchedRegion === policy.name,
         `${policy.name}: 이 이름이 자기 지역으로 안 잡힌다 (matchedRegion=${dayResult.structuredContent?.matchedRegion}) — 아래 요일 단언이 다른 지역 답을 보고 통과한다`,
       );
+
+      // 수거함 안내 근거가 구조화 출력에 남는지 같은 응답에서 함께 본다. 따로 루프를
+      // 돌면 40번을 더 부르고, `ownDayPageCount` 단언과도 멀어진다.
+      if (policy.coverageTier !== "metro") {
+        const shown = dayResult.structuredContent?.officialSources ?? [];
+        for (const kind of GUIDE_KINDS) {
+          // 노출된 쪽은 `{title, url}`뿐이라 `basis`로 종류를 가릴 수 없다. 지역 데이터에서
+          // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다. URL 없는 출처를 허용하는
+          // 스키마라(`validate-data.mjs`) `undefined === undefined`로 통과하지 않게 거른다.
+          const urls = (policy.sources ?? [])
+            .filter((source) => kind.re.test(source.title ?? "") || kind.re.test(source.basis ?? ""))
+            .map((source) => source.url)
+            .filter(Boolean);
+          if (urls.length === 0) {
+            // 출처가 아예 없는 쪽이 더 나쁘다 — 본문은 "전용 수거함에 배출합니다"라고
+            // 말하는데 근거가 하나도 없다. 순서로는 못 고치고 출처를 찾아야 하는 일이라
+            // 이 PR에서 닫지 못했다. 조용히 넘기지 말고 목록으로 묶어 둔다.
+            if (policy.specialCollections?.[kind.field]?.method?.length > 0) {
+              assert(
+                KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
+                `${policy.name}: ${kind.label} 안내를 본문에서 말하면서 그 근거 출처가 하나도 없다 — 출처를 찾아 넣거나 KNOWN_GUIDE_SOURCE_GAPS에 근거와 함께 등록해라`,
+              );
+            }
+            continue;
+          }
+          // 목록에 있는데 출처가 생겼다면 그 항목은 낡았다. 지우지 않으면 그 지역이
+          // 나중에 다시 출처를 잃어도 위 갈래가 조용히 면제한다.
+          assert(
+            !KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
+            `${policy.name}: ${kind.label} 출처가 생겼는데 KNOWN_GUIDE_SOURCE_GAPS에 아직 남아 있다 — 목록에서 지워라`,
+          );
+          assert(
+            shown.some((source) => urls.includes(source?.url)),
+            `${policy.name}: ${kind.label} 안내 출처를 갖고 있는데 officialSources에서 잘렸다 — 구조화만 읽는 호스트는 수거함 안내를 근거 없이 받는다`,
+          );
+        }
+      }
       const dayAnswer = resultText(dayResult);
       const dayLine = findDayCheckLine(dayAnswer);
       assert(dayLine, `${policy.name}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
@@ -1312,6 +1380,14 @@ async function runSmoke() {
         );
       }
     }
+    // 수거함 안내 근거가 구조화 출력에 남는지 **자치구 전수**로 본다. 케이스 몇 건으로
+    // 막으면 안 짚은 지역이 조용히 되돌아간다 — 출처를 하나 끼워 넣는 것만으로 밀려나고,
+    // 본문은 여전히 "약국·행정복지센터에 내세요"라고 말하는데 근거 링크만 사라진다.
+    //
+    // `officialSources`는 앞 세 개까지인데 요일 출처가 한 자리를 예약하므로 실제 창은 둘이다.
+    // 안내인지는 제목이 아니라 `basis`까지 봐야 한다 — 서대문 「폐금속자원 배출」·수원
+    // 「재활용분리배출」은 제목에 낱말이 없고 근거에만 있다.
+
     assert(
       ownDayPageCount === REGIONS_WITH_OWN_DAY_PAGE,
       `자기 지자체 요일 페이지로 닫히는 지역이 ${ownDayPageCount}곳이다 (기대 ${REGIONS_WITH_OWN_DAY_PAGE}곳) — 줄었으면 출처의 basis가 선택 정규식에 안 걸리는 것이고, 늘었으면 이 숫자를 올린다`,

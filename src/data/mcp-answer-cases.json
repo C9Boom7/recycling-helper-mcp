@@ -10407,7 +10407,8 @@
       "보건소와 지정약국, 동 행정복지센터"
     ],
     "expectedStructuredIncludes": [
-      "\"matchedRegion\":\"대구 달서구\""
+      "\"matchedRegion\":\"대구 달서구\"",
+      "달서구 폐의약품 수거 및 배출방법 안내"
     ]
   },
   {
@@ -11014,6 +11015,103 @@
     "expectedStructuredIncludes": [
       "\"matchedRegion\":\"대전광역시\"",
       "\"coverageTier\":\"metro\""
+    ]
+  },
+  {
+    "id": "region_source_order_haeundae_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "부산 해운대구",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"부산 해운대구\"",
+      "해운대구 폐의약품 배출요령 및 수거함 위치"
+    ]
+  },
+  {
+    "id": "region_source_order_seongdong_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성동구",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"서울 성동구\"",
+      "성동구 폐의약품 분리배출"
+    ]
+  },
+  {
+    "id": "region_structured_carries_bulky_and_guide",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "인천 남동구",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"인천 남동구\"",
+      "https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
+      "남동구 폐형광등 분리배출 및 처리요령"
+    ]
+  },
+  {
+    "id": "region_source_order_seongdong_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 성동구",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"서울 성동구\"",
+      "성동구 폐형광등·건전지 분리배출"
+    ]
+  },
+  {
+    "id": "region_source_order_bucheon_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 부천시",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 부천시\"",
+      "부천시보건소 가정 내 폐의약품 올바른 폐기방법 안내"
+    ]
+  },
+  {
+    "id": "region_source_order_suwon_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 수원시",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 수원시\"",
+      "수원시 재활용분리배출"
+    ]
+  },
+  {
+    "id": "region_source_order_seodaemun_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 서대문구",
+      "itemName": "폐형광등"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"서울 서대문구\"",
+      "서대문구 폐금속자원 배출"
+    ]
+  },
+  {
+    "id": "region_source_order_namyangju_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 남양주시",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 남양주시\"",
+      "남양주보건소 폐의약품 배출 안내"
     ]
   }
 ]
