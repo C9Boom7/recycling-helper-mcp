@@ -1369,7 +1369,8 @@
       "라벨 붙은 유리병",
       "플라스틱 뚜껑 붙은 유리병",
       "간장 유리병에 플라스틱 뚜껑 붙어있으면 어떻게 버려",
-      "스티커 붙은 유리병은 어떻게 버려"
+      "스티커 붙은 유리병은 어떻게 버려",
+      "와인병"
     ],
     "category": "glass",
     "disposalType": "recycle",
@@ -5799,7 +5800,8 @@
       "크림통",
       "화장품 플라스틱 용기",
       "화장품 유리병",
-      "펌프 화장품 용기"
+      "펌프 화장품 용기",
+      "화장품"
     ],
     "category": "container_by_material",
     "disposalType": "recycle_or_general_by_material",
@@ -6212,7 +6214,8 @@
       "향수 샘플",
       "향수 샘플 병",
       "작은 향수병",
-      "향수 샘플 작은 유리병도 향수병이랑 똑같아"
+      "향수 샘플 작은 유리병도 향수병이랑 똑같아",
+      "향수"
     ],
     "category": "cosmetic_glass_container",
     "disposalType": "glass_recycle_after_empty_or_general",
@@ -19523,7 +19526,8 @@
     "name": "식기세척기",
     "aliases": [
       "식기 세척기",
-      "빌트인 식기세척기"
+      "빌트인 식기세척기",
+      "식세기"
     ],
     "category": "electronics_appliance",
     "disposalType": "small_electronics_collection_or_bulky",

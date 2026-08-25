@@ -11198,5 +11198,60 @@
     "expectedStructuredExcludes": [
       "\"region\":\"   \""
     ]
+  },
+  {
+    "id": "short_noun_perfume_confirms_bottle",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "향수"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"향수병\""
+    ]
+  },
+  {
+    "id": "short_noun_cosmetics_confirms_container",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "화장품"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"화장품 용기\""
+    ]
+  },
+  {
+    "id": "short_noun_dishwasher_colloquial",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "식세기"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"식기세척기\""
+    ]
+  },
+  {
+    "id": "short_noun_wine_bottle_confirms_glass",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "와인병"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"유리병\""
+    ]
+  },
+  {
+    "id": "short_noun_cosmetics_does_not_steal_cotton_pad",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "화장솜"
+    },
+    "expectedStructuredIncludes": [
+      "\"found\":true",
+      "\"matchedItem\":\"화장솜\""
+    ]
   }
 ]
