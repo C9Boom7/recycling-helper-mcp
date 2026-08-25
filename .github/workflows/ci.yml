@@ -50,10 +50,23 @@ jobs:
         run: |
           set -euo pipefail
           docker run -d --name mcp-ci -p 3000:3000 recycling-helper-mcp:ci
+          # 컨테이너가 이미 죽었으면 기다릴 이유가 없다. 부팅 실패야말로 이 잡을
+          # 만든 이유인데, 그냥 기다리면 30초를 흘린 뒤 curl 실패로만 끝나 원인이
+          # 안 보인다 — 그 자리에서 로그를 찍고 끊는다.
           for _ in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:3000/health -o /tmp/health.json; then break; fi
+            if [ "$(docker inspect -f '{{.State.Running}}' mcp-ci)" != "true" ]; then
+              echo "컨테이너가 떠 있지 않다. 아래는 컨테이너 로그다."
+              docker logs mcp-ci || true
+              exit 1
+            fi
             sleep 1
           done
+          if [ ! -s /tmp/health.json ]; then
+            echo "/health가 30초 안에 응답하지 않았다. 아래는 컨테이너 로그다."
+            docker logs mcp-ci || true
+            exit 1
+          fi
           cat /tmp/health.json
           # 데이터가 이미지에 함께 실렸는지까지 본다 — dist/data 복사가 빠지면
           # 서버는 뜨는데 품목이 0개인 채로 응답한다.
