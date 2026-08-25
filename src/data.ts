@@ -2488,7 +2488,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     // 붙은 일회용 이름(`wax_mixed_container`·`mixed_vacuum_bottle`)이라, 사용자가 다른
     // 품목과 견줄 수 있는 분류 체계가 아니다. 실제 쓰임도 `scoreItem`이
     // 재질 질의에 가산점을 줄 때 부분 문자열로 훑는 게 전부다. 한글 라벨을 붙이는 건
-    // 106개를 통제 어휘로 묶어 계속 관리하겠다는 뜻인데, 그 대가로 얻는 줄이 바로
+    // 105개를 통제 어휘로 묶어 계속 관리하겠다는 뜻인데, 그 대가로 얻는 줄이 바로
     // 아래 `결론`보다 사용자에게 덜 말해 준다.
     //
     // `disposalType`도 같은 이유로 원본 대신 배출 그룹 라벨을 찍는다. 이름을 `배출
