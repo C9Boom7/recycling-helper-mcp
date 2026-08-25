@@ -225,7 +225,9 @@ const SPOT_CACHE_TTL_MS = (() => {
   const parsed = Number(raw);
   return raw !== "" && Number.isFinite(parsed) && parsed >= 0 ? parsed : 300_000;
 })();
-const SPOT_CACHE_MAX_ENTRIES = 500;
+// 엔트리당 최대 1,000행이라 개수 상한이 곧 메모리 상한이다 — 500이면 최악에 수십 MB를
+// 붙들 수 있어 100으로 낮춘다. 동 이름 100개면 TTL 5분 안의 재질문은 거의 다 걸린다.
+const SPOT_CACHE_MAX_ENTRIES = 100;
 const spotCache = new Map<string, { expiresAt: number; result: SpotLookup }>();
 
 /**

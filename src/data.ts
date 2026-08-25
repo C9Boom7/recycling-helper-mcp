@@ -2662,6 +2662,9 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
  * 조건을 고칠 때 스윕만 옛 갈래를 훑는다.
  */
 export function formatClassifyResultText(item: WasteItem, region?: string): string {
+  // 되비추는 줄이라 원본이 아니라 다듬은 값을 쓴다 — `"  "`가 그대로 오면
+  // `- 입력 지역:` 뒤가 빈 채로 나간다. 남는 게 없으면 줄 자체를 뺀다.
+  const trimmedRegion = region?.trim();
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
 
   // `- 세부 판단: ${item.disposalType}`가 여기 있었다. 바로 위 `배출 그룹`이 같은
@@ -2685,7 +2688,7 @@ export function formatClassifyResultText(item: WasteItem, region?: string): stri
           regionMatch,
         )
       : undefined,
-    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
+    trimmedRegion && itemNeedsRegionCheck(item) ? `- 입력 지역: ${trimmedRegion}` : undefined,
   ]
     .filter(Boolean)
     .join("\n");

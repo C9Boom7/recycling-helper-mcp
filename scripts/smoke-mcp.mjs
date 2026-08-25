@@ -1521,6 +1521,20 @@ async function runSmoke() {
       );
     }
 
+    // 공백만 온 region도 스키마가 끊는다 — 통과하면 핸들러가 다듬은 뒤 빈 문자열이라
+    // `""은(는) 아직 상세 지역 데이터가 없습니다`와 앞이 빈 머리글이 그대로 나간다.
+    // find_disposal_spots의 공백 dong과 같은 자리에서 같은 모양으로 끝나야 한다.
+    let blankRegionError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "get_region_disposal_info", arguments: { region: "   " } }, requestId++);
+    } catch (error) {
+      blankRegionError = error;
+    }
+    assert(
+      blankRegionError && String(blankRegionError.message).includes("한국 지역명을 전달하세요"),
+      `공백 region은 복구 안내가 붙은 -32602여야 한다: ${blankRegionError?.message ?? "(오류가 나지 않았다)"}`,
+    );
+
     // 같은 불변식이 품목 툴에도 걸린다. `빗자루`는 `regionCheckLevel: required`에
     // checkItems가 "배출 장소·요일"이라, 지역을 함께 주면 "- 확인 항목: 배출 장소·요일"
     // 한 줄로 끝나 있었다 — 요일을 말해놓고 어디서 확인하는지는 안 적는, 되묻기를 부른

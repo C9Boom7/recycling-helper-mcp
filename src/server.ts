@@ -315,7 +315,15 @@ const TOOL_DEFS: ToolDef[] = [
     description:
       "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps covers days for only some items. Optional itemName narrows the checklist to that item.",
     inputShape: {
-      region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
+      // find_disposal_spots의 dong과 같은 이유로 `.trim()`을 스키마에 둔다 — `"  "`가
+      // 통과하면 핸들러가 다듬은 뒤엔 빈 문자열이라, `""은(는) 아직 상세 지역 데이터가
+      // 없습니다`와 앞이 빈 머리글이 응답으로 나간다. 여기서 -32602 복구 안내로 끝낸다.
+      region: z
+        .string()
+        .trim()
+        .min(1, "지역 이름이 필요합니다 — 예: 서울 강남구.")
+        .max(80)
+        .describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
     },
     annotations: {
@@ -1201,6 +1209,11 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
       : undefined,
     // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
   ].filter((line): line is string => line !== undefined);
+
+  // 그룹마다 뒤에 구분용 빈 줄을 붙이므로 마지막 그룹 뒤에도 하나가 남는다. 마무리
+  // 문장이 없는 호출에서는 그게 그대로 답의 끝이 되어 빈 줄로 끝난다. 중간 구분 줄은
+  // 두고 끝의 것만 걷어낸다.
+  while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
 
   const structuredItems = planned.map((entry) =>
     entry.found
