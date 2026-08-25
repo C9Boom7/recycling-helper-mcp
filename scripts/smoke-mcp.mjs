@@ -1299,9 +1299,30 @@ async function runSmoke() {
     // 안내인지는 제목이 아니라 `basis`까지 봐야 한다 — 서대문 「폐금속자원 배출」·수원
     // 「재활용분리배출」은 제목에 낱말이 없고 근거에만 있다.
     const GUIDE_KINDS = [
-      { label: "폐의약품", re: /의약품/ },
-      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/ },
+      { label: "폐의약품", re: /의약품/, field: "medicine" },
+      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/, field: "batteryAndFluorescentLamp" },
     ];
+    // 본문은 수거함 안내를 말하는데 그 근거 출처가 하나도 없는 자리. 순서로는 못 고치고
+    // 출처를 찾아야 하는 일이라 이 PR에서 닫지 못했다. 조용히 넘기지 않고 이름을 남긴다 —
+    // **줄어야 할 목록이지 늘어야 할 목록이 아니다.** 새 지역이 같은 상태로 들어오면
+    // 위 단언에서 걸린다. 사유와 진행은 `docs/data-decision-backlog.md`에 있다.
+    const KNOWN_GUIDE_SOURCE_GAPS = new Set([
+      "songpa_gu:batteryAndFluorescentLamp",
+      "mapo_gu:medicine",
+      "seongnam_si:medicine",
+      "jongno_gu:medicine",
+      "jongno_gu:batteryAndFluorescentLamp",
+      "yongsan_gu:batteryAndFluorescentLamp",
+      "gwangjin_gu:medicine",
+      "gangbuk_gu:medicine",
+      "dobong_gu:medicine",
+      "eunpyeong_gu:medicine",
+      "gangseo_gu:batteryAndFluorescentLamp",
+      "geumcheon_gu:batteryAndFluorescentLamp",
+      "yeongdeungpo_gu:medicine",
+      "dongjak_gu:medicine",
+      "gangdong_gu:medicine",
+    ]);
     for (const policy of regionPolicies) {
       if (policy.coverageTier === "metro") continue;
       const shown = (
@@ -1309,11 +1330,26 @@ async function runSmoke() {
       ).structuredContent?.officialSources ?? [];
       for (const kind of GUIDE_KINDS) {
         // 노출된 쪽은 `{title, url}`뿐이라 `basis`로 종류를 가릴 수 없다. 지역 데이터에서
-        // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다.
+        // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다. URL 없는 출처를 허용하는
+        // 스키마라(`validate-data.mjs`) `undefined === undefined`로 통과하지 않게 거른다.
         const urls = (policy.sources ?? [])
           .filter((source) => kind.re.test(source.title ?? "") || kind.re.test(source.basis ?? ""))
-          .map((source) => source.url);
-        if (urls.length === 0) continue;
+          .map((source) => source.url)
+          .filter(Boolean);
+        if (urls.length === 0) {
+          // 출처가 아예 없는 쪽이 더 나쁘다 — 본문은 "전용 수거함에 배출합니다"라고
+          // 말하는데 근거가 하나도 없다. 순서로는 못 고치고 출처를 찾아야 하는 일이라
+          // 이 PR에서 닫지 못했다. 조용히 넘기지 말고 목록으로 묶어 두어, 새 지역이
+          // 같은 상태로 들어오면 여기서 걸리게 한다.
+          const claims = policy.specialCollections?.[kind.field]?.method?.length > 0;
+          if (claims) {
+            assert(
+              KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
+              `${policy.name}: ${kind.label} 안내를 본문에서 말하면서 그 근거 출처가 하나도 없다 — 출처를 찾아 넣거나 KNOWN_GUIDE_SOURCE_GAPS에 근거와 함께 등록해라`,
+            );
+          }
+          continue;
+        }
         assert(
           shown.some((source) => urls.includes(source?.url)),
           `${policy.name}: ${kind.label} 안내 출처를 갖고 있는데 officialSources에서 잘렸다 — 구조화만 읽는 호스트는 수거함 안내를 근거 없이 받는다`,
