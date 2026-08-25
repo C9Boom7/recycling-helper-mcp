@@ -954,15 +954,17 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
       }
     }
 
-    // 반대쪽 — 상한에 걸렸는데 행 수를 안 남긴 품목. 답변에는 12개가 전부인 것처럼
-    // 나간다. 임포터를 다시 돌리면 채워지므로 error가 아니라 warning으로 남긴다.
-    for (const [itemId, count] of Object.entries(feeRowsByItemId)) {
-      if (count === MAX_FEE_ROWS_PER_ITEM && preCapCounts?.[itemId] === undefined) {
-        warnings.push(
-          `${prefix}.fees sits at the ${MAX_FEE_ROWS_PER_ITEM}-row cap for item ${itemId} without preCapFeeRowCountByItemId; re-run the importer so the answer can disclose the trim`,
-        );
-      }
-    }
+    // 여기 반대쪽 검사가 있었다 — "정확히 12행인데 preCapFeeRowCountByItemId가 없으면
+    // 잘린 걸 감춘 것일 수 있다"는 경고다. **행 수만으로는 그 둘을 가를 수 없고, 가를
+    // 필요도 없다.** 세 임포터 모두 `sorted.length > MAX_FEE_ROWS`일 때만 이 필드를
+    // 쓰므로(import-district-fees.ts, import-ordinance-fees.ts, import-bulky-fees.ts),
+    // 필드가 없다는 건 자른 적이 없다는 뜻이다. 원문이 마침 12행이었을 뿐이다.
+    //
+    // 그런데도 경고문은 "임포터를 다시 돌리라"고 안내했다. 다시 돌려도 자를 게 없어
+    // 필드가 안 생기니 영원히 사라지지 않는다 — 실제로 서대문 옷장·은평 침대프레임이
+    // 그 상태로 남아 매 실행마다 두 줄을 찍고 있었다. 안 없어지는 경고는 나머지 경고까지
+    // 무시하게 만든다. 위쪽 검사(preCap이 있으면 실제 행 수·상한과 맞는가)가 진짜 방어선이라
+    // 이쪽은 걷어낸다.
   }
 
   if (Array.isArray(schedule.fees) && schedule.fees.length > 0) {
