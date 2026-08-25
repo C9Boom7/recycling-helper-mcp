@@ -284,7 +284,8 @@ export function findMaterialGuideline(id: string): MaterialGuideline | undefined
 // unrelated compounds stays out of the table: "글라스" would infer glass-bottle
 // recycling for 선글라스, and "껍질" would infer food waste for 조개껍질. Both are
 // general trash, and a wrong material principle reads more authoritative than
-// the generic material menu the fallback shows instead.
+// the generic material menu the fallback shows instead. "침대" needs a lookbehind
+// for the same reason — it would infer bulky-waste filing for 모니터 받침대.
 const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
   { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
@@ -296,7 +297,7 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "electronics_battery", pattern: /배터리|건전지|전지|충전|전동|전자|전기|가전|노트북|랩탑|케이블|충전기/u },
   { category: "hazardous_pressurized", pattern: /의약품|알약|물약|연고|시럽|형광등|가스|스프레이|부탄|에어로졸|살충|농약|페인트|소화기/u },
   { category: "food_waste", pattern: /음식물|먹다\s*남|과일|채소/u },
-  { category: "bulky", pattern: /대형|가구|침대|소파|장롱|매트리스/u },
+  { category: "bulky", pattern: /대형|가구|(?<!받)침대|소파|장롱|매트리스/u },
   { category: "general_trash", pattern: /실리콘|고무|라텍스|가죽|멜라민|스펀지|스폰지|복합\s*재질/u },
 ];
 
@@ -308,7 +309,16 @@ export function inferMaterialCategories(query: string, limit = 2): string[] {
     return [materialOnly];
   }
 
-  const lowered = query.toLowerCase();
+  // 매칭 게이트가 "이름은 걸렸지만 그 물건이 아니다"라고 판정한 질의는, 걸린 이름을 지우고
+  // 남은 말만 훑는다. 표가 부분 문자열 스캔이라 그냥 두면 게이트가 막은 본체(소파 커버의
+  // 소파, 가스레인지 후드의 가스)가 재질 원칙으로 되살아나는데, 틀린 재질 원칙은 일반
+  // 메뉴보다 권위 있게 읽힌다(위 표 주석).
+  //
+  // 그렇다고 질의를 통째로 버리면 사용자가 **직접 말한** 재질까지 같이 죽는다 — `비닐 소파
+  // 커버`의 비닐, `플라스틱 소파 커버`의 플라스틱은 소파와 상관없이 그 사람이 댄 단서다.
+  // 지우고 남는 게 없으면(`소파 커버`) 예전처럼 빈 목록 → 메뉴 + 되묻기로 착지한다.
+  const fragments = gateSuppressedFragments(query);
+  const lowered = (fragments.length > 0 ? stripRawFragments(query, fragments) : query).toLowerCase();
   const categories: string[] = [];
   for (const { category, pattern } of MATERIAL_QUERY_PATTERNS) {
     if (categories.length >= limit) break;
@@ -711,6 +721,73 @@ function isSwallowedByGatedSpan(gate: PartCompoundGate, gatedSpans: NameSpan[]):
   return gate.spans.every((span) =>
     gatedSpans.some((gated) => gated.start <= span.start && span.end <= gated.end && gated.end - gated.start > span.end - span.start),
   );
+}
+
+/**
+ * 게이트가 발동했을 때 지울 가스레인지 표기. 순서가 답을 가른다 — `레인지후드`를 먼저
+ * 지우면 `가스레인지 후드`에서 `가스`가 남아 유해·고압 갈래로 되살아난다.
+ */
+const GAS_RANGE_QUERY_SPELLINGS = ["가스레인지", "가스렌지", "레인지후드", "렌지후드"];
+
+/**
+ * 매칭 게이트(부품어 게이트, 가스레인지 비매칭 복합어)가 발동했다면, 질의에서 지울 원문
+ * 조각들을 돌려준다. 발동하지 않았으면 빈 배열이다.
+ *
+ * 게이트는 "이름은 찾았지만 그 물건이 아니다"는 판정인데, not_found 폴백의
+ * `inferMaterialCategories`가 같은 질의를 부분 문자열로 다시 훑으면 방금 막은
+ * 본체의 답이 재질 원칙으로 되살아난다("소파 커버"에 대형폐기물 신고 안내).
+ * 매칭이 성공한 질의는 폴백에 오지 않으므로, 이 판정은 not_found가 난 질의의
+ * 원인 후보에 게이트가 있는지를 묻는 자리에서만 평가된다.
+ *
+ * 참/거짓이 아니라 조각 목록인 이유는 폴백이 질의를 통째로 버리지 않기 위해서다.
+ * 걸린 이름만 지우면 `비닐 소파 커버`의 비닐처럼 사용자가 직접 댄 재질이 살아남는다.
+ */
+function gateSuppressedFragments(query: string): string[] {
+  const fragments: string[] = [];
+  if (isGasRangeNonmatchCompound(query)) fragments.push(...GAS_RANGE_QUERY_SPELLINGS);
+
+  const normalizedQuery = normalizeText(query);
+  if (!normalizedQuery) return fragments;
+
+  const wordIndex = buildQueryWordIndex(query);
+  for (const indexed of indexedItems) {
+    if (!partCompoundGateOf(normalizedQuery, wordIndex, indexed.names).gated) continue;
+    // 긴 이름부터 지운다. `알약`을 먼저 지우면 `알약 포장재 커버`에 `포장재`가 남아
+    // 비닐류로 되살아난다 — 게이트가 막은 바로 그 이름의 뒷조각이다.
+    fragments.push(
+      ...[...indexed.names].sort((a, b) => b.normalized.length - a.normalized.length).map(({ name }) => name),
+    );
+  }
+
+  return fragments;
+}
+
+/** 조각 글자 사이에 낄 수 있는 것 — 띄어쓰기와 문장부호. `normalizeText`가 지우는 것과 같다. */
+const RAW_FRAGMENT_GAP = "[^\\p{L}\\p{N}]*";
+
+function rawFragmentPattern(fragment: string): RegExp | undefined {
+  const chars = [...fragment].filter((char) => /[\p{L}\p{N}]/u.test(char));
+  if (chars.length === 0) return undefined;
+  return new RegExp(chars.map((char) => char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(RAW_FRAGMENT_GAP), "giu");
+}
+
+/**
+ * 질의 **원문**에서 조각을 지운다. 정규화 문자열의 구간을 원문 좌표로 되돌리지 않는 건
+ * 일부러다 — 되돌리려면 정규화 단계마다 좌표 매핑을 들고 다녀야 하는데, 그 복잡도로 얻는 건
+ * 드문 표기 몇 개다. 대신 글자 사이에 공백·문장부호가 끼는 것까지 받아(`가스 레인지 후드`)
+ * 흔한 표기를 덮는다.
+ *
+ * 지우기가 실패해 이름이 남아도 최악이 예전 동작(게이트 이전의 되살아남)이라 파괴적이지 않다.
+ * 지금 지켜야 하는 기대 목록은 `scripts/evaluate-data.ts`의 `materialInferenceExpectations`다.
+ */
+function stripRawFragments(query: string, fragments: string[]): string {
+  let stripped = query;
+  for (const fragment of fragments) {
+    const pattern = rawFragmentPattern(fragment);
+    if (pattern) stripped = stripped.replace(pattern, " ");
+  }
+
+  return stripped;
 }
 
 function stripShortAliasParticle(token: string): string {
@@ -1294,7 +1371,8 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
  * 여기서는 빠지지 않는다.
  *
  * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
- * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
+ * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다. 맨 이름 질의는
+ * `resolveRegionalPolicyIn`의 전용 분기가 되묻기로 받는다.
  *
  * `sharedAliases`도 그대로 넣는다. 나눠 쓰는 표기라 **양쪽이 함께 후보로 서는 것이
  * 맞는 동작**이다. 뒤에 시·군·구 이름이 붙으면 `remainderOwner`가 그 이름의 주인을
@@ -1513,6 +1591,51 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
         .slice(0, MAX_AMBIGUOUS_CANDIDATES)
         .map((policy) => ({ region: policy, matchedBy: policy.name, level: "metro" as const })),
     };
+  }
+
+  // 광역 표기 없이는 광역이 안 정해지는 시·군·구 이름("중구", "광주시")이 통째로
+  // 들어왔다. 이 목록은 일부러 매칭 표에서 빠져 있어(regionMatchNames 주석) 이대로
+  // 두면 후보 0개 → not_found로 떨어지고, 데이터를 갖고 있으면서 "상세 지역 데이터가
+  // 없습니다"라고 답하게 된다. 그 이름을 가진 지역을 전부 후보로 세워 되묻는다.
+  // sharedOwners처럼 이른 반환이다 — 뒤 단계는 이 이름을 아예 모르거나("중구"),
+  // 별칭 하나로 잘못 확정한다("광주시" → 광주광역시).
+  const prefixOnlyOwners = policies.filter(
+    (policy) =>
+      regionMatchLevel(policy) === "metro" &&
+      (policy.prefixOnlyDistrictAliases ?? []).some((alias) => normalizeText(alias) === normalizedQuery),
+  );
+  if (prefixOnlyOwners.length > 0) {
+    const byRegionId = new Map<string, MatchedRegionPolicy>();
+    // ① 같은 표기를 정식 별칭으로도 가진 지역 — 광주광역시가 "광주시"를 별칭으로
+    //    갖는다. prefixOnly 데이터가 "이름만으로 광역이 안 정해진다"고 말하는 이상,
+    //    별칭 확정도 되묻기 후보의 하나로 내린다.
+    for (const level of ["district", "metro"] as const) {
+      for (const candidate of regionCandidatesAt(policies, normalizedQuery, level, 3)) {
+        byRegionId.set(candidate.region.id, candidate);
+      }
+    }
+    // ② 이름의 마지막 어절이 같은 등록 자치구. 등록 자치구는 과확정을 막으려고 맨
+    //    이름("중구")을 별칭으로 달지 않으므로 ①에 안 걸린다. 빼면 서울 중구 주민이
+    //    후보 목록에서 자기 지역을 못 찾고, "강서구"는 부산 하나만 남아 되묻기가
+    //    아니라 반대쪽 오답이 된다.
+    for (const policy of policies) {
+      if (regionMatchLevel(policy) !== "district" || byRegionId.has(policy.id)) continue;
+      const lastWord = policy.name.slice(policy.name.lastIndexOf(" ") + 1);
+      if (normalizeText(lastWord) === normalizedQuery) {
+        byRegionId.set(policy.id, { region: policy, matchedBy: policy.name, level: "district" });
+      }
+    }
+    // ③ 같은 이름의 미등록 구·군을 대신 받는 광역들.
+    for (const policy of prefixOnlyOwners) {
+      if (!byRegionId.has(policy.id)) byRegionId.set(policy.id, { region: policy, matchedBy: policy.name, level: "metro" });
+    }
+    // 후보가 하나여도 되묻는다. 이 필드의 계약이 "이름만으로 광역이 안 정해진다"라,
+    // 나머지 보유 지역이 미등록이라는 이유로 확정하면 안 된다.
+    //
+    // ③을 마지막에 넣으므로, 후보가 상한(7)을 넘는 날 잘려 나가는 쪽은 미등록 구를 실제로
+    // 받아주는 광역이다. 지금은 최대 6이고 `scripts/test-region-matching.ts`의 "후보에 해당
+    // 광역 포함" 단언이 그 순간 깨지므로 침묵 회귀는 아니다 — 넘치면 순서부터 다시 본다.
+    return { status: "ambiguous", candidates: Array.from(byRegionId.values()).slice(0, MAX_AMBIGUOUS_CANDIDATES) };
   }
 
   const consider = (
@@ -1767,9 +1890,6 @@ function formatRegionSourceLine(source: WasteSource): string {
   return `- ${source.title}${url}${checkedAt}${basis}`;
 }
 
-export function formatRegionSourceList(region: RegionalPolicyData): string[] {
-  return region.sources.map(formatRegionSourceLine);
-}
 
 /**
  * 배출 그룹 라벨에 든 갈래 이름 → 그 갈래를 다루는 지역 출처를 고르는 어휘. 제목과 basis에서
@@ -2597,6 +2717,9 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
  * 조건을 고칠 때 스윕만 옛 갈래를 훑는다.
  */
 export function formatClassifyResultText(item: WasteItem, region?: string): string {
+  // 되비추는 줄이라 원본이 아니라 다듬은 값을 쓴다 — `"  "`가 그대로 오면
+  // `- 입력 지역:` 뒤가 빈 채로 나간다. 남는 게 없으면 줄 자체를 뺀다.
+  const trimmedRegion = region?.trim();
   const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
 
   // `- 세부 판단: ${item.disposalType}`가 여기 있었다. 바로 위 `배출 그룹`이 같은
@@ -2620,7 +2743,7 @@ export function formatClassifyResultText(item: WasteItem, region?: string): stri
           regionMatch,
         )
       : undefined,
-    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
+    trimmedRegion && itemNeedsRegionCheck(item) ? `- 입력 지역: ${trimmedRegion}` : undefined,
   ]
     .filter(Boolean)
     .join("\n");

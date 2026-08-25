@@ -240,7 +240,7 @@ async function getFreePort() {
   return port;
 }
 
-function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl = "" } = {}) {
+function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl = "", spotCacheTtlMs = "0" } = {}) {
   const server = spawn(process.execPath, ["dist/server.js"], {
     env: {
       ...process.env,
@@ -262,6 +262,10 @@ function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl =
       // 케이스만 더미 키와 목 주소를 함께 넘긴다.
       DATA_GO_KR_SERVICE_KEY: serviceKey,
       MOE_API_BASE_URL: upstreamBaseUrl,
+      // 기본은 캐시 끔. 스팟 스모크가 같은 동 이름으로 시나리오(성공·필터·품목별)를
+      // 갈아 끼우며 업스트림 호출 수를 단언하므로, 캐시가 켜져 있으면 판정이 캐시
+      // 적중 순서에 얹힌다. 캐시 자체는 인코딩 키 서버에서 켜고 따로 잰다.
+      SPOT_CACHE_TTL_MS: spotCacheTtlMs,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -802,7 +806,7 @@ async function runSmoke() {
     requestId += 1;
 
     // -32602는 호스트 모델이 읽고 다음 호출을 고치는 복구 프롬프트다. Zod 원문만
-    // 나가던 시기가 있어, 자연어 안내가 앞에 서고 원문이 상세로 남는지 고정한다.
+    // 나가던 시기가 있어, 자연어 안내가 앞에 서는지 고정한다.
     const invalidArgsResponse = await fetch(`${baseUrl}/mcp`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -820,9 +824,12 @@ async function runSmoke() {
         invalidArgs.error.message.includes("버릴 품목명을 한국어로 전달하세요"),
       `-32602 message lost its natural-language recovery line: ${invalidArgs.error.message}`,
     );
+    // Zod 원문 상세는 CALL_LOG_DETAILS=true에서만 붙는다. 기본 설정에서는 수백 바이트짜리
+    // pretty-print JSON이 호스트 컨텍스트를 먹지 않아야 한다 — 이 스위트는 false로 고정돼
+    // 있으므로(startServer) 여기서는 빠져 있는 쪽이 정상이다.
     assert(
-      invalidArgs.error.message.includes("상세:"),
-      `-32602 message dropped the Zod detail that debugging reads: ${invalidArgs.error.message}`,
+      !invalidArgs.error.message.includes("상세:"),
+      `-32602 message carries the Zod detail with CALL_LOG_DETAILS off: ${invalidArgs.error.message}`,
     );
     requestId += 1;
 
@@ -1055,6 +1062,14 @@ async function runSmoke() {
         );
       }
 
+      // 구분용 빈 줄이 살아 있어야 한다. 줄 배열의 filter(Boolean)이 빈 문자열까지 지워
+      // 제목이 앞 블록에 그대로 붙어 나간 적이 있다 — 마크다운 헤더가 아닌 제목이라
+      // 빈 줄이 유일한 섹션 경계다.
+      assert(
+        regionSizeText.includes("\n\n"),
+        "노원구 매트리스 지역 툴: 응답에 빈 줄이 하나도 없다 — 구분용 빈 문자열이 filter에 지워졌다",
+      );
+
       // R1·R2 공통: 지역 툴 응답에 글자 단위로 같은 줄이 두 번 있으면 안 된다. 연락처 블록이
       // 두 번 찍히던 것과 체크리스트가 위 블록을 옮겨 적던 것이 한 단언에 함께 걸린다.
       // 빈 줄만 뺀다. `확인할 정보`의 항목은 앞에 번호가 붙어(`1. `) 같은 값이라도 줄이 달라지므로
@@ -1162,6 +1177,11 @@ async function runSmoke() {
       const dashRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "빨래건조대" }, requestId++);
       const dashSteps = await callTool(baseUrl, "get_disposal_steps", { itemName: "빨래건조대", region: "서울 마포구" }, requestId++);
       const dashPlan = await callTool(baseUrl, "make_cleanup_plan", { items: ["빨래건조대"], region: "서울 마포구" }, requestId++);
+      // cleanup plan도 구분용 빈 줄이 살아 있어야 한다(지역 툴의 같은 단언 참고).
+      assert(
+        resultText(dashPlan).includes("\n\n"),
+        "마포구 빨래건조대 cleanup plan: 응답에 빈 줄이 하나도 없다 — 구분용 빈 문자열이 filter에 지워졌다",
+      );
       // 행이 여럿인데 규격이 전부 빈 경우도 본다 — 마포구 `피아노`는 `피아노`와
       // `전자피아노(오르간)` 두 고시명이 규격 없이 금액만 다르다. 단일 행만 고치면 이쪽은
       // `규격 2종`으로 남아 고시에 없는 구분을 지어낸다(PR #74 리뷰 1라운드).
@@ -1443,15 +1463,16 @@ async function runSmoke() {
       );
     }
 
-    // 요일 확인처로 안 뽑히는 것과 출처 목록에서 지우는 것은 다른 이야기다. 구로구
-    // 청소행정서비스헌장은 배출·수거 시각 표를 가진 유일한 구로구 페이지라 확인처로는
+    // 요일 확인처로 안 뽑히는 것과 출처를 지우는 것은 다른 이야기다. 구로구
+    // 청소행정서비스헌장은 배출·수거 시각 표를 가진 유일한 구로구 페이지라 출처로
     // 값이 있는데, basis만 고치겠다고 해놓고 항목을 통째로 지운 적이 있다.
-    const guroAnswer = resultText(
-      await callTool(baseUrl, "get_region_disposal_info", { region: "서울 구로구" }, requestId++),
-    );
+    // 응답 본문이 아니라 데이터를 본다 — 본문 "공식 확인처"는 구조화 응답과 같은
+    // 3개 상한을 쓰게 되면서 뒤쪽 출처가 응답에 안 실릴 수 있고, 이 단언이 막는
+    // 사고는 응답 축소가 아니라 데이터 삭제다.
+    const guroPolicy = regionPolicies.find((policy) => policy.name === "서울 구로구");
     assert(
-      guroAnswer.includes("guro.go.kr/www/contents.do?key=1649"),
-      "구로구 청소행정서비스헌장이 공식 확인처에서 사라졌다 — 요일 확인처로 안 뽑는 것과 출처를 지우는 것은 다르다",
+      guroPolicy?.sources.some((source) => source.url?.includes("guro.go.kr/www/contents.do?key=1649")),
+      "구로구 청소행정서비스헌장이 지역 출처 데이터에서 사라졌다 — 요일 확인처로 안 뽑는 것과 출처를 지우는 것은 다르다",
     );
 
     // 품목이 붙으면 체크리스트가 그 품목으로 좁혀진다. 좁히는 건 의도지만, 되묻기를
@@ -1499,6 +1520,20 @@ async function runSmoke() {
         `강남구+침대: 요일을 닫으면서 일반 체크리스트("${general}")까지 되살아났다 — 품목 좁히기가 풀린다`,
       );
     }
+
+    // 공백만 온 region도 스키마가 끊는다 — 통과하면 핸들러가 다듬은 뒤 빈 문자열이라
+    // `""은(는) 아직 상세 지역 데이터가 없습니다`와 앞이 빈 머리글이 그대로 나간다.
+    // find_disposal_spots의 공백 dong과 같은 자리에서 같은 모양으로 끝나야 한다.
+    let blankRegionError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "get_region_disposal_info", arguments: { region: "   " } }, requestId++);
+    } catch (error) {
+      blankRegionError = error;
+    }
+    assert(
+      blankRegionError && String(blankRegionError.message).includes("한국 지역명을 전달하세요"),
+      `공백 region은 복구 안내가 붙은 -32602여야 한다: ${blankRegionError?.message ?? "(오류가 나지 않았다)"}`,
+    );
 
     // 같은 불변식이 품목 툴에도 걸린다. `빗자루`는 `regionCheckLevel: required`에
     // checkItems가 "배출 장소·요일"이라, 지역을 함께 주면 "- 확인 항목: 배출 장소·요일"
@@ -2638,11 +2673,14 @@ const SPOT_EXPECTED_SECTIONS = [
 ];
 
 // PRD phase-12 R7: 이 툴의 크기 상한은 다른 툴 기준을 빌리지 않고 새로 잰다. 목표였던 "성공
-// 응답 text 2.5KB 이하"는 12곳이 다 찬 상계동 응답이 1,433B라 여유 있게 지킨다. 아래 값은 그
-// 실측(text 1,433B · 전체 3,222B, 2026-08-25)에 10%를 얹은 것이다 — 전체가 text의 두 배가 넘는
+// 응답 text 2.5KB 이하"는 12곳이 다 찬 상계동 응답이 1,612B라 여유 있게 지킨다. 아래 값은 그
+// 실측(text 1,612B · 전체 3,537B, 2026-08-26)에 10%를 얹은 것이다 — 전체가 text의 두 배가 넘는
 // 건 structuredContent가 같은 주소를 한 벌 더 싣기 때문이고, 다른 툴도 같은 성질을 안고 있다.
 // 기존 관행대로 실패가 아니라 경고로 시작한다.
-const SPOT_SIZE_WARN_BYTES = { text: 1_580, total: 3_550 };
+//
+// 첫 실측은 text 1,433B(2026-08-25)였다. 그 뒤 PR #77 리뷰 라운드가 상계동 픽스처에
+// 폐건전지·식용유 행을 더해 기대 응답 자체가 커진 것이라(런타임 변화 아님) 기준을 다시 쟀다.
+const SPOT_SIZE_WARN_BYTES = { text: 1_780, total: 3_890 };
 
 // structuredContent 화이트리스트(PRD phase-12 R5). 세 갈래가 모양이 달라 따로 둔다.
 const SPOT_FOUND_KEYS = ["found", "dong", "region", "categories", "truncated", "omitted", "source"];
@@ -3091,6 +3129,8 @@ async function runSpotSmoke() {
   const encodedRun = startServer(encodedPort, {
     serviceKey: SPOT_DUMMY_ENCODED_KEY,
     upstreamBaseUrl: upstream.baseUrl,
+    // 이 서버만 캐시를 켠다 — 같은 동 재질의가 업스트림으로 다시 나가지 않는지를 여기서 잰다.
+    spotCacheTtlMs: "300000",
   });
   const stopEncoded = () => {
     if (!encodedRun.server.killed) encodedRun.server.kill("SIGTERM");
@@ -3100,11 +3140,24 @@ async function runSpotSmoke() {
   try {
     const encodedBaseUrl = `http://${HOST}:${encodedPort}`;
     await waitForHealth(encodedBaseUrl, encodedRun.getOutput);
-    await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 1);
+    const cacheMiss = await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 1);
     const encodedRequest = upstream.requests.at(-1);
     assert(
       encodedRequest.rawQuery.includes(`serviceKey=${SPOT_DUMMY_ENCODED_KEY}`),
       "인코딩 키는 그대로 보내야 한다 — 두 번 인코딩되면 증상이 100% 폴백이라 가장 늦게 발견된다",
+    );
+
+    // 동 이름 캐시. 개발계정 일 한도 소진이 곧 툴의 수명이라, 같은 동 재질의가 TTL 안에
+    // 업스트림으로 다시 나가면 안 된다 — 응답은 첫 조회와 같아야 한다.
+    const callsBeforeCacheHit = upstream.requests.length;
+    const cacheHit = await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 2);
+    assert(
+      upstream.requests.length === callsBeforeCacheHit,
+      `같은 동 재질의가 업스트림으로 다시 나갔다 — 캐시가 동작하지 않는다 (${callsBeforeCacheHit} → ${upstream.requests.length})`,
+    );
+    assert(
+      resultText(cacheHit) === resultText(cacheMiss),
+      "캐시 적중 응답이 첫 조회와 다르다",
     );
   } finally {
     stopEncoded();

@@ -41,6 +41,10 @@ export const MEASURE_CASES = [
   { label: "지역 마포구 의자", tool: "get_region_disposal_info", args: { region: "서울 마포구", itemName: "의자" } },
   { label: "지역 광주 북구 매트리스", tool: "get_region_disposal_info", args: { region: "광주 북구", itemName: "매트리스" } },
   { label: "지역 강남구 (품목 없음)", tool: "get_region_disposal_info", args: { region: "서울 강남구" } },
+  // 출처가 아홉 개라 지역 툴 응답이 전 툴 최대(5.5KB)였던 곳. 본문 "공식 확인처"가
+  // 구조화와 같은 3개 상한을 쓰게 된 뒤의 크기를 표에 남긴다 — 이 케이스가 없어서
+  // 상한 없는 본문이 그동안 표에 안 잡혔다.
+  { label: "지역 서초구 (품목 없음)", tool: "get_region_disposal_info", args: { region: "서울 서초구" } },
 ];
 
 function bytes(value) {

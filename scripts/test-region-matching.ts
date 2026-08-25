@@ -71,6 +71,10 @@ function district(id: string, name: string, aliases: string[], metroId: string):
 const fixture: RegionalPolicyData[] = [
   metro("seoul", "서울특별시", ["서울", "서울시", "서울특별시"]),
   metro("busan", "부산광역시", ["부산", "부산시", "부산광역시"]),
+  // prefixOnly 이름의 되묻기 분기. 같은 이름을 별칭으로 가진 등록 자치구(①·②)와
+  // 미등록 구를 대신 받는 광역(③)이 한 후보 목록에 병합되는지를 실데이터와 무관하게
+  // 고정한다 — 실데이터는 등록 자치구에 맨 이름 별칭을 달지 않아 ①이 비어 있다.
+  { ...metro("daegu", "대구광역시", ["대구", "대구시", "대구광역시"]), prefixOnlyDistrictAliases: ["중구"] },
   district("seoul_jung_gu", "서울 중구", ["중구", "서울 중구", "서울시 중구"], "seoul"),
   district("busan_jung_gu", "부산 중구", ["중구", "부산 중구", "부산시 중구"], "busan"),
   district("busan_haeundae_gu", "부산 해운대구", ["해운대구", "부산 해운대구"], "busan"),
@@ -83,8 +87,9 @@ type Expectation =
   | { query: string; expect: "not_found" };
 
 const expectations: Expectation[] = [
-  // 어느 레벨에서도 유일하지 않다 — 확정하지 말고 되물어야 한다.
-  { query: "중구", expect: "ambiguous", candidateIds: ["busan_jung_gu", "seoul_jung_gu"] },
+  // 어느 레벨에서도 유일하지 않다 — 확정하지 말고 되물어야 한다. 별칭으로 걸린
+  // 자치구(①)와 prefixOnly로 미등록 중구를 대신 받는 대구(③)가 함께 후보로 선다.
+  { query: "중구", expect: "ambiguous", candidateIds: ["busan_jung_gu", "seoul_jung_gu", "daegu"] },
   // 광역 접두어가 붙으면 자치구가 확정된다.
   { query: "부산 중구", expect: "match", regionId: "busan_jung_gu", level: "district" },
   { query: "서울 중구", expect: "match", regionId: "seoul_jung_gu", level: "district" },
@@ -206,16 +211,24 @@ for (const query of nationallyAmbiguousDistrictQueries) {
  */
 const metroAmbiguousNames = ["고성군", "고성"];
 
-// `광주시`는 위 목록에 넣어봐야 검사가 되지 않는다 — 광주광역시가 원래 이 이름을
-// 별칭으로 갖고 있어 항상 확정되고, 예외 처리를 달면 어떤 경우에도 실패하지 않는
-// 빈 검사가 된다. 대신 **경기도가 이 이름을 가져가지 않았는지**만 직접 본다.
+// `광주시`는 광주광역시가 별칭으로 갖고 있으면서 경기도 광주시와 표기가 같다.
+// 예전에는 별칭 쪽이 이겨 광주광역시로 확정됐는데(경기 광주시 주민이 광역 안내를
+// 받았다), prefixOnly 되묻기 분기가 들어온 뒤로는 두 광역을 후보로 세워 되묻는
+// 것이 맞는 동작이다. 어느 한쪽이 빠지면 그쪽 주민이 후보 목록에서 자기 지역을
+// 못 찾는다.
 {
   const resolution = resolveRegionalPolicy("광주시");
-  const owner = resolution.status === "match" ? resolution.match.region.id : `(${resolution.status})`;
-  if (owner !== "gwangju") {
+  const candidateIds = resolution.status === "ambiguous" ? resolution.candidates.map((candidate) => candidate.region.id) : [];
+  if (resolution.status !== "ambiguous" || !candidateIds.includes("gwangju") || !candidateIds.includes("gyeonggi")) {
+    const actual =
+      resolution.status === "match"
+        ? resolution.match.region.id
+        : resolution.status === "ambiguous"
+          ? `ambiguous(${candidateIds.join(", ")})`
+          : "not_found";
     failures.push(
-      `"광주시"가 ${owner}로 갔다. 이 이름은 광주광역시가 원래 갖고 있고 경기도 광주시와 표기가 같다 — ` +
-        "경기도 별칭에 더하면 두 광역이 같은 이름을 물어 되묻기로 빠진다",
+      `"광주시"가 ${actual}로 갔다. 광주광역시와 경기도가 함께 후보로 서는 되묻기여야 한다 — ` +
+        "한쪽으로 확정되면 다른 쪽 주민이 남의 광역 안내를 받는다",
     );
   }
 }
@@ -272,6 +285,19 @@ for (const metro of regionalPolicies) {
       failures.push(
         `"${alias}" confidently resolved to ${metro.id}; 이 이름은 광역 접두어 없이 이 광역으로 가면 안 된다`,
       );
+    }
+    // 확정만 안 하면 되는 게 아니라, 이 광역이 후보로 서는 **되묻기**가 나가야 한다.
+    // not_found면 "상세 지역 데이터가 없습니다"라는 틀린 답이 나가고, 후보에서 빠지면
+    // 이 광역 주민이 목록에서 자기 지역을 못 찾는다. 8개 prefixOnly 이름 전부의
+    // 양성 회귀가 이 한 자리다.
+    if (resolution.status !== "ambiguous" || !resolution.candidates.some((candidate) => candidate.region.id === metro.id)) {
+      const actual =
+        resolution.status === "match"
+          ? resolution.match.region.id
+          : resolution.status === "ambiguous"
+            ? `ambiguous(${resolution.candidates.map((candidate) => candidate.region.id).join(", ")})`
+            : "not_found";
+      failures.push(`"${alias}"가 ${actual}로 갔다; ${metro.id}가 후보로 서는 되묻기여야 한다`);
     }
     const named = findNamedSubRegion(metro, alias);
     if (named !== undefined) {

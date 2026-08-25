@@ -31,7 +31,6 @@ import {
   formatItemGuide,
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
-  formatRegionSourceList,
   formatRegionSourceLines,
   regionCollectionSources,
   regionSourcesForItem,
@@ -189,10 +188,11 @@ type ToolLogMeta = {
    */
   inputSource?: InputSource;
   /**
-   * 외부 조회가 어떻게 끝났는지 — `ok` | `timeout` | `http` | `empty` | `truncated`
-   * (PRD phase-12 R6). `find_disposal_spots`에만 실린다. 사용자에게 나가는 응답은
-   * 실패 종류를 감추고 폴백 하나로 접으므로, 이 칸이 **실패를 세는 유일한 자리**다.
-   * 값은 클라이언트 모듈이 정하는 낱말이라 호출자 문자열도 키도 섞일 수 없다.
+   * 외부 조회가 어떻게 끝났는지 — `ok` | `empty` | `truncated` | `timeout` | `http` |
+   * `body` | `network`(PRD phase-12 R6, 실패 갈래는 `SpotLookup` 주석). `find_disposal_spots`
+   * 에만 실린다. 사용자에게 나가는 응답은 실패 종류를 감추고 폴백 하나로 접으므로, 이 칸이
+   * **실패를 세는 유일한 자리**다. 값은 클라이언트 모듈이 정하는 낱말이라 호출자 문자열도
+   * 키도 섞일 수 없다.
    */
   upstream?: string;
   /** 그 외부 조회에 걸린 시간. 툴 전체 `ms`와 갈라 봐야 느린 쪽이 우리인지 그쪽인지 안다. */
@@ -315,7 +315,17 @@ const TOOL_DEFS: ToolDef[] = [
     description:
       "Returns municipality-specific waste disposal information for a Korean region from RecyclingHelper(재활용척척): bulky-waste application links and fees, special collection points (batteries, medicine, clothing), what to verify locally, and official local sources. It does not return collection days as fixed values — those vary by 동 and building type, so the checklist names the official page to check and links it. Answer day questions with that link instead of asking which 동 or apartment complex the user lives in. Use when the region itself is the question — e.g. '성남시 대형폐기물 신고 어떻게 해?', '우리 동네 분리수거 어떻게 해?', '강남구 폐건전지 어디에 버려?'. If the user asks how to dispose of a specific item and only mentions their area in passing ('강남구 사는데 침대 어떻게 버려?'), use get_disposal_steps with the region parameter instead — except day or time questions, which belong here even when an item is named ('강남구 비닐 목요일 배출 맞아?'); get_disposal_steps covers days for only some items. Optional itemName narrows the checklist to that item.",
     inputShape: {
-      region: z.string().min(1).max(80).describe("Korean city, district, or neighborhood."),
+      // find_disposal_spots의 dong과 같은 이유로 `.trim()`을 스키마에 둔다 — `"  "`가
+      // 통과하면 핸들러가 다듬은 뒤엔 빈 문자열이라, `""은(는) 아직 상세 지역 데이터가
+      // 없습니다`와 앞이 빈 머리글이 응답으로 나간다. 여기서 -32602 복구 안내로 끝낸다.
+      // min에 커스텀 메시지를 달지 않는다 — 사용자 문구는 describeArgumentIssue의
+      // too_small 갈래(ARGUMENT_RECOVERY_HINTS.region)가 정하고, 여기 문자열은 읽히지 않는다.
+      region: z
+        .string()
+        .trim()
+        .min(1)
+        .max(80)
+        .describe("Korean city, district, or neighborhood."),
       itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
     },
     annotations: {
@@ -885,7 +895,17 @@ function photoConfirmLine(item: WasteItem): string {
   return `사진 속 물건은 "${item.name}" 품목 기준으로 안내합니다. 다르면 품목명을 알려주세요.`;
 }
 
-async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
+async function handleClassifyWasteItem({
+  itemName,
+  region: rawRegion,
+}: {
+  itemName: string;
+  region?: string;
+}): Promise<LoggedToolResult> {
+  // 공백만 온 지역은 안 온 것으로 본다. `make_cleanup_plan`의 hintRegion과 같은 이유다 —
+  // `optionalRegionParam`에 trim이 없어 `"   "`가 그대로 들어오는데, 그 값은 매칭에서
+  // 못 찾은 지역이 되고 되비추는 줄과 structuredContent에는 공백이 그대로 실린다.
+  const region = rawRegion?.trim() || undefined;
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return withRegionStatusLog(unknownItemResult(itemName), region);
   if (resolved.status === "ambiguous") {
@@ -932,13 +952,17 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
 
 async function handleGetDisposalSteps({
   itemName,
-  region,
+  region: rawRegion,
   inputSource,
 }: {
   itemName: string;
   region?: string;
   inputSource?: InputSource;
 }): Promise<LoggedToolResult> {
+  // 공백만 온 지역은 안 온 것으로 본다(handleClassifyWasteItem과 같은 이유). 다듬지 않으면
+  // `formatItemGuide`가 `-     기준 수거함 위치…`를 찍고 structuredContent의 `region`에도
+  // 공백이 그대로 실린다.
+  const region = rawRegion?.trim() || undefined;
   const resolved = resolveWasteItem(itemName);
   // 되묻는 두 갈래는 이미 "이게 맞냐"고 묻고 있어서 확인 문구를 겹쳐 붙일 자리가 없다.
   // 사진에서 왔다는 표시만 로그에 남긴다.
@@ -1144,7 +1168,9 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
 
   const lines = [
     "대청소 배출 계획",
-    region ? `지역: ${region}` : undefined,
+    // 원본 region이 아니라 다듬은 hintRegion을 쓴다 — `"   "`가 그대로 오면 원본은
+    // `지역:    ` 줄과 공백 문자열 필드를 낳는다.
+    hintRegion ? `지역: ${hintRegion}` : undefined,
     "",
     ...Array.from(groups.entries()).flatMap(([group, entries]) => [
       `## ${group}`,
@@ -1197,7 +1223,13 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
           : `${hintRegion} 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다.`
         : "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다."
       : undefined,
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
+
+  // 그룹마다 뒤에 구분용 빈 줄을 붙이므로 마지막 그룹 뒤에도 하나가 남는다. 마무리
+  // 문장이 없는 호출에서는 그게 그대로 답의 끝이 되어 빈 줄로 끝난다. 중간 구분 줄은
+  // 두고 끝의 것만 걷어낸다.
+  while (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
 
   const structuredItems = planned.map((entry) =>
     entry.found
@@ -1225,7 +1257,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   return textResult(
     lines.join("\n"),
     {
-      region,
+      region: hintRegion,
       items: structuredItems,
       ...(hasCriticalItem && hintRegion
         ? {
@@ -1346,8 +1378,16 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy, namedSubRegion?: s
   return `${regionMatch.region.name} 기준으로 ${confirmed.join("와 ")}까지 확인했습니다.`;
 }
 
-const MEDICINE_ITEM_IDS = new Set(["medicine"]);
-const BATTERY_LAMP_ITEM_IDS = new Set(["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"]);
+// 수거함 안내를 펼칠 품목은 수거함 묶음표(spot-categories.json)에서 파생한다. 목록을 따로
+// 들고 있으면 표가 늘 때 여기만 낡아도 아무도 모른다. 백열전구 하나만 여기서 더한다 —
+// 표에는 일부러 없다(수거함 대상이 아니라 find_disposal_spots는 폴백이 맞다). 하지만 지역
+// 수거함 안내의 전구류 예외 문장("백열전구·LED등은 특수마대")은 백열전구를 물었을 때도
+// 펼쳐야 한다.
+const MEDICINE_ITEM_IDS = new Set(spotCategories.find((category) => category.id === "medicine")?.itemIds ?? []);
+const BATTERY_LAMP_ITEM_IDS = new Set([
+  ...(spotCategories.find((category) => category.id === "battery_lamp")?.itemIds ?? []),
+  "incandescent_bulb",
+]);
 
 function collectionLines(label: string, method: string[] | undefined, expand: boolean): string[] {
   const filled = (method ?? []).filter((line) => typeof line === "string" && line.trim().length > 0);
@@ -1387,7 +1427,10 @@ function regionSpecialCollectionLines(region: RegionalPolicyData, item?: WasteIt
   ];
 }
 
-async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
+async function handleGetRegionDisposalInfo({ region: rawRegion, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
+  // 앞뒤 공백은 여기서 떼고 시작한다 — 다른 툴의 hintRegion과 같은 이유다. 원본을 쓰면
+  // `"  "`가 머리글(`   지역 확인 안내`)과 not_found 문장, structuredContent에 그대로 박힌다.
+  const region = rawRegion.trim();
   const resolved = itemName ? resolveWasteItem(itemName) : undefined;
   const match = resolved?.status === "match" ? resolved.match : undefined;
   const ambiguousCandidates =
@@ -1473,7 +1516,8 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
     itemGuideLines.length > 0 ? itemGuideLines.join("\n") : undefined,
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
 
   // 체크리스트가 "위에서 이미 답한 것"을 가려내는 근거.
   //
@@ -1493,6 +1537,16 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     regionMatch,
   );
 
+  // 본문 "공식 확인처"도 structuredContent와 같은 상한·같은 선별을 쓴다. 본문만 전부
+  // 찍던 때는 서초구가 아홉 줄 2.3KB를 실어 전 툴 최대 응답이었고, structuredContent의
+  // 3개 상한과도 어긋났다 — 같은 함수를 지나면 정의상 같아진다(요일 출처 보존 포함).
+  const regionOfficialSources = regionMatch
+    ? pickRegionOfficialSources(
+        regionMatch.region,
+        Math.max(0, MAX_OFFICIAL_SOURCES - (regionMatch.level === "metro" ? NATIONAL_FALLBACK_LINKS.length : 0)),
+      )
+    : [];
+
   const lines = [
     ...answerBodyLines,
     "",
@@ -1504,7 +1558,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     "",
     "공식 확인처",
     ...(regionMatch
-      ? formatRegionSourceList(regionMatch.region)
+      ? formatRegionSourceLines(regionOfficialSources)
       : NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)),
     // 광역까지만 좁혀졌으면 전국 안내 링크를 함께 남긴다. 시·군 이름을 광역 별칭으로
     // 흡수한 뒤 `안산시`는 미등록 폴백 대신 경기도로 착지하는데, 그 순간 분리배출.kr
@@ -1514,7 +1568,8 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ...(regionMatch?.level === "metro"
       ? NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)
       : []),
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
 
   return textResult(
     lines.join("\n"),
@@ -1546,17 +1601,12 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       // text에는 그대로 찍혀 둘이 어긋난다. 둘 더 가지면 49e712e가 고친 링크 소실이
       // 그대로 되살아난다 — 데이터 추가만으로 회귀하는 셈이라 순서를 뒤집는다.
       officialSources: regionMatch
-        ? (() => {
-            const national =
-              regionMatch.level === "metro"
-                ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
-                : [];
-            const room = Math.max(0, MAX_OFFICIAL_SOURCES - national.length);
-            return [
-              ...pickRegionOfficialSources(regionMatch.region, room).map((source) => ({ title: source.title, url: source.url })),
-              ...national,
-            ];
-          })()
+        ? [
+            ...regionOfficialSources.map((source) => ({ title: source.title, url: source.url })),
+            ...(regionMatch.level === "metro"
+              ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
+              : []),
+          ]
         : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
     },
     {
@@ -1638,12 +1688,18 @@ function districtNames(match: MatchedRegionPolicy, namedSubRegion?: string): str
  * 반대로 광역까지만 좁혀진 질의에는 시·군·구 이름이 없으므로 광역만 본다 — 광역 이름은
  * 전국에서 유일하니 그것만으로도 오염이 섞이지 않는다.
  */
-function addressInRegion(addrBase: string, metroNames: string[], districts: string[]): boolean {
+function addressInRegion(addrBase: string, metroNames: string[], districtPatterns: RegExp[]): boolean {
   if (metroNames.length > 0 && !metroNames.some((name) => addrBase.startsWith(name))) return false;
-  // 시·군·구는 어절 첫머리에서만 찾는다. 부분 문자열로 보면 이름을 품은 이웃 구가 통과한다 —
-  // `부산 서구` 질의에 강서구 주소가, `인천 동구`에 남동구 주소가 남는 식이다.
-  if (districts.length > 0 && !districts.some((name) => new RegExp(`(^|\\s)${escapeRegExp(name)}`).test(addrBase))) return false;
+  if (districtPatterns.length > 0 && !districtPatterns.some((pattern) => pattern.test(addrBase))) return false;
   return true;
+}
+
+// 시·군·구는 어절 첫머리에서만 찾는다. 부분 문자열로 보면 이름을 품은 이웃 구가 통과한다 —
+// `부산 서구` 질의에 강서구 주소가, `인천 동구`에 남동구 주소가 남는 식이다.
+// 정규식은 이름당 한 번만 만든다 — 행마다 만들면 한 호출에 최대 1,000행 × 표기 수만큼
+// 컴파일한다(g 플래그가 없어 재사용해도 상태가 남지 않는다).
+function districtPatternsOf(districts: string[]): RegExp[] {
+  return districts.map((name) => new RegExp(`(^|\\s)${escapeRegExp(name)}`));
 }
 
 function escapeRegExp(text: string): string {
@@ -1701,11 +1757,18 @@ function spotFallbackResult(params: {
             ? `${dong}에서 전용 수거함류 배출 장소는 찾지 못했습니다. 이렇게 확인해 보세요.`
             : `${dong}에 등록된 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`;
 
+  // 품목은 확정됐는데 걸리는 수거함 묶음이 없으면(소파·백열전구) "못 찾았다"로만 끝내지
+  // 않는다 — 이 동에 없는 게 아니라 수거함이 답이 아닌 품목이라, 그 품목의 기본 배출
+  // 경로를 한 줄 밝힌다. 묶음이 있으면 예전처럼 묶음의 일반 안내가 그 자리다.
+  const itemRouteLine =
+    category?.fallbackLine ??
+    (item ? `${item.name}은(는) 동네 전용 수거함으로 배출하는 품목이 아닙니다. ${item.summary}` : undefined);
+
   const lines = [
     opening,
     `- ${REGION_SELECT_GUIDE_LINK.title}에서 지역을 골라 수거함 안내를 확인하세요: ${REGION_SELECT_GUIDE_LINK.url}`,
     ...regionSourceLines,
-    category ? `- ${category.fallbackLine}` : undefined,
+    itemRouteLine ? `- ${itemRouteLine}` : undefined,
   ].filter((line) => line !== undefined);
 
   return textResult(
@@ -1718,7 +1781,7 @@ function spotFallbackResult(params: {
         ...(regionSources.length > 0
           ? { regionSources: regionSources.map((source) => ({ title: source.title, url: source.url })) }
           : {}),
-        ...(category ? { itemLine: category.fallbackLine } : {}),
+        ...(itemRouteLine ? { itemLine: itemRouteLine } : {}),
       },
     },
     log,
@@ -1753,6 +1816,9 @@ async function handleFindDisposalSpots({
   const baseLog: ToolLogMeta = {
     matchedId: matchedItem?.id,
     matchedRegion: regionMatch?.region.name,
+    // 세 툴이 같은 어휘로 남기는 지역 해상도 축(regionStatusFor 주석). 이 툴만 빠져
+    // 있으면 "동은 댔는데 구를 몰라 되물은 비율"이 집계에서 안 보인다.
+    regionStatus: regionStatusFor(hintRegion),
     upstreamMs: lookup.ms,
   };
 
@@ -1773,8 +1839,8 @@ async function handleFindDisposalSpots({
   if (regionMatch) {
     const metroNames = metroPrefixNames(regionMatch.region);
     // 행마다 다시 계산하지 않는다 — 한 호출에 최대 1,000행을 거른다.
-    const districts = districtNames(regionMatch, namedSubRegion);
-    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districts));
+    const districtPatterns = districtPatternsOf(districtNames(regionMatch, namedSubRegion));
+    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districtPatterns));
     regionLabel = regionMatch.region.name;
   } else {
     // 역추적 색인 없이 수렴만 본다(R4). 등록 지역 40곳짜리 색인으로 "이 동은 유일하다"를
@@ -2171,9 +2237,12 @@ async function handleJsonOnlyToolCall(body: JsonRpcBody, res: Response): Promise
   const parsed = z.object(registered.def.inputShape).safeParse(params.arguments ?? {});
   if (!parsed.success) {
     // 자연어 안내가 앞, Zod 원문이 뒤. 모델은 첫 문장만으로 다음 호출을 고칠 수
-    // 있고, 원문은 안내문이 뭉갠 세부(경로·코드)를 디버깅용으로 보존한다.
+    // 있고, 원문은 안내문이 뭉갠 세부(경로·코드)를 디버깅용으로 보존한다 — 다만
+    // 수백 바이트짜리 pretty-print JSON이 호스트 컨텍스트로 그대로 들어가므로,
+    // 디버깅 스위치가 켜졌을 때만 붙인다.
     const guidance = parsed.error.issues.map(describeArgumentIssue).join(" ");
-    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${guidance}\n상세: ${parsed.error.message}`));
+    const detail = CALL_LOG_DETAILS_ENABLED ? `\n상세: ${parsed.error.message}` : "";
+    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${guidance}${detail}`));
     return;
   }
 
@@ -2247,14 +2316,23 @@ app.post("/mcp", async (req: Request, res: Response) => {
     sessionIdGenerator: undefined,
   });
 
+  // close/에러 어느 경로로 끝나도 요청당 만든 server·transport를 한 번만 정리한다.
+  let cleanedUp = false;
+  const cleanup = (): void => {
+    if (cleanedUp) return;
+    cleanedUp = true;
+    void transport.close();
+    void server.close();
+  };
+
+  // await 뒤에 달면 응답이 끝나기 전에 클라이언트가 끊었을 때 close가 이미 발화한
+  // 뒤라 리스너가 영영 안 불린다 — 호스트 타임아웃·사용자 이탈이 잦은 카카오
+  // 환경에서 닿기 쉬운 경로다. 등록은 연결 전에 한다.
+  res.on("close", cleanup);
+
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
-
-    res.on("close", () => {
-      void transport.close();
-      void server.close();
-    });
   } catch (error) {
     // Transport-level failures can carry request-derived text in `message`, and
     // "운영 로그에 예외 메시지를 남기지 않는다"(qa-runbook 2절) has to hold on this
@@ -2270,6 +2348,8 @@ app.post("/mcp", async (req: Request, res: Response) => {
         id: null,
       });
     }
+    // 응답을 못 보낸 채 죽은 경로에서도 close 이벤트만 기다리지 않는다.
+    cleanup();
   }
 });
 
@@ -2328,11 +2408,23 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(PORT, HOST, (error?: Error) => {
-  if (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-
+// listen 콜백은 'listening' 리스너라 인자를 받지 않는다 — 예전의 `(error?: Error)` 분기는
+// 죽은 코드였고, 포트 충돌 같은 실제 기동 실패는 'error' 이벤트로 온다.
+const httpServer = app.listen(PORT, HOST, () => {
   console.log(`${SERVICE_NAME} MCP server listening at http://${HOST}:${PORT}`);
 });
+httpServer.on("error", (error: Error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});
+
+// k8s가 파드를 내릴 때 SIGTERM을 보낸다. 기본 동작(즉시 종료)이면 진행 중이던 tools/call의
+// 연결이 끊긴다 — QA 기간에는 하루 한두 번 재배포가 예정돼 있어 그때마다 오류 창이 생긴다.
+// 새 연결만 닫고 진행 중 요청을 마친 뒤 내려가되, 5초 안에 안 끝나면 강제 종료한다.
+const SHUTDOWN_TIMEOUT_MS = 5_000;
+for (const signal of ["SIGTERM", "SIGINT"] as const) {
+  process.on(signal, () => {
+    httpServer.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), SHUTDOWN_TIMEOUT_MS).unref();
+  });
+}

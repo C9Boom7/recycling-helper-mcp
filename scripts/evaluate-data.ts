@@ -13,7 +13,7 @@
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { isReservedQuery, resolveWasteItem, wasteItems } from "../src/data.js";
+import { inferMaterialCategories, isReservedQuery, resolveWasteItem, wasteItems } from "../src/data.js";
 
 type EvaluationCase = {
   query: string;
@@ -93,10 +93,43 @@ for (const item of wasteItems) {
   }
 }
 
+// not_found 폴백의 재질 추정. 매칭 게이트가 막은 질의("소파 커버"는 소파가 아니다)를
+// 부분 문자열 스캔이 되살리지 않아야 하고, 걸린 이름을 지우고 남은 재질 단서는 살아야 한다.
+// e2e 케이스(mcp-answer-cases의 part_compound_*)는 응답 문구만 보므로, 추정 갈래
+// 자체는 여기서 표로 고정한다.
+const materialInferenceExpectations: Array<{ query: string; expected: string[] }> = [
+  { query: "소파 커버", expected: [] },
+  { query: "소파 커버 버리는 법", expected: [] }, // 꼬리 어절이 부품어가 아니어도 게이트 판정을 따라 막힌다
+  { query: "가스레인지 후드", expected: [] }, // 부품어가 아니라 전용 게이트 경유
+  { query: "알약 포장재 커버", expected: [] }, // 삼킴 구간(isSwallowedByGatedSpan) 경유
+  { query: "모니터 받침대", expected: [] },
+  { query: "원목 받침대", expected: [] }, // 게이트와 별개로 "받침대"의 침대 오인은 lookbehind가 막는다
+  { query: "노트북 커버", expected: [] }, // 되살아나는 갈래가 bulky·hazardous만이 아니라는 증거
+  { query: "2층 침대", expected: ["bulky"] }, // lookbehind가 진짜 침대를 죽이지 않는다
+  { query: "이불 커버", expected: [] }, // 걸린 이름이 곧 재질 단서라, 지우고 나면 남는 게 없다
+  // 사용자가 직접 댄 재질은 게이트와 무관하다. 걸린 이름(소파)만 지우고 남은 말을 훑는다.
+  { query: "비닐 소파 커버", expected: ["vinyl_film"] },
+  { query: "플라스틱 소파 커버", expected: ["plastic_container"] },
+  // 재질 낱말이 걸린 품목의 복합 별칭("가죽 소파") 안에 있으면 이름과 함께 지워진다.
+  // 커튼·수건처럼 걸린 이름 자체가 재질 낱말인 경우와 같은 갈래로, 메뉴 폴백이 받는다.
+  { query: "가죽 소파 커버", expected: [] },
+];
+
+for (const { query, expected } of materialInferenceExpectations) {
+  const actual = inferMaterialCategories(query);
+  if (actual.length !== expected.length || actual.some((category, index) => category !== expected[index])) {
+    failures.push(
+      `inferMaterialCategories("${query}") = [${actual.join(", ")}]; expected [${expected.join(", ")}]`,
+    );
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Data evaluation failed (${failures.length}):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
-console.log(`Data evaluation passed: ${evaluationCases.length} item cases (resolver: src/data.ts)`);
+console.log(
+  `Data evaluation passed: ${evaluationCases.length} item cases, ${materialInferenceExpectations.length} fallback inference cases (resolver: src/data.ts)`,
+);
