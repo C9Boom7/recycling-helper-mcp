@@ -733,6 +733,52 @@
     ]
   },
   {
+    "region": "중구",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "jung_gu",
+      "busan",
+      "daegu",
+      "incheon",
+      "daejeon",
+      "ulsan"
+    ]
+  },
+  {
+    "region": "북구",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "buk_gu_daegu",
+      "buk_gu_gwangju",
+      "busan",
+      "ulsan"
+    ]
+  },
+  {
+    "region": "강서구",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gangseo_gu",
+      "busan"
+    ]
+  },
+  {
+    "region": "광주시",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gwangju",
+      "gyeonggi"
+    ]
+  },
+  {
+    "region": "고성군",
+    "expectedStatus": "ambiguous",
+    "expectedCandidateIds": [
+      "gangwon",
+      "gyeongnam"
+    ]
+  },
+  {
     "region": "전라남도",
     "expectedRegionId": "jeonnam",
     "expectedLevel": "metro"

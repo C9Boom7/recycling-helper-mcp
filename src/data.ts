@@ -1320,7 +1320,8 @@ function regionMatchStrength(normalizedQuery: string, normalizedName: string): R
  * 여기서는 빠지지 않는다.
  *
  * `prefixOnlyDistrictAliases`는 뺀다. 그쪽은 이름만으로 광역이 안 정해지는
- * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다.
+ * 것들이라 매칭에 넣으면 맨 "중구"가 광역 하나로 확정된다. 맨 이름 질의는
+ * `resolveRegionalPolicyIn`의 전용 분기가 되묻기로 받는다.
  *
  * `sharedAliases`도 그대로 넣는다. 나눠 쓰는 표기라 **양쪽이 함께 후보로 서는 것이
  * 맞는 동작**이다. 뒤에 시·군·구 이름이 붙으면 `remainderOwner`가 그 이름의 주인을
@@ -1539,6 +1540,47 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
         .slice(0, MAX_AMBIGUOUS_CANDIDATES)
         .map((policy) => ({ region: policy, matchedBy: policy.name, level: "metro" as const })),
     };
+  }
+
+  // 광역 표기 없이는 광역이 안 정해지는 시·군·구 이름("중구", "광주시")이 통째로
+  // 들어왔다. 이 목록은 일부러 매칭 표에서 빠져 있어(regionMatchNames 주석) 이대로
+  // 두면 후보 0개 → not_found로 떨어지고, 데이터를 갖고 있으면서 "상세 지역 데이터가
+  // 없습니다"라고 답하게 된다. 그 이름을 가진 지역을 전부 후보로 세워 되묻는다.
+  // sharedOwners처럼 이른 반환이다 — 뒤 단계는 이 이름을 아예 모르거나("중구"),
+  // 별칭 하나로 잘못 확정한다("광주시" → 광주광역시).
+  const prefixOnlyOwners = policies.filter(
+    (policy) =>
+      regionMatchLevel(policy) === "metro" &&
+      (policy.prefixOnlyDistrictAliases ?? []).some((alias) => normalizeText(alias) === normalizedQuery),
+  );
+  if (prefixOnlyOwners.length > 0) {
+    const byRegionId = new Map<string, MatchedRegionPolicy>();
+    // ① 같은 표기를 정식 별칭으로도 가진 지역 — 광주광역시가 "광주시"를 별칭으로
+    //    갖는다. prefixOnly 데이터가 "이름만으로 광역이 안 정해진다"고 말하는 이상,
+    //    별칭 확정도 되묻기 후보의 하나로 내린다.
+    for (const level of ["district", "metro"] as const) {
+      for (const candidate of regionCandidatesAt(policies, normalizedQuery, level, 3)) {
+        byRegionId.set(candidate.region.id, candidate);
+      }
+    }
+    // ② 이름의 마지막 어절이 같은 등록 자치구. 등록 자치구는 과확정을 막으려고 맨
+    //    이름("중구")을 별칭으로 달지 않으므로 ①에 안 걸린다. 빼면 서울 중구 주민이
+    //    후보 목록에서 자기 지역을 못 찾고, "강서구"는 부산 하나만 남아 되묻기가
+    //    아니라 반대쪽 오답이 된다.
+    for (const policy of policies) {
+      if (regionMatchLevel(policy) !== "district" || byRegionId.has(policy.id)) continue;
+      const lastWord = policy.name.slice(policy.name.lastIndexOf(" ") + 1);
+      if (normalizeText(lastWord) === normalizedQuery) {
+        byRegionId.set(policy.id, { region: policy, matchedBy: policy.name, level: "district" });
+      }
+    }
+    // ③ 같은 이름의 미등록 구·군을 대신 받는 광역들.
+    for (const policy of prefixOnlyOwners) {
+      if (!byRegionId.has(policy.id)) byRegionId.set(policy.id, { region: policy, matchedBy: policy.name, level: "metro" });
+    }
+    // 후보가 하나여도 되묻는다. 이 필드의 계약이 "이름만으로 광역이 안 정해진다"라,
+    // 나머지 보유 지역이 미등록이라는 이유로 확정하면 안 된다.
+    return { status: "ambiguous", candidates: Array.from(byRegionId.values()).slice(0, MAX_AMBIGUOUS_CANDIDATES) };
   }
 
   const consider = (
