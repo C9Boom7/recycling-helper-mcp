@@ -1197,7 +1197,8 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
           : `${hintRegion} 기준 배출 확인이 필요하면 지역 안내도 이어서 도와드릴 수 있습니다.`
         : "거주 지역을 알려주시면 대형폐기물 신고 방법·수수료나 전용 수거함 위치까지 확인해 드릴 수 있습니다."
       : undefined,
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
 
   const structuredItems = planned.map((entry) =>
     entry.found
@@ -1473,7 +1474,8 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     match && regionMatch ? "" : undefined,
     match && regionMatch ? `품목별 ${regionMatch.region.name} 안내` : undefined,
     itemGuideLines.length > 0 ? itemGuideLines.join("\n") : undefined,
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
 
   // 체크리스트가 "위에서 이미 답한 것"을 가려내는 근거.
   //
@@ -1514,7 +1516,8 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     ...(regionMatch?.level === "metro"
       ? NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)
       : []),
-  ].filter(Boolean);
+    // filter(Boolean)을 쓰면 구분용 빈 문자열까지 지워져 블록이 통째로 붙는다 — find_disposal_spots가 같은 함정을 먼저 밟았다.
+  ].filter((line): line is string => line !== undefined);
 
   return textResult(
     lines.join("\n"),

@@ -1055,6 +1055,14 @@ async function runSmoke() {
         );
       }
 
+      // 구분용 빈 줄이 살아 있어야 한다. 줄 배열의 filter(Boolean)이 빈 문자열까지 지워
+      // 제목이 앞 블록에 그대로 붙어 나간 적이 있다 — 마크다운 헤더가 아닌 제목이라
+      // 빈 줄이 유일한 섹션 경계다.
+      assert(
+        regionSizeText.includes("\n\n"),
+        "노원구 매트리스 지역 툴: 응답에 빈 줄이 하나도 없다 — 구분용 빈 문자열이 filter에 지워졌다",
+      );
+
       // R1·R2 공통: 지역 툴 응답에 글자 단위로 같은 줄이 두 번 있으면 안 된다. 연락처 블록이
       // 두 번 찍히던 것과 체크리스트가 위 블록을 옮겨 적던 것이 한 단언에 함께 걸린다.
       // 빈 줄만 뺀다. `확인할 정보`의 항목은 앞에 번호가 붙어(`1. `) 같은 값이라도 줄이 달라지므로
@@ -1162,6 +1170,11 @@ async function runSmoke() {
       const dashRegion = await callTool(baseUrl, "get_region_disposal_info", { region: "서울 마포구", itemName: "빨래건조대" }, requestId++);
       const dashSteps = await callTool(baseUrl, "get_disposal_steps", { itemName: "빨래건조대", region: "서울 마포구" }, requestId++);
       const dashPlan = await callTool(baseUrl, "make_cleanup_plan", { items: ["빨래건조대"], region: "서울 마포구" }, requestId++);
+      // cleanup plan도 구분용 빈 줄이 살아 있어야 한다(지역 툴의 같은 단언 참고).
+      assert(
+        resultText(dashPlan).includes("\n\n"),
+        "마포구 빨래건조대 cleanup plan: 응답에 빈 줄이 하나도 없다 — 구분용 빈 문자열이 filter에 지워졌다",
+      );
       // 행이 여럿인데 규격이 전부 빈 경우도 본다 — 마포구 `피아노`는 `피아노`와
       // `전자피아노(오르간)` 두 고시명이 규격 없이 금액만 다르다. 단일 행만 고치면 이쪽은
       // `규격 2종`으로 남아 고시에 없는 구분을 지어낸다(PR #74 리뷰 1라운드).
