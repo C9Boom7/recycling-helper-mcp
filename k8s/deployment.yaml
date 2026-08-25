@@ -33,6 +33,20 @@ spec:
               value: "0.0.0.0"
             - name: PORT
               value: "3000"
+            # 기후에너지환경부 분리배출 정보조회 서비스(공공데이터포털) 인증키.
+            # find_disposal_spots가 쓰는 유일한 비밀값이고, 비어 있으면 그 툴은 아예
+            # 등록되지 않는다(나머지 다섯 툴은 영향 없음). 값을 커밋하지 않는다.
+            #
+            # 이 파일은 참고용이다 — 본선 배포는 PlayMCP in KC라 실제 주입은 콘솔의
+            # 환경변수 화면에서 한다. 아래 Secret은 직접 k8s에 올릴 때의 모양이다.
+            - name: DATA_GO_KR_SERVICE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: recycling-helper-mcp-secrets
+                  key: data-go-kr-service-key
+                  # 키를 지우고 재배포하는 것이 이 툴의 되돌리기 스위치다. Secret 자체를
+                  # 지웠을 때 파드가 안 뜨면 되돌리기가 아니라 장애가 되므로 optional로 둔다.
+                  optional: true
           resources:
             requests:
               cpu: "100m"

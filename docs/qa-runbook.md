@@ -140,7 +140,9 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 | 필드 | 읽는 법 |
 | --- | --- |
 | `tool` | 호스트가 어느 툴을 골랐는지. 오라우팅 의심 문의는 여기부터 본다 |
-| `status` | `match` / `ambiguous` / `not_found` / `error` |
+| `status` | `match` / `ambiguous` / `not_found` / `error`. `find_disposal_spots`는 `spots`(주소를 냈다) / `spots_fallback`(폴백으로 내려앉았다) / `spots_ask`(어느 지역 동인지 되물었다) |
+| `upstream` | 외부 조회가 어떻게 끝났는지. `find_disposal_spots`에만 있다. 값과 대응은 5절 표에 있다 |
+| `upstreamMs` | 그 외부 조회에 걸린 시간. 아래 `ms`와 갈라 봐야 느린 쪽이 우리인지 그쪽인지 안다 |
 | `matchedId` | 확정된 품목 id. 엉뚱한 값이면 오매칭이다 |
 | `score` | 매칭 점수. 88 미만이면 폴백 티어에서 걸린 것 |
 | `matched` / `total` | 후보 수. `ambiguous`의 후보 폭을 본다 |
@@ -148,9 +150,9 @@ curl -sS -H 'content-type: application/json' -H 'accept: application/json' \
 | `regionStatus` | 지역이 어디까지 좁혀졌는지. `district`(자치구 확정) / `unregistered_district`(시·군·구를 댔지만 상세 데이터 없음) / `metro`(광역만 지목) / `ambiguous`(후보가 여럿이라 되물음) / `unknown`(찾아봤는데 없음). **값이 없으면 지역을 안 봤다는 뜻이다** — 지역을 안 물었거나(공백만 넣은 것도 포함), 물었어도 그 품목은 지역이 답을 바꾸지 않아 조회하지 않은 경우다. `unknown`과 뭉치지 않는다 |
 | `inputSource` | `photo`면 품목명이 사진에서 온 것. **없다고 직접 친 것은 아니다** — `get_disposal_steps`에만 있는 파라미터라 `classify_waste_item`이나 `make_cleanup_plan`으로 간 사진은 안 잡히고, 호스트가 `"image"` 같은 다른 값을 보내면 조용히 무시된다. 사진 트래픽의 하한으로만 읽는다 |
 | `errorName` / `errorAt` | `error`일 때만. 예외 클래스 이름과 스택 맨 윗줄(파일:라인) |
-| `ms` | 서버 처리 시간. 한 자릿수가 정상이다 |
+| `ms` | 서버 처리 시간. 한 자릿수가 정상이다. `find_disposal_spots`만 외부 호출을 기다리므로 300~500ms가 정상이다 |
 
-`status: "error"`는 코드 결함이므로 최우선으로 다룬다. `errorName`과 `errorAt`이 어느 코드에서 터졌는지까지는 짚어 주지만, 예외 메시지와 호출 인자는 기본 로그에 남지 않는다. 재현이 필요하면 로컬에서 `CALL_LOG_DETAILS=true`로 띄운다. 이 플래그를 켜면 `input`(`itemName`·`region`·`items`)과 예외 메시지가 로그 줄에 함께 실려서, 어떤 인자로 들어온 호출이 어떻게 터졌는지까지 보인다. 그때 나온 로그는 공유하거나 보관하지 않는다.
+`status: "error"`는 코드 결함이므로 최우선으로 다룬다. `errorName`과 `errorAt`이 어느 코드에서 터졌는지까지는 짚어 주지만, 예외 메시지와 호출 인자는 기본 로그에 남지 않는다. 재현이 필요하면 로컬에서 `CALL_LOG_DETAILS=true`로 띄운다. 이 플래그를 켜면 `input`(`itemName`·`region`·`items`·`dong`)과 예외 메시지가 로그 줄에 함께 실려서, 어떤 인자로 들어온 호출이 어떻게 터졌는지까지 보인다. 그때 나온 로그는 공유하거나 보관하지 않는다.
 
 ```bash
 CALL_LOG_DETAILS=true pnpm start   # 로컬 전용. 배포 환경변수에는 넣지 않는다
@@ -233,7 +235,38 @@ WIDGET_ENABLED=false
 
 **되돌리기 전에 알아둘 것**: 텍스트 폴백은 응답이 조금 더 커진다. 노원구 매트리스 기준 폴백 5.7KB, 위젯 4.1KB로 예전만큼 벌어지지 않는다 — 2026-08-18부터 위젯 응답도 structuredContent를 함께 싣기 때문이다. 원인은 수수료가 아니라 지역 안내가 text와 structuredContent에 두 번 실리는 것인데, 이제 폴백만의 특성이 아니라 양쪽 경로가 같이 안고 있다. 크기만 놓고 롤백을 망설일 이유는 없다는 뜻이다. 자세한 분해는 [post-finals-backlog.md](post-finals-backlog.md) 1번에 있다.
 
-## 5. 수정하고 내보내는 절차
+## 5. 배출 장소 조회가 문제일 때 — `DATA_GO_KR_SERVICE_KEY`
+
+`find_disposal_spots`만 외부 API(기후에너지환경부 분리배출 정보조회 서비스)를 실시간으로 부른다.
+나머지 다섯 툴은 그 API가 죽어도 아무 영향을 받지 않는다 — **장애는 이 툴 하나에 갇혀 있다.**
+
+되돌리는 방법은 키를 지우는 것이다. 값이 비면 이 툴은 `tools/list`에 아예 나오지 않는다. 별도 켬/끔 플래그는 없다.
+
+```bash
+DATA_GO_KR_SERVICE_KEY=      # 비우고 재배포하면 이 툴이 목록에서 내려간다
+```
+
+콘솔에 저장된 툴 목록 스냅샷은 재등록해야 갱신되므로 툴을 올릴 때도 내릴 때도 **재배포 뒤 재등록**이 필요하다
+([playmcp-in-kc.md](playmcp-in-kc.md) "등록 갱신"). 재등록 전까지 호스트는 옛 목록을 들고 있다.
+
+**증상은 로그의 `upstream` 한 칸이 가른다**(2절). 사용자에게 나가는 응답은 실패 종류를 감추고 폴백 하나로 접으므로,
+무엇이 잘못됐는지 읽을 수 있는 자리는 여기뿐이다.
+
+| `upstream` | 뜻 | 할 일 |
+| --- | --- | --- |
+| `ok` | 조회 정상. `status`가 `spots_fallback`인데 `ok`면 **우리 쪽 필터**가 다 걸렀다는 뜻이다 | 폴백+`ok` 조합은 지역·동 불일치(다른 지역의 동 이름), 판매소·기타뿐인 동, 수거함이 답이 아닌 품목 중 하나다. 업스트림 장애가 아니니 키·한도를 의심하지 않는다 |
+| `timeout` | 2.5초 안에 안 왔다 | 이따금 나오는 건 정상이다(실측 12회 중 1회가 2.3초). 계속 이어지면 그쪽 장애다 |
+| `http` | HTTP 오류, 게이트웨이 XML, 비정상 resultCode | 대개 키 문제이거나 하루 한도(10,000건) 초과다. `node scripts/probe-moe-recycling-api.mjs spot --addr 상계동`으로 확인한다 |
+| `empty` | 조회는 됐는데 0건 | 장애가 아니다. 법정동이 아닌 이름(`강남구`)이 들어오면 여기로 온다 |
+| `truncated` | 1,000행에서 잘렸다 | 응답에 "일부만 표시" 한 줄이 붙는다. 실측 최대가 524행이라 지금은 안 나오는 게 정상이다 |
+
+`timeout`이나 `http`가 계속돼도 **사용자는 답을 받는다** — 폴백이 전국 확인 경로와 지역 공식 확인처로 내려앉는다.
+최악은 "이 툴만 매번 2.5초 늦고 폴백"이고, 그 상태가 길어지면 위처럼 키를 비워 툴을 내린다(카카오와 협의).
+
+키가 로그나 응답에 실릴 일은 없다. 다루는 곳이 [src/moe-spot-client.ts](../src/moe-spot-client.ts) 한 곳이고,
+스모크가 응답과 로그 양쪽에서 키 문자열을 찾아본다. 그래도 유출이 의심되면 포털에서 재발급하고 콘솔 값만 바꾼다 — 코드는 손댈 것이 없다.
+
+## 6. 수정하고 내보내는 절차
 
 1. 브랜치를 만들어 고친다. main에 직접 커밋하지 않는다.
 2. `pnpm local:test`를 통과시킨다. 워크트리에서는 `pnpm --config.verify-deps-before-run=false local:test`가 필요하다.
@@ -247,13 +280,13 @@ WIDGET_ENABLED=false
 
 **재배포 횟수를 아끼려면 수정을 묶어서 내보낸다.** 하루 1~2회가 적당하다.
 
-## 6. 건드리면 안 되는 것
+## 7. 건드리면 안 되는 것
 
 - **예선 서버(`recycle-helper-mcp`, 서버 ID 1498)** — 어떤 경우에도 손대지 않는다.
 - 이름이 비슷한 서버가 셋이라 반드시 구분한다. 재배포 대상은 `-kakaotools` 접미사가 붙은 쪽이다. 상세는 [playmcp-in-kc.md](playmcp-in-kc.md).
 - 서비스 컨셉 변경, 인증 추가, 광고성 응답, 사용자 프롬프트 수집, 주민번호·카드번호 등 민감정보 요구 — 전부 본선 규격 위반이다.
 
-## 7. 참고 문서
+## 8. 참고 문서
 
 | 문서 | 언제 보나 |
 | --- | --- |

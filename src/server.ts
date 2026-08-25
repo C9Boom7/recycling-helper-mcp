@@ -11,6 +11,7 @@ import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-sc
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteItem, WasteMatch } from "./data.js";
 import {
+  briefSourceLabel,
   collectionDayCheckLine,
   confidenceLabel,
   disposalGroupLabel,
@@ -26,10 +27,14 @@ import {
   findRegionItemGuide,
   findRegisteredDistricts,
   findWasteItems,
+  formatClassifyResultText,
   formatItemGuide,
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceList,
+  formatRegionSourceLines,
+  regionCollectionSources,
+  regionSourcesForItem,
   formatUnregisteredDistrictScope,
   inferMaterialCategories,
   isBulkySecondaryRoute,
@@ -40,6 +45,7 @@ import {
   itemRegionGuidance,
   needsCollectionDaySource,
   publicReviewMetadata,
+  regionalPolicies,
   resolveRegionalPolicy,
   resolveWasteItem,
   wasteItems,
@@ -49,6 +55,14 @@ import {
 } from "./data.js";
 import type { DisposalWidgetPayload } from "./widgets.js";
 import { buildDisposalWidget } from "./widgets.js";
+import type { SpotCategory, SpotRow } from "./moe-spot-client.js";
+import {
+  categorizeSpotName,
+  findSpotsByDong,
+  hasSpotServiceKey,
+  spotCategories,
+  spotCategoryForItemId,
+} from "./moe-spot-client.js";
 
 const SERVICE_NAME = "RecyclingHelper(재활용척척)";
 // PRD phase-3 R1. Exactly "false" turns widgets off; anything else (including an
@@ -174,6 +188,15 @@ type ToolLogMeta = {
    * 하나뿐이라 호출자 문자열이 섞일 자리가 없다.
    */
   inputSource?: InputSource;
+  /**
+   * 외부 조회가 어떻게 끝났는지 — `ok` | `timeout` | `http` | `empty` | `truncated`
+   * (PRD phase-12 R6). `find_disposal_spots`에만 실린다. 사용자에게 나가는 응답은
+   * 실패 종류를 감추고 폴백 하나로 접으므로, 이 칸이 **실패를 세는 유일한 자리**다.
+   * 값은 클라이언트 모듈이 정하는 낱말이라 호출자 문자열도 키도 섞일 수 없다.
+   */
+  upstream?: string;
+  /** 그 외부 조회에 걸린 시간. 툴 전체 `ms`와 갈라 봐야 느린 쪽이 우리인지 그쪽인지 안다. */
+  upstreamMs?: number;
 };
 
 type InputSource = "photo";
@@ -304,6 +327,46 @@ const TOOL_DEFS: ToolDef[] = [
     },
     handler: handleGetRegionDisposalInfo,
   }),
+  /**
+   * PRD phase-12 D3. **키가 없으면 이 툴은 목록에 아예 나오지 않는다.** 등록해 놓고 매번
+   * 폴백으로 내려앉는 것보다 호스트가 처음부터 다른 툴을 고르는 쪽이 낫고, 키 env를 비우고
+   * 재배포하는 것이 그대로 되돌리기 스위치가 된다 — 별도 플래그는 두지 않는다.
+   *
+   * **거르는 자리는 여기 하나여야 한다.** 등록(SSE)·JSON-only 목록·JSON-only 디스패치가
+   * 전부 `TOOL_DEFS`에서 파생되므로, 갈래 하나만 걸러내면 "두 목록은 바이트 동일" 불변식이
+   * 조용히 깨진다.
+   */
+  ...(hasSpotServiceKey()
+    ? [
+        defineTool({
+          name: "find_disposal_spots",
+          title: "Find Disposal Spots",
+          description:
+            "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; forms like 상계1동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
+          inputShape: {
+            // `.trim()`이 스키마 단계에서 공백을 걷는다 — " "가 통과하면 정규화 뒤 빈 addr로
+            // 업스트림 한도를 쓰고 "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
+            dong: z
+              .string()
+              .trim()
+              .min(1, "법정동 이름이 필요합니다 — 예: 상계동.")
+              .max(40)
+              .describe("Korean legal-status neighborhood name (법정동), e.g. 상계동."),
+            region: optionalRegionParam,
+            itemName: z.string().max(80).optional().describe("Optional household waste item name in Korean."),
+          },
+          annotations: {
+            title: "Find Disposal Spots",
+            readOnlyHint: true,
+            destructiveHint: false,
+            // 유일하게 외부 서비스를 부르는 툴이다. 답이 우리 데이터만으로 정해지지 않는다.
+            openWorldHint: true,
+            idempotentHint: true,
+          },
+          handler: handleFindDisposalSpots,
+        }),
+      ]
+    : []),
 ];
 
 const COMPAT_TOOLS = TOOL_DEFS.map((def) => ({
@@ -441,17 +504,6 @@ function widgetResult(
     structuredContent,
     _log: { ...log, status: "match" },
   };
-}
-
-function briefSourceLabel(item: WasteItem): string {
-  const source = item.sources[0];
-  if (source) {
-    const basis = source.basis ? ` - ${source.basis}` : "";
-    const url = source.url ? ` (${source.url})` : "";
-    return `${source.title}${basis}${url}`;
-  }
-
-  return item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
 }
 
 // Title-only variant for list-shaped outputs (cleanup plan) where the full
@@ -872,31 +924,10 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     return widgetResult(matchedItemWidget(item, regionMatch, { region }), structured, log);
   }
 
-  const text = [
-    `분류 결과: ${item.name}`,
-    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
-    `- 세부 판단: ${item.disposalType}`,
-    `- 결론: ${item.summary}`,
-    `- 확신도: ${confidenceLabel(item.confidence)}`,
-    `- 지역 영향: ${itemRegionCheckLabel(item)}`,
-    `- 판단 범위: ${itemRegionGuidance(item)}`,
-    `- 대표 근거: ${briefSourceLabel(item)}`,
-    itemNeedsCriticalRegionCheck(item)
-      ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
-      : itemNeedsRegionCheck(item)
-      ? // 이 줄도 요일을 말하므로 확인처까지 함께 낸다. 지역 툴만 닫혀 있어서, 같은
-        // 사람이 툴만 갈아타면 되묻기가 그대로 살아났다.
-        withCollectionDaySourceLine(
-          "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
-          regionMatch,
-        )
-      : undefined,
-    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  return textResult(text, structured, log);
+  // 조립부는 `formatClassifyResultText`로 나가 있다. 카드 머리말과 같은 `- 키: 값`을 찍는
+  // 두 번째 표면이라 `runItemCardLabelSweep`이 카탈로그 전수로 훑어야 하는데, 핸들러 안에
+  // 두면 스윕이 품목 수만큼 HTTP를 더 때려야 한다.
+  return textResult(formatClassifyResultText(item, region), structured, log);
 }
 
 async function handleGetDisposalSteps({
@@ -1537,6 +1568,343 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
   );
 }
 
+/* ─────────────────────────── find_disposal_spots (PRD phase-12) ─────────────────────────── */
+
+const SPOT_SOURCE_LABEL = "기후에너지환경부 분리배출 정보조회 서비스";
+/** 묶음당·전체 개수 상한(R5). 둘이 충돌하면 R3 표 순서가 이긴다 — 급한 묶음이 위에 있다. */
+const SPOT_PER_CATEGORY_LIMIT = 3;
+const SPOT_TOTAL_LIMIT = 12;
+/** 폴백에 싣는 지역 공식 확인처 줄 수. 지역에 따라 출처가 여덟 줄까지 있어 상한이 필요하다. */
+const SPOT_MAX_REGION_SOURCES = 2;
+/** 되묻기에서 이름을 불러 주는 지역 수. 전국 동명이면 후보가 열 곳을 넘기도 한다. */
+const SPOT_MAX_ASK_REGIONS = 4;
+
+const regionPolicyById = new Map(regionalPolicies.map((policy) => [policy.id, policy]));
+
+/**
+ * 행정동 표기를 법정동으로 줄이는 규칙 하나(R2). `addr`은 법정동만 통해서
+ * `상계1동`은 그대로 보내면 NODATA다. 그 밖의 변형(`종로1가` 등)은 손대지 않는다 —
+ * 규칙을 늘릴수록 멀쩡한 이름을 망가뜨릴 자리가 늘고, 빗나가도 폴백이 받는다.
+ */
+function normalizeDongName(raw: string): string {
+  return raw.trim().replace(/제?\s*\d+\s*동$/, "동");
+}
+
+/** 수거함을 실제로 찾는 데 필요한 층·건물 설명이 `addrDtl`에 있다. 공백 하나로 잇는다. */
+function formatSpotAddress(row: SpotRow): string {
+  return `${row.addrBase} ${row.addrDtl}`.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * 주소에서 시·군·구까지를 떼어 낸다(`서울특별시 노원구 상계로 …` → `서울특별시 노원구`).
+ * 지역을 안 받았을 때 "이 응답이 한 지역으로 수렴하는가"를 세는 열쇠이자, 수렴했을 때
+ * 응답 머리에 밝히는 이름이다. 세종처럼 시·군·구가 없는 주소는 광역 이름만 남는다.
+ */
+function addressRegionLabel(addrBase: string): string {
+  const [metro, second] = addrBase.trim().split(/\s+/);
+  if (!metro) return "";
+  return second && /[시군구]$/.test(second) ? `${metro} ${second}` : metro;
+}
+
+/**
+ * 착지 지역이 속한 광역의 표기들. 주소는 광역 이름으로 시작하므로 `startsWith`로 본다 —
+ * 부분 문자열로 보면 `서울대공원`이 서울로 걸리는 식의 오검출이 생긴다.
+ */
+function metroPrefixNames(region: RegionalPolicyData): string[] {
+  const metro = region.metroId ? regionPolicyById.get(region.metroId) : region;
+  if (!metro) return [];
+  return [metro.name, ...metro.aliases].filter((name) => /[가-힣]/.test(name));
+}
+
+/**
+ * 착지 지역의 시·군·구 표기들. 광역까지만 좁혀졌으면 사용자가 지목한 시·군·구가 있을 때만
+ * 값이 있다(`청주시`). 로마자와 광역 접두어가 붙은 표기는 뺀다 — 주소에는 안 나온다.
+ */
+function districtNames(match: MatchedRegionPolicy, namedSubRegion?: string): string[] {
+  if (match.level === "metro") return namedSubRegion ? [namedSubRegion] : [];
+
+  const lastToken = match.region.name.split(/\s+/).at(-1) ?? "";
+  const candidates = [lastToken, ...match.region.aliases].filter(
+    (name) => name.length > 0 && !/\s/.test(name) && /[시군구]$/.test(name) && /[가-힣]/.test(name),
+  );
+  return Array.from(new Set(candidates));
+}
+
+/**
+ * 동음 오염 필터(R4). **광역과 시·군·구가 함께 맞아야 남긴다.**
+ *
+ * 구 이름 하나만 보면 안 된다 — `중구`·`북구`류는 광역시 여섯 곳에 흩어져 있어서, 부산 중구
+ * 질의에 대구 중구 주소가 그대로 통과한다(`prefixOnlyDistrictAliases`가 있는 이유와 같다).
+ * 반대로 광역까지만 좁혀진 질의에는 시·군·구 이름이 없으므로 광역만 본다 — 광역 이름은
+ * 전국에서 유일하니 그것만으로도 오염이 섞이지 않는다.
+ */
+function addressInRegion(addrBase: string, metroNames: string[], districts: string[]): boolean {
+  if (metroNames.length > 0 && !metroNames.some((name) => addrBase.startsWith(name))) return false;
+  // 시·군·구는 어절 첫머리에서만 찾는다. 부분 문자열로 보면 이름을 품은 이웃 구가 통과한다 —
+  // `부산 서구` 질의에 강서구 주소가, `인천 동구`에 남동구 주소가 남는 식이다.
+  if (districts.length > 0 && !districts.some((name) => new RegExp(`(^|\\s)${escapeRegExp(name)}`).test(addrBase))) return false;
+  return true;
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * 폴백(R5). **지역 객체에 기대지 않는다** — `region` 없이 `dong`만 온 기본 시나리오가
+ * 이 툴의 다수라, 지역이 없으면 비는 폴백은 폴백이 아니다. 그래서 셋으로 짠다:
+ * 전국 확인 경로 한 줄(늘 나간다), 지역이 있으면 그 지역의 공식 확인처, 품목이 확정됐으면
+ * 그 묶음이 들고 있는 일반 안내 한 줄.
+ *
+ * **업스트림 오류 내용은 어디에도 싣지 않는다.** 사용자가 할 수 있는 일이 아니고, 키가
+ * 섞여 나갈 수 있는 유일한 경로가 오류 문자열이다.
+ */
+function spotFallbackResult(params: {
+  dong: string;
+  reason: "upstream" | "empty";
+  regionMatch?: MatchedRegionPolicy;
+  category?: SpotCategory;
+  /** 품목이 확정됐을 때 그 이름. 0건 문장이 무엇을 못 찾았는지 밝히는 데 쓴다. */
+  itemLabel?: string;
+  /** 품목이 확정됐을 때 그 품목. 지역 출처를 품목 주제로 고르는 데 쓴다. */
+  item?: WasteItem;
+  /** 행은 받았는데 전부 노출하지 않는 묶음(판매소·기타)이었던 경우. */
+  hiddenOnly?: boolean;
+  /** 행은 받았는데 지역 필터가 전부 거른 경우 — 동과 지역이 안 맞는 신호다. */
+  regionFilteredAll?: boolean;
+  log: ToolLogMeta;
+}): LoggedToolResult {
+  const { dong, reason, regionMatch, category, itemLabel, item, hiddenOnly, regionFilteredAll, log } = params;
+  // 텍스트와 structuredContent가 **같은 출처를 같은 순서로** 실어야 한다 — 같은 배열에서 나온다.
+  // `sources[0]`을 그냥 집으면 자치구 대부분에서 대형폐기물 신청 페이지가 잡힌다. 품목이
+  // 있으면 그 품목의 주제로, 없으면 수거함·분리배출을 말하는 출처로 고른다.
+  const regionSources = regionMatch
+    ? (item ? regionSourcesForItem(regionMatch.region, item) : regionCollectionSources(regionMatch.region)).slice(
+        0,
+        SPOT_MAX_REGION_SOURCES,
+      )
+    : [];
+  const regionSourceLines = formatRegionSourceLines(regionSources);
+
+  // 두 갈래의 첫 문장을 가른다. 조회에 성공했는데 한 곳도 없었던 경우까지 "확인하지
+  // 못했습니다"라고 하면, 우리가 실제로 확인한 사실을 안 한 것처럼 말하는 셈이다.
+  // 품목을 물었으면 그 이름까지 밝힌다 — `소파`처럼 수거함이 답이 아닌 품목에서
+  // "이 동에는 배출 장소가 없다"고 말하면 그건 틀린 문장이다.
+  const opening =
+    reason === "upstream"
+      ? `${dong}의 배출 장소를 지금 조회하지 못했습니다. 대신 이렇게 확인할 수 있습니다.`
+      : regionFilteredAll && regionMatch
+        ? `${regionMatch.region.name}에서 "${dong}" 주소를 찾지 못했습니다. 다른 지역에 같은 이름의 동이 있을 수 있으니 동 이름과 지역이 맞는지 확인해 주세요.`
+        : itemLabel
+          ? `${dong}에서 ${itemLabel} 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`
+          : hiddenOnly
+            ? `${dong}에서 전용 수거함류 배출 장소는 찾지 못했습니다. 이렇게 확인해 보세요.`
+            : `${dong}에 등록된 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`;
+
+  const lines = [
+    opening,
+    `- ${REGION_SELECT_GUIDE_LINK.title}에서 지역을 골라 수거함 안내를 확인하세요: ${REGION_SELECT_GUIDE_LINK.url}`,
+    ...regionSourceLines,
+    category ? `- ${category.fallbackLine}` : undefined,
+  ].filter((line) => line !== undefined);
+
+  return textResult(
+    lines.join("\n"),
+    {
+      found: false,
+      dong,
+      fallback: {
+        mapUrl: REGION_SELECT_GUIDE_LINK.url,
+        ...(regionSources.length > 0
+          ? { regionSources: regionSources.map((source) => ({ title: source.title, url: source.url })) }
+          : {}),
+        ...(category ? { itemLine: category.fallbackLine } : {}),
+      },
+    },
+    log,
+  );
+}
+
+async function handleFindDisposalSpots({
+  dong,
+  region,
+  itemName,
+}: {
+  dong: string;
+  region?: string;
+  itemName?: string;
+}): Promise<LoggedToolResult> {
+  const normalizedDong = normalizeDongName(dong);
+  // 공백만 온 지역은 안 온 것으로 본다 — 다른 툴과 같은 규칙이다.
+  const hintRegion = region?.trim() || undefined;
+  const regionMatch = findRegionalPolicy(hintRegion);
+  const namedSubRegion = findNamedSubRegionForMatch(regionMatch, hintRegion);
+
+  /**
+   * 품목명은 이 툴에서 **필터일 뿐**이라 되묻지 않는다(R2). `ambiguous`도 `not_found`도
+   * 품목 필터 없이 전 묶음 요약으로 떨어진다 — 장소를 물은 사람에게 품목을 되물으면
+   * 원래 질문이 사라진다.
+   */
+  const resolvedItem = itemName?.trim() ? resolveWasteItem(itemName) : undefined;
+  const matchedItem = resolvedItem?.status === "match" ? resolvedItem.match.item : undefined;
+  const itemCategory = matchedItem ? spotCategoryForItemId(matchedItem.id) : undefined;
+
+  const lookup = await findSpotsByDong(normalizedDong);
+  const baseLog: ToolLogMeta = {
+    matchedId: matchedItem?.id,
+    matchedRegion: regionMatch?.region.name,
+    upstreamMs: lookup.ms,
+  };
+
+  if (!lookup.ok) {
+    return spotFallbackResult({
+      dong: normalizedDong,
+      reason: "upstream",
+      regionMatch,
+      category: itemCategory,
+      item: matchedItem,
+      log: { ...baseLog, status: "spots_fallback", upstream: lookup.upstream },
+    });
+  }
+
+  let rows: SpotRow[];
+  let regionLabel: string | undefined;
+
+  if (regionMatch) {
+    const metroNames = metroPrefixNames(regionMatch.region);
+    // 행마다 다시 계산하지 않는다 — 한 호출에 최대 1,000행을 거른다.
+    const districts = districtNames(regionMatch, namedSubRegion);
+    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districts));
+    regionLabel = regionMatch.region.name;
+  } else {
+    // 역추적 색인 없이 수렴만 본다(R4). 등록 지역 40곳짜리 색인으로 "이 동은 유일하다"를
+    // 판정하면 전국 동명에서 오염된 쪽을 정답으로 확정해 버린다 — 그건 필터가 아니다.
+    const counts = new Map<string, number>();
+    for (const row of lookup.rows) {
+      const label = addressRegionLabel(row.addrBase);
+      if (label) counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+
+    if (counts.size > 1) {
+      const regions = Array.from(counts.entries())
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, SPOT_MAX_ASK_REGIONS)
+        .map(([label]) => label);
+      // 오염된 주소를 자신 있게 내보내는 것보다 한 번 되묻는 쪽이 낫다.
+      // 지역을 대긴 했는데 우리가 못 알아들은 경우(맨 `중구` 등)에는 그 사실부터 밝힌다 —
+      // 방금 지역을 말한 사람에게 지역을 알려 달라고만 하면 안 들은 것처럼 읽힌다.
+      const unresolvedRegionNote =
+        hintRegion && !regionMatch ? `말씀하신 지역 "${hintRegion}"만으로는 어느 시·군·구인지 정하지 못했습니다. ` : "";
+      return textResult(
+        `${unresolvedRegionNote}여러 지역에 "${normalizedDong}"이라는 같은 이름의 동이 있습니다(${regions.join(", ")}). 시·군·구를 함께 알려주세요 — 예: "서울 노원구 상계동".`,
+        { found: false, dong: normalizedDong, ambiguousDong: true, regions },
+        { ...baseLog, status: "spots_ask", upstream: lookup.upstream },
+      );
+    }
+
+    rows = lookup.rows;
+    regionLabel = Array.from(counts.keys())[0];
+  }
+
+  const buckets = new Map<string, SpotRow[]>();
+  for (const row of rows) {
+    const category = categorizeSpotName(row.spotNm);
+    const bucket = buckets.get(category.id) ?? [];
+    bucket.push(row);
+    buckets.set(category.id, bucket);
+  }
+
+  /**
+   * 품목이 확정되면 그 묶음만, 아니면 기본 노출 묶음 전부를 표 순서대로 채운다.
+   *
+   * 확정됐는데 걸리는 묶음이 없는 품목(`소파`처럼 수거함이 답이 아닌 것들)은 **빈 목록**이다.
+   * 여기서 필터를 슬쩍 풀면 소파를 물은 사람에게 폐의약품 수거함 주소를 내주게 된다 —
+   * 못 찾았다고 말하고 폴백으로 내려앉는 쪽이 맞다.
+   */
+  const visible = matchedItem
+    ? itemCategory
+      ? [itemCategory]
+      : []
+    : spotCategories.filter((category) => category.defaultExposed);
+  const shown: Array<{ category: SpotCategory; rows: SpotRow[]; found: number }> = [];
+  // 전체 상한이 **통째로** 지운 묶음. 묶음당 상한은 "(N곳 중 M곳)"이 밝히지만, 묶음이
+  // 아예 빠지면 그 종류가 이 동에 없는 것처럼 읽힌다 — 그게 상한 표기를 둔 이유였다.
+  const omitted: Array<{ category: SpotCategory; found: number }> = [];
+  let total = 0;
+  for (const category of visible) {
+    const bucket = buckets.get(category.id) ?? [];
+    if (bucket.length === 0) continue;
+    if (total >= SPOT_TOTAL_LIMIT) {
+      omitted.push({ category, found: bucket.length });
+      continue;
+    }
+    const room = Math.min(SPOT_PER_CATEGORY_LIMIT, SPOT_TOTAL_LIMIT - total);
+    shown.push({ category, rows: bucket.slice(0, room), found: bucket.length });
+    total += Math.min(room, bucket.length);
+  }
+
+  if (shown.length === 0) {
+    return spotFallbackResult({
+      dong: normalizedDong,
+      reason: "empty",
+      regionMatch,
+      category: itemCategory,
+      itemLabel: matchedItem?.name,
+      item: matchedItem,
+      // 필터를 통과한 행이 있는데 전부 숨긴 묶음(판매소·기타)이면 "없다"가 아니라
+      // "전용 수거함은 못 찾았다"다 — 판매소가 응답의 절반을 차지하는 동이 실제로 있다.
+      hiddenOnly: rows.length > 0,
+      // 지역 필터가 행을 전부 걸렀으면 "이 동에는 없다"가 아니라 "이 지역에서는 못 찾았다"다 —
+      // 서교동 107행이 노원구 필터에 전멸하는 조합이 실제로 있다.
+      regionFilteredAll: rows.length === 0 && lookup.rows.length > 0 && Boolean(regionMatch),
+      log: { ...baseLog, status: "spots_fallback", upstream: lookup.upstream },
+    });
+  }
+
+  const heading = [regionLabel, normalizedDong].filter(Boolean).join(" ");
+  const lines = [
+    `## ${heading} 근처 배출 장소`,
+    "",
+    ...shown.flatMap(({ category, rows: spots, found }) => [
+      // 몇 곳을 찾았고 몇 곳을 보여 주는지 가른다. 상한에 걸린 걸 감추면 "이 동에는
+      // 세 곳뿐"으로 읽힌다.
+      `### ${category.label} (${found > spots.length ? `${found}곳 중 ${spots.length}곳` : `${found}곳`})`,
+      ...spots.map((spot) => `- ${spot.spotNm} | ${formatSpotAddress(spot)}`),
+    ]),
+    "",
+    // 절단은 사용자가 눈치챌 수 없는 유일한 실패라 한 줄로 밝힌다(R1).
+    lookup.truncated ? "- 자료가 많아 일부만 표시했습니다." : undefined,
+    // 전체 상한이 지운 묶음도 같은 이유로 밝힌다 — 없는 게 아니라 못 실은 것이다.
+    omitted.length > 0
+      ? `- 자리가 모자라 ${omitted.map(({ category, found }) => `${category.label} ${found}곳`).join(" · ")}은 싣지 못했습니다. 품목을 정해 물으면 그 묶음을 바로 보여 드립니다.`
+      : undefined,
+    "- 수거함 위치는 바뀔 수 있습니다. 방문 전 지자체 안내를 확인하세요.",
+    `- 출처: ${SPOT_SOURCE_LABEL}`,
+    // 빈 줄을 살려야 마지막 수거함 줄과 맺음말이 붙어 읽히지 않는다. `filter(Boolean)`을
+    // 쓰면 빈 문자열까지 지워져 블록이 통째로 붙는다.
+  ].filter((line) => line !== undefined);
+
+  return textResult(
+    lines.join("\n"),
+    {
+      found: true,
+      dong: normalizedDong,
+      ...(regionLabel ? { region: regionLabel } : {}),
+      categories: shown.map(({ category, rows: spots }) => ({
+        id: category.id,
+        label: category.label,
+        spots: spots.map((spot) => ({ name: spot.spotNm, address: formatSpotAddress(spot) })),
+      })),
+      ...(lookup.truncated ? { truncated: true } : {}),
+      ...(omitted.length > 0
+        ? { omitted: omitted.map(({ category, found }) => ({ id: category.id, label: category.label, found })) }
+        : {}),
+      source: SPOT_SOURCE_LABEL,
+    },
+    { ...baseLog, status: "spots", upstream: lookup.upstream },
+  );
+}
+
 function callStatus(result: CallToolResult): string {
   const structured = result.structuredContent as { found?: unknown; ambiguous?: unknown } | undefined;
   if (!structured) return "ok";
@@ -1579,6 +1947,9 @@ function withCallLog(
       itemName: typeof args.itemName === "string" ? args.itemName : undefined,
       region: typeof args.region === "string" ? args.region : undefined,
       items: Array.isArray(args.items) ? args.items : undefined,
+      // 동 이름도 사용자가 사는 곳이라 다른 인자와 같은 규칙을 따른다 — 기본 미기록,
+      // 로컬 QA가 CALL_LOG_DETAILS로 켤 때만 남는다(PRD phase-12 R6).
+      dong: typeof args.dong === "string" ? args.dong : undefined,
     };
 
     try {
@@ -1597,6 +1968,8 @@ function withCallLog(
           total: _log?.total,
           fallbackTier: _log?.fallbackTier,
           inputSource: _log?.inputSource,
+          upstream: _log?.upstream,
+          upstreamMs: _log?.upstreamMs,
           ms: Date.now() - startedAt,
         }),
       );
@@ -1761,6 +2134,9 @@ const ARGUMENT_RECOVERY_HINTS: Record<string, string> = {
   itemName: '버릴 품목명을 한국어로 전달하세요 (예: "기름 묻은 피자박스")',
   region: '한국 지역명을 전달하세요 (예: "서울 강남구")',
   items: '버릴 품목명 1~30개를 문자열 배열로 전달하세요 (예: ["침대", "화분"])',
+  // 이 툴에서 MCP 오류로 끝나는 경우는 입력 검증 실패뿐이라(PRD phase-12 D2), 다음 호출을
+  // 고칠 단서도 여기 한 줄이 전부다. 법정동이어야 한다는 것까지 적는다.
+  dong: '법정동 이름을 전달하세요 (예: "상계동"). 구·시 이름만으로는 조회되지 않습니다',
 };
 
 function describeArgumentIssue(issue: z.ZodIssue): string {

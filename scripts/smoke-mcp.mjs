@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { readFileSync } from "node:fs";
-import { request as httpRequest } from "node:http";
+import { createServer as createHttpServer, request as httpRequest } from "node:http";
 import { createServer } from "node:net";
 import { measureResult } from "./measure-response-size.mjs";
 
@@ -36,6 +36,8 @@ const EXPECTED_TOOL_NAMES = [
   "get_region_disposal_info",
   "make_cleanup_plan",
 ];
+// PRD phase-12 D3: `DATA_GO_KR_SERVICE_KEY`가 있을 때만 여섯 번째 툴이 목록에 선다.
+const EXPECTED_TOOL_NAMES_WITH_SPOTS = ["find_disposal_spots", ...EXPECTED_TOOL_NAMES].sort();
 const REQUIRED_TOOL_ANNOTATION_FIELDS = [
   "title",
   "readOnlyHint",
@@ -238,7 +240,7 @@ async function getFreePort() {
   return port;
 }
 
-function startServer(port, { widgets = false } = {}) {
+function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl = "" } = {}) {
   const server = spawn(process.execPath, ["dist/server.js"], {
     env: {
       ...process.env,
@@ -253,6 +255,13 @@ function startServer(port, { widgets = false } = {}) {
       // 그 셸에서 그대로 돌리면 서버가 물려받고, 아래 로그 단언이 검사하는 기본
       // 동작(인자를 남기지 않는다)이 조용히 빠진다.
       CALL_LOG_DETAILS: "false",
+      // PRD phase-12 R7: 같은 이유로 고정한다. 실측 관행상 개발자 셸에 진짜 키가 export돼
+      // 있어서, 상속만 하면 툴이 여섯 개가 되어 목록 완전일치 단언부터 깨진다. 더 나쁜 건
+      // 목 실행이 아니라 **실서버를 치게 되는** 것이다 — CI가 남의 한도를 쓰고, 그쪽이 느린
+      // 날에는 통과 여부가 우리 코드와 무관해진다. 기본은 빈 값(툴 미등록)이고, 목 업스트림
+      // 케이스만 더미 키와 목 주소를 함께 넘긴다.
+      DATA_GO_KR_SERVICE_KEY: serviceKey,
+      MOE_API_BASE_URL: upstreamBaseUrl,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -511,9 +520,9 @@ async function callTool(baseUrl, name, args, id) {
   );
 }
 
-function assertToolMetadata(tool, context) {
+function assertToolMetadata(tool, context, expectedNames = EXPECTED_TOOL_NAMES) {
   assert(typeof tool.name === "string" && tool.name.length > 0, `${context} tool was missing name`);
-  assert(EXPECTED_TOOL_NAMES.includes(tool.name), `${context} returned unexpected tool ${tool.name}`);
+  assert(expectedNames.includes(tool.name), `${context} returned unexpected tool ${tool.name}`);
   assert(
     typeof tool.description === "string" && tool.description.trim().length > 0,
     `${context} ${tool.name} was missing description`,
@@ -540,13 +549,13 @@ function assertToolMetadata(tool, context) {
   }
 }
 
-function assertToolList(toolList, context) {
+function assertToolList(toolList, context, expectedNames = EXPECTED_TOOL_NAMES) {
   assert(Array.isArray(toolList.tools), `${context} tools/list result did not include tools array`);
   const toolNames = toolList.tools.map((tool) => tool.name).sort();
-  assert(toolNames.length === EXPECTED_TOOL_NAMES.length, `${context} expected ${EXPECTED_TOOL_NAMES.length} tools, got ${toolNames.length}`);
-  assert(toolNames.join(",") === EXPECTED_TOOL_NAMES.join(","), `${context} returned a different tool list`);
+  assert(toolNames.length === expectedNames.length, `${context} expected ${expectedNames.length} tools, got ${toolNames.length}`);
+  assert(toolNames.join(",") === expectedNames.join(","), `${context} returned a different tool list`);
   for (const tool of toolList.tools) {
-    assertToolMetadata(tool, context);
+    assertToolMetadata(tool, context, expectedNames);
   }
   return toolNames;
 }
@@ -733,6 +742,24 @@ async function runSmoke() {
 
     const getDiscovery = await mcpGetDiscovery(baseUrl);
     assertToolList(getDiscovery, "GET discovery");
+
+    // PRD phase-12 D3·R7⑥: 이 서버는 키 없이 떴으므로 여섯 번째 툴이 없어야 한다. 위 목록
+    // 단언들이 개수를 지키지만 **무엇이 빠졌는지는 말해 주지 않아서** 이름으로 한 번 더 박는다.
+    // 등록되지 않은 툴은 호출도 못 한다 — 그래야 되돌리기(키 제거 후 재배포)가 실제로 툴을 내린다.
+    assert(
+      !toolsList.tools.some((tool) => tool.name === "find_disposal_spots"),
+      "find_disposal_spots must not be registered when DATA_GO_KR_SERVICE_KEY is empty",
+    );
+    let unknownToolError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "find_disposal_spots", arguments: { dong: "상계동" } }, 4);
+    } catch (error) {
+      unknownToolError = error;
+    }
+    assert(
+      unknownToolError && String(unknownToolError.message).includes("Unknown tool"),
+      "calling find_disposal_spots without a service key should come back as an unknown tool",
+    );
 
     // 사진 경로는 description으로 안내하고 `inputSource`로 신호를 받는다. description만
     // 고치고 파라미터가 스키마에 안 실리면 호스트는 보낼 방법이 없으므로 여기서 잡는다.
@@ -1257,6 +1284,31 @@ async function runSmoke() {
     //
     // 이름이 실제로 그 지역으로 매칭됐는지부터 본다. 광역으로 폴백하거나 되묻기로 빠지면
     // 다른 지역의 요일 줄을 놓고 아래 단언이 전부 통과해, 49곳을 돈다는 이 루프가 헛돈다.
+    const GUIDE_KINDS = [
+      { label: "폐의약품", re: /의약품/, field: "medicine" },
+      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/, field: "batteryAndFluorescentLamp" },
+    ];
+    // 본문은 수거함 안내를 말하는데 그 근거 출처가 하나도 없는 자리. 순서로는 못 고치고
+    // 출처를 찾아야 하는 일이라 이 PR에서 닫지 못했다. 조용히 넘기지 않고 이름을 남긴다 —
+    // **줄어야 할 목록이지 늘어야 할 목록이 아니다.** 새 지역이 같은 상태로 들어오면
+    // 위 단언에서 걸린다. 사유와 진행은 `docs/data-decision-backlog.md`에 있다.
+    const KNOWN_GUIDE_SOURCE_GAPS = new Set([
+      "songpa_gu:batteryAndFluorescentLamp",
+      "mapo_gu:medicine",
+      "seongnam_si:medicine",
+      "jongno_gu:medicine",
+      "jongno_gu:batteryAndFluorescentLamp",
+      "yongsan_gu:batteryAndFluorescentLamp",
+      "gwangjin_gu:medicine",
+      "gangbuk_gu:medicine",
+      "dobong_gu:medicine",
+      "eunpyeong_gu:medicine",
+      "gangseo_gu:batteryAndFluorescentLamp",
+      "geumcheon_gu:batteryAndFluorescentLamp",
+      "yeongdeungpo_gu:medicine",
+      "dongjak_gu:medicine",
+      "gangdong_gu:medicine",
+    ]);
     let ownDayPageCount = 0;
     for (const policy of regionPolicies) {
       const dayResult = await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++);
@@ -1264,6 +1316,43 @@ async function runSmoke() {
         dayResult.structuredContent?.matchedRegion === policy.name,
         `${policy.name}: 이 이름이 자기 지역으로 안 잡힌다 (matchedRegion=${dayResult.structuredContent?.matchedRegion}) — 아래 요일 단언이 다른 지역 답을 보고 통과한다`,
       );
+
+      // 수거함 안내 근거가 구조화 출력에 남는지 같은 응답에서 함께 본다. 따로 루프를
+      // 돌면 40번을 더 부르고, `ownDayPageCount` 단언과도 멀어진다.
+      if (policy.coverageTier !== "metro") {
+        const shown = dayResult.structuredContent?.officialSources ?? [];
+        for (const kind of GUIDE_KINDS) {
+          // 노출된 쪽은 `{title, url}`뿐이라 `basis`로 종류를 가릴 수 없다. 지역 데이터에서
+          // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다. URL 없는 출처를 허용하는
+          // 스키마라(`validate-data.mjs`) `undefined === undefined`로 통과하지 않게 거른다.
+          const urls = (policy.sources ?? [])
+            .filter((source) => kind.re.test(source.title ?? "") || kind.re.test(source.basis ?? ""))
+            .map((source) => source.url)
+            .filter(Boolean);
+          if (urls.length === 0) {
+            // 출처가 아예 없는 쪽이 더 나쁘다 — 본문은 "전용 수거함에 배출합니다"라고
+            // 말하는데 근거가 하나도 없다. 순서로는 못 고치고 출처를 찾아야 하는 일이라
+            // 이 PR에서 닫지 못했다. 조용히 넘기지 말고 목록으로 묶어 둔다.
+            if (policy.specialCollections?.[kind.field]?.method?.length > 0) {
+              assert(
+                KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
+                `${policy.name}: ${kind.label} 안내를 본문에서 말하면서 그 근거 출처가 하나도 없다 — 출처를 찾아 넣거나 KNOWN_GUIDE_SOURCE_GAPS에 근거와 함께 등록해라`,
+              );
+            }
+            continue;
+          }
+          // 목록에 있는데 출처가 생겼다면 그 항목은 낡았다. 지우지 않으면 그 지역이
+          // 나중에 다시 출처를 잃어도 위 갈래가 조용히 면제한다.
+          assert(
+            !KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
+            `${policy.name}: ${kind.label} 출처가 생겼는데 KNOWN_GUIDE_SOURCE_GAPS에 아직 남아 있다 — 목록에서 지워라`,
+          );
+          assert(
+            shown.some((source) => urls.includes(source?.url)),
+            `${policy.name}: ${kind.label} 안내 출처를 갖고 있는데 officialSources에서 잘렸다 — 구조화만 읽는 호스트는 수거함 안내를 근거 없이 받는다`,
+          );
+        }
+      }
       const dayAnswer = resultText(dayResult);
       const dayLine = findDayCheckLine(dayAnswer);
       assert(dayLine, `${policy.name}: 요일 확인 항목이 사라졌다 — 되묻기를 막던 줄이다`);
@@ -1298,64 +1387,6 @@ async function runSmoke() {
     // `officialSources`는 앞 세 개까지인데 요일 출처가 한 자리를 예약하므로 실제 창은 둘이다.
     // 안내인지는 제목이 아니라 `basis`까지 봐야 한다 — 서대문 「폐금속자원 배출」·수원
     // 「재활용분리배출」은 제목에 낱말이 없고 근거에만 있다.
-    const GUIDE_KINDS = [
-      { label: "폐의약품", re: /의약품/, field: "medicine" },
-      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/, field: "batteryAndFluorescentLamp" },
-    ];
-    // 본문은 수거함 안내를 말하는데 그 근거 출처가 하나도 없는 자리. 순서로는 못 고치고
-    // 출처를 찾아야 하는 일이라 이 PR에서 닫지 못했다. 조용히 넘기지 않고 이름을 남긴다 —
-    // **줄어야 할 목록이지 늘어야 할 목록이 아니다.** 새 지역이 같은 상태로 들어오면
-    // 위 단언에서 걸린다. 사유와 진행은 `docs/data-decision-backlog.md`에 있다.
-    const KNOWN_GUIDE_SOURCE_GAPS = new Set([
-      "songpa_gu:batteryAndFluorescentLamp",
-      "mapo_gu:medicine",
-      "seongnam_si:medicine",
-      "jongno_gu:medicine",
-      "jongno_gu:batteryAndFluorescentLamp",
-      "yongsan_gu:batteryAndFluorescentLamp",
-      "gwangjin_gu:medicine",
-      "gangbuk_gu:medicine",
-      "dobong_gu:medicine",
-      "eunpyeong_gu:medicine",
-      "gangseo_gu:batteryAndFluorescentLamp",
-      "geumcheon_gu:batteryAndFluorescentLamp",
-      "yeongdeungpo_gu:medicine",
-      "dongjak_gu:medicine",
-      "gangdong_gu:medicine",
-    ]);
-    for (const policy of regionPolicies) {
-      if (policy.coverageTier === "metro") continue;
-      const shown = (
-        await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++)
-      ).structuredContent?.officialSources ?? [];
-      for (const kind of GUIDE_KINDS) {
-        // 노출된 쪽은 `{title, url}`뿐이라 `basis`로 종류를 가릴 수 없다. 지역 데이터에서
-        // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다. URL 없는 출처를 허용하는
-        // 스키마라(`validate-data.mjs`) `undefined === undefined`로 통과하지 않게 거른다.
-        const urls = (policy.sources ?? [])
-          .filter((source) => kind.re.test(source.title ?? "") || kind.re.test(source.basis ?? ""))
-          .map((source) => source.url)
-          .filter(Boolean);
-        if (urls.length === 0) {
-          // 출처가 아예 없는 쪽이 더 나쁘다 — 본문은 "전용 수거함에 배출합니다"라고
-          // 말하는데 근거가 하나도 없다. 순서로는 못 고치고 출처를 찾아야 하는 일이라
-          // 이 PR에서 닫지 못했다. 조용히 넘기지 말고 목록으로 묶어 두어, 새 지역이
-          // 같은 상태로 들어오면 여기서 걸리게 한다.
-          const claims = policy.specialCollections?.[kind.field]?.method?.length > 0;
-          if (claims) {
-            assert(
-              KNOWN_GUIDE_SOURCE_GAPS.has(`${policy.id}:${kind.field}`),
-              `${policy.name}: ${kind.label} 안내를 본문에서 말하면서 그 근거 출처가 하나도 없다 — 출처를 찾아 넣거나 KNOWN_GUIDE_SOURCE_GAPS에 근거와 함께 등록해라`,
-            );
-          }
-          continue;
-        }
-        assert(
-          shown.some((source) => urls.includes(source?.url)),
-          `${policy.name}: ${kind.label} 안내 출처를 갖고 있는데 officialSources에서 잘렸다 — 구조화만 읽는 호스트는 수거함 안내를 근거 없이 받는다`,
-        );
-      }
-    }
 
     assert(
       ownDayPageCount === REGIONS_WITH_OWN_DAY_PAGE,
@@ -2035,6 +2066,107 @@ async function runWidgetBuilderCases() {
 }
 
 /**
+ * `- 키: 값` 머리말에 영문 내부 키가 새지 않는지 카탈로그 전수로 본다.
+ *
+ * 이 자리는 세 번 같은 식으로 샜다 — `- 판단 조건:`이 조건 키를(PR #75), `- 분류:`가
+ * `category`를, `- 배출 판단:`이 `disposalType`을 그대로 찍었다. 셋 다 데이터가 아니라
+ * 렌더링 쪽 결함이라 `validate-data.mjs`의 매핑 전수 대응 검사로는 걸리지 않는다.
+ * 매핑이 멀쩡해도 그 매핑을 안 거치고 원본을 찍으면 그만이기 때문이다.
+ *
+ * **표면을 둘 다 훑는다.** 처음 넣을 때는 `formatItemGuide`만 봤는데, 같은 머리말을 찍는
+ * 자리가 `classify_waste_item`의 텍스트 갈래에도 있다(`분류 결과:`로 시작하는 블록).
+ * 그쪽은 `- 세부 판단:`으로 `disposalType`을 그대로 내던 세 번째 누수 지점인데 가드가
+ * 안 닿아, 같은 줄을 도로 넣어도 스위트가 초록불이었다. HTTP 스모크를 품목 수만큼 더
+ * 때우는 대신 조립부를 `formatClassifyResultText`로 빼서 여기서 나란히 렌더한다.
+ *
+ * 대상은 이 둘뿐이다. `check_confusing_item`은 `1. 소파` 아래에 세 칸 들여쓴
+ * `   - 결론:` 후보 목록을, `make_cleanup_plan`은 `## 배출 그룹` 아래에
+ * `- 입력 -> 품목명: 요약` 항목 줄을 낸다. 카드 머리말과 모양이 달라 여기 억지로 끼우면
+ * 검사 대상이 아닌 줄까지 잡는다(두 툴 모두 값은 이미 라벨 함수를 거친다).
+ *
+ * 머리말만 보는 이유는 `### 배출 방법`부터는 URL과 출처 제목이 섞이기 때문이고,
+ * 새 줄이 붙는 자리도 머리말이다. 키별로 무엇을 요구하는지는 아래 목록을 본다.
+ */
+
+/**
+ * 머리말 키를 성격별로 가른다. 값을 우리가 매핑으로 짓는 줄, 사람이 쓴 문장이 실리는 줄,
+ * 외부 문자열이 그대로 오는 줄을 한 자로 재면 한쪽은 오탐이 나고 다른 쪽은 누수를 놓친다.
+ *
+ * **라벨 목록**은 `, `로 쪼개 토큰마다 한글을 요구한다. 값 전체에 한글 한 글자만 있으면
+ * 통과시키면 `- 판단 조건: 전자제품, foo bar`처럼 여럿 중 **하나만** 영문인 모양이 그대로
+ * 빠져나가는데, 그게 바로 PR #75가 닫은 누수다(라벨 없는 조건 하나가 영문으로 샜다).
+ *
+ * **문장**은 값 전체에 한글이 있으면 통과다. 사람이 쓴 문장이라 쉼표로 쪼개면 오탐이 난다.
+ *
+ * **모르는 키는 라벨 목록과 같은 엄격한 규칙을 쓴다.** 머리말에 줄을 새로 붙이는 사람이
+ * 그 줄을 어느 갈래에 둘지 여기에 적게 만드는 게 요점이다. 조용히 통과시키면 검사에
+ * 구멍이 도로 난다.
+ */
+const ITEM_CARD_LABEL_LIST_KEYS = ["판단 조건", "배출 그룹", "확신도", "지역 영향"];
+const ITEM_CARD_SENTENCE_KEYS = ["결론", "판단 범위", "입력 지역"];
+/**
+ * 검사에서 빼는 키. **사유를 안 적으면 다음 사람이 "왜 여기만 빠졌지" 하고 도로 넣는다.**
+ *
+ * `대표 근거`는 `briefSourceLabel`이 짓는 줄이라 출처 제목 + basis + URL이 그대로 실린다.
+ * 우리가 라벨로 짓는 값이 아니라 데이터가 가진 문자열이다. 지금은 336개 제목에 다 한글이
+ * 있어 통과하지만, 영문 제목 출처가 하나 들어오거나 `sources`가 비어 `sourceRefs[0]`이
+ * ASCII인 품목이 생기면 CI가 "영문 키 누수"라는 **틀린 진단**으로 떨어진다 — 데이터
+ * 선택을 렌더링 결함으로 오인시키는 메시지다.
+ */
+const ITEM_CARD_EXEMPT_KEYS = ["대표 근거"];
+
+/** 새는 토큰을 돌려준다. 깨끗하면 `undefined`. */
+function findItemCardHeaderLeak(key, value) {
+  if (ITEM_CARD_EXEMPT_KEYS.includes(key)) return undefined;
+  const tokens = ITEM_CARD_SENTENCE_KEYS.includes(key) ? [value] : value.split(", ");
+  return tokens.find((token) => !/[가-힣]/.test(token));
+}
+
+async function runItemCardLabelSweep() {
+  const { formatClassifyResultText, formatItemGuide, wasteItems } = await import("../dist/data.js");
+  const surfaces = [
+    ["get_disposal_steps 카드", formatItemGuide],
+    ["classify_waste_item 텍스트", formatClassifyResultText],
+  ];
+  const leaked = [];
+  const seenKeys = new Set();
+
+  for (const item of wasteItems) {
+    // 지역을 넘겨 지역 줄이 붙는 갈래까지 같은 렌더로 훑는다.
+    for (const region of [undefined, "서울 강남구"]) {
+      for (const [surface, render] of surfaces) {
+        // 첫 줄(`## 품목명`·`분류 결과: 품목명`)은 `- `로 시작하지 않아 아래 정규식에
+        // 걸리지 않는다. 표면마다 자를 자리를 따로 세지 않으려고 그대로 흘려보낸다.
+        for (const line of render(item, region).split("\n")) {
+          if (line.startsWith("###")) break;
+          const field = /^- ([^:]+): (.+)$/.exec(line);
+          if (!field) continue;
+          seenKeys.add(field[1]);
+          const leak = findItemCardHeaderLeak(field[1], field[2]);
+          if (leak !== undefined)
+            leaked.push(`${item.id} (${surface}, region=${region ?? "없음"}): ${line}\n    새는 값: "${leak}"`);
+        }
+      }
+    }
+  }
+
+  assert(leaked.length === 0, `item card header leaked a non-Korean value:\n${leaked.slice(0, 5).join("\n")}`);
+
+  // 목록에 없는 키가 나왔다면 엄격한 규칙으로 이미 검사한 뒤다. 통과했더라도 어느 갈래에
+  // 둘지는 사람이 정해야 해서 여기서 이름을 부른다 — 쉼표로 잇는 문장 키가 목록 밖에
+  // 남아 있으면 다음에 값이 늘 때 오탐으로 떨어진다.
+  const classified = [...ITEM_CARD_LABEL_LIST_KEYS, ...ITEM_CARD_SENTENCE_KEYS, ...ITEM_CARD_EXEMPT_KEYS];
+  const unclassified = [...seenKeys].filter((key) => !classified.includes(key));
+  if (unclassified.length > 0)
+    console.log(`  머리말에 갈래가 안 정해진 키가 있다(엄격 규칙으로 검사함): ${unclassified.join(", ")}`);
+
+  console.log(
+    `Item card label sweep passed: ${wasteItems.length} items x 2 region modes x ${surfaces.length} surfaces, ` +
+      `머리말 키 ${seenKeys.size}종(라벨 목록은 토큰 단위, 문장은 값 단위, \`${ITEM_CARD_EXEMPT_KEYS.join("`·`")}\`는 면제)`,
+  );
+}
+
+/**
  * Every item through the widget path once. The 183 get_disposal_steps answer
  * cases are pinned to WIDGET_ENABLED=false, so on their own they would only
  * cover a shape production never serves (R1 leaves widgets on by default) —
@@ -2415,6 +2547,575 @@ async function runWidgetSmoke() {
   }
 }
 
+/* ───────────────────── find_disposal_spots (PRD phase-12 R7) ───────────────────── */
+
+/**
+ * 목 업스트림. **실서버는 절대 치지 않는다** — 남의 한도를 쓰는 것도 문제고, 그쪽이 느린 날
+ * 통과 여부가 우리 코드와 무관해지는 게 더 문제다.
+ *
+ * 픽스처는 실측(docs/moe-recycling-api-2026-08-24.md 2-2-1)의 축약본이다. 상계동은 종류
+ * 분포와 개수 상한을, `우동`·`서교동`·`중앙동`은 동음 오염 세 갈래를 재현한다.
+ */
+const SPOT_FIXTURES = {
+  // 표기 두 가지(`의류 수거함`/`의류수거함`)가 한 묶음으로 합쳐지는 것도 여기서 본다.
+  상계동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 노원구 상계로 121", addrDtl: "노원구보건소 1층" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 노원구 동일로 1414", addrDtl: "상계동주민센터" },
+    { spotNm: "전지 수거함", addrBase: "서울특별시 노원구 노해로 437", addrDtl: "노원구청 앞" },
+    { spotNm: "형광등 수거함", addrBase: "서울특별시 노원구 노해로 437", addrDtl: "노원구청 앞" },
+    // 두 묶음 표기를 겸하는 실측 사례. 표 순서상 `battery_lamp`가 이겨야 한다.
+    { spotNm: "폐형광등∙폐건전지 전용 배출함", addrBase: "서울특별시 노원구 한글비석로 220", addrDtl: "" },
+    { spotNm: "폐건전지 수거함", addrBase: "서울특별시 노원구 상계로1길 10", addrDtl: "" },
+    // 표기가 붙은 지자체도 있다 — `전지` 패턴이 공백에 민감하면 이 행이 기타로 샌다.
+    { spotNm: "폐건전지수거함", addrBase: "서울특별시 노원구 상계로1길 20", addrDtl: "" },
+    { spotNm: "의류 수거함", addrBase: "서울특별시 노원구 상계로 88", addrDtl: "" },
+    { spotNm: "의류 수거함", addrBase: "서울특별시 노원구 상계로 92", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 노원구 동일로204길 12", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 노원구 동일로207길 3", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 노원구 한글비석로 100", addrDtl: "" },
+    { spotNm: "중소형 수거함", addrBase: "서울특별시 노원구 노원로 330", addrDtl: "상계주공아파트 관리사무소" },
+    { spotNm: "폐휴대폰 배출처", addrBase: "서울특별시 노원구 노해로 437", addrDtl: "노원구청 민원실" },
+    { spotNm: "소형가전 수거함", addrBase: "서울특별시 노원구 상계로 200", addrDtl: "" },
+    { spotNm: "투명페트병 무인회수기", addrBase: "서울특별시 노원구 동일로 1400", addrDtl: "지하철 4호선 상계역" },
+    { spotNm: "페트병·캔 무인회수기", addrBase: "서울특별시 노원구 노해로 480", addrDtl: "" },
+    { spotNm: "음식물 RFID", addrBase: "서울특별시 노원구 상계로 300", addrDtl: "" },
+    { spotNm: "음식물 RFID", addrBase: "서울특별시 노원구 상계로 320", addrDtl: "" },
+    { spotNm: "식용유 수거함", addrBase: "서울특별시 노원구 상계로 340", addrDtl: "" },
+    // 기본 노출에서 빠지는 둘. 응답의 절반을 차지하는 종량제봉투와 이름만으로는 알 수 없는 기타.
+    { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 상계로 11", addrDtl: "○○마트" },
+    { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 상계로 13", addrDtl: "○○편의점" },
+    { spotNm: "재활용정거장(이동식)", addrBase: "서울특별시 노원구 상계로 15", addrDtl: "" },
+  ],
+  // 실측 동음 오염: `우동`은 화성 `석우동`에 부분일치로 걸린다.
+  우동: [
+    { spotNm: "폐의약품 수거함", addrBase: "부산광역시 해운대구 우동 1418", addrDtl: "해운대구보건소" },
+    { spotNm: "의류수거함", addrBase: "부산광역시 해운대구 좌동순환로 30", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "경기도 화성시 석우동 92", addrDtl: "동탄보건지소" },
+  ],
+  // 전국 동명 자치구. 구 이름만 보고 거르면 `광주 북구` 질의에 대구 북구 주소가 그대로 통과한다.
+  중앙동: [
+    { spotNm: "폐의약품 수거함", addrBase: "대구광역시 북구 중앙대로 100", addrDtl: "북구보건소" },
+    { spotNm: "폐의약품 수거함", addrBase: "대구광역시 북구 중앙대로 200", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "광주광역시 북구 금재로 30", addrDtl: "북구청 1층" },
+  ],
+  // 실측: 마포 95건에 여수 9건이 섞인다.
+  서교동: [
+    { spotNm: "의류수거함", addrBase: "서울특별시 마포구 월드컵북로 21", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 마포구 서교동 358", addrDtl: "마포구보건소" },
+    { spotNm: "폐의약품 수거함", addrBase: "전라남도 여수시 서교동 12", addrDtl: "여수시보건소" },
+  ],
+  단건동: [{ spotNm: "폐의약품 수거함", addrBase: "충청북도 청주시 흥덕구 단건로 1", addrDtl: "단건동주민센터" }],
+  // 이름을 품은 이웃 구 — `부산 서구` 질의에 강서구 주소가 부분 문자열로 통과하면 안 된다.
+  경계동: [
+    { spotNm: "폐의약품 수거함", addrBase: "부산광역시 서구 구덕로 120", addrDtl: "서구보건소" },
+    { spotNm: "폐의약품 수거함", addrBase: "부산광역시 강서구 낙동북로 477", addrDtl: "강서구보건소" },
+  ],
+  // 이중 중첩 `items: [{ item: [...] }]` — 실서버가 이 모양을 실제로 낸다.
+  중첩동: [
+    { spotNm: "폐의약품 수거함", addrBase: "대전광역시 서구 둔산로 100", addrDtl: "서구보건소" },
+    { spotNm: "의류수거함", addrBase: "대전광역시 서구 둔산로 200", addrDtl: "" },
+  ],
+  절단동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 학동로 426", addrDtl: "강남구보건소" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 강남구 학동로 400", addrDtl: "" },
+  ],
+  느린동: [{ spotNm: "폐의약품 수거함", addrBase: "서울특별시 성동구 고산자로 270", addrDtl: "성동구보건소" }],
+  // 판매소·기타뿐인 동 — 노출 묶음이 하나도 없다.
+  판매소동: [
+    { spotNm: "종량제봉투 판매소", addrBase: "서울특별시 노원구 판매로 1", addrDtl: "○○마트" },
+    { spotNm: "재활용정거장(이동식)", addrBase: "서울특별시 노원구 판매로 3", addrDtl: "" },
+  ],
+  빈동: [],
+};
+
+/** 상계동 응답에서 기대하는 묶음과 개수. 표 순서·묶음당 3곳·전체 12곳이 한꺼번에 걸린다. */
+const SPOT_EXPECTED_SECTIONS = [
+  "### 폐의약품 수거함 (2곳)",
+  "### 폐건전지·폐형광등 수거함 (5곳 중 3곳)",
+  "### 의류 수거함 (5곳 중 3곳)",
+  "### 폐휴대폰·소형가전 수거함 (3곳)",
+  "### 투명페트병·캔 무인회수기 (2곳 중 1곳)",
+];
+
+// PRD phase-12 R7: 이 툴의 크기 상한은 다른 툴 기준을 빌리지 않고 새로 잰다. 목표였던 "성공
+// 응답 text 2.5KB 이하"는 12곳이 다 찬 상계동 응답이 1,433B라 여유 있게 지킨다. 아래 값은 그
+// 실측(text 1,433B · 전체 3,222B, 2026-08-25)에 10%를 얹은 것이다 — 전체가 text의 두 배가 넘는
+// 건 structuredContent가 같은 주소를 한 벌 더 싣기 때문이고, 다른 툴도 같은 성질을 안고 있다.
+// 기존 관행대로 실패가 아니라 경고로 시작한다.
+const SPOT_SIZE_WARN_BYTES = { text: 1_580, total: 3_550 };
+
+// structuredContent 화이트리스트(PRD phase-12 R5). 세 갈래가 모양이 달라 따로 둔다.
+const SPOT_FOUND_KEYS = ["found", "dong", "region", "categories", "truncated", "omitted", "source"];
+const SPOT_OMITTED_KEYS = ["id", "label", "found"];
+const SPOT_CATEGORY_KEYS = ["id", "label", "spots"];
+const SPOT_SPOT_KEYS = ["name", "address"];
+const SPOT_FALLBACK_KEYS = ["found", "dong", "fallback"];
+const SPOT_FALLBACK_INNER_KEYS = ["mapUrl", "regionSources", "itemLine"];
+const SPOT_ASK_KEYS = ["found", "dong", "ambiguousDong", "regions"];
+
+function assertKeysWithin(object, allowed, context) {
+  for (const key of Object.keys(object ?? {})) {
+    assert(allowed.includes(key), `${context}: structuredContent에 화이트리스트 밖 키 "${key}"가 있다`);
+  }
+}
+
+function assertSpotStructured(result, context) {
+  const structured = result.structuredContent;
+  assert(isPlainObject(structured), `${context}: structuredContent가 없다`);
+
+  if (structured.found === true) {
+    assertKeysWithin(structured, SPOT_FOUND_KEYS, context);
+    assert(Array.isArray(structured.categories) && structured.categories.length > 0, `${context}: categories[]가 비었다`);
+    for (const category of structured.categories) {
+      assertKeysWithin(category, SPOT_CATEGORY_KEYS, `${context} categories[]`);
+      assert(Array.isArray(category.spots) && category.spots.length > 0, `${context}: ${category.id} spots[]가 비었다`);
+      assert(category.spots.length <= 3, `${context}: ${category.id}가 묶음당 3곳 상한을 넘었다`);
+      for (const spot of category.spots) {
+        assertKeysWithin(spot, SPOT_SPOT_KEYS, `${context} spots[]`);
+        assert(isNonEmptyText(spot.name) && isNonEmptyText(spot.address), `${context}: 이름이나 주소가 빈 곳이 있다`);
+      }
+    }
+    const total = structured.categories.reduce((sum, category) => sum + category.spots.length, 0);
+    assert(total <= 12, `${context}: 전체 12곳 상한을 넘어 ${total}곳이 나갔다`);
+    for (const entry of structured.omitted ?? []) {
+      assertKeysWithin(entry, SPOT_OMITTED_KEYS, `${context} omitted[]`);
+    }
+    return;
+  }
+
+  if (structured.ambiguousDong === true) {
+    assertKeysWithin(structured, SPOT_ASK_KEYS, context);
+    assert(Array.isArray(structured.regions) && structured.regions.length > 1, `${context}: 되묻기인데 후보 지역이 둘 미만이다`);
+    return;
+  }
+
+  assertKeysWithin(structured, SPOT_FALLBACK_KEYS, context);
+  assert(isPlainObject(structured.fallback), `${context}: fallback 블록이 없다`);
+  assertKeysWithin(structured.fallback, SPOT_FALLBACK_INNER_KEYS, `${context} fallback`);
+  assert(isNonEmptyText(structured.fallback.mapUrl), `${context}: fallback.mapUrl이 비었다`);
+}
+
+function isNonEmptyText(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/** 폴백이 늘 들고 나가는 전국 확인 경로. `src/data.ts`의 `REGION_SELECT_GUIDE_LINK`와 같은 주소다. */
+const REGION_SELECT_GUIDE_URL = "https://www.분리배출.kr/front/region/region.do";
+
+/** 목 업스트림이 받은 요청. 키 인코딩과 법정동 정규화를 여기서 확인한다. */
+function startMockUpstream() {
+  const requests = [];
+  const server = createHttpServer((req, res) => {
+    // 타임아웃 케이스에서는 클라이언트가 먼저 끊는다. 그 뒤에 쓰면 ECONNRESET이 떠서
+    // 목 서버가 스모크 전체를 넘어뜨린다.
+    res.on("error", () => {});
+    const url = new URL(req.url, `http://${HOST}`);
+    const addr = url.searchParams.get("addr") ?? "";
+    requests.push({
+      path: url.pathname,
+      addr,
+      rawQuery: url.search,
+      serviceKey: url.searchParams.get("serviceKey") ?? "",
+      numOfRows: url.searchParams.get("numOfRows"),
+    });
+
+    const rows = SPOT_FIXTURES[addr];
+    const send = (payload) => {
+      if (res.destroyed || res.writableEnded) return;
+      res.writeHead(200, { "Content-Type": "application/json;charset=UTF-8" });
+      res.end(JSON.stringify(payload));
+    };
+
+    if (rows === undefined) {
+      // NODATA도 정상 응답이다(resultCode 03). 실패로 접으면 폴백 이유가 뒤바뀐다.
+      send({ response: { header: { resultCode: "03", resultMsg: "NODATA_ERROR" }, body: { items: "", totalCount: 0 } } });
+      return;
+    }
+
+    const header = { resultCode: "00", resultMsg: "NORMAL SERVICE." };
+    // 단건이면 배열이 아니라 객체로 온다 — 수거함이 한 곳뿐인 동에서만 터지는 자리다.
+    // 중첩동은 실서버가 내는 또 다른 모양(`items: [{ item: [...] }]`)을 재현한다.
+    const items = addr === "중첩동" ? [{ item: rows }] : rows.length === 1 ? { item: rows[0] } : { item: rows };
+    // 1,000행 절단은 totalCount로만 드러난다.
+    const totalCount = addr === "절단동" ? 2_000 : rows.length;
+
+    if (addr === "느린동") {
+      // 타임아웃(2.5초)보다 늦게 답한다. 클라이언트가 먼저 끊어야 한다.
+      const timer = setTimeout(() => send({ response: { header, body: { items, totalCount } } }), 3_000);
+      timer.unref();
+      return;
+    }
+
+    send({ response: { header, body: { items, totalCount } } });
+  });
+
+  server.listen(0, HOST);
+  return once(server, "listening").then(() => ({
+    baseUrl: `http://${HOST}:${server.address().port}`,
+    requests,
+    close: () =>
+      new Promise((resolve) => {
+        // keep-alive로 열려 있는 연결까지 끊어야 close가 걸리지 않는다.
+        server.closeAllConnections();
+        server.close(resolve);
+      }),
+  }));
+}
+
+// 실제 포털 디코딩 키를 닮은 더미. `+`와 `=`가 들어 있어야 인코딩 규칙이 실제로 걸린다.
+const SPOT_DUMMY_KEY = "smoke+dummy/key==";
+// 인코딩 키(`%`가 들어 있는 쪽)는 그대로 실려야 한다. 두 번 인코딩하면 증상이
+// "툴은 등록됐는데 100% 폴백"이라 가장 늦게 발견된다.
+const SPOT_DUMMY_ENCODED_KEY = "smoke%2Bdummy%2Fkey%3D%3D";
+
+async function runSpotSmoke() {
+  const upstream = await startMockUpstream();
+  const port = await getFreePort();
+  const baseUrl = `http://${HOST}:${port}`;
+  const { server, getOutput } = startServer(port, {
+    serviceKey: SPOT_DUMMY_KEY,
+    upstreamBaseUrl: upstream.baseUrl,
+  });
+
+  const stopServer = () => {
+    if (!server.killed) server.kill("SIGTERM");
+  };
+  process.once("exit", stopServer);
+
+  let requestId = 1;
+  const call = (args) => callTool(baseUrl, "find_disposal_spots", args, requestId++);
+
+  try {
+    await waitForHealth(baseUrl, getOutput);
+
+    // 키가 있으면 여섯 번째 툴이 선다. 두 목록이 여전히 바이트 동일해야 한다 —
+    // 조건부 구성이 `TOOL_DEFS` 한 곳이 아니면 여기서 갈린다.
+    const toolsList = await mcpRequest(baseUrl, "tools/list", {}, requestId++);
+    assertToolList(toolsList, "spot SSE tools/list", EXPECTED_TOOL_NAMES_WITH_SPOTS);
+    const jsonOnlyToolsList = await jsonOnlyMcpRequest(baseUrl, "tools/list", {}, requestId++);
+    assertToolList(jsonOnlyToolsList, "spot JSON-only tools/list", EXPECTED_TOOL_NAMES_WITH_SPOTS);
+    const sortByName = (tools) => [...tools].sort((a, b) => a.name.localeCompare(b.name));
+    assert(
+      JSON.stringify(sortByName(toolsList.tools)) === JSON.stringify(sortByName(jsonOnlyToolsList.tools)),
+      "with a service key the SSE and JSON-only tool lists must still be identical",
+    );
+
+    const spotTool = toolsList.tools.find((tool) => tool.name === "find_disposal_spots");
+    assert(spotTool.inputSchema.required?.includes("dong"), "find_disposal_spots must require dong");
+    assert(
+      !(spotTool.inputSchema.required ?? []).includes("region") && !(spotTool.inputSchema.required ?? []).includes("itemName"),
+      "region and itemName must stay optional",
+    );
+    assert(spotTool.description.includes("법정동"), "description must say a 법정동 name is required");
+    assert(
+      spotTool.description.includes("get_disposal_steps"),
+      "description must send how-to-throw-away questions to get_disposal_steps",
+    );
+
+    // ① 성공 — 묶음 순서, 묶음당 3곳, 전체 12곳, 주소 이어 붙이기.
+    const success = await call({ dong: "상계동", region: "서울 노원구" });
+    const successText = resultText(success);
+    assert(
+      successText.startsWith("## 서울 노원구 상계동 근처 배출 장소"),
+      `상계동 응답의 머리가 다르다:\n${successText.slice(0, 80)}`,
+    );
+    for (const section of SPOT_EXPECTED_SECTIONS) {
+      assert(successText.includes(section), `상계동 응답에 "${section}"이 없다:\n${successText}`);
+    }
+    const shownSpots = successText.split("\n").filter((line) => line.startsWith("- ") && line.includes(" | "));
+    assert(shownSpots.length === 12, `전체 12곳 상한이 안 지켜졌다 — ${shownSpots.length}곳이 나갔다`);
+    // 상한이 순서대로 채워졌다면 표 뒤쪽 노출 묶음(음식물·식용유)이 잘린다. 실제 자료에는 있다.
+    assert(!successText.includes("### 음식물류 배출기"), "전체 상한에 닿으면 표 뒤쪽 묶음부터 잘려야 한다");
+    // 잘린 묶음은 "없는 것"이 아니라 "못 실은 것"으로 읽혀야 한다 — 리뷰 1라운드 지적.
+    assert(
+      successText.includes("자리가 모자라 음식물류 배출기 2곳 · 폐식용유 수거함 1곳은 싣지 못했습니다"),
+      `전체 상한이 지운 묶음을 밝히지 않았다:\n${successText}`,
+    );
+    assert(!successText.includes("종량제봉투"), "종량제봉투 판매소는 기본 노출에서 빠진다");
+    assert(!successText.includes("재활용정거장"), "기타 묶음은 노출하지 않는다");
+    assert(
+      successText.includes("- 폐의약품 수거함 | 서울특별시 노원구 상계로 121 노원구보건소 1층"),
+      "addrBase와 addrDtl을 공백 하나로 이어 붙여야 한다",
+    );
+    assert(successText.includes("- 출처: 기후에너지환경부 분리배출 정보조회 서비스"), "출처 줄이 없다");
+    assert(successText.includes("수거함 위치는 바뀔 수 있습니다"), "확인 안내 줄이 없다");
+    assert(!successText.includes("자료가 많아"), "절단되지 않았는데 절단 안내가 붙었다");
+    assertSpotStructured(success, "상계동 성공");
+    assert(success.structuredContent.region === "서울 노원구", "성공 응답은 착지한 지역 이름을 밝힌다");
+    assert(
+      success.structuredContent.categories.map((category) => category.id).join(",") ===
+        "medicine,battery_lamp,clothing,electronics,pet_bottle",
+      "묶음 순서가 표 순서와 다르다",
+    );
+    assert(success.structuredContent.truncated === undefined, "절단되지 않은 응답에 truncated가 실렸다");
+    assert(
+      JSON.stringify(success.structuredContent.omitted) ===
+        JSON.stringify([
+          { id: "food", label: "음식물류 배출기", found: 2 },
+          { id: "cooking_oil", label: "폐식용유 수거함", found: 1 },
+        ]),
+      `전체 상한이 지운 묶음이 structuredContent에 없다: ${JSON.stringify(success.structuredContent.omitted)}`,
+    );
+
+    // 키가 응답 어디에도 실리면 안 된다. 키를 다루는 곳은 클라이언트 모듈 한 곳이다.
+    const successPayload = JSON.stringify(success);
+    assert(!successPayload.includes(SPOT_DUMMY_KEY), "응답에 서비스 키가 실렸다");
+    assert(!successPayload.includes("smoke"), "응답에 서비스 키 조각이 실렸다");
+
+    const successSize = measureResult(success, { widgets: false });
+    if (successSize.content > SPOT_SIZE_WARN_BYTES.text || successSize.total > SPOT_SIZE_WARN_BYTES.total) {
+      console.warn(
+        `[size] find_disposal_spots 상계동 응답이 text ${successSize.content}B · 전체 ${successSize.total}B — ` +
+          `경고 상한 ${SPOT_SIZE_WARN_BYTES.text}B / ${SPOT_SIZE_WARN_BYTES.total}B를 넘었다. 개수 상한이나 줄 모양이 늘어난 것이다.`,
+      );
+    }
+
+    // 요청이 규칙대로 나갔는지. 디코딩 키는 인코딩해서, 쪽 넘김 없이 1,000행을 한 번에.
+    const successRequest = upstream.requests.at(-1);
+    assert(successRequest.path.endsWith("/getSpot"), `getSpot이 아니라 ${successRequest.path}를 쳤다`);
+    assert(successRequest.numOfRows === "1000", "numOfRows=1000 한 번으로 받아야 한다");
+    assert(
+      successRequest.rawQuery.includes(`serviceKey=${encodeURIComponent(SPOT_DUMMY_KEY)}`),
+      `디코딩 키는 인코딩해서 보내야 한다: ${successRequest.rawQuery.replace(/serviceKey=[^&]*/, "serviceKey=<redacted>")}`,
+    );
+
+    // ② 타임아웃 폴백 — 목이 3초 뒤에 답한다. 2.5초에 끊고 폴백이 나가야 한다.
+    const startedAt = Date.now();
+    const timeout = await call({ dong: "느린동" });
+    const timeoutMs = Date.now() - startedAt;
+    assert(timeoutMs < 2_900, `타임아웃이 안 걸렸다 — ${timeoutMs}ms 만에 돌아왔다`);
+    assert(timeout.isError !== true, "업스트림이 죽어도 MCP 오류로 끝내지 않는다");
+    const timeoutText = resultText(timeout);
+    assert(timeoutText.startsWith("느린동의 배출 장소를 지금 조회하지 못했습니다"), `폴백 문구가 다르다:\n${timeoutText}`);
+    assert(timeoutText.includes(REGION_SELECT_GUIDE_URL), "폴백에 전국 확인 경로가 없다");
+    assertSpotStructured(timeout, "타임아웃 폴백");
+    assert(timeout.structuredContent.found === false, "폴백은 found:false다");
+
+    // ③ 0건 폴백 — 지역과 품목이 함께 오면 세 요소가 전부 선다.
+    const empty = await call({ dong: "빈동", region: "서울 노원구", itemName: "폐의약품" });
+    const emptyText = resultText(empty);
+    // 품목을 물었으면 무엇을 못 찾았는지까지 밝힌다 — "이 동에는 배출 장소가 없다"는 다른 말이다.
+    assert(emptyText.startsWith("빈동에서 폐의약품 배출 장소를 찾지 못했습니다"), `0건 폴백 문구가 다르다:\n${emptyText}`);
+    assert(emptyText.includes(REGION_SELECT_GUIDE_URL), "0건 폴백에 전국 확인 경로가 없다");
+    assert(emptyText.includes("약국"), "품목이 확정됐으면 그 묶음의 일반 안내 한 줄이 붙는다");
+    assertSpotStructured(empty, "0건 폴백");
+    assert(Array.isArray(empty.structuredContent.fallback.regionSources), "지역이 있으면 공식 확인처가 실린다");
+    // sources[0]을 그냥 집으면 자치구 대부분에서 대형폐기물 신청 페이지가 잡힌다 — 품목 주제로 골라야 한다.
+    assert(
+      empty.structuredContent.fallback.regionSources.every((source) => !/대형/.test(source.title)),
+      `폐의약품 폴백의 확인처가 품목과 무관하다: ${JSON.stringify(empty.structuredContent.fallback.regionSources)}`,
+    );
+    assert(isNonEmptyText(empty.structuredContent.fallback.itemLine), "품목이 확정되면 itemLine이 실린다");
+
+    // 지역 없이 0건이어도 폴백이 비면 안 된다 — 이쪽이 이 툴의 기본 시나리오다.
+    const bareEmpty = await call({ dong: "없는동" });
+    const bareEmptyText = resultText(bareEmpty);
+    assert(bareEmptyText.startsWith("없는동에 등록된 배출 장소를 찾지 못했습니다"), `0건 폴백 문구가 다르다:\n${bareEmptyText}`);
+    assert(bareEmptyText.includes(REGION_SELECT_GUIDE_URL), "지역 없는 폴백에도 확인 경로 한 줄은 나가야 한다");
+    assertSpotStructured(bareEmpty, "지역 없는 0건 폴백");
+    assert(bareEmpty.structuredContent.fallback.regionSources === undefined, "지역이 없으면 지역 출처도 없다");
+
+    // ④ 동음 되묻기 — 시·군·구가 둘로 갈리면 오염된 주소 대신 되묻는다.
+    const ask = await call({ dong: "서교동" });
+    const askText = resultText(ask);
+    assert(askText.includes("시·군·구를 함께 알려주세요"), `되묻기 문구가 다르다:\n${askText}`);
+    assertSpotStructured(ask, "동음 되묻기");
+    assert(ask.structuredContent.ambiguousDong === true, "되묻기에는 ambiguousDong 표시가 있다");
+    assert(
+      ask.structuredContent.regions.includes("서울특별시 마포구") && ask.structuredContent.regions.includes("전라남도 여수시"),
+      `되묻기 후보가 다르다: ${JSON.stringify(ask.structuredContent.regions)}`,
+    );
+
+    // 지역을 대긴 했는데 못 알아들은 경우(맨 `중구`) — 그 사실을 밝히고 되묻는다.
+    const unresolvedRegion = await call({ dong: "서교동", region: "중구" });
+    const unresolvedText = resultText(unresolvedRegion);
+    assert(
+      unresolvedText.startsWith('말씀하신 지역 "중구"만으로는'),
+      `못 알아들은 지역을 밝히지 않고 지역을 또 물었다:\n${unresolvedText}`,
+    );
+
+    // 지역 필터가 행을 전부 거르면 "이 동에는 없다"가 아니라 지역·동 불일치로 말한다.
+    const filteredAll = await call({ dong: "서교동", region: "서울 노원구" });
+    const filteredAllText = resultText(filteredAll);
+    assert(
+      filteredAllText.startsWith('서울 노원구에서 "서교동" 주소를 찾지 못했습니다'),
+      `지역 필터 전멸을 "등록된 배출 장소 없음"으로 말했다:\n${filteredAllText}`,
+    );
+    assert(filteredAll.structuredContent.found === false, "지역 필터 전멸은 성공 응답이 아니다");
+
+    // 같은 질의에 지역을 얹으면 오염이 걸러지고 답이 나간다.
+    const askResolved = await call({ dong: "서교동", region: "서울 마포구" });
+    const askResolvedText = resultText(askResolved);
+    assert(askResolvedText.includes("마포구"), "지역을 얹으면 그 지역 주소가 나가야 한다");
+    assert(!askResolvedText.includes("여수"), "다른 시·도의 같은 이름 동이 섞였다");
+    assertSpotStructured(askResolved, "서교동 + 마포구");
+
+    // 실측 오염 사례. `우동`은 화성 `석우동`에 부분일치로 걸린다.
+    const pollution = await call({ dong: "우동", region: "부산 해운대구" });
+    const pollutionText = resultText(pollution);
+    assert(pollutionText.includes("해운대구"), "해운대 주소가 빠졌다");
+    assert(!pollutionText.includes("화성시"), "다른 시·도의 부분일치 주소가 섞였다");
+
+    // 이름을 품은 이웃 구 — 시·군·구는 어절 첫머리에서만 맞아야 한다.
+    const boundary = await call({ dong: "경계동", region: "부산 서구" });
+    const boundaryText = resultText(boundary);
+    assert(boundaryText.includes("부산광역시 서구"), "부산 서구 주소가 빠졌다");
+    assert(!boundaryText.includes("강서구"), "이름을 품은 이웃 구(강서구)가 부분 문자열로 통과했다");
+
+    // 이중 중첩 items — 안 풀면 행 0개로 읽혀 "이 동에는 없다"는 거짓 답이 된다.
+    const nested = await call({ dong: "중첩동", region: "대전 서구" });
+    assert(resultText(nested).includes("서구보건소"), `이중 중첩 응답이 비었다:\n${resultText(nested)}`);
+    assertSpotStructured(nested, "이중 중첩");
+
+    // **구 이름만 보면 안 되는 갈래.** 자치구 이름은 광역시 여섯 곳에 흩어져 있다.
+    const sameNameDistrict = await call({ dong: "중앙동", region: "광주 북구" });
+    const sameNameText = resultText(sameNameDistrict);
+    assert(sameNameText.includes("광주광역시 북구"), "광주 북구 주소가 빠졌다");
+    assert(!sameNameText.includes("대구광역시"), "구 이름만 맞는 다른 광역의 주소가 통과했다");
+
+    // ⑤ 단건 `items.item` 객체 정규화 — 수거함이 한 곳뿐인 동에서만 터지는 자리다.
+    const single = await call({ dong: "단건동" });
+    const singleText = resultText(single);
+    assert(singleText.includes("단건동주민센터"), `단건 응답이 비었다:\n${singleText}`);
+    assertSpotStructured(single, "단건 정규화");
+    assert(single.structuredContent.categories[0].spots.length === 1, "단건 응답은 한 곳이다");
+    // 지역을 안 줬으면 응답이 수렴한 지역 이름을 스스로 밝힌다.
+    assert(single.structuredContent.region === "충청북도 청주시", "수렴한 지역명을 응답 머리에 밝혀야 한다");
+
+    // ⑦ 1,000행 절단 — 오류가 아니라 "완전해 보이는 답"으로 나타나는 유일한 실패다.
+    const truncated = await call({ dong: "절단동", region: "서울 강남구" });
+    const truncatedText = resultText(truncated);
+    assert(truncatedText.includes("자료가 많아 일부만 표시했습니다"), `절단 안내가 없다:\n${truncatedText}`);
+    assertSpotStructured(truncated, "절단 표시");
+    assert(truncated.structuredContent.truncated === true, "절단 플래그가 structuredContent에 없다");
+
+    // 행정동 정규화 — `상계1동`은 그대로 보내면 NODATA다.
+    const normalized = await call({ dong: "상계1동", region: "서울 노원구" });
+    assert(upstream.requests.at(-1).addr === "상계동", `행정동을 법정동으로 줄이지 않았다: ${upstream.requests.at(-1).addr}`);
+    assert(resultText(normalized).startsWith("## 서울 노원구 상계동"), "정규화된 동 이름으로 답해야 한다");
+
+    // 품목 필터 — 확정되면 그 묶음만, 못 찾거나 모호하면 되묻지 않고 전 묶음으로 간다.
+    const filtered = await call({ dong: "상계동", region: "서울 노원구", itemName: "폐의약품" });
+    const filteredText = resultText(filtered);
+    assert(filteredText.includes("폐의약품 수거함 (2곳)"), "확정된 품목의 묶음이 없다");
+    assert(!filteredText.includes("의류 수거함"), "품목이 확정되면 그 묶음만 내보낸다");
+    assert(filtered.structuredContent.categories.length === 1, "품목 필터가 걸리면 묶음은 하나다");
+
+    // 리뷰 1라운드 지적: 폐식용유는 getSpot에 수거함이 실제로 오는데 묶음이 없어 폴백으로 떨어졌다.
+    const oilItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "식용유" });
+    const oilText = resultText(oilItem);
+    assert(oilText.includes("### 폐식용유 수거함 (1곳)"), `식용유 질의가 수거함 주소를 받지 못했다:\n${oilText}`);
+    assert(oilItem.structuredContent.categories.length === 1, "품목 필터가 걸리면 묶음은 하나다");
+
+    const unknownItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "존재하지않는품목zzz" });
+    const unknownItemText = resultText(unknownItem);
+    assert(unknownItemText.includes("폐의약품 수거함"), "품목을 못 찾아도 전 묶음 요약으로 답한다");
+    assert(unknownItemText.includes("의류 수거함"), "품목을 못 찾으면 필터 없이 간다");
+    assert(!unknownItemText.includes("찾으시나요"), "장소 질문에 품목 되묻기로 답하지 않는다");
+
+    // 판매소·기타만 있는 동 — 행을 받아 놓고 "등록된 배출 장소가 없다"고 말하면 거짓이다.
+    const hiddenOnly = await call({ dong: "판매소동", region: "서울 노원구" });
+    const hiddenOnlyText = resultText(hiddenOnly);
+    assert(
+      hiddenOnlyText.startsWith("판매소동에서 전용 수거함류 배출 장소는 찾지 못했습니다"),
+      `숨은 묶음만 있는 동의 폴백 문구가 다르다:\n${hiddenOnlyText}`,
+    );
+    assert(hiddenOnly.structuredContent.found === false, "숨은 묶음만 있으면 성공 응답을 내지 않는다");
+
+    // 백열전구는 형광등 수거함에 넣으면 안 되는 품목이다(waste-items 카드가 그렇게 말한다).
+    // battery_lamp 묶음에 물려 있으면 이 툴이 같은 서버의 그 카드와 반대말을 한다.
+    const bulbItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "백열전구" });
+    const bulbText = resultText(bulbItem);
+    assert(bulbItem.structuredContent.found === false, "백열전구가 형광등 수거함 주소를 받으면 안 된다");
+    assert(!bulbText.includes("폐건전지·폐형광등"), "백열전구 응답에 형광등 수거함이 실렸다");
+
+    // 수거함이 없는 품목(소파)은 억지로 다른 묶음을 보여 주는 대신 폴백으로 내려앉는다.
+    const noCategoryItem = await call({ dong: "상계동", region: "서울 노원구", itemName: "소파" });
+    const noCategoryText = resultText(noCategoryItem);
+    assert(noCategoryText.includes(REGION_SELECT_GUIDE_URL), "묶음이 없는 품목은 폴백으로 간다");
+    assert(
+      noCategoryText.startsWith("상계동에서 소파 배출 장소를 찾지 못했습니다"),
+      `수거함이 실제로 있는 동이므로 "이 동에는 배출 장소가 없다"고 말하면 안 된다:\n${noCategoryText}`,
+    );
+    assert(noCategoryItem.structuredContent.found === false, "묶음이 없으면 성공 응답을 내지 않는다");
+
+    // 입력 검증 실패만 MCP 오류로 끝난다(D2). 그 오류는 다음 호출을 고칠 안내를 달고 나간다.
+    let invalidError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "find_disposal_spots", arguments: {} }, requestId++);
+    } catch (error) {
+      invalidError = error;
+    }
+    assert(invalidError && String(invalidError.message).includes("법정동"), "dong 누락은 복구 안내가 붙은 -32602여야 한다");
+
+    // 공백만 온 dong도 스키마가 끊는다 — 통과하면 빈 addr로 업스트림 한도를 쓰고
+    // "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
+    const upstreamCallsBefore = upstream.requests.length;
+    let blankError;
+    try {
+      await jsonOnlyMcpRequest(baseUrl, "tools/call", { name: "find_disposal_spots", arguments: { dong: "   " } }, requestId++);
+    } catch (error) {
+      blankError = error;
+    }
+    assert(blankError && String(blankError.message).includes("법정동"), "공백 dong은 복구 안내가 붙은 -32602여야 한다");
+    assert(upstream.requests.length === upstreamCallsBefore, "공백 dong이 업스트림 호출을 쓰면 안 된다");
+
+    // ⑥ 로그 — 세 status와 upstream 낱말이 실제로 찍히는지. 실패를 세는 유일한 자리다.
+    const logExpectations = [
+      { args: { dong: "상계동", region: "서울 노원구" }, status: "spots", upstream: "ok" },
+      { args: { dong: "느린동" }, status: "spots_fallback", upstream: "timeout" },
+      { args: { dong: "빈동" }, status: "spots_fallback", upstream: "empty" },
+      { args: { dong: "서교동" }, status: "spots_ask", upstream: "ok" },
+      { args: { dong: "절단동", region: "서울 강남구" }, status: "spots", upstream: "truncated" },
+    ];
+    for (const { args, status, upstream: upstreamStatus } of logExpectations) {
+      await awaitLoggedCall({
+        getOutput,
+        tool: "find_disposal_spots",
+        seen: (entry) => entry.status === status && entry.upstream === upstreamStatus && typeof entry.upstreamMs === "number",
+        call: () => call(args),
+        what: `status=${status}, upstream=${upstreamStatus}`,
+      });
+    }
+
+    // 동 이름은 기본 로그에 남지 않는다 — 사용자가 사는 곳이라 다른 인자와 같은 규칙이다.
+    assert(!getOutput().includes("상계동"), "기본 설정에서는 로그에 동 이름이 남지 않아야 한다");
+    // 키는 로그에도 남지 않는다.
+    assert(!getOutput().includes(SPOT_DUMMY_KEY), "로그에 서비스 키가 남았다");
+  } finally {
+    stopServer();
+  }
+
+  // 인코딩 키(`%`가 든 쪽)는 그대로 실려야 한다. 두 번 인코딩하면 인증이 깨진다.
+  const encodedPort = await getFreePort();
+  const encodedRun = startServer(encodedPort, {
+    serviceKey: SPOT_DUMMY_ENCODED_KEY,
+    upstreamBaseUrl: upstream.baseUrl,
+  });
+  const stopEncoded = () => {
+    if (!encodedRun.server.killed) encodedRun.server.kill("SIGTERM");
+  };
+  process.once("exit", stopEncoded);
+
+  try {
+    const encodedBaseUrl = `http://${HOST}:${encodedPort}`;
+    await waitForHealth(encodedBaseUrl, encodedRun.getOutput);
+    await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 1);
+    const encodedRequest = upstream.requests.at(-1);
+    assert(
+      encodedRequest.rawQuery.includes(`serviceKey=${SPOT_DUMMY_ENCODED_KEY}`),
+      "인코딩 키는 그대로 보내야 한다 — 두 번 인코딩되면 증상이 100% 폴백이라 가장 늦게 발견된다",
+    );
+  } finally {
+    stopEncoded();
+    await upstream.close();
+  }
+
+  console.log(`find_disposal_spots smoke test passed (${upstream.requests.length} upstream calls, all mocked)`);
+}
+
 await runSmoke();
+await runItemCardLabelSweep();
 await runWidgetBuilderCases();
 await runWidgetSmoke();
+await runSpotSmoke();
