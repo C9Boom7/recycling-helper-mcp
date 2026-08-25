@@ -11028,5 +11028,41 @@
       "\"matchedRegion\":\"경기도 부천시\"",
       "부천시보건소 가정 내 폐의약품 올바른 폐기방법 안내"
     ]
+  },
+  {
+    "id": "region_source_order_suwon_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 수원시",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 수원시\"",
+      "수원시 재활용분리배출"
+    ]
+  },
+  {
+    "id": "region_source_order_seodaemun_battery_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "서울 서대문구",
+      "itemName": "폐형광등"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"서울 서대문구\"",
+      "서대문구 폐금속자원 배출"
+    ]
+  },
+  {
+    "id": "region_source_order_namyangju_medicine_visible",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "경기도 남양주시",
+      "itemName": "폐의약품"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"경기도 남양주시\"",
+      "남양주보건소 폐의약품 배출 안내"
+    ]
   }
 ]
