@@ -32,3 +32,39 @@ jobs:
 
       # tsc 두 벌 + 데이터 검증 + 지역 매칭 + MCP 스모크(전부 localhost)
       - run: pnpm local:test
+
+  # 배포 경로는 PlayMCP in KC의 Git 소스 빌드, 즉 이 Dockerfile이다. 그런데 CI가
+  # 이미지를 한 번도 만들어 보지 않아서, 이미지에서만 나는 결함은 **재배포 클릭
+  # 직후**에야 드러났다. 빌드하고 실제로 띄워 /health까지 친다.
+  docker:
+    name: docker build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - run: docker build -t recycling-helper-mcp:ci .
+
+      - name: /health 응답 확인
+        run: |
+          set -euo pipefail
+          docker run -d --name mcp-ci -p 3000:3000 recycling-helper-mcp:ci
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/health -o /tmp/health.json; then break; fi
+            sleep 1
+          done
+          cat /tmp/health.json
+          # 데이터가 이미지에 함께 실렸는지까지 본다 — dist/data 복사가 빠지면
+          # 서버는 뜨는데 품목이 0개인 채로 응답한다.
+          node -e '
+            const health = require("/tmp/health.json");
+            const expected = require("./src/data/waste-items.json").length;
+            if (health.items !== expected) {
+              console.error(`health.items=${health.items}, expected ${expected}`);
+              process.exit(1);
+            }
+            console.log(`health.items=${health.items} (ok)`);
+          '
+
+      - if: always()
+        run: docker rm -f mcp-ci || true
