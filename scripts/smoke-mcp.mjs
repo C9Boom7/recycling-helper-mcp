@@ -982,7 +982,9 @@ async function runSmoke() {
 
       // R2-a 세 번째 갈래: 배출 그룹 라벨에 고를 어휘가 아예 없는 품목(`region_specific` →
       // "지역 확인 필요")은 거를 근거가 없으니 지역 출처를 전부 낸다. 대표 1개로 줄이면
-      // 도봉구 sources[0]인 스마트클린 도봉만 남아 정작 이 품목이 봐야 할 수거함 안내를 잃는다.
+      // 도봉구 sources[0] 하나만 남아 이 품목이 봐야 할 다른 안내를 잃는다 — 그 자리가 무엇인지는
+      // 출처 순서에 달려 있어(2026-08-25 순서 정리로 바뀌었다) 지역 출처를 전부 내는 이 갈래
+      // 자체가 안전장치다.
       const ledText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "LED등", region: "서울 도봉구" }, requestId++));
       const ledSources = sliceFrom(ledText, "### 서울 도봉구 공식 출처", "도봉구 LED등");
       assert(ledSources.includes("도봉구 폐형광등·폐건전지 배출안내"), "도봉구 LED등: 고를 어휘가 없는 품목에서 지역 출처를 대표 1개로 잘라 수거함 안내를 잃었다");
@@ -1289,6 +1291,36 @@ async function runSmoke() {
         );
       }
     }
+    // 수거함 안내 근거가 구조화 출력에 남는지 **자치구 전수**로 본다. 케이스 몇 건으로
+    // 막으면 안 짚은 지역이 조용히 되돌아간다 — 출처를 하나 끼워 넣는 것만으로 밀려나고,
+    // 본문은 여전히 "약국·행정복지센터에 내세요"라고 말하는데 근거 링크만 사라진다.
+    //
+    // `officialSources`는 앞 세 개까지인데 요일 출처가 한 자리를 예약하므로 실제 창은 둘이다.
+    // 안내인지는 제목이 아니라 `basis`까지 봐야 한다 — 서대문 「폐금속자원 배출」·수원
+    // 「재활용분리배출」은 제목에 낱말이 없고 근거에만 있다.
+    const GUIDE_KINDS = [
+      { label: "폐의약품", re: /의약품/ },
+      { label: "폐건전지·폐형광등", re: /건전지|전지류|형광등|배터리/ },
+    ];
+    for (const policy of regionPolicies) {
+      if (policy.coverageTier === "metro") continue;
+      const shown = (
+        await callTool(baseUrl, "get_region_disposal_info", { region: policy.name }, requestId++)
+      ).structuredContent?.officialSources ?? [];
+      for (const kind of GUIDE_KINDS) {
+        // 노출된 쪽은 `{title, url}`뿐이라 `basis`로 종류를 가릴 수 없다. 지역 데이터에서
+        // 그 종류의 출처를 먼저 고른 뒤 **URL로** 맞춘다.
+        const urls = (policy.sources ?? [])
+          .filter((source) => kind.re.test(source.title ?? "") || kind.re.test(source.basis ?? ""))
+          .map((source) => source.url);
+        if (urls.length === 0) continue;
+        assert(
+          shown.some((source) => urls.includes(source?.url)),
+          `${policy.name}: ${kind.label} 안내 출처를 갖고 있는데 officialSources에서 잘렸다 — 구조화만 읽는 호스트는 수거함 안내를 근거 없이 받는다`,
+        );
+      }
+    }
+
     assert(
       ownDayPageCount === REGIONS_WITH_OWN_DAY_PAGE,
       `자기 지자체 요일 페이지로 닫히는 지역이 ${ownDayPageCount}곳이다 (기대 ${REGIONS_WITH_OWN_DAY_PAGE}곳) — 줄었으면 출처의 basis가 선택 정규식에 안 걸리는 것이고, 늘었으면 이 숫자를 올린다`,
