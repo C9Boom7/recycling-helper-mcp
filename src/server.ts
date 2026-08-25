@@ -1144,7 +1144,9 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
 
   const lines = [
     "대청소 배출 계획",
-    region ? `지역: ${region}` : undefined,
+    // 원본 region이 아니라 다듬은 hintRegion을 쓴다 — `"   "`가 그대로 오면 원본은
+    // `지역:    ` 줄과 공백 문자열 필드를 낳는다.
+    hintRegion ? `지역: ${hintRegion}` : undefined,
     "",
     ...Array.from(groups.entries()).flatMap(([group, entries]) => [
       `## ${group}`,
@@ -1226,7 +1228,7 @@ async function handleMakeCleanupPlan({ items, region }: { items: string[]; regio
   return textResult(
     lines.join("\n"),
     {
-      region,
+      region: hintRegion,
       items: structuredItems,
       ...(hasCriticalItem && hintRegion
         ? {
@@ -1347,8 +1349,16 @@ function regionCoverageNote(regionMatch: MatchedRegionPolicy, namedSubRegion?: s
   return `${regionMatch.region.name} 기준으로 ${confirmed.join("와 ")}까지 확인했습니다.`;
 }
 
-const MEDICINE_ITEM_IDS = new Set(["medicine"]);
-const BATTERY_LAMP_ITEM_IDS = new Set(["battery", "power_bank", "fluorescent_lamp", "led_lamp", "incandescent_bulb"]);
+// 수거함 안내를 펼칠 품목은 수거함 묶음표(spot-categories.json)에서 파생한다. 목록을 따로
+// 들고 있으면 표가 늘 때 여기만 낡아도 아무도 모른다. 백열전구 하나만 여기서 더한다 —
+// 표에는 일부러 없다(수거함 대상이 아니라 find_disposal_spots는 폴백이 맞다). 하지만 지역
+// 수거함 안내의 전구류 예외 문장("백열전구·LED등은 특수마대")은 백열전구를 물었을 때도
+// 펼쳐야 한다.
+const MEDICINE_ITEM_IDS = new Set(spotCategories.find((category) => category.id === "medicine")?.itemIds ?? []);
+const BATTERY_LAMP_ITEM_IDS = new Set([
+  ...(spotCategories.find((category) => category.id === "battery_lamp")?.itemIds ?? []),
+  "incandescent_bulb",
+]);
 
 function collectionLines(label: string, method: string[] | undefined, expand: boolean): string[] {
   const filled = (method ?? []).filter((line) => typeof line === "string" && line.trim().length > 0);
@@ -1388,7 +1398,10 @@ function regionSpecialCollectionLines(region: RegionalPolicyData, item?: WasteIt
   ];
 }
 
-async function handleGetRegionDisposalInfo({ region, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
+async function handleGetRegionDisposalInfo({ region: rawRegion, itemName }: { region: string; itemName?: string }): Promise<LoggedToolResult> {
+  // 앞뒤 공백은 여기서 떼고 시작한다 — 다른 툴의 hintRegion과 같은 이유다. 원본을 쓰면
+  // `"  "`가 머리글(`   지역 확인 안내`)과 not_found 문장, structuredContent에 그대로 박힌다.
+  const region = rawRegion.trim();
   const resolved = itemName ? resolveWasteItem(itemName) : undefined;
   const match = resolved?.status === "match" ? resolved.match : undefined;
   const ambiguousCandidates =
@@ -1715,11 +1728,18 @@ function spotFallbackResult(params: {
             ? `${dong}에서 전용 수거함류 배출 장소는 찾지 못했습니다. 이렇게 확인해 보세요.`
             : `${dong}에 등록된 배출 장소를 찾지 못했습니다. 이렇게 확인해 보세요.`;
 
+  // 품목은 확정됐는데 걸리는 수거함 묶음이 없으면(소파·백열전구) "못 찾았다"로만 끝내지
+  // 않는다 — 이 동에 없는 게 아니라 수거함이 답이 아닌 품목이라, 그 품목의 기본 배출
+  // 경로를 한 줄 밝힌다. 묶음이 있으면 예전처럼 묶음의 일반 안내가 그 자리다.
+  const itemRouteLine =
+    category?.fallbackLine ??
+    (item ? `${item.name}은(는) 동네 전용 수거함으로 배출하는 품목이 아닙니다. ${item.summary}` : undefined);
+
   const lines = [
     opening,
     `- ${REGION_SELECT_GUIDE_LINK.title}에서 지역을 골라 수거함 안내를 확인하세요: ${REGION_SELECT_GUIDE_LINK.url}`,
     ...regionSourceLines,
-    category ? `- ${category.fallbackLine}` : undefined,
+    itemRouteLine ? `- ${itemRouteLine}` : undefined,
   ].filter((line) => line !== undefined);
 
   return textResult(
@@ -1732,7 +1752,7 @@ function spotFallbackResult(params: {
         ...(regionSources.length > 0
           ? { regionSources: regionSources.map((source) => ({ title: source.title, url: source.url })) }
           : {}),
-        ...(category ? { itemLine: category.fallbackLine } : {}),
+        ...(itemRouteLine ? { itemLine: itemRouteLine } : {}),
       },
     },
     log,
@@ -2359,11 +2379,23 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(PORT, HOST, (error?: Error) => {
-  if (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
-
+// listen 콜백은 'listening' 리스너라 인자를 받지 않는다 — 예전의 `(error?: Error)` 분기는
+// 죽은 코드였고, 포트 충돌 같은 실제 기동 실패는 'error' 이벤트로 온다.
+const httpServer = app.listen(PORT, HOST, () => {
   console.log(`${SERVICE_NAME} MCP server listening at http://${HOST}:${PORT}`);
 });
+httpServer.on("error", (error: Error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+});
+
+// k8s가 파드를 내릴 때 SIGTERM을 보낸다. 기본 동작(즉시 종료)이면 진행 중이던 tools/call의
+// 연결이 끊긴다 — QA 기간에는 하루 한두 번 재배포가 예정돼 있어 그때마다 오류 창이 생긴다.
+// 새 연결만 닫고 진행 중 요청을 마친 뒤 내려가되, 5초 안에 안 끝나면 강제 종료한다.
+const SHUTDOWN_TIMEOUT_MS = 5_000;
+for (const signal of ["SIGTERM", "SIGINT"] as const) {
+  process.on(signal, () => {
+    httpServer.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), SHUTDOWN_TIMEOUT_MS).unref();
+  });
+}
