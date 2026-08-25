@@ -189,10 +189,11 @@ type ToolLogMeta = {
    */
   inputSource?: InputSource;
   /**
-   * 외부 조회가 어떻게 끝났는지 — `ok` | `timeout` | `http` | `empty` | `truncated`
-   * (PRD phase-12 R6). `find_disposal_spots`에만 실린다. 사용자에게 나가는 응답은
-   * 실패 종류를 감추고 폴백 하나로 접으므로, 이 칸이 **실패를 세는 유일한 자리**다.
-   * 값은 클라이언트 모듈이 정하는 낱말이라 호출자 문자열도 키도 섞일 수 없다.
+   * 외부 조회가 어떻게 끝났는지 — `ok` | `empty` | `truncated` | `timeout` | `http` |
+   * `body` | `network`(PRD phase-12 R6, 실패 갈래는 `SpotLookup` 주석). `find_disposal_spots`
+   * 에만 실린다. 사용자에게 나가는 응답은 실패 종류를 감추고 폴백 하나로 접으므로, 이 칸이
+   * **실패를 세는 유일한 자리**다. 값은 클라이언트 모듈이 정하는 낱말이라 호출자 문자열도
+   * 키도 섞일 수 없다.
    */
   upstream?: string;
   /** 그 외부 조회에 걸린 시간. 툴 전체 `ms`와 갈라 봐야 느린 쪽이 우리인지 그쪽인지 안다. */
@@ -1641,12 +1642,18 @@ function districtNames(match: MatchedRegionPolicy, namedSubRegion?: string): str
  * 반대로 광역까지만 좁혀진 질의에는 시·군·구 이름이 없으므로 광역만 본다 — 광역 이름은
  * 전국에서 유일하니 그것만으로도 오염이 섞이지 않는다.
  */
-function addressInRegion(addrBase: string, metroNames: string[], districts: string[]): boolean {
+function addressInRegion(addrBase: string, metroNames: string[], districtPatterns: RegExp[]): boolean {
   if (metroNames.length > 0 && !metroNames.some((name) => addrBase.startsWith(name))) return false;
-  // 시·군·구는 어절 첫머리에서만 찾는다. 부분 문자열로 보면 이름을 품은 이웃 구가 통과한다 —
-  // `부산 서구` 질의에 강서구 주소가, `인천 동구`에 남동구 주소가 남는 식이다.
-  if (districts.length > 0 && !districts.some((name) => new RegExp(`(^|\\s)${escapeRegExp(name)}`).test(addrBase))) return false;
+  if (districtPatterns.length > 0 && !districtPatterns.some((pattern) => pattern.test(addrBase))) return false;
   return true;
+}
+
+// 시·군·구는 어절 첫머리에서만 찾는다. 부분 문자열로 보면 이름을 품은 이웃 구가 통과한다 —
+// `부산 서구` 질의에 강서구 주소가, `인천 동구`에 남동구 주소가 남는 식이다.
+// 정규식은 이름당 한 번만 만든다 — 행마다 만들면 한 호출에 최대 1,000행 × 표기 수만큼
+// 컴파일한다(g 플래그가 없어 재사용해도 상태가 남지 않는다).
+function districtPatternsOf(districts: string[]): RegExp[] {
+  return districts.map((name) => new RegExp(`(^|\\s)${escapeRegExp(name)}`));
 }
 
 function escapeRegExp(text: string): string {
@@ -1756,6 +1763,9 @@ async function handleFindDisposalSpots({
   const baseLog: ToolLogMeta = {
     matchedId: matchedItem?.id,
     matchedRegion: regionMatch?.region.name,
+    // 세 툴이 같은 어휘로 남기는 지역 해상도 축(regionStatusFor 주석). 이 툴만 빠져
+    // 있으면 "동은 댔는데 구를 몰라 되물은 비율"이 집계에서 안 보인다.
+    regionStatus: regionStatusFor(hintRegion),
     upstreamMs: lookup.ms,
   };
 
@@ -1776,8 +1786,8 @@ async function handleFindDisposalSpots({
   if (regionMatch) {
     const metroNames = metroPrefixNames(regionMatch.region);
     // 행마다 다시 계산하지 않는다 — 한 호출에 최대 1,000행을 거른다.
-    const districts = districtNames(regionMatch, namedSubRegion);
-    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districts));
+    const districtPatterns = districtPatternsOf(districtNames(regionMatch, namedSubRegion));
+    rows = lookup.rows.filter((row) => addressInRegion(row.addrBase, metroNames, districtPatterns));
     regionLabel = regionMatch.region.name;
   } else {
     // 역추적 색인 없이 수렴만 본다(R4). 등록 지역 40곳짜리 색인으로 "이 동은 유일하다"를

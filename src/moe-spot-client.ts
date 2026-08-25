@@ -2,9 +2,9 @@
  * 기후에너지환경부 분리배출 정보조회 서비스의 `getSpot` 클라이언트 (PRD phase-12 R1).
  *
  * 이 서버의 **유일한 외부 런타임 의존**이라, 이 파일이 하는 일의 절반은 조회가 아니라
- * "실패했을 때 조용히 물러나기"다. 타임아웃·HTTP 오류·JSON 파싱 실패·비정상 resultCode를
- * 전부 하나의 실패로 접어 돌려주고, 호출부(`find_disposal_spots` 핸들러)는 그걸 폴백으로
- * 받는다. 실패 종류를 가르는 것은 `_log` 한 곳뿐이다.
+ * "실패했을 때 조용히 물러나기"다. 어떤 실패든 던지지 않고 실패값으로 돌려주고,
+ * 호출부(`find_disposal_spots` 핸들러)는 그걸 폴백으로 받는다. 실패 종류를 가르는 것은
+ * `_log` 한 곳뿐이다(`SpotLookup` 주석 참고).
  *
  * 키를 다루는 곳도 여기 하나다. 키는 로그·오류·응답 어디에도 싣지 않는다.
  */
@@ -100,9 +100,15 @@ export type SpotLookup =
       ms: number;
     }
   | {
-      /** 타임아웃과 그 밖의 실패(HTTP 오류·게이트웨이 XML·비정상 resultCode)만 가른다. */
+      /**
+       * 실패 갈래. 값은 로그(`_log.upstream`)에만 실리고 사용자 응답은 어느 쪽이든 같은
+       * 폴백이다. 한 낱말로 접어 두면 프리징 기간에 원인을 좁힐 수 없어 가른다 —
+       * `http`는 HTTP 상태 오류, `body`는 본문 해석 실패(게이트웨이 XML = 키 오류·한도
+       * 초과, 비정상 resultCode 포함), `network`는 fetch 자체가 던진 실패(DNS·연결 거부)다.
+       * 키를 잘못 넣은 "툴은 등록됐는데 100% 폴백"은 body가 쌓이는 모양으로 나타난다.
+       */
       ok: false;
-      upstream: "timeout" | "http";
+      upstream: "timeout" | "http" | "body" | "network";
       ms: number;
     };
 
@@ -205,12 +211,52 @@ function parseSpotBody(text: string): ParsedSpotBody | undefined {
 }
 
 /**
+ * 동 이름 캐시. 공공데이터포털 개발계정에는 일 호출 한도가 있고, 한도를 넘기면 그날
+ * 남은 시간 내내 게이트웨이 오류(→ 100% 폴백)라 **한도 소진이 곧 툴의 수명**이다.
+ * 같은 동을 몇 분 안에 다시 물으면 나가지 않게 막는다. 무상태 서버 원칙은 사용자
+ * 상태에 대한 것이라 프로세스 내 응답 캐시는 어긋나지 않는다.
+ *
+ * 성공 응답만 담는다 — 실패를 담으면 일시 장애가 TTL 동안 고정된다. 상한을 넘으면
+ * 가장 오래 담긴 것부터 지운다. `SPOT_CACHE_TTL_MS=0`으로 끌 수 있다(스모크가 목
+ * 업스트림 시나리오를 동 이름별로 갈아 끼우기 위해 쓴다).
+ */
+const SPOT_CACHE_TTL_MS = (() => {
+  const raw = (process.env.SPOT_CACHE_TTL_MS ?? "").trim();
+  const parsed = Number(raw);
+  return raw !== "" && Number.isFinite(parsed) && parsed >= 0 ? parsed : 300_000;
+})();
+const SPOT_CACHE_MAX_ENTRIES = 500;
+const spotCache = new Map<string, { expiresAt: number; result: SpotLookup }>();
+
+/**
  * 동 이름 하나로 배출 장소를 한 번 조회한다. 쪽 넘김도 재시도도 없다.
  *
  * 키는 URL에만 실리고 반환값에는 어떤 형태로도 담기지 않는다 — 실패 이유조차 낱말 하나로만
  * 돌려주는 이유가 그것이다. 이 함수는 아무것도 로그로 찍지 않는다.
+ *
+ * 캐시에 걸리면 fetch 없이 그 결과를 그대로 돌려준다. `ms`도 원 조회의 값이다 —
+ * 로그의 upstreamMs는 "업스트림이 얼마나 걸렸나"를 재는 자리라 0으로 덮지 않는다.
  */
 export async function findSpotsByDong(dong: string): Promise<SpotLookup> {
+  if (SPOT_CACHE_TTL_MS > 0) {
+    const cached = spotCache.get(dong);
+    if (cached) {
+      if (cached.expiresAt > Date.now()) return cached.result;
+      spotCache.delete(dong);
+    }
+  }
+  const result = await fetchSpotsByDong(dong);
+  if (SPOT_CACHE_TTL_MS > 0 && result.ok) {
+    if (spotCache.size >= SPOT_CACHE_MAX_ENTRIES) {
+      const oldest = spotCache.keys().next().value;
+      if (oldest !== undefined) spotCache.delete(oldest);
+    }
+    spotCache.set(dong, { expiresAt: Date.now() + SPOT_CACHE_TTL_MS, result });
+  }
+  return result;
+}
+
+async function fetchSpotsByDong(dong: string): Promise<SpotLookup> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   const startedAt = Date.now();
@@ -225,7 +271,7 @@ export async function findSpotsByDong(dong: string): Promise<SpotLookup> {
     if (!response.ok) return { ok: false, upstream: "http", ms };
 
     const parsed = parseSpotBody(text);
-    if (!parsed) return { ok: false, upstream: "http", ms };
+    if (!parsed) return { ok: false, upstream: "body", ms };
 
     /**
      * 절단은 오류가 아니라 **특정 묶음이 통째로 빠진 완전해 보이는 답**으로 나타난다.
@@ -243,7 +289,7 @@ export async function findSpotsByDong(dong: string): Promise<SpotLookup> {
     const ms = Date.now() - startedAt;
     // 예외 메시지는 읽지 않는다 — 무엇이 담겨 있든 우리가 쓸 것은 "시간을 넘겼나"뿐이다.
     const timedOut = controller.signal.aborted || (error instanceof Error && error.name === "AbortError");
-    return { ok: false, upstream: timedOut ? "timeout" : "http", ms };
+    return { ok: false, upstream: timedOut ? "timeout" : "network", ms };
   } finally {
     clearTimeout(timer);
   }

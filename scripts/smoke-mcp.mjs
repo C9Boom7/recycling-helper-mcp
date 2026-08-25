@@ -240,7 +240,7 @@ async function getFreePort() {
   return port;
 }
 
-function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl = "" } = {}) {
+function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl = "", spotCacheTtlMs = "0" } = {}) {
   const server = spawn(process.execPath, ["dist/server.js"], {
     env: {
       ...process.env,
@@ -262,6 +262,10 @@ function startServer(port, { widgets = false, serviceKey = "", upstreamBaseUrl =
       // 케이스만 더미 키와 목 주소를 함께 넘긴다.
       DATA_GO_KR_SERVICE_KEY: serviceKey,
       MOE_API_BASE_URL: upstreamBaseUrl,
+      // 기본은 캐시 끔. 스팟 스모크가 같은 동 이름으로 시나리오(성공·필터·품목별)를
+      // 갈아 끼우며 업스트림 호출 수를 단언하므로, 캐시가 켜져 있으면 판정이 캐시
+      // 적중 순서에 얹힌다. 캐시 자체는 인코딩 키 서버에서 켜고 따로 잰다.
+      SPOT_CACHE_TTL_MS: spotCacheTtlMs,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -3104,6 +3108,8 @@ async function runSpotSmoke() {
   const encodedRun = startServer(encodedPort, {
     serviceKey: SPOT_DUMMY_ENCODED_KEY,
     upstreamBaseUrl: upstream.baseUrl,
+    // 이 서버만 캐시를 켠다 — 같은 동 재질의가 업스트림으로 다시 나가지 않는지를 여기서 잰다.
+    spotCacheTtlMs: "300000",
   });
   const stopEncoded = () => {
     if (!encodedRun.server.killed) encodedRun.server.kill("SIGTERM");
@@ -3113,11 +3119,24 @@ async function runSpotSmoke() {
   try {
     const encodedBaseUrl = `http://${HOST}:${encodedPort}`;
     await waitForHealth(encodedBaseUrl, encodedRun.getOutput);
-    await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 1);
+    const cacheMiss = await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 1);
     const encodedRequest = upstream.requests.at(-1);
     assert(
       encodedRequest.rawQuery.includes(`serviceKey=${SPOT_DUMMY_ENCODED_KEY}`),
       "인코딩 키는 그대로 보내야 한다 — 두 번 인코딩되면 증상이 100% 폴백이라 가장 늦게 발견된다",
+    );
+
+    // 동 이름 캐시. 개발계정 일 한도 소진이 곧 툴의 수명이라, 같은 동 재질의가 TTL 안에
+    // 업스트림으로 다시 나가면 안 된다 — 응답은 첫 조회와 같아야 한다.
+    const callsBeforeCacheHit = upstream.requests.length;
+    const cacheHit = await callTool(encodedBaseUrl, "find_disposal_spots", { dong: "상계동", region: "서울 노원구" }, 2);
+    assert(
+      upstream.requests.length === callsBeforeCacheHit,
+      `같은 동 재질의가 업스트림으로 다시 나갔다 — 캐시가 동작하지 않는다 (${callsBeforeCacheHit} → ${upstream.requests.length})`,
+    );
+    assert(
+      resultText(cacheHit) === resultText(cacheMiss),
+      "캐시 적중 응답이 첫 조회와 다르다",
     );
   } finally {
     stopEncoded();
