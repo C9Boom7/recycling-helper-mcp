@@ -893,7 +893,17 @@ function photoConfirmLine(item: WasteItem): string {
   return `사진 속 물건은 "${item.name}" 품목 기준으로 안내합니다. 다르면 품목명을 알려주세요.`;
 }
 
-async function handleClassifyWasteItem({ itemName, region }: { itemName: string; region?: string }): Promise<LoggedToolResult> {
+async function handleClassifyWasteItem({
+  itemName,
+  region: rawRegion,
+}: {
+  itemName: string;
+  region?: string;
+}): Promise<LoggedToolResult> {
+  // 공백만 온 지역은 안 온 것으로 본다. `make_cleanup_plan`의 hintRegion과 같은 이유다 —
+  // `optionalRegionParam`에 trim이 없어 `"   "`가 그대로 들어오는데, 그 값은 매칭에서
+  // 못 찾은 지역이 되고 되비추는 줄과 structuredContent에는 공백이 그대로 실린다.
+  const region = rawRegion?.trim() || undefined;
   const resolved = resolveWasteItem(itemName);
   if (resolved.status === "not_found") return withRegionStatusLog(unknownItemResult(itemName), region);
   if (resolved.status === "ambiguous") {
@@ -940,13 +950,17 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
 
 async function handleGetDisposalSteps({
   itemName,
-  region,
+  region: rawRegion,
   inputSource,
 }: {
   itemName: string;
   region?: string;
   inputSource?: InputSource;
 }): Promise<LoggedToolResult> {
+  // 공백만 온 지역은 안 온 것으로 본다(handleClassifyWasteItem과 같은 이유). 다듬지 않으면
+  // `formatItemGuide`가 `-     기준 수거함 위치…`를 찍고 structuredContent의 `region`에도
+  // 공백이 그대로 실린다.
+  const region = rawRegion?.trim() || undefined;
   const resolved = resolveWasteItem(itemName);
   // 되묻는 두 갈래는 이미 "이게 맞냐"고 묻고 있어서 확인 문구를 겹쳐 붙일 자리가 없다.
   // 사진에서 왔다는 표시만 로그에 남긴다.

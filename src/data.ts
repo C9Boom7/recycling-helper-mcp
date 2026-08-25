@@ -309,15 +309,16 @@ export function inferMaterialCategories(query: string, limit = 2): string[] {
     return [materialOnly];
   }
 
-  // 매칭 게이트가 "이름은 걸렸지만 그 물건이 아니다"라고 판정한 질의는 추정하지 않는다.
-  // 이 표는 부분 문자열 스캔이라, 게이트가 막은 본체(소파 커버의 소파, 가스레인지 후드의
-  // 가스)를 재질 원칙으로 되살린다. 틀린 재질 원칙은 일반 메뉴보다 권위 있게 읽히므로
-  // (위 표 주석), 게이트 발동 질의는 메뉴 + 되묻기로 착지시킨다.
-  if (isGateSuppressedQuery(query)) {
-    return [];
-  }
-
-  const lowered = query.toLowerCase();
+  // 매칭 게이트가 "이름은 걸렸지만 그 물건이 아니다"라고 판정한 질의는, 걸린 이름을 지우고
+  // 남은 말만 훑는다. 표가 부분 문자열 스캔이라 그냥 두면 게이트가 막은 본체(소파 커버의
+  // 소파, 가스레인지 후드의 가스)가 재질 원칙으로 되살아나는데, 틀린 재질 원칙은 일반
+  // 메뉴보다 권위 있게 읽힌다(위 표 주석).
+  //
+  // 그렇다고 질의를 통째로 버리면 사용자가 **직접 말한** 재질까지 같이 죽는다 — `비닐 소파
+  // 커버`의 비닐, `플라스틱 소파 커버`의 플라스틱은 소파와 상관없이 그 사람이 댄 단서다.
+  // 지우고 남는 게 없으면(`소파 커버`) 예전처럼 빈 목록 → 메뉴 + 되묻기로 착지한다.
+  const fragments = gateSuppressedFragments(query);
+  const lowered = (fragments.length > 0 ? stripRawFragments(query, fragments) : query).toLowerCase();
   const categories: string[] = [];
   for (const { category, pattern } of MATERIAL_QUERY_PATTERNS) {
     if (categories.length >= limit) break;
@@ -723,20 +724,70 @@ function isSwallowedByGatedSpan(gate: PartCompoundGate, gatedSpans: NameSpan[]):
 }
 
 /**
- * 매칭 게이트(부품어 게이트, 가스레인지 비매칭 복합어)가 발동하는 질의인가.
+ * 게이트가 발동했을 때 지울 가스레인지 표기. 순서가 답을 가른다 — `레인지후드`를 먼저
+ * 지우면 `가스레인지 후드`에서 `가스`가 남아 유해·고압 갈래로 되살아난다.
+ */
+const GAS_RANGE_QUERY_SPELLINGS = ["가스레인지", "가스렌지", "레인지후드", "렌지후드"];
+
+/**
+ * 매칭 게이트(부품어 게이트, 가스레인지 비매칭 복합어)가 발동했다면, 질의에서 지울 원문
+ * 조각들을 돌려준다. 발동하지 않았으면 빈 배열이다.
  *
  * 게이트는 "이름은 찾았지만 그 물건이 아니다"는 판정인데, not_found 폴백의
  * `inferMaterialCategories`가 같은 질의를 부분 문자열로 다시 훑으면 방금 막은
  * 본체의 답이 재질 원칙으로 되살아난다("소파 커버"에 대형폐기물 신고 안내).
  * 매칭이 성공한 질의는 폴백에 오지 않으므로, 이 판정은 not_found가 난 질의의
  * 원인 후보에 게이트가 있는지를 묻는 자리에서만 평가된다.
+ *
+ * 참/거짓이 아니라 조각 목록인 이유는 폴백이 질의를 통째로 버리지 않기 위해서다.
+ * 걸린 이름만 지우면 `비닐 소파 커버`의 비닐처럼 사용자가 직접 댄 재질이 살아남는다.
  */
-function isGateSuppressedQuery(query: string): boolean {
-  if (isGasRangeNonmatchCompound(query)) return true;
+function gateSuppressedFragments(query: string): string[] {
+  const fragments: string[] = [];
+  if (isGasRangeNonmatchCompound(query)) fragments.push(...GAS_RANGE_QUERY_SPELLINGS);
+
   const normalizedQuery = normalizeText(query);
-  if (!normalizedQuery) return false;
+  if (!normalizedQuery) return fragments;
+
   const wordIndex = buildQueryWordIndex(query);
-  return indexedItems.some((indexed) => partCompoundGateOf(normalizedQuery, wordIndex, indexed.names).gated);
+  for (const indexed of indexedItems) {
+    if (!partCompoundGateOf(normalizedQuery, wordIndex, indexed.names).gated) continue;
+    // 긴 이름부터 지운다. `알약`을 먼저 지우면 `알약 포장재 커버`에 `포장재`가 남아
+    // 비닐류로 되살아난다 — 게이트가 막은 바로 그 이름의 뒷조각이다.
+    fragments.push(
+      ...[...indexed.names].sort((a, b) => b.normalized.length - a.normalized.length).map(({ name }) => name),
+    );
+  }
+
+  return fragments;
+}
+
+/** 조각 글자 사이에 낄 수 있는 것 — 띄어쓰기와 문장부호. `normalizeText`가 지우는 것과 같다. */
+const RAW_FRAGMENT_GAP = "[^\\p{L}\\p{N}]*";
+
+function rawFragmentPattern(fragment: string): RegExp | undefined {
+  const chars = [...fragment].filter((char) => /[\p{L}\p{N}]/u.test(char));
+  if (chars.length === 0) return undefined;
+  return new RegExp(chars.map((char) => char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(RAW_FRAGMENT_GAP), "giu");
+}
+
+/**
+ * 질의 **원문**에서 조각을 지운다. 정규화 문자열의 구간을 원문 좌표로 되돌리지 않는 건
+ * 일부러다 — 되돌리려면 정규화 단계마다 좌표 매핑을 들고 다녀야 하는데, 그 복잡도로 얻는 건
+ * 드문 표기 몇 개다. 대신 글자 사이에 공백·문장부호가 끼는 것까지 받아(`가스 레인지 후드`)
+ * 흔한 표기를 덮는다.
+ *
+ * 지우기가 실패해 이름이 남아도 최악이 예전 동작(게이트 이전의 되살아남)이라 파괴적이지 않다.
+ * 지금 지켜야 하는 기대 목록은 `scripts/evaluate-data.ts`의 `materialInferenceExpectations`다.
+ */
+function stripRawFragments(query: string, fragments: string[]): string {
+  let stripped = query;
+  for (const fragment of fragments) {
+    const pattern = rawFragmentPattern(fragment);
+    if (pattern) stripped = stripped.replace(pattern, " ");
+  }
+
+  return stripped;
 }
 
 function stripShortAliasParticle(token: string): string {
@@ -1580,6 +1631,10 @@ export function resolveRegionalPolicyIn(policies: RegionalPolicyData[], region?:
     }
     // 후보가 하나여도 되묻는다. 이 필드의 계약이 "이름만으로 광역이 안 정해진다"라,
     // 나머지 보유 지역이 미등록이라는 이유로 확정하면 안 된다.
+    //
+    // ③을 마지막에 넣으므로, 후보가 상한(7)을 넘는 날 잘려 나가는 쪽은 미등록 구를 실제로
+    // 받아주는 광역이다. 지금은 최대 6이고 `scripts/test-region-matching.ts`의 "후보에 해당
+    // 광역 포함" 단언이 그 순간 깨지므로 침묵 회귀는 아니다 — 넘치면 순서부터 다시 본다.
     return { status: "ambiguous", candidates: Array.from(byRegionId.values()).slice(0, MAX_AMBIGUOUS_CANDIDATES) };
   }
 
