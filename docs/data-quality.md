@@ -9,7 +9,7 @@
 새 품목은 단순 FAQ 문장이 아니라 아래 축을 함께 가진다.
 
 - `name`, `aliases`: 사용자가 실제로 말할 법한 이름과 별칭
-- `category`, `disposalType`: 내부 분류와 최종 배출 판단
+- `category`, `disposalType`: 내부 분류와 최종 배출 판단. 둘 다 lowercase snake_case 키라 사용자에게 그대로 보이면 안 된다 — `disposalType`은 `disposal-groups.json`을 거쳐 `배출 그룹` 라벨로만 나가고, `category`는 나가는 자리가 없다(재질 질의 가산점 계산에만 쓴다)
 - `conditions`: 판단을 바꾸는 상태 태그
 - `summary`, `steps`, `cautions`: 사용자에게 보여줄 답변 재료
 - `needsRegionCheck`, `regionPolicy`: 지역 확인 필요 여부와 확인 항목
@@ -28,6 +28,8 @@
 2. `condition-labels.json`에 한글 라벨을 붙인다. 어투는 기존 라벨을 따라 짧은 명사구로 맞춘다.
 
 `validate-data.mjs`가 둘의 전수 대응을 강제한다. 라벨 없는 태그를 쓰면 error, 아무 품목도 안 쓰는 라벨이 남아 있으면 warning이다.
+
+매핑이 멀쩡해도 렌더링이 그 매핑을 안 거치면 소용없으므로, 카드 쪽은 smoke의 `runItemCardLabelSweep`이 따로 본다. 카드 머리말의 `- 키: 값` 줄을 카탈로그 전 품목에 대해 훑어 한글이 한 글자도 없는 값이 있으면 떨어뜨린다. 머리말에 새 줄을 붙일 때는 이 검사를 먼저 통과시켜야 한다.
 
 뜻이 다른 태그로 이미 덮이는 상태라면 태그를 새로 만들기 전에 카드를 렌더해 본다. 카드의 다른 줄이 이미 같은 말을 하고 있으면 태그를 붙이는 쪽이 오히려 군더더기다 — `자가주사기 주사바늘`의 `region_specific`이 그랬다. `판단 범위` 줄과 `지역 확인 필요` 블록이 이미 지역 확인을 말하고 있어서 태그를 뺐다.
 

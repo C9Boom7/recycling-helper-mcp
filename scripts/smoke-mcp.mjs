@@ -1990,6 +1990,107 @@ async function runWidgetBuilderCases() {
 }
 
 /**
+ * `- 키: 값` 머리말에 영문 내부 키가 새지 않는지 카탈로그 전수로 본다.
+ *
+ * 이 자리는 세 번 같은 식으로 샜다 — `- 판단 조건:`이 조건 키를(PR #75), `- 분류:`가
+ * `category`를, `- 배출 판단:`이 `disposalType`을 그대로 찍었다. 셋 다 데이터가 아니라
+ * 렌더링 쪽 결함이라 `validate-data.mjs`의 매핑 전수 대응 검사로는 걸리지 않는다.
+ * 매핑이 멀쩡해도 그 매핑을 안 거치고 원본을 찍으면 그만이기 때문이다.
+ *
+ * **표면을 둘 다 훑는다.** 처음 넣을 때는 `formatItemGuide`만 봤는데, 같은 머리말을 찍는
+ * 자리가 `classify_waste_item`의 텍스트 갈래에도 있다(`분류 결과:`로 시작하는 블록).
+ * 그쪽은 `- 세부 판단:`으로 `disposalType`을 그대로 내던 세 번째 누수 지점인데 가드가
+ * 안 닿아, 같은 줄을 도로 넣어도 스위트가 초록불이었다. HTTP 스모크를 품목 수만큼 더
+ * 때우는 대신 조립부를 `formatClassifyResultText`로 빼서 여기서 나란히 렌더한다.
+ *
+ * 대상은 이 둘뿐이다. `check_confusing_item`은 `1. 소파` 아래에 세 칸 들여쓴
+ * `   - 결론:` 후보 목록을, `make_cleanup_plan`은 `## 배출 그룹` 아래에
+ * `- 입력 -> 품목명: 요약` 항목 줄을 낸다. 카드 머리말과 모양이 달라 여기 억지로 끼우면
+ * 검사 대상이 아닌 줄까지 잡는다(두 툴 모두 값은 이미 라벨 함수를 거친다).
+ *
+ * 머리말만 보는 이유는 `### 배출 방법`부터는 URL과 출처 제목이 섞이기 때문이고,
+ * 새 줄이 붙는 자리도 머리말이다. 키별로 무엇을 요구하는지는 아래 목록을 본다.
+ */
+
+/**
+ * 머리말 키를 성격별로 가른다. 값을 우리가 매핑으로 짓는 줄, 사람이 쓴 문장이 실리는 줄,
+ * 외부 문자열이 그대로 오는 줄을 한 자로 재면 한쪽은 오탐이 나고 다른 쪽은 누수를 놓친다.
+ *
+ * **라벨 목록**은 `, `로 쪼개 토큰마다 한글을 요구한다. 값 전체에 한글 한 글자만 있으면
+ * 통과시키면 `- 판단 조건: 전자제품, foo bar`처럼 여럿 중 **하나만** 영문인 모양이 그대로
+ * 빠져나가는데, 그게 바로 PR #75가 닫은 누수다(라벨 없는 조건 하나가 영문으로 샜다).
+ *
+ * **문장**은 값 전체에 한글이 있으면 통과다. 사람이 쓴 문장이라 쉼표로 쪼개면 오탐이 난다.
+ *
+ * **모르는 키는 라벨 목록과 같은 엄격한 규칙을 쓴다.** 머리말에 줄을 새로 붙이는 사람이
+ * 그 줄을 어느 갈래에 둘지 여기에 적게 만드는 게 요점이다. 조용히 통과시키면 검사에
+ * 구멍이 도로 난다.
+ */
+const ITEM_CARD_LABEL_LIST_KEYS = ["판단 조건", "배출 그룹", "확신도", "지역 영향"];
+const ITEM_CARD_SENTENCE_KEYS = ["결론", "판단 범위", "입력 지역"];
+/**
+ * 검사에서 빼는 키. **사유를 안 적으면 다음 사람이 "왜 여기만 빠졌지" 하고 도로 넣는다.**
+ *
+ * `대표 근거`는 `briefSourceLabel`이 짓는 줄이라 출처 제목 + basis + URL이 그대로 실린다.
+ * 우리가 라벨로 짓는 값이 아니라 데이터가 가진 문자열이다. 지금은 336개 제목에 다 한글이
+ * 있어 통과하지만, 영문 제목 출처가 하나 들어오거나 `sources`가 비어 `sourceRefs[0]`이
+ * ASCII인 품목이 생기면 CI가 "영문 키 누수"라는 **틀린 진단**으로 떨어진다 — 데이터
+ * 선택을 렌더링 결함으로 오인시키는 메시지다.
+ */
+const ITEM_CARD_EXEMPT_KEYS = ["대표 근거"];
+
+/** 새는 토큰을 돌려준다. 깨끗하면 `undefined`. */
+function findItemCardHeaderLeak(key, value) {
+  if (ITEM_CARD_EXEMPT_KEYS.includes(key)) return undefined;
+  const tokens = ITEM_CARD_SENTENCE_KEYS.includes(key) ? [value] : value.split(", ");
+  return tokens.find((token) => !/[가-힣]/.test(token));
+}
+
+async function runItemCardLabelSweep() {
+  const { formatClassifyResultText, formatItemGuide, wasteItems } = await import("../dist/data.js");
+  const surfaces = [
+    ["get_disposal_steps 카드", formatItemGuide],
+    ["classify_waste_item 텍스트", formatClassifyResultText],
+  ];
+  const leaked = [];
+  const seenKeys = new Set();
+
+  for (const item of wasteItems) {
+    // 지역을 넘겨 지역 줄이 붙는 갈래까지 같은 렌더로 훑는다.
+    for (const region of [undefined, "서울 강남구"]) {
+      for (const [surface, render] of surfaces) {
+        // 첫 줄(`## 품목명`·`분류 결과: 품목명`)은 `- `로 시작하지 않아 아래 정규식에
+        // 걸리지 않는다. 표면마다 자를 자리를 따로 세지 않으려고 그대로 흘려보낸다.
+        for (const line of render(item, region).split("\n")) {
+          if (line.startsWith("###")) break;
+          const field = /^- ([^:]+): (.+)$/.exec(line);
+          if (!field) continue;
+          seenKeys.add(field[1]);
+          const leak = findItemCardHeaderLeak(field[1], field[2]);
+          if (leak !== undefined)
+            leaked.push(`${item.id} (${surface}, region=${region ?? "없음"}): ${line}\n    새는 값: "${leak}"`);
+        }
+      }
+    }
+  }
+
+  assert(leaked.length === 0, `item card header leaked a non-Korean value:\n${leaked.slice(0, 5).join("\n")}`);
+
+  // 목록에 없는 키가 나왔다면 엄격한 규칙으로 이미 검사한 뒤다. 통과했더라도 어느 갈래에
+  // 둘지는 사람이 정해야 해서 여기서 이름을 부른다 — 쉼표로 잇는 문장 키가 목록 밖에
+  // 남아 있으면 다음에 값이 늘 때 오탐으로 떨어진다.
+  const classified = [...ITEM_CARD_LABEL_LIST_KEYS, ...ITEM_CARD_SENTENCE_KEYS, ...ITEM_CARD_EXEMPT_KEYS];
+  const unclassified = [...seenKeys].filter((key) => !classified.includes(key));
+  if (unclassified.length > 0)
+    console.log(`  머리말에 갈래가 안 정해진 키가 있다(엄격 규칙으로 검사함): ${unclassified.join(", ")}`);
+
+  console.log(
+    `Item card label sweep passed: ${wasteItems.length} items x 2 region modes x ${surfaces.length} surfaces, ` +
+      `머리말 키 ${seenKeys.size}종(라벨 목록은 토큰 단위, 문장은 값 단위, \`${ITEM_CARD_EXEMPT_KEYS.join("`·`")}\`는 면제)`,
+  );
+}
+
+/**
  * Every item through the widget path once. The 183 get_disposal_steps answer
  * cases are pinned to WIDGET_ENABLED=false, so on their own they would only
  * cover a shape production never serves (R1 leaves widgets on by default) —
@@ -2938,6 +3039,7 @@ async function runSpotSmoke() {
 }
 
 await runSmoke();
+await runItemCardLabelSweep();
 await runWidgetBuilderCases();
 await runWidgetSmoke();
 await runSpotSmoke();

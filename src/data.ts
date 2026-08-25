@@ -1730,6 +1730,23 @@ export function publicReviewMetadata(item: WasteItem): Pick<ReviewMetadata, "sta
   return { status: item.review.status };
 }
 
+/**
+ * 한 줄짜리 대표 근거. `### 근거` 목록과 달리 출처 하나만, 제목 + basis + URL로 줄인다.
+ *
+ * `src/server.ts`에 있던 것을 옮겼다. `formatClassifyResultText`가 이걸 쓰는데, 그 함수는
+ * `scripts/smoke-mcp.mjs`의 카드 라벨 전수 스윕이 서버를 띄우지 않고 부를 수 있어야 한다.
+ */
+export function briefSourceLabel(item: WasteItem): string {
+  const source = item.sources[0];
+  if (source) {
+    const basis = source.basis ? ` - ${source.basis}` : "";
+    const url = source.url ? ` (${source.url})` : "";
+    return `${source.title}${basis}${url}`;
+  }
+
+  return item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
+}
+
 export function formatSourceList(item: WasteItem): string[] {
   if (item.sources?.length > 0) {
     return item.sources.map((source) => {
@@ -2485,8 +2502,18 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   const lines = [
     `## ${item.name}`,
     "",
-    `- 분류: ${item.category}`,
-    `- 배출 판단: ${item.disposalType}`,
+    // `category`는 카드에서 뺐다. 품목 336개에 값이 105가지고 그중 52개가 품목 하나에만
+    // 붙은 일회용 이름(`wax_mixed_container`·`mixed_vacuum_bottle`)이라, 사용자가 다른
+    // 품목과 견줄 수 있는 분류 체계가 아니다. 실제 쓰임도 `scoreItem`이
+    // 재질 질의에 가산점을 줄 때 부분 문자열로 훑는 게 전부다. 한글 라벨을 붙이는 건
+    // 105개를 통제 어휘로 묶어 계속 관리하겠다는 뜻인데, 그 대가로 얻는 줄이 바로
+    // 아래 `결론`보다 사용자에게 덜 말해 준다.
+    //
+    // `disposalType`도 같은 이유로 원본 대신 배출 그룹 라벨을 찍는다. 이름을 `배출
+    // 그룹`으로 맞춘 건 위젯 캡션·`classify_waste_item`·structuredContent의
+    // `disposalGroup`이 이미 그 이름으로 같은 값을 부르고 있어서다 — 툴만 갈아탄
+    // 사용자가 같은 값을 다른 이름으로 두 번 만나지 않게 한다.
+    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
     `- 결론: ${item.summary}`,
     `- 확신도: ${confidenceLabel(item.confidence)}`,
     `- 판단 범위: ${itemRegionGuidance(item)}`,
@@ -2554,6 +2581,49 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   }
 
   return lines.join("\n");
+}
+
+/**
+ * `classify_waste_item`의 텍스트 응답. 위젯을 끈 갈래(`WIDGET_ENABLED=false`)에서만 나간다.
+ *
+ * `handleClassifyWasteItem`([src/server.ts](../src/server.ts)) 안에 있던 조립부를 그대로 옮긴
+ * 것이다 — 문구도 줄 순서도 손대지 않았다. 밖으로 뺀 이유는 하나뿐이다. 이 자리는 카드
+ * 머리말과 똑같이 `- 키: 값`을 찍는 **두 번째 표면**인데, `formatItemGuide`만 부르던
+ * `runItemCardLabelSweep`([scripts/smoke-mcp.mjs](../scripts/smoke-mcp.mjs))이 여기는 못 봤다.
+ * 핸들러 안에 있으면 스윕이 카탈로그 전수로 훑으려면 HTTP를 품목 수만큼 더 때려야 한다.
+ *
+ * 지역 매칭을 인자로 받지 않고 여기서 다시 짓는 건 `formatItemGuide`와 같은 방식이다.
+ * 핸들러가 이미 가진 값을 넘기게 하면 스윕이 그 유도식을 베껴 써야 하고, 그러면 핸들러가
+ * 조건을 고칠 때 스윕만 옛 갈래를 훑는다.
+ */
+export function formatClassifyResultText(item: WasteItem, region?: string): string {
+  const regionMatch = itemNeedsRegionCheck(item) ? findRegionalPolicy(region) : undefined;
+
+  // `- 세부 판단: ${item.disposalType}`가 여기 있었다. 바로 위 `배출 그룹`이 같은
+  // 값을 한국어로 이미 말하고 있어서 남는 건 영문 키뿐이었고, 모델이 원본 키를 볼
+  // 자리는 structuredContent의 `disposalType`으로 따로 있다.
+  return [
+    `분류 결과: ${item.name}`,
+    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
+    `- 결론: ${item.summary}`,
+    `- 확신도: ${confidenceLabel(item.confidence)}`,
+    `- 지역 영향: ${itemRegionCheckLabel(item)}`,
+    `- 판단 범위: ${itemRegionGuidance(item)}`,
+    `- 대표 근거: ${briefSourceLabel(item)}`,
+    itemNeedsCriticalRegionCheck(item)
+      ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
+      : itemNeedsRegionCheck(item)
+      ? // 이 줄도 요일을 말하므로 확인처까지 함께 낸다. 지역 툴만 닫혀 있어서, 같은
+        // 사람이 툴만 갈아타면 되묻기가 그대로 살아났다.
+        withCollectionDaySourceLine(
+          "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
+          regionMatch,
+        )
+      : undefined,
+    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 /**

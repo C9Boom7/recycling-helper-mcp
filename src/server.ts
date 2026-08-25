@@ -11,6 +11,7 @@ import { toJsonSchemaCompat } from "@modelcontextprotocol/sdk/server/zod-json-sc
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import type { MatchedRegionPolicy, MaterialGuideline, RegionalPolicyData, WasteItem, WasteMatch } from "./data.js";
 import {
+  briefSourceLabel,
   collectionDayCheckLine,
   confidenceLabel,
   disposalGroupLabel,
@@ -26,6 +27,7 @@ import {
   findRegionItemGuide,
   findRegisteredDistricts,
   findWasteItems,
+  formatClassifyResultText,
   formatItemGuide,
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
@@ -504,17 +506,6 @@ function widgetResult(
   };
 }
 
-function briefSourceLabel(item: WasteItem): string {
-  const source = item.sources[0];
-  if (source) {
-    const basis = source.basis ? ` - ${source.basis}` : "";
-    const url = source.url ? ` (${source.url})` : "";
-    return `${source.title}${basis}${url}`;
-  }
-
-  return item.sourceRefs[0] ?? "재활용척척 보수 안내 정책";
-}
-
 // Title-only variant for list-shaped outputs (cleanup plan) where the full
 // basis + URL label would balloon the text for every item.
 function briefSourceTitle(item: WasteItem): string {
@@ -933,31 +924,10 @@ async function handleClassifyWasteItem({ itemName, region }: { itemName: string;
     return widgetResult(matchedItemWidget(item, regionMatch, { region }), structured, log);
   }
 
-  const text = [
-    `분류 결과: ${item.name}`,
-    `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
-    `- 세부 판단: ${item.disposalType}`,
-    `- 결론: ${item.summary}`,
-    `- 확신도: ${confidenceLabel(item.confidence)}`,
-    `- 지역 영향: ${itemRegionCheckLabel(item)}`,
-    `- 판단 범위: ${itemRegionGuidance(item)}`,
-    `- 대표 근거: ${briefSourceLabel(item)}`,
-    itemNeedsCriticalRegionCheck(item)
-      ? "- 전용 수거함, 지정 수거처, 대형폐기물 신고 또는 수수료처럼 지역 기준이 실제 배출 방법을 바꿀 수 있습니다."
-      : itemNeedsRegionCheck(item)
-      ? // 이 줄도 요일을 말하므로 확인처까지 함께 낸다. 지역 툴만 닫혀 있어서, 같은
-        // 사람이 툴만 갈아타면 되묻기가 그대로 살아났다.
-        withCollectionDaySourceLine(
-          "- 기본 판단은 가능하며, 실제 배출 요일·장소나 수거함·회수 가능 여부만 거주지 기준에 맞추면 됩니다.",
-          regionMatch,
-        )
-      : undefined,
-    region && itemNeedsRegionCheck(item) ? `- 입력 지역: ${region}` : undefined,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  return textResult(text, structured, log);
+  // 조립부는 `formatClassifyResultText`로 나가 있다. 카드 머리말과 같은 `- 키: 값`을 찍는
+  // 두 번째 표면이라 `runItemCardLabelSweep`이 카탈로그 전수로 훑어야 하는데, 핸들러 안에
+  // 두면 스윕이 품목 수만큼 HTTP를 더 때려야 한다.
+  return textResult(formatClassifyResultText(item, region), structured, log);
 }
 
 async function handleGetDisposalSteps({
