@@ -2017,7 +2017,7 @@
     ]
   },
   {
-    "id": "home_injection_needle_sharps_contact_required",
+    "id": "home_injection_needle_general_safe_wrap",
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "주사바늘 달린 자가주사기는 어떻게 버려?",
@@ -2025,20 +2025,22 @@
     },
     "expectedTextIncludes": [
       "자가주사기 주사바늘",
-      "일반쓰레기나 재활용품",
-      "뚫리지 않는 용기",
-      "보건소",
-      "처방 의료기관",
-      "약국",
-      "지자체"
+      "의료폐기물이 아닙니다",
+      "밀봉",
+      "종량제봉투",
+      "전용 수거함"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"home_injection_needle\"",
       "\"matchedBy\":\"주사바늘 달린 자가주사기는 어떻게 버려\"",
-      "\"regionNotes\""
+      "\"disposalGroup\":\"일반쓰레기\"",
+      "\"regionCheckLevel\":\"참고\""
     ],
     "expectedStructuredExcludes": [
       "\"id\":\"plastic_food_container\""
+    ],
+    "expectedTextExcludes": [
+      "처방 의료기관"
     ]
   },
   {
@@ -3250,18 +3252,18 @@
     },
     "expectedTextIncludes": [
       "고양이 모래",
-      "벤토나이트 모래",
-      "불연성종량제봉투",
-      "고양이 두부모래",
+      "벤토나이트",
+      "불연성 종량제 마대",
+      "두부모래",
       "종량제봉투",
       "변기",
-      "지역 하수"
+      "하수"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"cat_litter\"",
-      "\"matchedBy\":\"고양이 모래\"",
-      "\"status\":\"region_review_needed\"",
-      "\"regionCheckLevel\":\"참고\""
+      "\"matchedBy\":\"벤토나이트\"",
+      "\"disposalGroup\":\"일반쓰레기/불연성\"",
+      "\"regionCheckLevel\":\"필수\""
     ]
   },
   {
@@ -10526,6 +10528,251 @@
     ]
   },
   {
+    "id": "moe_mouse_pad_not_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마우스패드"
+    },
+    "expectedTextIncludes": [
+      "마우스패드",
+      "종량제봉투"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"mouse_pad\"",
+      "\"disposalGroup\":\"일반쓰레기\""
+    ],
+    "expectedTextExcludes": [
+      "소형 전기전자제품 전용수거함"
+    ]
+  },
+  {
+    "id": "moe_sewing_needle_not_medical",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "바늘"
+    },
+    "expectedTextIncludes": [
+      "바늘",
+      "종량제봉투",
+      "감쌉니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"sewing_needle\""
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"home_injection_needle\""
+    ]
+  },
+  {
+    "id": "moe_cooking_oil_container_not_oil",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "식용유 용기"
+    },
+    "expectedTextIncludes": [
+      "식용유 용기",
+      "플라스틱류"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cooking_oil_container\"",
+      "\"disposalGroup\":\"재활용\""
+    ],
+    "expectedTextExcludes": [
+      "전용 수거함을 이용하고, 소량은 흡수"
+    ]
+  },
+  {
+    "id": "moe_toothbrush_holder_not_toothbrush",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "칫솔 꽂이"
+    },
+    "expectedTextIncludes": [
+      "칫솔꽂이",
+      "재질",
+      "불연성"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toothbrush_holder\"",
+      "\"disposalGroup\":\"재활용/일반쓰레기/불연성\""
+    ]
+  },
+  {
+    "id": "moe_nasal_spray_is_medicine",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "나잘스프레이"
+    },
+    "expectedTextIncludes": [
+      "폐의약품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"medicine\"",
+      "\"matchedBy\":\"나잘스프레이\""
+    ],
+    "expectedTextExcludes": [
+      "스프레이캔"
+    ]
+  },
+  {
+    "id": "moe_insulation_not_packing_styrofoam",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "단열스티로폼"
+    },
+    "expectedTextIncludes": [
+      "단열재",
+      "대형폐기물"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"insulation_foam\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedTextExcludes": [
+      "스티로폼류로 배출"
+    ]
+  },
+  {
+    "id": "moe_radon_bed_not_mattress",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "라돈 침대"
+    },
+    "expectedTextIncludes": [
+      "라돈",
+      "역회수"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"radon_bed\"",
+      "\"regionCheckLevel\":\"필수\""
+    ],
+    "expectedTextExcludes": [
+      "대형폐기물 신고 페이지에서 품목을 선택"
+    ]
+  },
+  {
+    "id": "moe_bidet_group_is_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "비데"
+    },
+    "expectedTextIncludes": [
+      "소형 전기전자제품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"bidet\"",
+      "\"disposalGroup\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "moe_toothbrush_sterilizer_group",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "칫솔살균기"
+    },
+    "expectedTextIncludes": [
+      "소형 전기전자제품"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"toothbrush_sterilizer\"",
+      "\"disposalGroup\":\"소형가전\""
+    ]
+  },
+  {
+    "id": "moe_keyboard_skin_not_keyboard",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "키보드 스킨"
+    },
+    "expectedTextIncludes": [
+      "찾지 못했습니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ],
+    "expectedTextExcludes": [
+      "소형가전"
+    ]
+  },
+  {
+    "id": "moe_phone_accessory_not_phone",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스마트폰 액세서리"
+    },
+    "expectedTextIncludes": [
+      "찾지 못했습니다"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false"
+    ],
+    "expectedTextExcludes": [
+      "개인정보를 삭제"
+    ]
+  },
+  {
+    "id": "moe_mouse_still_small_electronics",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "마우스"
+    },
+    "expectedTextIncludes": [
+      "소형가전"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"small_electronics\""
+    ]
+  },
+  {
+    "id": "moe_instant_rice_container_survives_gate",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "즉석밥 용기"
+    },
+    "expectedTextIncludes": [
+      "즉석밥"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"instant_rice_container\""
+    ]
+  },
+  {
+    "id": "moe_syringe_not_medical_waste",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "인슐린 주사기 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "의료폐기물이 아닙니다",
+      "종량제봉투",
+      "밀봉"
+    ],
+    "expectedTextExcludes": [
+      "처방 의료기관"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"home_injection_needle\"",
+      "\"disposalGroup\":\"일반쓰레기\""
+    ]
+  },
+  {
+    "id": "moe_bentonite_litter_nonburnable",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "벤토나이트 모래 어떻게 버려?"
+    },
+    "expectedTextIncludes": [
+      "불연성 종량제 마대",
+      "두부모래",
+      "변기"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"cat_litter\"",
+      "\"disposalGroup\":\"일반쓰레기/불연성\"",
+      "\"regionCheckLevel\":\"필수\""
+    ]
+  },
+  {
     "id": "p9_dalseo_fee_line",
     "tool": "get_disposal_steps",
     "arguments": {
@@ -10664,11 +10911,13 @@
       "itemName": "자가주사기 주사바늘"
     },
     "expectedTextIncludes": [
-      "- 판단 조건: 유해/위험 품목, 날카로움, 안전 포장 필요",
-      "### 지역 확인 필요"
+      "- 판단 조건: 날카로움, 안전 포장 필요",
+      "종량제봉투"
     ],
     "expectedTextExcludes": [
-      "region specific"
+      "region specific",
+      "유해/위험 품목",
+      "### 지역 확인 필요"
     ]
   },
   {

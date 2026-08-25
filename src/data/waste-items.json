@@ -3102,7 +3102,11 @@
       "알약",
       "시럽약",
       "연고",
-      "약"
+      "약",
+      "나잘스프레이",
+      "비강 스프레이",
+      "코 스프레이",
+      "콧물 스프레이"
     ],
     "category": "hazardous",
     "disposalType": "special_collection",
@@ -3176,6 +3180,14 @@
         "checkedAt": "2026-06-27",
         "basis": "약국, 보건소, 주민센터 등 폐의약품 수거함 위치는 지역별로 확인합니다.",
         "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 나잘스프레이",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%82%98%EC%9E%98%EC%8A%A4%ED%94%84%EB%A0%88%EC%9D%B4",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「나잘스프레이」의 배출방법을 «폐의약품 수거함»로 안내합니다.",
+        "note": "「나잘스프레이」가 스프레이캔으로 오매칭돼 캔 재활용 안내가 나가던 것을 막는 직접 근거입니다."
       }
     ],
     "review": {
@@ -4233,71 +4245,83 @@
     "name": "고양이 모래",
     "aliases": [
       "벤토나이트 모래",
+      "벤토나이트",
       "두부모래",
-      "반려동물 모래"
+      "고양이 두부모래",
+      "반려동물 모래",
+      "고양이 화장실 모래",
+      "규사 모래"
     ],
     "category": "pet_waste",
-    "disposalType": "general",
-    "summary": "사용한 고양이 모래는 일반쓰레기로 배출하는 것이 일반적이며 변기에 버리지 않습니다.",
+    "disposalType": "general_or_nonburnable_by_material",
+    "summary": "고양이 모래는 재질에 따라 갈립니다. 두부모래처럼 타는 재질은 종량제봉투로, 벤토나이트·규사처럼 광물성이라 타지 않는 재질은 불연성 종량제 마대로 배출합니다.",
     "steps": [
-      "배설물을 포함해 밀봉합니다.",
-      "종량제봉투에 일반쓰레기로 배출합니다."
+      "제품 표시에서 두부(콩비지·전분)인지 광물(벤토나이트·규사)인지 확인합니다.",
+      "배설물을 포함해 새지 않게 밀봉합니다.",
+      "두부모래처럼 가연성이면 종량제봉투로 배출합니다.",
+      "벤토나이트·규사처럼 불연성이면 불연성 종량제 마대(지역에 따라 PP마대·특수규격봉투)로 배출합니다.",
+      "불연성 마대 제도를 따로 두지 않는 지자체도 있으니 거주지 기준을 확인합니다."
     ],
     "cautions": [
-      "변기에 버리면 배관 막힘과 수질 문제가 생길 수 있습니다.",
-      "제품별 변기 배출 가능 표기가 있어도 지역 하수 기준을 확인하세요."
+      "변기나 하수구에 버리지 않습니다. 하수관이 막힐 수 있습니다.",
+      "제품에 변기 배출 가능이라고 적혀 있어도 지역 하수 기준을 먼저 확인합니다.",
+      "불연성 마대의 이름과 판매처는 지자체마다 다르고, 세종시처럼 가연성·불연성을 한 봉투로 받는 곳도 있습니다."
     ],
     "confidence": "medium",
     "needsRegionCheck": true,
     "sourceRefs": [
-      "생활폐기물 분리배출 누리집"
+      "생활폐기물 분리배출 누리집 품목사전: 벤토나이트 모래",
+      "생활폐기물 분리배출 누리집 품목사전: 고양이 두부모래",
+      "세종특별자치시 고양이 모래 분리배출 안내"
     ],
-    "conditions": [],
+    "conditions": [
+      "pet_waste",
+      "nonburnable"
+    ],
     "regionPolicy": {
       "scope": "region_specific",
       "needsRegionCheck": true,
-      "reason": "세부 배출 기준이나 전용 수거함 운영 여부가 지역별로 다를 수 있습니다.",
+      "regionCheckLevel": "required",
+      "reason": "벤토나이트·규사를 받는 불연성 종량제 마대의 운영 여부와 이름이 지자체 조례마다 다릅니다. 가연성·불연성을 한 봉투로 받는 지자체도 있습니다.",
       "checkItems": [
+        "불연성 종량제 마대 운영 여부와 판매처",
         "품목별 지역 배출 기준",
-        "재활용품 배출 요일",
-        "전용 수거함 운영 여부",
-        "주택 유형별 배출 방식"
+        "지역 하수 배출 기준"
       ]
     },
     "sources": [
       {
         "title": "생활폐기물 분리배출 누리집 품목사전 - 벤토나이트 모래",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=507",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%B2%A4%ED%86%A0%EB%82%98%EC%9D%B4%ED%8A%B8%20%EB%AA%A8%EB%9E%98",
         "sourceType": "official_guidance",
-        "checkedAt": "2026-07-02",
-        "basis": "벤토나이트 모래는 재활용이 어렵고 불에 타지 않는 불연성폐기물에 해당하므로 불연성종량제봉투(마대)로 배출합니다. 하수관이 막힐 수 있으므로 변기나 하수구에 배출하지 않습니다.",
-        "note": "Top item source 감사에서 확인한 고양이 모래 대표 품목사전 직접 근거입니다."
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 벤토나이트 모래를 «불연성종량제폐기물»로 분류하고 «불연성종량제봉투(마대)로 배출»하도록 안내합니다. 「하수관이 막힐수 있으므로 변기, 하수구에 배출 금지」도 같은 페이지에 있습니다."
       },
       {
         "title": "생활폐기물 분리배출 누리집 품목사전 - 고양이 두부모래",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?niIdx=423",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EA%B3%A0%EC%96%91%EC%9D%B4%20%EB%91%90%EB%B6%80%EB%AA%A8%EB%9E%98",
         "sourceType": "official_guidance",
-        "checkedAt": "2026-07-02",
-        "basis": "고양이 두부모래는 콩비지와 전분으로 만든 가연성 제품이므로 종량제봉투로 배출합니다. 모래 성상이 규사, 벤토나이트 등 불연성 모래인 경우에는 불연성종량제봉투에 담아 배출합니다.",
-        "note": "Top item source 감사에서 확인한 고양이 모래 대표 품목사전 직접 근거입니다."
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 두부모래를 «콩비지와 전분으로 만든 제품으로 불에 타는 가연성»이라 종량제봉투로 안내하고, 같은 페이지에서 「고양이 모래 성상이 불연성 모래(규사, 벤토나이트 등)인 경우에는 불연성종량제봉투에 담아서 배출」한다고 재질 구분을 명시합니다.",
+        "note": "재질을 가르지 않고 전부 일반 종량제봉투로 안내하던 것을 고친 직접 근거입니다."
       },
       {
-        "title": "생활폐기물 분리배출 누리집 지역별 정보",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
+        "title": "세종특별자치시 고양이 모래 분리배출 안내",
+        "url": "https://www.sejong.go.kr/bbs/R3880/view.do?nttId=B000000139298Qn5eM4b&mno=sub06_01",
         "sourceType": "local_guidance",
-        "checkedAt": "2026-06-27",
-        "basis": "변기 배출 가능 표기와 별개로 지역 하수·폐기물 기준 확인이 필요합니다.",
-        "note": "지역별 수거함, 배출일, 신고 방식 확인용 출처입니다."
+        "checkedAt": "2026-08-25",
+        "basis": "세종시는 폐기물관리 조례 제16조제3항에 따라 가연성·불연성 생활쓰레기를 일반용(재사용) 봉투로 함께 받는다고 안내합니다.",
+        "note": "불연성 마대 구분이 전국 공통이 아니라는 반례라, 지역 확인 안내를 함께 두는 근거입니다."
       }
     ],
     "review": {
       "status": "region_review_needed",
-      "reviewer": "official-source-enrichment",
-      "lastReviewedAt": "2026-06-27",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
       "notes": [
-        "Top 50 데이터 보강 과정에서 공식 출처와 판단 근거를 구조화했습니다.",
-        "품목 기본 판단은 있으나 수거함 위치, 배출일, 신고 방식 등 지역 기준 확인이 필요합니다.",
-        "2026-07-02 Top item source 감사에서 벤토나이트 모래와 고양이 두부모래 품목사전 직접 근거를 추가했습니다."
+        "환경부 분리배출 API 대조: 사전은 벤토나이트(불연성 마대)와 두부모래(종량제봉투)를 나누는데 우리 카드는 둘을 묶어 전부 일반쓰레기로 안내했습니다.",
+        "재질 구분은 근거 문장에만 들어 있어 사용자가 보는 본문과 배출 그룹에는 반영되지 않았습니다. 본문·disposalType을 함께 고쳤습니다.",
+        "불연성 마대는 지자체 조례 영역이라 전국 공통이 아닙니다(세종시 반례). 지역 확인을 참고 등급으로 함께 안내합니다."
       ]
     }
   },
@@ -8516,87 +8540,69 @@
       "주사바늘 달린 자가주사기는 어떻게 버려"
     ],
     "category": "medical_sharps",
-    "disposalType": "hazardous_sharps_collection_contact_required",
-    "summary": "자가주사기 주사바늘은 찔림 사고와 감염 위험이 있는 날카로운 폐기물입니다. 일반쓰레기나 재활용품으로 바로 넣지 말고, 뚫리지 않는 용기에 담아 밀봉한 뒤 보건소, 처방 의료기관, 약국, 지자체 수거 기준을 확인합니다.",
+    "disposalType": "general_safe_wrap",
+    "summary": "가정에서 나온 주사기와 인슐린 펜니들은 의료폐기물이 아닙니다. 바늘이 밖으로 나오지 않게 단단한 용기나 신문지·테이프로 충분히 감싸 밀봉한 뒤 종량제봉투로 배출합니다.",
     "steps": [
-      "사용한 바늘을 맨손으로 만지거나 임의로 분해하지 않습니다.",
-      "전용 수거용기나 두꺼운 플라스틱병처럼 뚫리지 않는 용기에 넣고 뚜껑을 닫습니다.",
-      "겉면에 주사바늘 또는 날카로운 폐기물이라고 표시합니다.",
-      "보건소, 처방받은 병원·의원, 약국, 거주 지자체에 가정 내 자가주사 바늘 회수 방법을 확인한 뒤 배출합니다.",
-      "의료기관에서 발생한 주사바늘은 의료기관의 의료폐기물 처리 절차를 따릅니다."
+      "바늘에 캡을 씌우거나, 빈 페트병처럼 뚫리지 않는 단단한 용기에 모읍니다.",
+      "용기가 없으면 신문지와 테이프로 날카로운 부분을 충분히 감쌉니다.",
+      "겉면에 날카로운 물건이라고 표시합니다.",
+      "종량제봉투로 배출합니다."
     ],
     "cautions": [
-      "주사바늘을 종량제봉투에 헐겁게 넣거나 재활용품으로 배출하지 않습니다.",
-      "바늘을 자르거나 구부리거나 힘으로 분리하지 않습니다.",
-      "다른 사람이 찔릴 수 있으므로 투명 봉투나 종이봉투에 그대로 담지 않습니다.",
-      "지역별 회수처와 접수 방식이 다를 수 있어 실제 배출 전 확인이 필요합니다."
+      "가정에서 나온 주사기는 폐의약품 수거함 대상이 아닙니다. 약국이나 보건소의 폐의약품 수거함에 넣지 않습니다.",
+      "일부 지자체는 폐주사기 전용 수거함을 따로 운영합니다. 거주지에 있으면 그쪽이 더 안전합니다.",
+      "바늘이 봉투를 뚫고 나오면 수거 작업자가 찔릴 수 있습니다. 밀봉이 이 품목의 핵심입니다."
     ],
-    "confidence": "medium",
+    "confidence": "high",
     "needsRegionCheck": true,
     "sourceRefs": [
-      "폐기물관리법 시행령 별표 2: 의료폐기물의 종류",
-      "생활폐기물 분리배출 누리집 지역별 정보",
-      "생활폐기물 분리배출 누리집 품목사전 검색: 주사바늘/자가주사기"
+      "생활폐기물 분리배출 누리집 품목사전: 주사기",
+      "생활폐기물 분리배출 누리집 품목사전: 인슐린주사기",
+      "환경부 의료폐기물 분류·관리 방법 안내(2014.11)"
     ],
     "conditions": [
-      "hazardous",
       "sharp",
       "safe_wrap_required"
     ],
     "regionPolicy": {
-      "scope": "local_collection_point",
+      "scope": "region_specific",
       "needsRegionCheck": true,
-      "reason": "가정에서 발생한 자가주사 바늘의 회수처, 접수 가능 여부, 포장 방식은 보건소·의료기관·지자체 기준 확인이 필요합니다.",
-      "checkItems": [
-        "보건소 또는 처방 의료기관 회수 가능 여부",
-        "약국 회수 가능 여부",
-        "전용 수거용기 또는 밀봉 용기 기준",
-        "지역 생활계 유해폐기물 또는 의료 관련 폐기물 문의처"
-      ]
+      "regionCheckLevel": "advisory",
+      "reason": "기본 배출은 전국 공통으로 종량제봉투지만, 일부 지자체는 폐주사기 전용 수거함을 운영합니다."
     },
     "sources": [
       {
-        "title": "폐기물관리법 시행령 별표 2 - 의료폐기물의 종류",
-        "url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%ED%8F%90%EA%B8%B0%EB%AC%BC%EA%B4%80%EB%A6%AC%EB%B2%95%EC%8B%9C%ED%96%89%EB%A0%B9/%EB%B3%84%ED%91%9C2",
-        "sourceType": "law",
-        "checkedAt": "2026-07-01",
-        "basis": "의료기관 등에서 발생하는 의료폐기물 중 주사바늘처럼 날카로운 폐기물은 별도 관리 대상입니다. 가정 자가주사 바늘은 생활폐기물 품목사전 단독 항목이 없어 안전상 의료성 날카로운 폐기물 기준을 참고합니다.",
-        "note": "가정 발생품의 직접 배출처가 아니라 위험성과 분리 관리 필요성을 판단하는 법령 보조 근거입니다."
-      },
-      {
-        "title": "환경부 생활계 유해폐기물 관리지침 - 폐주사기",
-        "url": "https://www.me.go.kr/m/file/readDownloadFile.do?fileId=153393&fileSeq=1",
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 주사기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%A3%BC%EC%82%AC%EA%B8%B0",
         "sourceType": "official_guidance",
-        "checkedAt": "2026-07-02",
-        "basis": "생활계 유해폐기물 분리수거 적용대상에 폐주사기를 포함하며, 폐주사기처럼 날카로운 폐기물은 신문지 등으로 포장한 뒤 딱딱한 종이 또는 플라스틱 용기 등에 담아 위험성을 표시해 배출하도록 안내합니다. 폐주사기 등은 다른 폐기물과 혼합되지 않도록 별도 배출함을 제작하고 표지판을 설치하도록 합니다.",
-        "note": "가정 발생 자가주사 바늘의 안전 포장과 지자체 분리수거 필요성을 보강하는 환경부 지침입니다."
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 주사기를 «일반폐기물 / 일반종량제폐기물»로 분류하고 「주사기는 충분히 감싼 후 종량제봉투로 배출합니다」라고 안내합니다. 특징에 「가정에서 발생하는 주사기는 폐의약품에 해당하지 않으며 의료폐기물에도 해당하지 않습니다」가 명시돼 있습니다.",
+        "note": "보건소·처방기관·약국 회수로 안내하던 것을 고친 직접 근거입니다."
       },
       {
-        "title": "생활폐기물 분리배출 누리집 지역별 정보",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/region/region.do",
-        "sourceType": "local_guidance",
-        "checkedAt": "2026-07-01",
-        "basis": "지역별 수거함, 지정 수거처, 배출 방식은 지자체 안내를 확인합니다.",
-        "note": "가정 내 자가주사 바늘은 보건소·처방기관·약국·지자체 기준 확인이 필요합니다."
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 인슐린주사기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%9D%B8%EC%8A%90%EB%A6%B0%EC%A3%BC%EC%82%AC%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 인슐린 주사기도 같은 분류와 배출방법으로 안내하며, 「가정에서 발생하는 인슐린 주사기는 폐의약품에 해당하지 않으며 의료폐기물에도 해당하지 않습니다」를 명시합니다."
       },
       {
-        "title": "생활폐기물 분리배출 누리집 품목사전 검색 - 주사바늘/자가주사기",
-        "url": "https://www.xn--oy2b29bd3a601b.kr/front/dischargeMethod/dictionary.do",
-        "sourceType": "manual_review",
-        "checkedAt": "2026-07-01",
-        "basis": "주사바늘, 주사침, 자가주사기 검색에서 단독 품목사전 항목을 확인하지 못했습니다. 따라서 일반쓰레기 확정 안내 대신 보건소·처방 의료기관·약국·지자체 문의를 우선 안내합니다.",
-        "note": "단독 공식 품목 근거가 없는 high-risk 품목이므로 지역 회수처 확인 안내를 답변에 고정합니다."
+        "title": "환경부 의료폐기물 분류·관리 방법 안내 (2014.11, 폐자원관리과)",
+        "url": "http://www.me.go.kr/home/file/readDownloadFile.do?fileId=110677&fileSeq=1",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "「의료폐기물에 해당하지 않은 폐기물」 목록에 «가정에서 발생하는 주사바늘, 거즈, 솜 등»이 들어 있습니다.",
+        "note": "폐기물관리법상 의료폐기물은 의료기관 등 시설에서 나온 것으로 한정되며, 가정 배출은 생활폐기물이라는 근거입니다."
       }
     ],
     "review": {
       "status": "region_review_needed",
-      "reviewer": "official-source-enrichment",
-      "lastReviewedAt": "2026-07-01",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
       "notes": [
-        "question-backlog의 주사바늘 달린 자가주사기 후보를 신규 품목, 평가 케이스, MCP 답변 케이스로 반영했습니다.",
-        "품목사전 단독 항목은 확인하지 못해 confidence는 medium으로 두고, 일반쓰레기·재활용품 직접 배출 금지와 회수처 확인을 우선합니다.",
-        "추후 강남구 보건소 또는 서울시 차원의 자가주사 바늘 회수 공지가 확인되면 source를 보강합니다.",
-        "2026-07-02 환경부 생활계 유해폐기물 관리지침에서 폐주사기 분리수거 대상 및 날카로운 폐기물 안전 포장 기준을 확인해 source를 보강했습니다."
+        "환경부 분리배출 API 대조: 사전은 주사기·인슐린주사기를 모두 종량제봉투로 안내하고, 가정 배출은 폐의약품도 의료폐기물도 아니라고 명시합니다.",
+        "기존 안내(보건소·처방기관·약국 회수)는 2019년 「생활계 유해폐기물 관리 가이드라인(안)」 계열 문구로 보이며, 2023.12 관리지침과 현행 품목사전은 밀봉 후 종량제봉투를 말합니다.",
+        "전용 수거함을 운영하는 지자체가 있어 지역 확인은 참고 등급으로 남겼습니다."
       ]
     }
   },
@@ -12974,7 +12980,7 @@
       "UV 칫솔살균기"
     ],
     "category": "small_appliance",
-    "disposalType": "recycle",
+    "disposalType": "small_electronics_collection",
     "conditions": [],
     "summary": "칫솔살균기는 소형 전기전자제품이므로 전용수거함으로 배출합니다.",
     "steps": [
@@ -13007,14 +13013,23 @@
         "sourceType": "official_guidance",
         "checkedAt": "2026-08-14",
         "basis": "칫솔살균기는 재활용폐기물(전기전자제품)로 소형전기전자제품 수거함에 배출. 5개 이상 배출 시 폐가전 무상방문수거(1599-0903) 이용 가능."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 칫솔살균기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%B9%AB%EC%86%94%EC%82%B4%EA%B7%A0%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「칫솔살균기」의 배출방법을 «소형전기전자제품 수거함 · 무상방문수거»로 안내합니다.",
+        "note": "카드 본문은 이미 소형가전 수거함을 안내하는데 배출 그룹만 «재활용»으로 나가던 것을 맞춘 근거입니다."
       }
     ],
     "review": {
       "status": "standard_import",
       "reviewer": "phase-2-coverage",
-      "lastReviewedAt": "2026-08-14",
+      "lastReviewedAt": "2026-08-25",
       "notes": [
-        "Phase 2 표준 티어 벌크 확장으로 추가."
+        "Phase 2 표준 티어 벌크 확장으로 추가.",
+        "2026-08-25 환경부 분리배출 API 대조: 본문은 소형가전 수거함을 안내하는데 disposalType이 recycle이라 배출 그룹이 «재활용»으로 나갔습니다. small_electronics_collection으로 맞췄습니다."
       ]
     }
   },
@@ -13028,7 +13043,7 @@
       "비데기"
     ],
     "category": "small_appliance",
-    "disposalType": "recycle",
+    "disposalType": "small_electronics_collection",
     "conditions": [],
     "summary": "전기비데는 전기전자제품이므로 소형 전기전자제품 전용수거함이나 폐가전 무상방문수거로 배출합니다.",
     "steps": [
@@ -13061,14 +13076,23 @@
         "sourceType": "official_guidance",
         "checkedAt": "2026-08-14",
         "basis": "전기비데는 재활용폐기물(전기전자 제품류)로 소형전기전자제품 전용수거함에 배출. 5개 이상 또는 대형 제품과 함께 배출 시 무상방문수거(1599-0903) 이용."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 전기비데",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%A0%84%EA%B8%B0%EB%B9%84%EB%8D%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「전기비데」의 배출방법을 «소형전기전자제품 수거함 · 무상방문수거»로 안내합니다.",
+        "note": "카드 본문은 이미 소형가전 수거함을 안내하는데 배출 그룹만 «재활용»으로 나가던 것을 맞춘 근거입니다."
       }
     ],
     "review": {
       "status": "standard_import",
       "reviewer": "phase-2-coverage",
-      "lastReviewedAt": "2026-08-14",
+      "lastReviewedAt": "2026-08-25",
       "notes": [
-        "Phase 2 표준 티어 벌크 확장으로 추가."
+        "Phase 2 표준 티어 벌크 확장으로 추가.",
+        "2026-08-25 환경부 분리배출 API 대조: 본문은 소형가전 수거함을 안내하는데 disposalType이 recycle이라 배출 그룹이 «재활용»으로 나갔습니다. small_electronics_collection으로 맞췄습니다."
       ]
     }
   },
@@ -21737,6 +21761,360 @@
         "PR #61 리뷰에서 '젖병 소독기'·'젖병 살균기'·'젖병 워머'가 두 글자 품목 이름 '젖병'에 걸려 79점으로 젖병 카드를 받던 것이 드러났다. 전기전자제품을 물었는데 플라스틱류 안내가 나가던 오답이라 단독 품목으로 세웠다.",
         "'젖병 워머'와 '젖병 중탕기'는 살균이 아니라 데우는 기계지만, 같은 소형전기전자 갈래라 전용수거함·무상방문수거 안내가 똑같아 이 품목의 별칭으로 함께 묶었다.",
         "무상방문수거를 안내하는 품목의 `needsRegionCheck: false`는 지역 신청 경로를 통째로 감췄던 전례(session-coordination.md, PR #16 후속)가 있어 `true`로 두고 `regionCheckLevel`도 `required`로 맞췄다."
+      ]
+    }
+  },
+  {
+    "id": "mouse_pad",
+    "name": "마우스패드",
+    "aliases": [
+      "마우스 패드",
+      "마우스패드 커버",
+      "게이밍 마우스패드",
+      "장패드"
+    ],
+    "category": "mixed_material",
+    "disposalType": "general",
+    "summary": "마우스패드는 고무 바닥에 천이나 코팅이 붙어 있어 재활용되지 않으므로 종량제봉투로 배출합니다.",
+    "steps": [
+      "젖어 있으면 말립니다.",
+      "종량제봉투에 들어가도록 접거나 잘라 넣습니다.",
+      "종량제봉투로 배출합니다."
+    ],
+    "cautions": [
+      "마우스는 소형 전기전자제품이라 배출 경로가 다릅니다. 마우스패드만 종량제봉투로 배출합니다.",
+      "고무와 천이 붙어 있어 분리되지 않으므로 재질별로 나누려 하지 않아도 됩니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 마우스패드"
+    ],
+    "conditions": [
+      "mixed_material"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "공식 품목사전이 마우스패드를 종량제봉투로 직접 안내합니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 마우스패드",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%A7%88%EC%9A%B0%EC%8A%A4%ED%8C%A8%EB%93%9C",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「마우스패드」의 배출방법을 «종량제봉투»로 안내합니다.",
+        "note": "마우스(소형가전)로 오매칭되던 것을 막는 직접 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「마우스패드」가 소형가전으로 오매칭되던 것을 확인해 추가했습니다."
+      ]
+    }
+  },
+  {
+    "id": "sewing_needle",
+    "name": "바늘",
+    "aliases": [
+      "바느질 바늘",
+      "재봉 바늘",
+      "시침바늘",
+      "자수 바늘",
+      "돗바늘"
+    ],
+    "category": "sharp",
+    "disposalType": "general_safe_wrap",
+    "summary": "바느질 바늘은 종량제봉투로 배출하되, 수거 작업자가 찔리지 않도록 단단한 통이나 두꺼운 종이에 감싸 밀봉합니다.",
+    "steps": [
+      "빈 페트병이나 단단한 통에 모으거나, 두꺼운 종이·테이프로 감쌉니다.",
+      "겉면에 날카로운 물건이라고 표시합니다.",
+      "종량제봉투로 배출합니다."
+    ],
+    "cautions": [
+      "주사기와 인슐린 펜니들도 같은 종량제봉투 대상이지만, 바늘이 봉투를 뚫지 않게 단단한 용기에 담아 밀봉하는 별도 카드를 따릅니다.",
+      "금속이지만 낱개로 고철류에 넣으면 선별 작업자가 다칠 수 있습니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 바늘"
+    ],
+    "conditions": [
+      "sharp",
+      "safe_wrap_required"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "공식 품목사전이 바늘을 종량제봉투로 직접 안내합니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 바늘",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%B0%94%EB%8A%98",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「바늘」의 배출방법을 «종량제봉투»로 안내합니다.",
+        "note": "「바늘」이 자가주사기 주사바늘로 오매칭돼 의료폐기물 절차를 안내하던 것을 막는 직접 근거입니다. 안전 포장은 가위·칼날 카드와 같은 기준을 씁니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「바늘」이 자가주사기 주사바늘로 오매칭되던 것을 확인해 추가했습니다.",
+        "포장 절차는 같은 sharp 계열인 가위·칼날 카드의 기준을 따랐습니다."
+      ]
+    }
+  },
+  {
+    "id": "cooking_oil_container",
+    "name": "식용유 용기",
+    "aliases": [
+      "식용유병",
+      "식용유 페트병",
+      "식용유 플라스틱 용기",
+      "콩기름 용기",
+      "카놀라유 용기"
+    ],
+    "category": "plastic_container",
+    "disposalType": "recycle",
+    "summary": "식용유 용기는 남은 기름을 따라내고 헹군 뒤 플라스틱류로 배출합니다.",
+    "steps": [
+      "남은 기름을 따라내고 키친타월로 안쪽을 닦습니다.",
+      "세제로 헹궈 기름기를 없애고 말립니다.",
+      "라벨을 떼고 플라스틱류로 배출합니다."
+    ],
+    "cautions": [
+      "기름이 남아 있으면 재활용되지 않아 종량제봉투로 가야 합니다.",
+      "따라낸 폐식용유는 용기와 갈래가 다릅니다. 양이 많으면 전용 수거함을, 소량은 흡수시켜 종량제봉투로 배출합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": false,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 식용유 용기"
+    ],
+    "conditions": [
+      "empty_required",
+      "plastic_container"
+    ],
+    "regionPolicy": {
+      "scope": "national_default",
+      "needsRegionCheck": false,
+      "reason": "공식 품목사전이 식용유 용기를 플라스틱 수거함으로 직접 안내합니다."
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 식용유 용기",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%8B%9D%EC%9A%A9%EC%9C%A0%20%EC%9A%A9%EA%B8%B0",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「식용유 용기」의 배출방법을 «플라스틱 수거함»로 안내합니다.",
+        "note": "용기가 내용물(폐식용유)로 오매칭돼 전용 수거함 안내가 나가던 것을 막는 직접 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "verified",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「식용유 용기」가 폐식용유(내용물)로 오매칭되던 것을 확인해 추가했습니다."
+      ]
+    }
+  },
+  {
+    "id": "insulation_foam",
+    "name": "단열재",
+    "aliases": [
+      "단열스티로폼",
+      "스티로폼 단열재",
+      "아이소핑크",
+      "건축용 단열재",
+      "압출법 단열재"
+    ],
+    "category": "bulky",
+    "disposalType": "bulky_waste_or_construction_waste",
+    "summary": "건축용 단열재는 포장용 스티로폼과 달리 재활용되지 않아, 대형폐기물로 신고하거나 전문 처리업체를 통해 배출합니다.",
+    "steps": [
+      "포장용 스티로폼이 아니라 건축·시공에 쓰인 단열재인지 확인합니다.",
+      "공사·인테리어 과정에서 나왔다면 공사장 생활폐기물이라 전문 처리업체를 이용합니다.",
+      "가정에서 소량 나온 경우 지자체 대형폐기물 신고 대상인지 확인합니다."
+    ],
+    "cautions": [
+      "흰색이어도 포장용 스티로폼 수거함에 넣지 않습니다. 난연제와 접착제가 섞여 있어 재활용 공정에 들어가지 않습니다.",
+      "공사에서 나온 양이 많으면 지자체 대형폐기물이 아니라 건설폐기물로 처리해야 합니다."
+    ],
+    "confidence": "high",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 단열스티로폼"
+    ],
+    "conditions": [
+      "bulky",
+      "mixed_material"
+    ],
+    "regionPolicy": {
+      "scope": "bulky_waste",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "대형폐기물 신고 대상인지, 공사장 폐기물로 처리해야 하는지가 지자체와 배출량에 따라 갈립니다.",
+      "checkItems": [
+        "대형폐기물 신고 대상 여부",
+        "공사장 생활폐기물 처리 기준",
+        "품목별 수수료"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 단열스티로폼",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%8B%A8%EC%97%B4%EC%8A%A4%ED%8B%B0%EB%A1%9C%ED%8F%BC",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「단열스티로폼」의 배출방법을 «대형폐기물 · 전문처리»로 안내합니다.",
+        "note": "포장용 스티로폼(styrofoam)으로 오매칭돼 재활용 안내가 나가던 것을 막는 직접 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「단열스티로폼」이 포장용 스티로폼으로 오매칭되던 것을 확인해 추가했습니다."
+      ]
+    }
+  },
+  {
+    "id": "toothbrush_holder",
+    "name": "칫솔꽂이",
+    "aliases": [
+      "칫솔 꽂이",
+      "칫솔걸이",
+      "칫솔통",
+      "칫솔 스탠드"
+    ],
+    "category": "utensil_material_specific",
+    "disposalType": "recycle_or_general_or_nonburnable_by_material",
+    "summary": "칫솔꽂이는 재질에 따라 갈립니다. 플라스틱이나 금속 한 가지면 해당 수거함으로, 여러 재질이 붙어 있으면 종량제봉투로, 도자기·유리면 불연성 폐기물로 배출합니다.",
+    "steps": [
+      "물기를 비우고 안쪽을 헹궈 말립니다.",
+      "바닥과 겉면의 재질 표시를 확인합니다.",
+      "플라스틱 한 가지면 플라스틱류, 금속 한 가지면 고철류로 배출합니다.",
+      "여러 재질이 붙어 떨어지지 않으면 종량제봉투로 배출합니다.",
+      "도자기나 유리 재질이면 불연성 폐기물이라 거주지의 불연성 마대 기준을 확인해 배출합니다."
+    ],
+    "cautions": [
+      "칫솔은 여러 재질이 섞여 종량제봉투로 가는 별개 품목입니다. 꽂이와 함께 넣지 않습니다.",
+      "도자기나 유리 재질은 재활용되지 않습니다. 뚝배기·사기그릇처럼 불연성 폐기물이라 거주지 기준을 확인해 배출합니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 칫솔 꽂이(금속∙플라스틱)",
+      "생활폐기물 분리배출 누리집 품목사전: 칫솔 꽂이(복합 재질)"
+    ],
+    "conditions": [
+      "mixed_material",
+      "nonburnable"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "reason": "도자기·유리 재질은 불연성 폐기물이라, 불연성 전용 마대로 받는지 종량제봉투로 받는지가 지역마다 다릅니다.",
+      "checkItems": [
+        "도자기·유리의 불연성 폐기물 배출 기준",
+        "플라스틱류 배출 요일"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 칫솔 꽂이(금속∙플라스틱)",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%B9%AB%EC%86%94%20%EA%BD%82%EC%9D%B4%28%EA%B8%88%EC%86%8D%E2%88%99%ED%94%8C%EB%9D%BC%EC%8A%A4%ED%8B%B1%29",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「칫솔 꽂이(금속∙플라스틱)」의 배출방법을 «플라스틱 수거함 · 고철 수거함»로 안내합니다."
+      },
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 칫솔 꽂이(복합 재질)",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EC%B9%AB%EC%86%94%20%EA%BD%82%EC%9D%B4%28%EB%B3%B5%ED%95%A9%20%EC%9E%AC%EC%A7%88%29",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「칫솔 꽂이(복합 재질)」의 배출방법을 «종량제봉투»로 안내합니다.",
+        "note": "「칫솔 꽂이」가 칫솔로 오매칭되던 것을 막는 직접 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「칫솔 꽂이」가 칫솔로 오매칭되던 것을 확인해 추가했습니다.",
+        "공식 사전이 금속∙플라스틱과 복합 재질을 나눠 안내해 재질 분기 품목으로 넣었습니다."
+      ]
+    }
+  },
+  {
+    "id": "radon_bed",
+    "name": "라돈 침대",
+    "aliases": [
+      "라돈 매트리스",
+      "라돈 검출 침대",
+      "라돈 검출 매트리스",
+      "모나자이트 침대"
+    ],
+    "category": "bulky_household",
+    "disposalType": "region_specific",
+    "summary": "라돈이 검출된 침대와 매트리스는 일반 대형폐기물로 내놓지 않고, 제조사 회수(역회수)와 지자체 배출 방법을 함께 확인합니다.",
+    "steps": [
+      "제조사나 판매처에 회수 대상 제품인지 확인하고 회수를 요청합니다.",
+      "회수 절차가 진행되기 전까지는 사람이 오래 머무는 공간에서 멀리 떨어진 곳에 두고 자주 환기합니다.",
+      "제조사 회수가 어려우면 거주 지자체에 라돈 검출 제품 배출 방법을 문의합니다."
+    ],
+    "cautions": [
+      "일반 매트리스와 배출 경로가 다릅니다. 대형폐기물 스티커를 붙여 그냥 내놓지 않습니다.",
+      "해체하거나 겉감을 뜯으면 가루가 날릴 수 있으므로 그대로 둡니다."
+    ],
+    "confidence": "medium",
+    "needsRegionCheck": true,
+    "sourceRefs": [
+      "생활폐기물 분리배출 누리집 품목사전: 라돈 침대(라돈 매트리스)"
+    ],
+    "conditions": [
+      "hazardous",
+      "bulky"
+    ],
+    "regionPolicy": {
+      "scope": "region_specific",
+      "needsRegionCheck": true,
+      "regionCheckLevel": "required",
+      "reason": "공식 품목사전이 «지자체 배출방법»과 «역회수» 두 갈래로 안내해, 실제 배출 경로는 지자체와 제조사 회수 진행 상황에 따라 갈립니다.",
+      "checkItems": [
+        "라돈 검출 제품 배출 방법",
+        "제조사 회수 진행 여부"
+      ]
+    },
+    "sources": [
+      {
+        "title": "생활폐기물 분리배출 누리집 품목사전 - 라돈 침대(라돈 매트리스)",
+        "url": "https://www.xn--oy2b29bd3a601b.kr/front/search/searchDispose.do?searchCnd=1&searchWrd=%EB%9D%BC%EB%8F%88%20%EC%B9%A8%EB%8C%80%28%EB%9D%BC%EB%8F%88%20%EB%A7%A4%ED%8A%B8%EB%A6%AC%EC%8A%A4%29",
+        "sourceType": "official_guidance",
+        "checkedAt": "2026-08-25",
+        "basis": "품목사전이 「라돈 침대(라돈 매트리스)」의 배출방법을 «지자체 배출방법 · 역회수»로 안내합니다.",
+        "note": "「라돈 침대」가 일반 매트리스·침대 프레임으로 오매칭돼 대형폐기물 신고 안내가 나가던 것을 막는 직접 근거입니다."
+      }
+    ],
+    "review": {
+      "status": "region_review_needed",
+      "reviewer": "moe-api-crosscheck",
+      "lastReviewedAt": "2026-08-25",
+      "notes": [
+        "환경부 분리배출 API 사전 대조에서 「라돈 침대」가 침대 프레임으로 오매칭되던 것을 확인해 추가했습니다.",
+        "공식 사전이 두 갈래(지자체 배출방법·역회수)로 안내해 region_specific으로 뒀습니다."
       ]
     }
   }

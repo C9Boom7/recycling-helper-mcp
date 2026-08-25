@@ -326,8 +326,8 @@
   {
     "query": "벤토나이트 모래",
     "expectedItemId": "cat_litter",
-    "expectedDisposalType": "general",
-    "notes": "사용한 반려동물 모래는 변기 배출을 피하고 일반쓰레기로 안내해야 합니다."
+    "expectedDisposalType": "general_or_nonburnable_by_material",
+    "notes": "2026-08-25 환경부 사전 대조. 벤토나이트·규사는 불연성 마대, 두부모래는 종량제봉투로 재질에 따라 갈립니다."
   },
   {
     "query": "양념 묻은 배달 플라스틱 용기",
@@ -638,8 +638,8 @@
   {
     "query": "주사바늘 달린 자가주사기는 어떻게 버려?",
     "expectedItemId": "home_injection_needle",
-    "expectedDisposalType": "hazardous_sharps_collection_contact_required",
-    "notes": "자가주사기 주사바늘은 일반쓰레기나 재활용품이 아니라 안전 용기 밀봉 후 보건소·처방기관·약국·지자체 회수 기준 확인으로 안내해야 합니다."
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "2026-08-25 환경부 사전 대조로 뒤집었습니다. 품목사전이 가정 배출 주사기를 폐의약품도 의료폐기물도 아니라고 명시하고 밀봉 후 종량제봉투로 안내합니다."
   },
   {
     "query": "인덕션 유리 상판 깨진 건 대형폐기물이야?",
@@ -1112,14 +1112,14 @@
   {
     "query": "칫솔살균기",
     "expectedItemId": "toothbrush_sterilizer",
-    "expectedDisposalType": "recycle",
-    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다. 2026-08-25: 카드 본문이 안내하는 소형가전 수거함에 맞춰 disposalType을 고쳤습니다."
   },
   {
     "query": "비데는 어떻게 버려?",
     "expectedItemId": "bidet",
-    "expectedDisposalType": "recycle",
-    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
+    "expectedDisposalType": "small_electronics_collection",
+    "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다. 2026-08-25: 카드 본문이 안내하는 소형가전 수거함에 맞춰 disposalType을 고쳤습니다."
   },
   {
     "query": "변기커버는 어떻게 버려?",
@@ -1978,5 +1978,41 @@
     "expectedItemId": "bottle_sterilizer",
     "expectedDisposalType": "small_electronics_collection",
     "notes": "PR #61 리뷰 후속. 두 글자 이름 '젖병'에 걸려 젖병 카드를 받던 전기제품을 이 품목이 받는다."
+  },
+  {
+    "query": "마우스패드 어떻게 버려?",
+    "expectedItemId": "mouse_pad",
+    "expectedDisposalType": "general",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 소형가전(마우스)으로 확정되던 자리."
+  },
+  {
+    "query": "바늘 어떻게 버려?",
+    "expectedItemId": "sewing_needle",
+    "expectedDisposalType": "general_safe_wrap",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 자가주사기 주사바늘로 확정돼 의료폐기물 절차를 안내하던 자리."
+  },
+  {
+    "query": "식용유 용기 어떻게 버려?",
+    "expectedItemId": "cooking_oil_container",
+    "expectedDisposalType": "recycle",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 내용물(폐식용유)로 확정되던 자리."
+  },
+  {
+    "query": "단열스티로폼 어떻게 버려?",
+    "expectedItemId": "insulation_foam",
+    "expectedDisposalType": "bulky_waste_or_construction_waste",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 포장용 스티로폼으로 확정되던 자리."
+  },
+  {
+    "query": "칫솔꽂이 어떻게 버려?",
+    "expectedItemId": "toothbrush_holder",
+    "expectedDisposalType": "recycle_or_general_or_nonburnable_by_material",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 칫솔로 확정되던 자리."
+  },
+  {
+    "query": "라돈 침대 어떻게 버려?",
+    "expectedItemId": "radon_bed",
+    "expectedDisposalType": "region_specific",
+    "notes": "환경부 분리배출 API 사전 대조(2026-08-25)에서 오매칭을 확인해 추가한 품목입니다. 침대 프레임으로 확정돼 대형폐기물 신고를 안내하던 자리."
   }
 ]

@@ -2467,7 +2467,7 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
   const lines = [
     `## ${item.name}`,
     "",
-    // `category`는 카드에서 뺐다. 품목 330개에 값이 105가지고 그중 52개가 품목 하나에만
+    // `category`는 카드에서 뺐다. 품목 336개에 값이 105가지고 그중 52개가 품목 하나에만
     // 붙은 일회용 이름(`wax_mixed_container`·`mixed_vacuum_bottle`)이라, 사용자가 다른
     // 품목과 견줄 수 있는 분류 체계가 아니다. 실제 쓰임도 `scoreItem`이
     // 재질 질의에 가산점을 줄 때 부분 문자열로 훑는 게 전부다. 한글 라벨을 붙이는 건
