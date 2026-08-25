@@ -1497,6 +1497,19 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       ambiguousCandidates,
       defaultSummary: match?.item.summary,
       checkList,
+      // 대형폐기물 신청·수수료 주소는 **제 필드로** 낸다. 본문에는
+      // `formatRegionBulkyContactLines`가 찍지만 구조화 페이로드에는 담는 자리가 없어,
+      // 지금까지는 `officialSources`에 같은 주소를 한 번 더 넣어야만 구조화만 읽는
+      // 호스트에 닿았다. 그 자리는 셋뿐이라 수거함 안내와 경쟁했고, 실제로 12곳에서
+      // 안내가 밀려 있었다. 자리를 다투게 둘 게 아니라 각자 낼 자리를 준다.
+      bulkyWasteContact:
+        regionMatch && regionMatch.region.coverageTier !== "metro" && regionMatch.region.bulkyWaste
+          ? {
+              phone: regionMatch.region.bulkyWaste.phone,
+              applicationUrl: regionMatch.region.bulkyWaste.applicationUrl,
+              feeUrl: regionMatch.region.bulkyWaste.feeUrl,
+            }
+          : undefined,
       // Phase 0 R5 상한은 3개다. **자를 곳은 합친 뒤가 아니라 지역 출처 쪽이다.**
       // 합친 배열을 자르면 광역이 출처를 하나 더 갖는 순간 정부24가 조용히 밀려나고
       // text에는 그대로 찍혀 둘이 어긋난다. 둘 더 가지면 49e712e가 고친 링크 소실이

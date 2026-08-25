@@ -99,6 +99,10 @@ const STRUCTURED_KEY_WHITELIST = {
     "ambiguousCandidates",
     "defaultSummary",
     "checkList",
+    // 대형폐기물 신청·수수료 주소와 문의 전화. 본문에는 늘 찍히지만 구조화에는 담는
+    // 자리가 없어, 전에는 `officialSources` 세 자리 중 하나를 같은 주소로 써야만
+    // 구조화만 읽는 호스트에 닿았다. 그 경쟁 때문에 12곳에서 수거함 안내가 밀렸다.
+    "bulkyWasteContact",
     "officialSources",
   ],
 };

@@ -10991,5 +10991,18 @@
       "\"matchedRegion\":\"서울 성동구\"",
       "성동구 폐의약품 분리배출"
     ]
+  },
+  {
+    "id": "region_structured_carries_bulky_and_guide",
+    "tool": "get_region_disposal_info",
+    "arguments": {
+      "region": "인천 남동구",
+      "itemName": "폐건전지"
+    },
+    "expectedStructuredIncludes": [
+      "\"matchedRegion\":\"인천 남동구\"",
+      "https://www.namdong.go.kr/main/area/clean/dumps_sticker.jsp",
+      "남동구 폐형광등 분리배출 및 처리요령"
+    ]
   }
 ]
