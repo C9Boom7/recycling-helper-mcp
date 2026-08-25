@@ -427,6 +427,20 @@ expectDocumentCount(
   bulkyWasteFeeSchedules.reduce((sum, schedule) => sum + (schedule.fees?.length ?? 0), 0),
 );
 expectReadmeReviewSnapshot();
+// session-coordination의 "총 N행"도 묶는다 — 이 줄만 대조에서 빠져 있어 서초·송파를
+// 채운 뒤 245행이 어긋난 채로 남았다.
+expectDocumentCount(
+  "docs/session-coordination.md bulky fee rows",
+  sessionCoordination,
+  /수수료 보유 지역은 \d+곳, 총 ([\d,]+)행/,
+  bulkyWasteFeeSchedules.reduce((sum, schedule) => sum + (schedule.fees?.length ?? 0), 0),
+);
+expectDocumentCount(
+  "docs/session-coordination.md bulky fee regions",
+  sessionCoordination,
+  /수수료 보유 지역은 (\d+)곳/,
+  bulkyWasteFeeSchedules.length,
+);
 // 런북의 `items`는 배포 판정 기준값이다.
 expectDocumentCount("docs/qa-runbook.md health items", qaRunbook, /"items":(\d+)\}`여야 정상이다/, items.length);
 
