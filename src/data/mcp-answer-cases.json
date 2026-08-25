@@ -8832,10 +8832,12 @@
       "## 가스레인지",
       "가스 밸브를 잠그고",
       "연결 호스를 분리",
-      "대형생활폐기물 수수료 후보"
+      "대형생활폐기물 수수료 후보",
+      "재질로 추정한 일반 원칙"
     ],
     "expectedStructuredExcludes": [
-      "\"id\":\"gas_range\""
+      "\"id\":\"gas_range\"",
+      "\"id\":\"hazardous_pressurized\""
     ]
   },
   {
@@ -9908,6 +9910,32 @@
     ],
     "expectedStructuredIncludes": [
       "\"found\":false"
+    ],
+    "expectedTextExcludes": [
+      "재질로 추정한 일반 원칙"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"bulky\""
+    ]
+  },
+  {
+    "id": "material_fallback_lookbehind_wooden_stand",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "원목 받침대"
+    },
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙:"
+    ],
+    "expectedTextExcludes": [
+      "재질로 추정한 일반 원칙"
+    ],
+    "expectedStructuredIncludes": [
+      "\"found\":false",
+      "\"inferred\":false"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"bulky\""
     ]
   },
   {
@@ -9917,7 +9945,17 @@
       "itemName": "소파 커버"
     },
     "expectedStructuredIncludes": [
-      "\"found\":false"
+      "\"found\":false",
+      "\"inferred\":false"
+    ],
+    "expectedTextIncludes": [
+      "주요 재질별 한 줄 원칙:"
+    ],
+    "expectedTextExcludes": [
+      "재질로 추정한 일반 원칙"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"bulky\""
     ]
   },
   {
@@ -10281,10 +10319,15 @@
       "입력한 품목 \"알약 포장재 커버\"을(를) 초기 데이터에서 확실히 찾지 못했습니다."
     ],
     "expectedTextExcludes": [
-      "## 폐의약품"
+      "## 폐의약품",
+      "재질로 추정한 일반 원칙"
     ],
     "expectedStructuredIncludes": [
-      "\"found\":false"
+      "\"found\":false",
+      "\"inferred\":false"
+    ],
+    "expectedStructuredExcludes": [
+      "\"id\":\"hazardous_pressurized\""
     ]
   },
   {

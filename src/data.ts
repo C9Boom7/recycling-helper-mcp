@@ -284,7 +284,8 @@ export function findMaterialGuideline(id: string): MaterialGuideline | undefined
 // unrelated compounds stays out of the table: "글라스" would infer glass-bottle
 // recycling for 선글라스, and "껍질" would infer food waste for 조개껍질. Both are
 // general trash, and a wrong material principle reads more authoritative than
-// the generic material menu the fallback shows instead.
+// the generic material menu the fallback shows instead. "침대" needs a lookbehind
+// for the same reason — it would infer bulky-waste filing for 모니터 받침대.
 const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "styrofoam", pattern: /스티로폼|스치로폼|아이스박스|완충재/u },
   { category: "vinyl_film", pattern: /비닐|봉지|봉투|필름|포장지|포장재|파우치|에어캡|뽁뽁이/u },
@@ -296,7 +297,7 @@ const MATERIAL_QUERY_PATTERNS: Array<{ category: string; pattern: RegExp }> = [
   { category: "electronics_battery", pattern: /배터리|건전지|전지|충전|전동|전자|전기|가전|노트북|랩탑|케이블|충전기/u },
   { category: "hazardous_pressurized", pattern: /의약품|알약|물약|연고|시럽|형광등|가스|스프레이|부탄|에어로졸|살충|농약|페인트|소화기/u },
   { category: "food_waste", pattern: /음식물|먹다\s*남|과일|채소/u },
-  { category: "bulky", pattern: /대형|가구|침대|소파|장롱|매트리스/u },
+  { category: "bulky", pattern: /대형|가구|(?<!받)침대|소파|장롱|매트리스/u },
   { category: "general_trash", pattern: /실리콘|고무|라텍스|가죽|멜라민|스펀지|스폰지|복합\s*재질/u },
 ];
 
@@ -306,6 +307,14 @@ export function inferMaterialCategories(query: string, limit = 2): string[] {
   const materialOnly = MATERIAL_ONLY_QUERIES.get(normalizeText(query));
   if (materialOnly) {
     return [materialOnly];
+  }
+
+  // 매칭 게이트가 "이름은 걸렸지만 그 물건이 아니다"라고 판정한 질의는 추정하지 않는다.
+  // 이 표는 부분 문자열 스캔이라, 게이트가 막은 본체(소파 커버의 소파, 가스레인지 후드의
+  // 가스)를 재질 원칙으로 되살린다. 틀린 재질 원칙은 일반 메뉴보다 권위 있게 읽히므로
+  // (위 표 주석), 게이트 발동 질의는 메뉴 + 되묻기로 착지시킨다.
+  if (isGateSuppressedQuery(query)) {
+    return [];
   }
 
   const lowered = query.toLowerCase();
@@ -711,6 +720,23 @@ function isSwallowedByGatedSpan(gate: PartCompoundGate, gatedSpans: NameSpan[]):
   return gate.spans.every((span) =>
     gatedSpans.some((gated) => gated.start <= span.start && span.end <= gated.end && gated.end - gated.start > span.end - span.start),
   );
+}
+
+/**
+ * 매칭 게이트(부품어 게이트, 가스레인지 비매칭 복합어)가 발동하는 질의인가.
+ *
+ * 게이트는 "이름은 찾았지만 그 물건이 아니다"는 판정인데, not_found 폴백의
+ * `inferMaterialCategories`가 같은 질의를 부분 문자열로 다시 훑으면 방금 막은
+ * 본체의 답이 재질 원칙으로 되살아난다("소파 커버"에 대형폐기물 신고 안내).
+ * 매칭이 성공한 질의는 폴백에 오지 않으므로, 이 판정은 not_found가 난 질의의
+ * 원인 후보에 게이트가 있는지를 묻는 자리에서만 평가된다.
+ */
+function isGateSuppressedQuery(query: string): boolean {
+  if (isGasRangeNonmatchCompound(query)) return true;
+  const normalizedQuery = normalizeText(query);
+  if (!normalizedQuery) return false;
+  const wordIndex = buildQueryWordIndex(query);
+  return indexedItems.some((indexed) => partCompoundGateOf(normalizedQuery, wordIndex, indexed.names).gated);
 }
 
 function stripShortAliasParticle(token: string): string {
