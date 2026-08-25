@@ -2250,14 +2250,23 @@ app.post("/mcp", async (req: Request, res: Response) => {
     sessionIdGenerator: undefined,
   });
 
+  // close/에러 어느 경로로 끝나도 요청당 만든 server·transport를 한 번만 정리한다.
+  let cleanedUp = false;
+  const cleanup = (): void => {
+    if (cleanedUp) return;
+    cleanedUp = true;
+    void transport.close();
+    void server.close();
+  };
+
+  // await 뒤에 달면 응답이 끝나기 전에 클라이언트가 끊었을 때 close가 이미 발화한
+  // 뒤라 리스너가 영영 안 불린다 — 호스트 타임아웃·사용자 이탈이 잦은 카카오
+  // 환경에서 닿기 쉬운 경로다. 등록은 연결 전에 한다.
+  res.on("close", cleanup);
+
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
-
-    res.on("close", () => {
-      void transport.close();
-      void server.close();
-    });
   } catch (error) {
     // Transport-level failures can carry request-derived text in `message`, and
     // "운영 로그에 예외 메시지를 남기지 않는다"(qa-runbook 2절) has to hold on this
@@ -2273,6 +2282,8 @@ app.post("/mcp", async (req: Request, res: Response) => {
         id: null,
       });
     }
+    // 응답을 못 보낸 채 죽은 경로에서도 close 이벤트만 기다리지 않는다.
+    cleanup();
   }
 });
 
