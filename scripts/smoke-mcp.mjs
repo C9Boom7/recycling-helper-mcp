@@ -1963,36 +1963,54 @@ async function runWidgetBuilderCases() {
 }
 
 /**
- * 카드 머리말의 `- 키: 값` 줄에 영문 내부 키가 새지 않는지 카탈로그 전수로 본다.
+ * `- 키: 값` 머리말에 영문 내부 키가 새지 않는지 카탈로그 전수로 본다.
  *
  * 이 자리는 세 번 같은 식으로 샜다 — `- 판단 조건:`이 조건 키를(PR #75), `- 분류:`가
  * `category`를, `- 배출 판단:`이 `disposalType`을 그대로 찍었다. 셋 다 데이터가 아니라
  * 렌더링 쪽 결함이라 `validate-data.mjs`의 매핑 전수 대응 검사로는 걸리지 않는다.
  * 매핑이 멀쩡해도 그 매핑을 안 거치고 원본을 찍으면 그만이기 때문이다.
  *
+ * **표면을 둘 다 훑는다.** 처음 넣을 때는 `formatItemGuide`만 봤는데, 같은 머리말을 찍는
+ * 자리가 `classify_waste_item`의 텍스트 갈래에도 있다(`분류 결과:`로 시작하는 블록).
+ * 그쪽은 `- 세부 판단:`으로 `disposalType`을 그대로 내던 세 번째 누수 지점인데 가드가
+ * 안 닿아, 같은 줄을 도로 넣어도 스위트가 초록불이었다. HTTP 스모크를 품목 수만큼 더
+ * 때우는 대신 조립부를 `formatClassifyResultText`로 빼서 여기서 나란히 렌더한다.
+ *
+ * 대상은 이 둘뿐이다. `check_confusing_item`은 `1. 소파` 아래에 세 칸 들여쓴
+ * `   - 결론:` 후보 목록을, `make_cleanup_plan`은 `## 배출 그룹` 아래에
+ * `- 입력 -> 품목명: 요약` 항목 줄을 낸다. 카드 머리말과 모양이 달라 여기 억지로 끼우면
+ * 검사 대상이 아닌 줄까지 잡는다(두 툴 모두 값은 이미 라벨 함수를 거친다).
+ *
  * 검사 기준은 `condition-labels.json` 라벨에 쓰는 것과 같다 — 한글이 한 글자도 없으면
- * 사용자가 읽을 수 없는 값이 나간 것으로 본다. 머리말만 보는 이유는 아래 `### 배출 방법`
+ * 사용자가 읽을 수 없는 값이 나간 것으로 본다. 머리말만 보는 이유는 `### 배출 방법`
  * 부터는 URL과 출처 제목이 섞이기 때문이고, 새 줄이 붙는 자리도 머리말이다.
  */
 async function runItemCardLabelSweep() {
-  const { formatItemGuide, wasteItems } = await import("../dist/data.js");
+  const { formatClassifyResultText, formatItemGuide, wasteItems } = await import("../dist/data.js");
+  const surfaces = [
+    ["get_disposal_steps 카드", formatItemGuide],
+    ["classify_waste_item 텍스트", formatClassifyResultText],
+  ];
   const leaked = [];
 
   for (const item of wasteItems) {
     // 지역을 넘겨 지역 줄이 붙는 갈래까지 같은 렌더로 훑는다.
     for (const region of [undefined, "서울 강남구"]) {
-      const header = formatItemGuide(item, region).split("\n").slice(1);
-      for (const line of header) {
-        if (line.startsWith("###")) break;
-        const field = /^- ([^:]+): (.+)$/.exec(line);
-        if (!field) continue;
-        if (!/[가-힣]/.test(field[2])) leaked.push(`${item.id} (region=${region ?? "없음"}): ${line}`);
+      for (const [surface, render] of surfaces) {
+        // 첫 줄(`## 품목명`·`분류 결과: 품목명`)은 `- `로 시작하지 않아 아래 정규식에
+        // 걸리지 않는다. 표면마다 자를 자리를 따로 세지 않으려고 그대로 흘려보낸다.
+        for (const line of render(item, region).split("\n")) {
+          if (line.startsWith("###")) break;
+          const field = /^- ([^:]+): (.+)$/.exec(line);
+          if (!field) continue;
+          if (!/[가-힣]/.test(field[2])) leaked.push(`${item.id} (${surface}, region=${region ?? "없음"}): ${line}`);
+        }
       }
     }
   }
 
   assert(leaked.length === 0, `item card header leaked a non-Korean value:\n${leaked.slice(0, 5).join("\n")}`);
-  console.log(`Item card label sweep passed: ${wasteItems.length} items x 2 region modes`);
+  console.log(`Item card label sweep passed: ${wasteItems.length} items x 2 region modes x ${surfaces.length} surfaces`);
 }
 
 /**
