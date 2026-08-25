@@ -1223,11 +1223,11 @@
         "basis": "일반생활쓰레기·음식물쓰레기·재활용품 배출요일과 시간, 재활용품 분리배출 요령, 음식물쓰레기 전용봉투 제외 품목, 특수규격봉투(PP포대) 대상"
       },
       {
-        "title": "마포구청 대형폐기물배출안내",
-        "url": "https://www.mapo.go.kr/site/main/content/mapo05060502",
+        "title": "마포구청 폐형광등·폐건전지 수거함 배치 현황",
+        "url": "https://www.mapo.go.kr/site/main/content/mapo05060507",
         "sourceType": "local_guidance",
         "checkedAt": "2026-07-03",
-        "basis": "대형생활폐기물 동주민센터·구청 홈페이지 신고, 신고필증 부착 배출, 대형폐가전 무료 방문수거와 1599-0903 안내"
+        "basis": "마포구 동별 폐형광등·폐건전지 수거함 주소와 상세 위치 목록"
       },
       {
         "title": "마포구청 의류수거함 배치 현황",
@@ -1237,11 +1237,11 @@
         "basis": "마포구 동별 의류수거함 주소와 상세 위치 목록"
       },
       {
-        "title": "마포구청 폐형광등·폐건전지 수거함 배치 현황",
-        "url": "https://www.mapo.go.kr/site/main/content/mapo05060507",
+        "title": "마포구청 대형폐기물배출안내",
+        "url": "https://www.mapo.go.kr/site/main/content/mapo05060502",
         "sourceType": "local_guidance",
         "checkedAt": "2026-07-03",
-        "basis": "마포구 동별 폐형광등·폐건전지 수거함 주소와 상세 위치 목록"
+        "basis": "대형생활폐기물 동주민센터·구청 홈페이지 신고, 신고필증 부착 배출, 대형폐가전 무료 방문수거와 1599-0903 안내"
       },
       {
         "title": "마포구청 투명페트병 무인회수기 설치 현황",
@@ -2389,11 +2389,11 @@
     },
     "sources": [
       {
-        "title": "성동구 대형생활폐기물 배출신고 안내",
-        "url": "https://www.sd.go.kr/main/contents.do?key=1670",
+        "title": "성동구 폐의약품 분리배출",
+        "url": "https://www.sd.go.kr/main/contents.do?key=4522",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "구청 홈페이지 신청 경로(신청하기 → 통합로그인)와 상용 앱·전화 접수 병행, 청소행정과 02-2286-5532 확인"
+        "basis": "약 형태별 배출방법, 우체통 배출 조건, 수거함 36곳"
       },
       {
         "title": "성동구 대형생활폐기물 수집·운반 수수료 품목별 부과기준",
@@ -2410,11 +2410,11 @@
         "basis": "폐건전지·폐형광등 배출방법과 동별 분리수거함 위치"
       },
       {
-        "title": "성동구 폐의약품 분리배출",
-        "url": "https://www.sd.go.kr/main/contents.do?key=4522",
+        "title": "성동구 대형생활폐기물 배출신고 안내",
+        "url": "https://www.sd.go.kr/main/contents.do?key=1670",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "약 형태별 배출방법, 우체통 배출 조건, 수거함 36곳"
+        "basis": "구청 홈페이지 신청 경로(신청하기 → 통합로그인)와 상용 앱·전화 접수 병행, 청소행정과 02-2286-5532 확인"
       },
       {
         "title": "성동구 일반생활쓰레기 배출방법",
@@ -2674,11 +2674,11 @@
         "basis": "인터넷 접수와 동별 대행업체 경로, 청소행정과 청소작업팀 02-330-1376 확인"
       },
       {
-        "title": "서대문구 대형폐기물 폐기물 규격",
-        "url": "https://www.sdm.go.kr/civil/print/waste/standards.do",
+        "title": "서대문구 폐의약품 배출",
+        "url": "https://www.sdm.go.kr/civil/type/pharmacy.do",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "품목별 규격과 부과금액 조회표"
+        "basis": "배출 장소와 약 형태별 배출방법 (본문이 이미지 한 장이라 이미지를 읽어 확인)"
       },
       {
         "title": "서대문구 폐금속자원 배출",
@@ -2688,11 +2688,11 @@
         "basis": "폐형광등·폐건전지 분리배출 방법과 수거함 위치 안내"
       },
       {
-        "title": "서대문구 폐의약품 배출",
-        "url": "https://www.sdm.go.kr/civil/type/pharmacy.do",
+        "title": "서대문구 대형폐기물 폐기물 규격",
+        "url": "https://www.sdm.go.kr/civil/print/waste/standards.do",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "배출 장소와 약 형태별 배출방법 (본문이 이미지 한 장이라 이미지를 읽어 확인)"
+        "basis": "품목별 규격과 부과금액 조회표"
       },
       {
         "title": "서대문구 생활쓰레기 배출 안내",
@@ -2894,11 +2894,11 @@
         "basis": "실물 스티커·인터넷 신고·'빼기' 앱 세 갈래 신고 경로와 동별 수거업체 표, 담당부서 청소자원과 031-5191-3249 (수정일 2026-01-30)"
       },
       {
-        "title": "수원시 대형폐기물 인터넷 신고 - 수수료 및 세부요금",
-        "url": "https://waste.suwon.go.kr/lmth/01_intro/intro_0201.asp",
+        "title": "수원시 정책제안 답변 - 폐의약품 처리 해결방안",
+        "url": "https://www.suwon.go.kr/web/manmin/propse/BD_propseView.do?propseNo=P-00000901&q_rowPerPage=8",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "가구류·가전제품류·기타 탭으로 나뉜 품목별 처리비용 표. 이미지가 아니라 파싱 가능한 HTML 표이고 인코딩은 euc-kr이다"
+        "basis": "청소자원과 답변에서 '보건소와 각 동 행정복지센터에 폐의약품 수거함을 운영중' 확인"
       },
       {
         "title": "수원시 재활용분리배출",
@@ -2908,11 +2908,11 @@
         "basis": "폐건전지·폐형광등 배출 방법과 교환 기준, 폐LED조명 전용수거함 배출 안내 (수정일 2026-07-07)"
       },
       {
-        "title": "수원시 정책제안 답변 - 폐의약품 처리 해결방안",
-        "url": "https://www.suwon.go.kr/web/manmin/propse/BD_propseView.do?propseNo=P-00000901&q_rowPerPage=8",
+        "title": "수원시 대형폐기물 인터넷 신고 - 수수료 및 세부요금",
+        "url": "https://waste.suwon.go.kr/lmth/01_intro/intro_0201.asp",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "청소자원과 답변에서 '보건소와 각 동 행정복지센터에 폐의약품 수거함을 운영중' 확인"
+        "basis": "가구류·가전제품류·기타 탭으로 나뉜 품목별 처리비용 표. 이미지가 아니라 파싱 가능한 HTML 표이고 인코딩은 euc-kr이다"
       },
       {
         "title": "수원시보건소 폐의약품 처리 관련 안내",
@@ -2966,11 +2966,11 @@
     },
     "sources": [
       {
-        "title": "용인시 대형폐기물 배출신청안내",
-        "url": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_01.jsp",
+        "title": "용인시 폐의약품 올바른 배출 방법 안내문",
+        "url": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20240924104604530",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "'빼기' 앱·읍면동 방문·스티커 판매소 세 갈래 신청 경로와 구별 수거 요일, 자원순환과 031-6193-2694 확인"
+        "basis": "자원순환과 2024-09-24 시정소식. 본문이 이미지 한 장이라 이미지를 읽어 배출 장소와 형태별 방법을 확인했다"
       },
       {
         "title": "용인시 대형폐기물 수수료 기준표",
@@ -2987,11 +2987,11 @@
         "basis": "전지류와 형광등 배출 방법, 읍면동 주민센터 수거함 안내"
       },
       {
-        "title": "용인시 폐의약품 올바른 배출 방법 안내문",
-        "url": "https://www.yongin.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20240924104604530",
+        "title": "용인시 대형폐기물 배출신청안내",
+        "url": "https://www.yongin.go.kr/home/www/www12/www12_08/www12_03/www12_03_02/www12_03_02_01.jsp",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "자원순환과 2024-09-24 시정소식. 본문이 이미지 한 장이라 이미지를 읽어 배출 장소와 형태별 방법을 확인했다"
+        "basis": "'빼기' 앱·읍면동 방문·스티커 판매소 세 갈래 신청 경로와 구별 수거 요일, 자원순환과 031-6193-2694 확인"
       }
     ]
   },
@@ -3046,11 +3046,11 @@
         "basis": "전화·인터넷·모바일 세 갈래 배출 방법과 12개 대행구역 수거업체 표, 자원순환과 자원순환정책팀 031-8075-2685 확인"
       },
       {
-        "title": "고양시 대형폐기물 인터넷신고센터 - 배출신청",
-        "url": "https://clean.gys.or.kr/clean/request",
+        "title": "고양시 행정복지센터 폐의약품 수거함 운영 안내",
+        "url": "https://www.goyang.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1030&q_bbscttSn=20251106103125077",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "고양도시관리공사 운영. 관할 구·동과 수거대행업체를 고르고 품목·수량·배출일시를 넣는 실제 접수 폼"
+        "basis": "자원순환과 2025-11-06 새소식. 동 행정복지센터 민원실 수거함 운영과 약 형태별 배출 요령, 약 봉투 제거 안내"
       },
       {
         "title": "고양시 대형폐기물 인터넷신고센터 - 품목별 수수료",
@@ -3067,11 +3067,11 @@
         "basis": "폐형광등·폐건전지·의류 수거함 배출 요령과 LED·깨진 형광등 예외"
       },
       {
-        "title": "고양시 행정복지센터 폐의약품 수거함 운영 안내",
-        "url": "https://www.goyang.go.kr/www/user/bbs/BD_selectBbs.do?q_bbsCode=1030&q_bbscttSn=20251106103125077",
+        "title": "고양시 대형폐기물 인터넷신고센터 - 배출신청",
+        "url": "https://clean.gys.or.kr/clean/request",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "자원순환과 2025-11-06 새소식. 동 행정복지센터 민원실 수거함 운영과 약 형태별 배출 요령, 약 봉투 제거 안내"
+        "basis": "고양도시관리공사 운영. 관할 구·동과 수거대행업체를 고르고 품목·수량·배출일시를 넣는 실제 접수 폼"
       },
       {
         "title": "고양시 생활폐기물",
@@ -3212,11 +3212,11 @@
         "basis": "행정복지센터 방문·온라인 신고·전화 신고 세 갈래 경로와 정보제공부서 자원순환과 재활용팀 032-625-3193 (최종수정 2026-04-17)"
       },
       {
-        "title": "부천시 대형폐기물 인터넷신고 - 품목별 수거기준 및 비용",
-        "url": "https://clean.bucheon.go.kr/site/main/wasteCleaning/wasteItemList?sub=02&main=01",
+        "title": "부천시 청소알림방 - 폐건전지(배터리) 올바른 분리배출 요령",
+        "url": "https://www.bucheon.go.kr/site/program/board/webzineboard/view?menuid=148006007006006&pagesize=12&boardtypeid=27344&encid=WAM9kJRRVTtJJJuUET5Faw==",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "번호·분류·물품·규격·단가 5열 HTML 표에 전체 210건. 가구·가전·주방물품 등 8개 분류 탭과 품목 검색을 함께 제공한다"
+        "basis": "전지수거함 배출과 분리 기준, 손상 배터리 취급 주의. 메뉴가 아니라 청소알림방 게시글에 있었다"
       },
       {
         "title": "부천시보건소 가정 내 폐의약품 올바른 폐기방법 안내",
@@ -3226,11 +3226,11 @@
         "basis": "보건소 세 곳과 거점 약국 96개소 배출처, 제형별 배출 방법과 수거 대상이 아닌 품목"
       },
       {
-        "title": "부천시 청소알림방 - 폐건전지(배터리) 올바른 분리배출 요령",
-        "url": "https://www.bucheon.go.kr/site/program/board/webzineboard/view?menuid=148006007006006&pagesize=12&boardtypeid=27344&encid=WAM9kJRRVTtJJJuUET5Faw==",
+        "title": "부천시 대형폐기물 인터넷신고 - 품목별 수거기준 및 비용",
+        "url": "https://clean.bucheon.go.kr/site/main/wasteCleaning/wasteItemList?sub=02&main=01",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "전지수거함 배출과 분리 기준, 손상 배터리 취급 주의. 메뉴가 아니라 청소알림방 게시글에 있었다"
+        "basis": "번호·분류·물품·규격·단가 5열 HTML 표에 전체 210건. 가구·가전·주방물품 등 8개 분류 탭과 품목 검색을 함께 제공한다"
       },
       {
         "title": "부천시 생활쓰레기",
@@ -3290,11 +3290,11 @@
         "basis": "온라인 배출신고·읍면동사무소 방문·모바일앱 세 갈래 경로와 통합관리센터 주소, 담당 자원순환정책팀 031-590-8280 (최종수정 2026-01-09)"
       },
       {
-        "title": "남양주 대형폐기물 통합관리센터 - 수수료 안내",
-        "url": "https://smartclean.nyj.go.kr/online/bulky/item",
+        "title": "남양주보건소 폐의약품 배출 안내",
+        "url": "https://www.nyj.go.kr/health/selectBbsNttView.do?key=462&bbsNo=128&nttNo=486749",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "분류·품목·규격·가격 4열 표에 227개 품목. 시청 쪽 수수료표는 HWP 첨부뿐이라 표로 열린 곳은 여기다"
+        "basis": "2024-10-04 보건소 게시글. 본문이 이미지 한 장이라 첨부 이미지를 읽어 배출 장소 16개 읍면동과 보건소 두 곳, 약 형태별 방법을 확인했다"
       },
       {
         "title": "남양주시 부서 업무검색 - 자원순환정책팀",
@@ -3318,11 +3318,11 @@
         "basis": "자원재활용 인센티브 대상 5종과 폐건전지·폐형광등 교환 기준, 접수장소 읍면동사무소"
       },
       {
-        "title": "남양주보건소 폐의약품 배출 안내",
-        "url": "https://www.nyj.go.kr/health/selectBbsNttView.do?key=462&bbsNo=128&nttNo=486749",
+        "title": "남양주 대형폐기물 통합관리센터 - 수수료 안내",
+        "url": "https://smartclean.nyj.go.kr/online/bulky/item",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-16",
-        "basis": "2024-10-04 보건소 게시글. 본문이 이미지 한 장이라 첨부 이미지를 읽어 배출 장소 16개 읍면동과 보건소 두 곳, 약 형태별 방법을 확인했다"
+        "basis": "분류·품목·규격·가격 4열 표에 227개 품목. 시청 쪽 수수료표는 HWP 첨부뿐이라 표로 열린 곳은 여기다"
       },
       {
         "title": "남양주시 생활쓰레기 수거",
@@ -3371,11 +3371,11 @@
     },
     "sources": [
       {
-        "title": "해운대구 대형폐기물 배출 신청",
-        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007003",
+        "title": "해운대구 폐의약품 배출요령 및 수거함 위치",
+        "url": "https://www.haeundae.go.kr/board/view.do?boardId=BBS_0000038&menuCd=DOM_000000104001001000&paging=ok&startPage=2&searchType=DATA_TITLE&dataSid=3167609",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "구청 자체 온라인 신청 화면. '대형폐기물 온라인 신청하기' 버튼과 인터넷 신청 절차(신청서 작성 → 이름·연락처·배출장소·희망배출일시·배출품목·수집운반업체 선택 → 처리업체 유선연락으로 수거일시 확인 → 수거 시 수수료 납부), 수수료를 신청 시 수납하지 않고 수거할 때 품목확인 후 현금·카드·계좌이체로 받는다는 안내, 담당 051-749-4462를 확인했다"
+        "basis": "2026-05-14 게시글. 알약·가루약·물약·특수용기 형태별 배출 방법과 참여 약국 수거함, 의약외품·건강기능식품 제외 기준"
       },
       {
         "title": "해운대구 대형폐기물이란?",
@@ -3392,11 +3392,11 @@
         "basis": "폐건전지·폐형광등 전용수거함 배출 요령과 공동주택 수거신청 번호 051-749-4451, 주택·빌라의 동주민센터 배출 기준"
       },
       {
-        "title": "해운대구 폐의약품 배출요령 및 수거함 위치",
-        "url": "https://www.haeundae.go.kr/board/view.do?boardId=BBS_0000038&menuCd=DOM_000000104001001000&paging=ok&startPage=2&searchType=DATA_TITLE&dataSid=3167609",
+        "title": "해운대구 대형폐기물 배출 신청",
+        "url": "https://www.haeundae.go.kr/index.do?menuCd=DOM_000000102014007003",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "2026-05-14 게시글. 알약·가루약·물약·특수용기 형태별 배출 방법과 참여 약국 수거함, 의약외품·건강기능식품 제외 기준"
+        "basis": "구청 자체 온라인 신청 화면. '대형폐기물 온라인 신청하기' 버튼과 인터넷 신청 절차(신청서 작성 → 이름·연락처·배출장소·희망배출일시·배출품목·수집운반업체 선택 → 처리업체 유선연락으로 수거일시 확인 → 수거 시 수수료 납부), 수수료를 신청 시 수납하지 않고 수거할 때 품목확인 후 현금·카드·계좌이체로 받는다는 안내, 담당 051-749-4462를 확인했다"
       },
       {
         "title": "해운대구 자원순환과",
@@ -3579,11 +3579,11 @@
         "basis": "인터넷 신고와 신고필증 출력·인증번호 기재 방식, 신고 품목과 금액이 다르면 수거하지 않는 기준, 청소행정과 032-453-2560과 수거업체 도림환경 032-423-0008을 확인했다"
       },
       {
-        "title": "남동구 대형폐기물 배출 수수료 목록",
-        "url": "https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp",
+        "title": "남동구 보건소 가정 내 폐의약품 수거·처리 안내",
+        "url": "https://biz.namdong.go.kr/clinic/bbs/bbsMsgDetail.do?msg_seq=1942&bcd=clinic_news",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "품명·규격·단가 3열 표를 가전/가구/스포츠·악기 등 6개 분류로 제공한다. 침대 2인세트 25,000원, 보일러 6,000원, 탁구대 20,000원 등을 확인했다"
+        "basis": "2024-08-30 게시글. 약 형태별 배출 방법과 약국·동 행정복지센터·보건소 1층 수거 장소, 보건행정과 032-453-5083"
       },
       {
         "title": "남동구 폐형광등 분리배출 및 처리요령",
@@ -3593,11 +3593,11 @@
         "basis": "단독주택·공동주택별 배출 장소와 대상 품목, 전지를 제품에서 분리해 내는 기준, 20개 동 수거함 위치"
       },
       {
-        "title": "남동구 보건소 가정 내 폐의약품 수거·처리 안내",
-        "url": "https://biz.namdong.go.kr/clinic/bbs/bbsMsgDetail.do?msg_seq=1942&bcd=clinic_news",
+        "title": "남동구 대형폐기물 배출 수수료 목록",
+        "url": "https://www.namdong.go.kr/main/area/clean/dumps_fees.jsp",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "2024-08-30 게시글. 약 형태별 배출 방법과 약국·동 행정복지센터·보건소 1층 수거 장소, 보건행정과 032-453-5083"
+        "basis": "품명·규격·단가 3열 표를 가전/가구/스포츠·악기 등 6개 분류로 제공한다. 침대 2인세트 25,000원, 보일러 6,000원, 탁구대 20,000원 등을 확인했다"
       }
     ]
   },
@@ -3645,11 +3645,11 @@
         "basis": "폐기물배출신고 시스템과 '여기로' 앱, 행정복지센터 키오스크 접수 경로와 자원순환과 폐기물관리팀 032-509-6610을 확인했다. 스티커를 지정판매소에서 구입하거나 인터넷 신청 시 약 7% 할인받아 붙인다는 배출 전 부착 방식도 이 페이지에서 확인했다"
       },
       {
-        "title": "부평구 폐기물 신고 — 인터넷 배출 신고 수수료",
-        "url": "https://waste.icbp.go.kr/icbp/load_bill.asp",
+        "title": "부평구 부평1동 불용의약품 폐기 방법 안내",
+        "url": "https://www.icbp.go.kr/dong/bbs/bbsMsgDetail.do?msg_seq=106067&bcd=dong_notice&dong=bupyeong1&pgno=76",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "연번·품목·규격·수수료 4열 단가표와 인터넷 신고 약 7% 할인, 단가표에 없는 품목은 현장에서 단가를 안내한다는 기준, 전문의료기기·전자제품류 제외를 확인했다"
+        "basis": "2023-02-20 게시글. 구청·동 행정복지센터·보건(지)소·관내 약국 수거함으로 모아 보건소에서 일괄 폐기한다는 경로"
       },
       {
         "title": "부평구 폐형광등·전지류 배출",
@@ -3666,11 +3666,11 @@
         "basis": "탈착형·일체형·회로 부착 배터리별 배출 방법과 부푼 배터리 처리, 수거함이 없는 제품의 문의처 이순환거버넌스"
       },
       {
-        "title": "부평구 부평1동 불용의약품 폐기 방법 안내",
-        "url": "https://www.icbp.go.kr/dong/bbs/bbsMsgDetail.do?msg_seq=106067&bcd=dong_notice&dong=bupyeong1&pgno=76",
+        "title": "부평구 폐기물 신고 — 인터넷 배출 신고 수수료",
+        "url": "https://waste.icbp.go.kr/icbp/load_bill.asp",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-21",
-        "basis": "2023-02-20 게시글. 구청·동 행정복지센터·보건(지)소·관내 약국 수거함으로 모아 보건소에서 일괄 폐기한다는 경로"
+        "basis": "연번·품목·규격·수수료 4열 단가표와 인터넷 신고 약 7% 할인, 단가표에 없는 품목은 현장에서 단가를 안내한다는 기준, 전문의료기기·전자제품류 제외를 확인했다"
       }
     ]
   },
@@ -3713,11 +3713,11 @@
     },
     "sources": [
       {
-        "title": "달서구 대형폐기물(폐가전) 처리신청",
-        "url": "https://www.dalseo.daegu.kr/index.do?menu_id=00001415",
+        "title": "달서구 폐의약품 수거 및 배출방법 안내",
+        "url": "https://www.dalseo.daegu.kr/index.do?menu_id=10000102&menu_link=/icms/bbs/selectBoardArticle.do&bbsId=BBS_00029&nttId=90740&bbsTyCode=BBST03&bbsAttrbCode=BBSA03",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-23",
-        "basis": "「여기로」 앱·누리집 신청 경로, 폐가전 무상방문수거 1599-0903, 자원순환과 053-667-2721을 확인했다"
+        "basis": "2025-03-12 공지. 수거장소는 보건소·지정약국·동행정복지센터이고 알약·물약·가루약·외용약별 배출 방법을 적어 뒀다"
       },
       {
         "title": "달서구 대형폐기물 수거품목 처리수수료",
@@ -3734,11 +3734,11 @@
         "basis": "폐형광등·전지류 분리배출함 위치와 재활용이 안 되는 품목, 재활용품 교환사업 교환 기준, 자원순환과 053-667-2724"
       },
       {
-        "title": "달서구 폐의약품 수거 및 배출방법 안내",
-        "url": "https://www.dalseo.daegu.kr/index.do?menu_id=10000102&menu_link=/icms/bbs/selectBoardArticle.do&bbsId=BBS_00029&nttId=90740&bbsTyCode=BBST03&bbsAttrbCode=BBSA03",
+        "title": "달서구 대형폐기물(폐가전) 처리신청",
+        "url": "https://www.dalseo.daegu.kr/index.do?menu_id=00001415",
         "sourceType": "local_guidance",
         "checkedAt": "2026-08-23",
-        "basis": "2025-03-12 공지. 수거장소는 보건소·지정약국·동행정복지센터이고 알약·물약·가루약·외용약별 배출 방법을 적어 뒀다"
+        "basis": "「여기로」 앱·누리집 신청 경로, 폐가전 무상방문수거 1599-0903, 자원순환과 053-667-2721을 확인했다"
       }
     ]
   },
