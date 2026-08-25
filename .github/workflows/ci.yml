@@ -18,9 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # 버전은 package.json의 `packageManager`가 정한다 — 여기에 `version:`을 함께 주면
+      # 액션이 "Multiple versions of pnpm specified"로 거부한다. 이미지(corepack)와 CI가
+      # 같은 값을 보게 하려고 필드를 넣은 것이라, 출처는 한 곳이어야 맞다.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       # 배포 이미지(Dockerfile)가 node:22라서 CI도 같은 메이저로 맞춘다.
       - uses: actions/setup-node@v6
