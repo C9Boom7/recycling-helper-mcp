@@ -1835,9 +1835,6 @@ function formatRegionSourceLine(source: WasteSource): string {
   return `- ${source.title}${url}${checkedAt}${basis}`;
 }
 
-export function formatRegionSourceList(region: RegionalPolicyData): string[] {
-  return region.sources.map(formatRegionSourceLine);
-}
 
 /**
  * 배출 그룹 라벨에 든 갈래 이름 → 그 갈래를 다루는 지역 출처를 고르는 어휘. 제목과 basis에서

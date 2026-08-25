@@ -806,7 +806,7 @@ async function runSmoke() {
     requestId += 1;
 
     // -32602는 호스트 모델이 읽고 다음 호출을 고치는 복구 프롬프트다. Zod 원문만
-    // 나가던 시기가 있어, 자연어 안내가 앞에 서고 원문이 상세로 남는지 고정한다.
+    // 나가던 시기가 있어, 자연어 안내가 앞에 서는지 고정한다.
     const invalidArgsResponse = await fetch(`${baseUrl}/mcp`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -824,9 +824,12 @@ async function runSmoke() {
         invalidArgs.error.message.includes("버릴 품목명을 한국어로 전달하세요"),
       `-32602 message lost its natural-language recovery line: ${invalidArgs.error.message}`,
     );
+    // Zod 원문 상세는 CALL_LOG_DETAILS=true에서만 붙는다. 기본 설정에서는 수백 바이트짜리
+    // pretty-print JSON이 호스트 컨텍스트를 먹지 않아야 한다 — 이 스위트는 false로 고정돼
+    // 있으므로(startServer) 여기서는 빠져 있는 쪽이 정상이다.
     assert(
-      invalidArgs.error.message.includes("상세:"),
-      `-32602 message dropped the Zod detail that debugging reads: ${invalidArgs.error.message}`,
+      !invalidArgs.error.message.includes("상세:"),
+      `-32602 message carries the Zod detail with CALL_LOG_DETAILS off: ${invalidArgs.error.message}`,
     );
     requestId += 1;
 
@@ -1460,15 +1463,16 @@ async function runSmoke() {
       );
     }
 
-    // 요일 확인처로 안 뽑히는 것과 출처 목록에서 지우는 것은 다른 이야기다. 구로구
-    // 청소행정서비스헌장은 배출·수거 시각 표를 가진 유일한 구로구 페이지라 확인처로는
+    // 요일 확인처로 안 뽑히는 것과 출처를 지우는 것은 다른 이야기다. 구로구
+    // 청소행정서비스헌장은 배출·수거 시각 표를 가진 유일한 구로구 페이지라 출처로
     // 값이 있는데, basis만 고치겠다고 해놓고 항목을 통째로 지운 적이 있다.
-    const guroAnswer = resultText(
-      await callTool(baseUrl, "get_region_disposal_info", { region: "서울 구로구" }, requestId++),
-    );
+    // 응답 본문이 아니라 데이터를 본다 — 본문 "공식 확인처"는 구조화 응답과 같은
+    // 3개 상한을 쓰게 되면서 뒤쪽 출처가 응답에 안 실릴 수 있고, 이 단언이 막는
+    // 사고는 응답 축소가 아니라 데이터 삭제다.
+    const guroPolicy = regionPolicies.find((policy) => policy.name === "서울 구로구");
     assert(
-      guroAnswer.includes("guro.go.kr/www/contents.do?key=1649"),
-      "구로구 청소행정서비스헌장이 공식 확인처에서 사라졌다 — 요일 확인처로 안 뽑는 것과 출처를 지우는 것은 다르다",
+      guroPolicy?.sources.some((source) => source.url?.includes("guro.go.kr/www/contents.do?key=1649")),
+      "구로구 청소행정서비스헌장이 지역 출처 데이터에서 사라졌다 — 요일 확인처로 안 뽑는 것과 출처를 지우는 것은 다르다",
     );
 
     // 품목이 붙으면 체크리스트가 그 품목으로 좁혀진다. 좁히는 건 의도지만, 되묻기를
@@ -2655,11 +2659,14 @@ const SPOT_EXPECTED_SECTIONS = [
 ];
 
 // PRD phase-12 R7: 이 툴의 크기 상한은 다른 툴 기준을 빌리지 않고 새로 잰다. 목표였던 "성공
-// 응답 text 2.5KB 이하"는 12곳이 다 찬 상계동 응답이 1,433B라 여유 있게 지킨다. 아래 값은 그
-// 실측(text 1,433B · 전체 3,222B, 2026-08-25)에 10%를 얹은 것이다 — 전체가 text의 두 배가 넘는
+// 응답 text 2.5KB 이하"는 12곳이 다 찬 상계동 응답이 1,612B라 여유 있게 지킨다. 아래 값은 그
+// 실측(text 1,612B · 전체 3,537B, 2026-08-26)에 10%를 얹은 것이다 — 전체가 text의 두 배가 넘는
 // 건 structuredContent가 같은 주소를 한 벌 더 싣기 때문이고, 다른 툴도 같은 성질을 안고 있다.
 // 기존 관행대로 실패가 아니라 경고로 시작한다.
-const SPOT_SIZE_WARN_BYTES = { text: 1_580, total: 3_550 };
+//
+// 첫 실측은 text 1,433B(2026-08-25)였다. 그 뒤 PR #77 리뷰 라운드가 상계동 픽스처에
+// 폐건전지·식용유 행을 더해 기대 응답 자체가 커진 것이라(런타임 변화 아님) 기준을 다시 쟀다.
+const SPOT_SIZE_WARN_BYTES = { text: 1_780, total: 3_890 };
 
 // structuredContent 화이트리스트(PRD phase-12 R5). 세 갈래가 모양이 달라 따로 둔다.
 const SPOT_FOUND_KEYS = ["found", "dong", "region", "categories", "truncated", "omitted", "source"];

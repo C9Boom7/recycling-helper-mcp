@@ -31,7 +31,6 @@ import {
   formatItemGuide,
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
-  formatRegionSourceList,
   formatRegionSourceLines,
   regionCollectionSources,
   regionSourcesForItem,
@@ -1496,6 +1495,16 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     regionMatch,
   );
 
+  // 본문 "공식 확인처"도 structuredContent와 같은 상한·같은 선별을 쓴다. 본문만 전부
+  // 찍던 때는 서초구가 아홉 줄 2.3KB를 실어 전 툴 최대 응답이었고, structuredContent의
+  // 3개 상한과도 어긋났다 — 같은 함수를 지나면 정의상 같아진다(요일 출처 보존 포함).
+  const regionOfficialSources = regionMatch
+    ? pickRegionOfficialSources(
+        regionMatch.region,
+        Math.max(0, MAX_OFFICIAL_SOURCES - (regionMatch.level === "metro" ? NATIONAL_FALLBACK_LINKS.length : 0)),
+      )
+    : [];
+
   const lines = [
     ...answerBodyLines,
     "",
@@ -1507,7 +1516,7 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
     "",
     "공식 확인처",
     ...(regionMatch
-      ? formatRegionSourceList(regionMatch.region)
+      ? formatRegionSourceLines(regionOfficialSources)
       : NATIONAL_FALLBACK_LINKS.map((link) => `- ${link.title}: ${link.url} - ${link.basis}`)),
     // 광역까지만 좁혀졌으면 전국 안내 링크를 함께 남긴다. 시·군 이름을 광역 별칭으로
     // 흡수한 뒤 `안산시`는 미등록 폴백 대신 경기도로 착지하는데, 그 순간 분리배출.kr
@@ -1550,17 +1559,12 @@ async function handleGetRegionDisposalInfo({ region, itemName }: { region: strin
       // text에는 그대로 찍혀 둘이 어긋난다. 둘 더 가지면 49e712e가 고친 링크 소실이
       // 그대로 되살아난다 — 데이터 추가만으로 회귀하는 셈이라 순서를 뒤집는다.
       officialSources: regionMatch
-        ? (() => {
-            const national =
-              regionMatch.level === "metro"
-                ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
-                : [];
-            const room = Math.max(0, MAX_OFFICIAL_SOURCES - national.length);
-            return [
-              ...pickRegionOfficialSources(regionMatch.region, room).map((source) => ({ title: source.title, url: source.url })),
-              ...national,
-            ];
-          })()
+        ? [
+            ...regionOfficialSources.map((source) => ({ title: source.title, url: source.url })),
+            ...(regionMatch.level === "metro"
+              ? NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url }))
+              : []),
+          ]
         : NATIONAL_FALLBACK_LINKS.map((link) => ({ title: link.title, url: link.url })),
     },
     {
@@ -2184,9 +2188,12 @@ async function handleJsonOnlyToolCall(body: JsonRpcBody, res: Response): Promise
   const parsed = z.object(registered.def.inputShape).safeParse(params.arguments ?? {});
   if (!parsed.success) {
     // 자연어 안내가 앞, Zod 원문이 뒤. 모델은 첫 문장만으로 다음 호출을 고칠 수
-    // 있고, 원문은 안내문이 뭉갠 세부(경로·코드)를 디버깅용으로 보존한다.
+    // 있고, 원문은 안내문이 뭉갠 세부(경로·코드)를 디버깅용으로 보존한다 — 다만
+    // 수백 바이트짜리 pretty-print JSON이 호스트 컨텍스트로 그대로 들어가므로,
+    // 디버깅 스위치가 켜졌을 때만 붙인다.
     const guidance = parsed.error.issues.map(describeArgumentIssue).join(" ");
-    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${guidance}\n상세: ${parsed.error.message}`));
+    const detail = CALL_LOG_DETAILS_ENABLED ? `\n상세: ${parsed.error.message}` : "";
+    res.json(jsonRpcError(body.id, -32602, `Invalid arguments for ${toolName}: ${guidance}${detail}`));
     return;
   }
 
