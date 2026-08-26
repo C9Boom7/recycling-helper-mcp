@@ -1,0 +1,201 @@
+{
+  "note": "조례 파서를 대조할 수기 표본이다. 자동 수집으로 다시 만들지 않는다 — verify-ordinance-fees.mjs 머리 주석 참고. 대조는 품명·규격·금액만 보므로 itemId는 담지 않는다 — 수기 시절의 배정에는 「대자리(돗자리)」를 요가매트로 적은 것 같은 오류가 섞여 있어, 그대로 두면 틀린 매핑을 다시 심는 씨앗이 된다.",
+  "regions": {
+    "seocho_gu": {
+      "regionName": "서울 서초구",
+      "transcribedAt": "2026-07-02",
+      "sourceTitle": "서초구청 대형폐기물 배출안내",
+      "sourceUrl": "https://www.seocho.go.kr/site/seocho/01/10103070301002018030701.jsp",
+      "fees": [
+        {
+          "itemName": "의자",
+          "spec": "1인용",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "의자",
+          "spec": "책상용의자(바퀴달린 의자)",
+          "feeKrw": 3000
+        },
+        {
+          "itemName": "의자",
+          "spec": "책상용의자(바퀴달린 의자 대형)",
+          "feeKrw": 4000
+        },
+        {
+          "itemName": "의자",
+          "spec": "장의자",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "침대 매트리스",
+          "spec": "1인용",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "침대 매트리스",
+          "spec": "2인용",
+          "feeKrw": 8000
+        },
+        {
+          "itemName": "이불",
+          "spec": "겨울용(1채당)",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "대자리(돗자리)",
+          "spec": "3.3㎡(1평)당",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "거울",
+          "spec": "1m×60cm 이하",
+          "feeKrw": 3000
+        },
+        {
+          "itemName": "거울",
+          "spec": "1m×60cm 초과",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "서랍장",
+          "spec": "4단 이하",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "서랍장",
+          "spec": "5단 이상",
+          "feeKrw": 4000
+        },
+        {
+          "itemName": "빨래건조대",
+          "spec": "모든 규격",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "빈 화분",
+          "spec": "대형",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "빈 화분",
+          "spec": "소형",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "장난감류",
+          "spec": "모든 규격",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "인형류",
+          "spec": "대형",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "인형류",
+          "spec": "소형",
+          "feeKrw": 1000
+        }
+      ]
+    },
+    "songpa_gu": {
+      "regionName": "서울 송파구",
+      "transcribedAt": "2026-07-02",
+      "sourceTitle": "스마트클린 송파 대형폐기물 수수료 안내 (구 송파구청 품목별수거기준 및 비용)",
+      "sourceUrl": "https://smartclean.songpa.go.kr/online/bulky/item",
+      "fees": [
+        {
+          "itemName": "의자",
+          "spec": "1인용",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "의자",
+          "spec": "장의자",
+          "feeKrw": 6000
+        },
+        {
+          "itemName": "의자",
+          "spec": "회전의자",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "침대(목재)",
+          "spec": "1인용 매트리스",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "침대(목재)",
+          "spec": "2인용 매트리스",
+          "feeKrw": 8000
+        },
+        {
+          "itemName": "이불",
+          "spec": "겨울용",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "돗자리(대자리,놀이매트)",
+          "spec": "1㎡당",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "거울",
+          "spec": "가장 긴면 50cm미만",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "거울",
+          "spec": "가장 긴면 50cm이상",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "서랍장",
+          "spec": "4단 이하",
+          "feeKrw": 3000
+        },
+        {
+          "itemName": "서랍장",
+          "spec": "5단 이상",
+          "feeKrw": 5000
+        },
+        {
+          "itemName": "빨래건조대",
+          "spec": "길이 1m 미만",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "빨래건조대",
+          "spec": "길이 1m 이상",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "화분",
+          "spec": "지름 50cm 이상",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "화분",
+          "spec": "지름 50cm 미만",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "장난감",
+          "spec": "길이 50cm미만",
+          "feeKrw": 1000
+        },
+        {
+          "itemName": "장난감",
+          "spec": "길이 50cm이상",
+          "feeKrw": 2000
+        },
+        {
+          "itemName": "인형",
+          "spec": "인형",
+          "feeKrw": 1000
+        }
+      ]
+    }
+  }
+}

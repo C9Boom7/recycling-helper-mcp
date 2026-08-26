@@ -1,14 +1,16 @@
 /**
  * R2 골든셋 검증 — 조례 파서를 믿어도 되는지 확인한다 (Phase 6 R2).
  *
- * 수기 데이터를 그대로 들고 있는 2개 지역(서초·송파, 36행)을 조례에서 다시 뽑아
- * `src/data/bulky-waste-fees.json`과 대조한다. 파서를 새 지역에 쓰기 전에 여기부터
- * 통과시킨다.
+ * 사람이 원문을 보고 옮겨 적은 2개 지역(서초·송파, 36행)을 조례에서 다시 뽑아
+ * 대조한다. 파서를 새 지역에 쓰기 전에 여기부터 통과시킨다.
  *
  * 넷이던 대상이 2026-08-19에 둘이 됐다. 마포는 조례 추출로, 강남은 구청 표로 출처를
  * 옮겼다 — 우리 행이 이 검증이 다시 돌리는 그 파서에서 나오면 대조가 자기 충족이 되고,
  * 출처가 아예 다르면 금액이 갈리는 게 정상이라 불일치로 셀 근거가 없다. 자세한 사정은
  * `fetch-ordinance-fees.mjs`의 `GOLDEN_TARGETS` 주석에 적어 뒀다.
+ *
+ * 2026-08-26에 그 36행을 픽스처로 떼어 냈다(`GOLDEN_FIXTURE_PATH`). 운영 데이터를 읽던
+ * 때는 두 지역의 커버리지를 넓히는 순간 골든셋이 사라져, 검증이 확장을 막는 형국이었다.
  *
  * **통과 조건은 금액 불일치 0건이다.** 조례에는 있는데 우리에게 없는 행은 불일치가
  * 아니라 R3의 후보이므로 세지 않는다.
@@ -30,7 +32,20 @@ import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 
 import { GOLDEN_TARGETS, collectRegion } from "./fetch-ordinance-fees.mjs";
 
-const FEES_PATH = "src/data/bulky-waste-fees.json";
+/**
+ * 대조 기준은 **동결한 수기 표본**이지 운영 데이터가 아니다.
+ *
+ * 예전에는 `src/data/bulky-waste-fees.json`의 서초·송파 행을 그대로 읽었다. 그러면 그 두
+ * 지역의 커버리지를 넓히는 순간 골든셋이 사라진다 — 자동 수집으로 채우면 대조가 자기
+ * 충족이 되고(서초는 같은 조례 파서), 다른 출처로 채우면 금액이 갈리는 게 정상이라
+ * 불일치로 셀 근거가 없다(송파는 구청 표). 실제로 두 지역 모두 전체 표가 확인돼 있는데도
+ * "채우면 검증이 죽는다"가 확장을 막고 있었다.
+ *
+ * 그래서 수기로 옮겨 적었던 36행을 픽스처로 떼어 냈다. 운영 데이터가 어떻게 바뀌든 파서를
+ * 붙드는 기준은 그대로 남는다. **이 파일은 자동 수집으로 다시 만들지 않는다** — 사람이
+ * 원문을 보고 고친 값만 들어간다.
+ */
+const GOLDEN_FIXTURE_PATH = "scripts/fixtures/ordinance-golden-rows.json";
 const OUTPUT_DIR = "data/ordinance-raw";
 
 /**
@@ -102,7 +117,7 @@ async function main() {
   }
 
   const targets = requested.length > 0 ? GOLDEN_TARGETS.filter((t) => requested.includes(t.regionId)) : GOLDEN_TARGETS;
-  const schedules = JSON.parse(readFileSync(FEES_PATH, "utf8"));
+  const goldenRegions = JSON.parse(readFileSync(GOLDEN_FIXTURE_PATH, "utf8")).regions;
   mkdirSync(OUTPUT_DIR, { recursive: true });
 
   let totalRows = 0;
@@ -113,9 +128,9 @@ async function main() {
   let emptyRegions = 0;
 
   for (const target of targets) {
-    const schedule = schedules.find((item) => item.regionId === target.regionId);
+    const schedule = goldenRegions[target.regionId];
     if (!schedule) {
-      console.error(`${target.regionId}: ${FEES_PATH}에 수수료표가 없다 — 골든셋이 아니다`);
+      console.error(`${target.regionId}: ${GOLDEN_FIXTURE_PATH}에 수기 표본이 없다 — 골든셋이 아니다`);
       process.exitCode = 1;
       continue;
     }

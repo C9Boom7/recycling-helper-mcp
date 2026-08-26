@@ -14,6 +14,8 @@ const partNounsPath = new URL("../src/data/compound-part-nouns.json", import.met
 const spotCategoriesPath = new URL("../src/data/spot-categories.json", import.meta.url);
 const sourceCoveragePath = new URL("../docs/source-coverage.md", import.meta.url);
 const sessionCoordinationPath = new URL("../docs/session-coordination.md", import.meta.url);
+const readmePath = new URL("../README.md", import.meta.url);
+const qaRunbookPath = new URL("../docs/qa-runbook.md", import.meta.url);
 const items = JSON.parse(readFileSync(dataPath, "utf8"));
 const regionalPolicies = JSON.parse(readFileSync(regionPolicyPath, "utf8"));
 const bulkyWasteFeeSchedules = JSON.parse(readFileSync(bulkyWasteFeesPath, "utf8"));
@@ -28,6 +30,8 @@ const compoundPartNouns = JSON.parse(readFileSync(partNounsPath, "utf8"));
 const spotCategories = JSON.parse(readFileSync(spotCategoriesPath, "utf8"));
 const sourceCoverage = readFileSync(sourceCoveragePath, "utf8");
 const sessionCoordination = readFileSync(sessionCoordinationPath, "utf8");
+const readme = readFileSync(readmePath, "utf8");
+const qaRunbook = readFileSync(qaRunbookPath, "utf8");
 
 const confidenceValues = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["official_guidance", "local_guidance", "law", "safety_guidance", "manual_review"]);
@@ -102,6 +106,11 @@ function countBy(values, getKey) {
   return counts;
 }
 
+/** 문서의 숫자는 천 단위 쉼표를 쓰기도 한다(`3,584행`). 대조 전에 걷어낸다. */
+function docNumber(raw) {
+  return Number(String(raw).replace(/,/g, ""));
+}
+
 function expectDocumentCount(label, text, regex, expected) {
   const match = text.match(regex);
   if (!match) {
@@ -109,9 +118,56 @@ function expectDocumentCount(label, text, regex, expected) {
     return;
   }
 
-  const actual = Number(match[1]);
+  const actual = docNumber(match[1]);
   if (actual !== expected) {
     errors.push(`${label} count must be ${expected}, got ${actual}`);
+  }
+}
+
+/**
+ * `(57개 지역 — full 5, standard 35, metro 17)` 꼴의 티어 요약. 넷을 한 정규식으로 잡아야
+ * 총계만 고치고 티어 분포를 안 고치는 어긋남이 안 생긴다.
+ */
+function expectRegionTierSnapshot(label, text, regex) {
+  const match = text.match(regex);
+  if (!match) {
+    errors.push(`${label} region tier snapshot is missing from docs`);
+    return;
+  }
+
+  const tierCounts = countBy(regionalPolicies, (policy) => policy?.coverageTier);
+  const expected = [regionalPolicies.length, tierCounts.full ?? 0, tierCounts.standard ?? 0, tierCounts.metro ?? 0];
+  const labels = ["total", "full", "standard", "metro"];
+  for (const [index, name] of labels.entries()) {
+    const actual = docNumber(match[index + 1]);
+    if (actual !== expected[index]) {
+      errors.push(`${label} region tier ${name} must be ${expected[index]}, got ${actual}`);
+    }
+  }
+}
+
+/** README의 `품목 리뷰 상태: verified N / ...` 한 줄. 넷이 함께 움직이므로 함께 본다. */
+function expectReadmeReviewSnapshot() {
+  const match = readme.match(
+    /품목 리뷰 상태: `verified` (\d+) \/ `region_review_needed` (\d+) \/ `needs_source` (\d+) \/ `standard_import` (\d+)/,
+  );
+  if (!match) {
+    errors.push("README.md review status snapshot is missing from docs");
+    return;
+  }
+
+  const counts = countBy(items, (item) => item?.review?.status);
+  const expected = {
+    verified: counts.verified ?? 0,
+    region_review_needed: counts.region_review_needed ?? 0,
+    needs_source: counts.needs_source ?? 0,
+    standard_import: counts.standard_import ?? 0,
+  };
+  for (const [index, key] of Object.keys(expected).entries()) {
+    const actual = docNumber(match[index + 1]);
+    if (actual !== expected[key]) {
+      errors.push(`README.md review ${key} must be ${expected[key]}, got ${actual}`);
+    }
   }
 }
 
@@ -344,6 +400,50 @@ expectDocumentCount(
   /지역 평가 케이스 (\d+)개/,
   regionEvaluationCases.length,
 );
+// README와 QA 런북도 대조한다. 이 둘은 어느 정규식에도 안 걸려서 조용히 밀려 있었고,
+// 하필 **읽는 사람이 가장 많은 문서**다. 런북 24행의 `items`는 QA 첫 30초에 정상/비정상을
+// 가르는 유일한 기준값이라, 낡으면 멀쩡한 배포를 등록 불일치로 오진하게 만든다.
+expectDocumentCount("README.md waste items", readme, /`src\/data\/waste-items\.json` \((\d+)개\)/, items.length);
+expectDocumentCount("README.md evaluation cases", readme, /`src\/data\/evaluation-cases\.json` \((\d+)개\)/, evaluationCases.length);
+expectDocumentCount("README.md MCP answer cases", readme, /`src\/data\/mcp-answer-cases\.json` \((\d+)개\)/, mcpAnswerCases.length);
+expectDocumentCount(
+  "README.md region evaluation cases",
+  readme,
+  /`src\/data\/region-evaluation-cases\.json` \((\d+)개\)/,
+  regionEvaluationCases.length,
+);
+expectRegionTierSnapshot("README.md", readme, /\((\d+)개 지역 — full (\d+), standard (\d+), metro (\d+)\)/);
+expectRegionTierSnapshot("docs/qa-runbook.md", qaRunbook, /등록된 (\d+)개 지역.*?`full` (\d+)곳.*?`standard` (\d+)곳.*?`metro` (\d+)곳/);
+expectDocumentCount(
+  "README.md bulky fee regions",
+  readme,
+  /`src\/data\/bulky-waste-fees\.json` \((\d+)개 지역/,
+  bulkyWasteFeeSchedules.length,
+);
+expectDocumentCount(
+  "README.md bulky fee rows",
+  readme,
+  /`src\/data\/bulky-waste-fees\.json` \(\d+개 지역 ([\d,]+)행/,
+  bulkyWasteFeeSchedules.reduce((sum, schedule) => sum + (schedule.fees?.length ?? 0), 0),
+);
+expectReadmeReviewSnapshot();
+// session-coordination의 "총 N행"도 묶는다 — 이 줄만 대조에서 빠져 있어 서초·송파를
+// 채운 뒤 245행이 어긋난 채로 남았다.
+expectDocumentCount(
+  "docs/session-coordination.md bulky fee rows",
+  sessionCoordination,
+  /수수료 보유 지역은 \d+곳, 총 ([\d,]+)행/,
+  bulkyWasteFeeSchedules.reduce((sum, schedule) => sum + (schedule.fees?.length ?? 0), 0),
+);
+expectDocumentCount(
+  "docs/session-coordination.md bulky fee regions",
+  sessionCoordination,
+  /수수료 보유 지역은 (\d+)곳/,
+  bulkyWasteFeeSchedules.length,
+);
+// 런북의 `items`는 배포 판정 기준값이다.
+expectDocumentCount("docs/qa-runbook.md health items", qaRunbook, /"items":(\d+)\}`여야 정상이다/, items.length);
+
 expectSessionSourceSnapshot({
   wasteItems: items.length,
   evaluationCases: evaluationCases.length,
@@ -868,15 +968,17 @@ for (const [index, schedule] of bulkyWasteFeeSchedules.entries()) {
       }
     }
 
-    // 반대쪽 — 상한에 걸렸는데 행 수를 안 남긴 품목. 답변에는 12개가 전부인 것처럼
-    // 나간다. 임포터를 다시 돌리면 채워지므로 error가 아니라 warning으로 남긴다.
-    for (const [itemId, count] of Object.entries(feeRowsByItemId)) {
-      if (count === MAX_FEE_ROWS_PER_ITEM && preCapCounts?.[itemId] === undefined) {
-        warnings.push(
-          `${prefix}.fees sits at the ${MAX_FEE_ROWS_PER_ITEM}-row cap for item ${itemId} without preCapFeeRowCountByItemId; re-run the importer so the answer can disclose the trim`,
-        );
-      }
-    }
+    // 여기 반대쪽 검사가 있었다 — "정확히 12행인데 preCapFeeRowCountByItemId가 없으면
+    // 잘린 걸 감춘 것일 수 있다"는 경고다. **행 수만으로는 그 둘을 가를 수 없고, 가를
+    // 필요도 없다.** 세 임포터 모두 `sorted.length > MAX_FEE_ROWS`일 때만 이 필드를
+    // 쓰므로(import-district-fees.ts, import-ordinance-fees.ts, import-bulky-fees.ts),
+    // 필드가 없다는 건 자른 적이 없다는 뜻이다. 원문이 마침 12행이었을 뿐이다.
+    //
+    // 그런데도 경고문은 "임포터를 다시 돌리라"고 안내했다. 다시 돌려도 자를 게 없어
+    // 필드가 안 생기니 영원히 사라지지 않는다 — 실제로 서대문 옷장·은평 침대프레임이
+    // 그 상태로 남아 매 실행마다 두 줄을 찍고 있었다. 안 없어지는 경고는 나머지 경고까지
+    // 무시하게 만든다. 위쪽 검사(preCap이 있으면 실제 행 수·상한과 맞는가)가 진짜 방어선이라
+    // 이쪽은 걷어낸다.
   }
 
   if (Array.isArray(schedule.fees) && schedule.fees.length > 0) {

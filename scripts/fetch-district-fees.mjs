@@ -44,6 +44,10 @@ export const TARGETS = [
   { regionId: "seongbuk_gu", name: "서울 성북구", kind: "smartclean", url: "https://smartclean.sb.go.kr/online/bulky/item" },
   { regionId: "jungnang_gu", name: "서울 중랑구", kind: "smartclean", url: "https://www.smartclean-jungnang.kr/online/bulky/item" },
   { regionId: "yangcheon_gu", name: "서울 양천구", kind: "smartclean", url: "https://smartclean.yangcheon.go.kr/online/bulky/item" },
+  // 송파구(2026-08-26). full 티어인데 수기 18행뿐이라 소파·침대·장롱·가전이 통째로
+  // 비어 있었다. 조례 트랙은 좌우 2단 조판이라 「TV / 가스 레인지 = 0원」류가 섞여 못
+  // 쓰고(import-ordinance-fees.ts 주석), 스마트클린 표는 275행이 그대로 읽힌다.
+  { regionId: "songpa_gu", name: "서울 송파구", kind: "smartclean", url: "https://smartclean.songpa.go.kr/online/bulky/item" },
   { regionId: "seodaemun_gu", name: "서울 서대문구", kind: "sdm_table", url: "https://www.sdm.go.kr/civil/print/waste/standards.do" },
   { regionId: "seongdong_gu", name: "서울 성동구", kind: "sd_popup", url: "https://www.sd.go.kr/site/reserve/popup/cts2182_popup.html" },
   { regionId: "guro_gu", name: "서울 구로구", kind: "guro_list", url: "https://www.guro.go.kr/www/costList.do?key=3412" },

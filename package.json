@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "tsc && mkdir -p dist/data && cp src/data/*.json dist/data/",
