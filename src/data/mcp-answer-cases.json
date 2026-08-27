@@ -11365,12 +11365,17 @@
     "id": "epr_digital_piano_keyboard_only",
     "tool": "get_disposal_steps",
     "arguments": {
-      "itemName": "전자피아노"
+      "itemName": "전자피아노",
+      "region": "서울 강남구"
     },
     "expectedTextIncludes": [
-      "## 피아노",
-      "건반 본체만",
+      "## 전자피아노",
+      "건반 본체",
       "의자와 받침대"
+    ],
+    "expectedStructuredIncludes": [
+      "\"id\":\"digital_piano\"",
+      "\"regionCheckLevel\":\"필수\""
     ]
   },
   {
@@ -11405,6 +11410,20 @@
     "expectedTextIncludes": [
       "개수 제한 없이 1개부터",
       "5개 이상"
+    ]
+  },
+  {
+    "id": "epr_acoustic_piano_stays_bulky",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "피아노"
+    },
+    "expectedTextIncludes": [
+      "## 피아노",
+      "대형폐기물"
+    ],
+    "expectedTextExcludes": [
+      "건반 본체"
     ]
   }
 ]

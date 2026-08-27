@@ -167,9 +167,9 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 정확도 개선은 품목 데이터와 대표 질문 평가셋을 함께 관리합니다.
 
-- 품목 데이터: `src/data/waste-items.json` (336개)
-- 대표 질문 평가셋: `src/data/evaluation-cases.json` (336개)
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (632개)
+- 품목 데이터: `src/data/waste-items.json` (337개)
+- 대표 질문 평가셋: `src/data/evaluation-cases.json` (337개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (633개)
 - 지역 정책 데이터: `src/data/region-policies.json` (57개 지역 — full 5, standard 35, metro 17)
 - 지역 평가셋: `src/data/region-evaluation-cases.json` (136개)
 - 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (28개 지역 3,829행 — 서울 25개 구는 전부 있고, 경기 6개 시와 광역시 자치구 6곳이 남았다)
@@ -185,7 +185,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 - 로컬 MCP 검증 흐름: [docs/local-mcp-workflow.md](docs/local-mcp-workflow.md)
 - 본선 이후로 미룬 과제: [docs/post-finals-backlog.md](docs/post-finals-backlog.md)
 
-품목 리뷰 상태: `verified` 44 / `region_review_needed` 91 / `needs_source` 7 / `standard_import` 194. 질문 백로그: `covered` 110 / `wont_fix` 1 / `todo` 0.
+품목 리뷰 상태: `verified` 44 / `region_review_needed` 92 / `needs_source` 7 / `standard_import` 194. 질문 백로그: `covered` 110 / `wont_fix` 1 / `todo` 0.
 
 검증:
 

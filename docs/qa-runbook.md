@@ -21,9 +21,9 @@ curl -sS https://recycling-helper-mcp-kakaotools.playmcp-endpoint.kakaocloud.io/
 curl -sS https://recycling-helper-mcp.playmcp-endpoint.kakaocloud.io/health
 ```
 
-둘 다 `{"ok":true,"service":"RecyclingHelper(재활용척척)","items":336}`여야 정상이다.
+둘 다 `{"ok":true,"service":"RecyclingHelper(재활용척척)","items":337}`여야 정상이다.
 `items`는 품목 수라 데이터가 늘 때마다 바뀐다. **이 숫자를 외우지 말고 배포하려는 커밋에서 직접 뽑아 대조한다** —
-`node -e "console.log(require('./src/data/waste-items.json').length)"`. 여기 적힌 336은 2026-08-26 기준이다.
+`node -e "console.log(require('./src/data/waste-items.json').length)"`. 여기 적힌 337은 2026-08-28 기준이다.
 
 - 응답이 없다 → 서버가 내려갔다. PlayMCP in KC 콘솔에서 Status를 확인한다. 코드 문제가 아니다.
 - **두 주소의 `items`가 다르다 → 등록 불일치다. 여기서 멈추고 이것부터 해결한다.** 2026-08-15 기준 재배포 대상은 324,
