@@ -1,0 +1,14 @@
+{"ts":"2026-09-16T05:01:11.203Z","tool":"get_disposal_steps","status":"match","matchedId":"pizza_box_oily","score":100,"ms":3}
+{"ts":"2026-09-16T05:02:40.771Z","tool":"get_disposal_steps","status":"match","matchedId":"mattress","matchedRegion":"서울 노원구","regionStatus":"district","score":100,"ms":16}
+{"ts":"2026-09-16T05:03:02.118Z","tool":"get_disposal_steps","status":"ambiguous","ms":2}
+{"ts":"2026-09-16T05:04:55.900Z","tool":"get_disposal_steps","status":"not_found","fallbackTier":"menu","ms":2}
+{"ts":"2026-09-16T05:05:31.442Z","tool":"get_disposal_steps","status":"not_found","fallbackTier":"vinyl_film","ms":3}
+{"ts":"2026-09-16T05:06:18.005Z","tool":"get_disposal_steps","status":"match","matchedId":"styrofoam","inputSource":"photo","score":100,"ms":4}
+{"ts":"2026-09-16T05:07:44.612Z","tool":"classify_waste_item","status":"match","matchedId":"spray_can","regionStatus":"unregistered_district","matchedRegion":"충청북도","score":100,"ms":5}
+{"ts":"2026-09-16T05:09:12.330Z","tool":"get_region_disposal_info","status":"ok","matchedRegion":"서울 강남구","regionStatus":"district","ms":6}
+{"ts":"2026-09-16T05:10:03.884Z","tool":"get_region_disposal_info","status":"ok","regionStatus":"unknown","ms":1}
+{"ts":"2026-09-16T05:11:47.219Z","tool":"make_cleanup_plan","status":"partial","matched":3,"total":4,"ms":11}
+{"ts":"2026-09-16T05:13:20.507Z","tool":"find_disposal_spots","status":"spots","regionStatus":"district","matchedRegion":"서울 노원구","upstream":"ok","upstreamMs":388,"ms":392}
+{"ts":"2026-09-16T05:15:09.061Z","tool":"find_disposal_spots","status":"spots_ask","upstream":"ok","upstreamMs":455,"ms":459}
+{"ts":"2026-09-16T05:16:52.774Z","tool":"find_disposal_spots","status":"spots_fallback","upstream":"timeout","upstreamMs":2503,"ms":2506}
+{"ts":"2026-09-16T05:18:31.190Z","tool":"find_disposal_spots","status":"spots_fallback","upstream":"body","upstreamMs":274,"ms":277}
