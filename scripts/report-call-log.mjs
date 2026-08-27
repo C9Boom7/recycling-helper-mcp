@@ -16,9 +16,11 @@
  * 내면 운영 중에 "리포트가 실패했다"로 읽혀 정작 볼 숫자를 못 보게 된다.
  */
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
 /** 항상 등록되는 다섯. 여기 있는데 호출이 0이면 description이 안 먹히고 있다는 신호다. */
-const ALWAYS_REGISTERED_TOOLS = [
+export const ALWAYS_REGISTERED_TOOLS = [
   "classify_waste_item",
   "get_disposal_steps",
   "check_confusing_item",
@@ -30,7 +32,7 @@ const ALWAYS_REGISTERED_TOOLS = [
  * 키 없이 배포한 기간의 로그에서 이걸 "안 불린 툴"로 함께 세면, 이 리포트에서 가장
  * 중요한 줄이 늘 늑대를 부르게 된다 — 문구를 갈라 둔다.
  */
-const KEY_GATED_TOOL = "find_disposal_spots";
+export const KEY_GATED_TOOL = "find_disposal_spots";
 
 /** 답을 못 준 것으로 세는 status. 툴마다 이름이 달라 한자리에 모은다. */
 const UNANSWERED = new Set(["not_found", "ambiguous", "spots_ask", "spots_fallback"]);
@@ -39,6 +41,18 @@ const UNANSWERED = new Set(["not_found", "ambiguous", "spots_ask", "spots_fallba
  * 한 칸에 뭉치고, 빼 두면 100% 터지는 툴이 `0/N (0.0%)`로 멀쩡해 보인다. 따로 센다.
  */
 const FAILED = new Set(["error"]);
+/**
+ * `get_region_disposal_info`는 되묻거나 지역을 못 알아들어도 `status: "ok"`로 남는다 —
+ * 그 툴은 어느 갈래로 가든 안내를 내보내기 때문이다. status만 세면 100번 연속 되물어도
+ * `0/100 (0.0%)`이 되어, 이 절을 가른 이유가 무색해진다. 그 툴에서는 지역 해상도로 본다.
+ */
+const REGION_TOOL = "get_region_disposal_info";
+const REGION_UNANSWERED = new Set(["ambiguous", "unknown"]);
+
+function isUnanswered(entry) {
+  if (UNANSWERED.has(entry.status)) return true;
+  return entry.tool === REGION_TOOL && REGION_UNANSWERED.has(entry.regionStatus);
+}
 
 function readInput(path) {
   if (path) {
@@ -64,24 +78,34 @@ function maxOf(values) {
   return values.reduce((max, value) => (value > max ? value : max), -Infinity);
 }
 
-function parseLines(text) {
+/**
+ * 못 읽은 줄을 두 갈래로 나눠 센다.
+ *
+ * `noise`는 JSON이 아예 아닌 줄이다 — 서버 기동 배너가 늘 여기 들어가고, 컨테이너 로그
+ * 수집기가 붙이는 접두사도 마찬가지다. **정상이다.**
+ * `malformed`는 JSON 객체로는 읽혔는데 `tool`이 없는 줄이다. 이건 로그 형식이 바뀌었다는
+ * 뜻이라 다르게 다뤄야 한다 — 둘을 한 칸에 뭉쳤더니, 재시작 직후 호출이 0건인 조용한
+ * 구간에서 배너 한 줄 때문에 "형식이 바뀌었다"고 끊었다.
+ */
+export function parseLines(text) {
   const entries = [];
-  let skipped = 0;
+  let noise = 0;
+  let malformed = 0;
   for (const line of text.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     // 컨테이너 로그는 앞에 타임스탬프가 붙기도 한다. 첫 `{`부터 읽어 본다.
     const start = trimmed.indexOf("{");
-    if (start === -1) { skipped += 1; continue; }
+    if (start === -1) { noise += 1; continue; }
     try {
       const entry = JSON.parse(trimmed.slice(start));
       if (entry && typeof entry === "object" && typeof entry.tool === "string") entries.push(entry);
-      else skipped += 1;
+      else malformed += 1;
     } catch {
-      skipped += 1;
+      noise += 1;
     }
   }
-  return { entries, skipped };
+  return { entries, noise, malformed };
 }
 
 function countBy(entries, pick) {
@@ -117,15 +141,15 @@ function main() {
     return;
   }
 
-  const { entries, skipped } = parseLines(readInput(args[0]));
+  const { entries, noise, malformed } = parseLines(readInput(args[0]));
   if (entries.length === 0) {
-    // 로그가 통째로 비었으면(조용한 구간) 정상이다. 줄은 있는데 하나도 못 읽었으면
-    // 형식이 바뀐 것이므로 끊는다 — `pnpm check`가 이 갈래로 스크립트의 실명을 잡는다.
-    if (skipped > 0) {
-      console.error(`호출 로그 줄을 하나도 못 읽었다 (건너뛴 줄 ${skipped}개). 로그 형식이 바뀌었는지 본다.`);
+    // 호출이 0건인 구간은 정상이다(재시작 직후 배너만 있는 창이 그렇다). `tool`이 빠진
+    // JSON 줄이 있을 때만 형식이 바뀐 것으로 보고 끊는다.
+    if (malformed > 0) {
+      console.error(`호출 로그 줄을 하나도 못 읽었다 (tool이 없는 JSON 줄 ${malformed}개). 로그 형식이 바뀌었는지 본다.`);
       process.exit(1);
     }
-    console.log("로그가 비어 있다.");
+    console.log(`이 구간에는 툴 호출이 없다${noise > 0 ? ` (로그 줄이 아닌 줄 ${noise}개는 건너뛰었다)` : ""}.`);
     return;
   }
 
@@ -133,7 +157,7 @@ function main() {
   const stamps = entries.map((entry) => entry.ts).filter((ts) => typeof ts === "string").sort();
   console.log(`# 호출 로그 요약 — ${total}건`);
   if (stamps.length > 0) console.log(`기간: ${stamps[0]} ~ ${stamps[stamps.length - 1]}`);
-  if (skipped > 0) console.log(`읽지 못한 줄: ${skipped}개`);
+  if (malformed > 0) console.log(`tool이 없는 JSON 줄: ${malformed}개 — 로그 형식이 바뀌었는지 본다`);
 
   section("툴별 호출");
   const byTool = countBy(entries, (entry) => entry.tool);
@@ -153,8 +177,8 @@ function main() {
   section("답을 못 준 비율");
   for (const [tool] of byTool) {
     const rows = entries.filter((entry) => entry.tool === tool);
-    const missed = rows.filter((entry) => UNANSWERED.has(entry.status));
-    const detail = countBy(missed, (entry) => entry.status)
+    const missed = rows.filter(isUnanswered);
+    const detail = countBy(missed, (entry) => (tool === REGION_TOOL ? `지역 ${entry.regionStatus}` : entry.status))
       .map(([status, count]) => `${status} ${count}`)
       .join(", ");
     console.log(`- ${tool}: ${missed.length}/${rows.length} (${share(missed.length, rows.length)})${detail ? ` — ${detail}` : ""}`);
@@ -221,4 +245,8 @@ function main() {
   }
 }
 
-main();
+// 스모크가 이 파일에서 툴 목록과 파서를 가져다 쓴다(손으로 베낀 목록이 서버와 어긋나는
+// 것을 거기서 잡는다). 가져다 쓸 때 리포트가 돌면 안 되므로 직접 실행일 때만 부른다.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}
