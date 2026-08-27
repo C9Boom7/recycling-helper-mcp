@@ -3045,6 +3045,9 @@ async function runSpotSmoke() {
       ["성수1가2동", "성수동1가"],
       ["금호2·3가동", "금호동2가"], // 앞번호가 여럿이면 첫 번호로. 옛 규칙은 `금호2·동3가`를 만들었다
       ["종로1·2·3·4가동", "종로1가"], // 이름이 `로`로 끝나면 법정동에 `동`이 없다
+      ["원효로1동", "원효로1가"], // 숫자 규칙에도 같은 `로` 갈래가 필요하다(리뷰 2라운드)
+      ["한강로동", "한강로1가"], // 번호가 없어 규칙이 못 짚는다 — 별칭 표
+      ["숭인제1동", "숭인동"],
       ["약수동", "신당동"], // 이름이 아예 다른 행정동
       ["왕십리도선동", "하왕십리동"],
     ]) {
@@ -3053,6 +3056,14 @@ async function runSpotSmoke() {
         upstream.requests.at(-1).addr === expected,
         `행정동 정규화가 빗나갔다: ${said} → ${upstream.requests.at(-1).addr} (기대: ${expected})`,
       );
+    }
+
+    // 별칭 표가 이름을 바꿨으면 응답이 그 사실을 되비춰야 한다 — 안 그러면 `약수동`을
+    // 물은 사람이 대 본 적 없는 `신당동`으로 시작하는 답을 받는다(리뷰 2라운드).
+    {
+      const renamed = resultText(await call({ dong: "약수동", region: "서울 중구" }));
+      assert(renamed.includes("약수동"), `별칭으로 바뀐 원래 이름이 응답에 없다:\n${renamed}`);
+      assert(renamed.includes("신당동"), `별칭이 가리키는 법정동이 응답에 없다:\n${renamed}`);
     }
 
     // 건드리면 안 되는 것들. `본동`은 동작구 법정동이고, `광희동`은 법정동 `광희동1가`에
@@ -3073,10 +3084,29 @@ async function runSpotSmoke() {
      * 끝나지 않았다). 정규화는 조회 전에 끝나므로 업스트림을 타지 않고 재는 게 맞다.
      */
     {
-      const startedAt = Date.now();
-      await call({ dong: `가1가${"1".repeat(37)}`, region: "서울 노원구" });
-      const elapsed = Date.now() - startedAt;
-      assert(elapsed < 1_000, `행정동 정규화가 되짚기로 멈춘다: ${elapsed}ms`);
+      // `call`은 fetch에 시한을 안 걸어서, 되짚기가 되살아나면 이벤트 루프가 멈춘 채
+      // 응답이 영영 안 온다 — 단언이 실패하는 게 아니라 스위트가 CI 시한까지 매달린다.
+      // 그래서 이 한 번만 직접 쳐서 시한을 건다(리뷰 2라운드).
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3_000);
+      try {
+        const response = await fetch(`${baseUrl}/mcp`, {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: requestId++,
+            method: "tools/call",
+            params: { name: "find_disposal_spots", arguments: { dong: `가1가${"1".repeat(37)}`, region: "서울 노원구" } },
+          }),
+          signal: controller.signal,
+        });
+        await response.text();
+      } catch (error) {
+        assert(false, `행정동 정규화가 되짚기로 멈춘다 — 3초 안에 응답이 없다: ${error?.name ?? error}`);
+      } finally {
+        clearTimeout(timer);
+      }
     }
 
     // 품목 필터 — 확정되면 그 묶음만, 못 찾거나 모호하면 되묻지 않고 전 묶음으로 간다.
