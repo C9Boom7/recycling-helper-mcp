@@ -947,12 +947,17 @@
       "깨끗한 부분과 오염된 부분",
       "깨끗한 종이 부분",
       "일반쓰레기",
-      "품목사전 - 피자박스"
+      "품목사전 - 피자박스",
+      "## 기름 묻은 피자박스\n\n기름이나 음식물이 묻은",
+      "- 판단 범위: 전국 공통 기준으로 바로 안내 가능합니다."
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pizza_box_oily\"",
       "\"matchedBy\":\"기름 묻은 피자박스\"",
       "\"status\":\"verified\""
+    ],
+    "expectedTextExcludes": [
+      "- 확신도:"
     ]
   },
   {
@@ -11435,6 +11440,30 @@
     "expectedTextIncludes": [
       "개수 제한 없이 1개부터",
       "5개 이상"
+    ]
+  },
+  {
+    "id": "epr_floor_lamp_brief_source_is_item_dictionary",
+    "tool": "classify_waste_item",
+    "arguments": {
+      "itemName": "스탠드 조명"
+    },
+    "expectedTextIncludes": [
+      "- 대표 근거: 생활폐기물 분리배출 누리집 품목사전 - 스탠드 조명"
+    ],
+    "expectedTextExcludes": [
+      "- 대표 근거: E-순환거버넌스"
+    ]
+  },
+  {
+    "id": "epr_electric_oven_range_has_route",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "오븐레인지"
+    },
+    "expectedTextIncludes": [
+      "전기만 쓰는 전기오븐",
+      "소형가전 전용수거함"
     ]
   }
 ]
