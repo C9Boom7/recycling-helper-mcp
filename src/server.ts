@@ -1666,7 +1666,28 @@ const ADMINISTRATIVE_DONG_ALIASES = new Map<string, string>([
   ["일원본동", "일원동"],
   ["중계본동", "중계동"],
   ["화곡본동", "화곡동"],
+  // 서울 송파구 — 218개 표본이 송파를 안 덮어 3라운드에서 드러났다.
+  ["가락본동", "가락동"],
+  ["잠실본동", "잠실동"],
+  /**
+   * 서수 `제`가 든 행정동. 규칙은 어간을 길게 잡아 `숭인제동`을 만드는데, 짧게 잡으면
+   * `홍제1동`이 `홍동`(충남 홍성군 홍동면 158건)으로 새서 **틀린 동네 주소를 자신 있게**
+   * 내보낸다. 0건으로 떨어져 폴백을 타는 쪽이 낫다고 보고 어간을 길게 잡은 뒤,
+   * 실제로 쓰는 이름만 여기 적는다.
+   */
+  ["숭인제1동", "숭인동"],
+  ["숭인제2동", "숭인동"],
+  ["창신제1동", "창신동"],
+  ["창신제2동", "창신동"],
+  ["창신제3동", "창신동"],
 ]);
+
+/**
+ * 이름이 `로`로 끝나도 법정동이 `N가`인 것은 **이 넷뿐이다**. 어간이 `로`로 끝나는지만
+ * 보면 `구로3동`이 `구로3가`(0건)가 된다 — 법정동은 `구로동`(593건)이다.
+ * 후보를 넓히기 전에 반드시 `getSpot`으로 건수를 확인한다(`청파로1가`는 0건이라 없다).
+ */
+const RO_STEMS_WITH_GA_DONG = new Set(["종로", "을지로", "원효로", "한강로"]);
 
 /**
  * `금호1가동`·`성수1가2동`·`금호2ㆍ3가동`처럼 `가`가 든 행정동.
@@ -1677,7 +1698,7 @@ const ADMINISTRATIVE_DONG_ALIASES = new Map<string, string>([
  * 않았다. `dong`은 사용자가 주는 값이라 그대로 두면 이벤트 루프가 멈춘다.
  */
 const GA_FORM_DONG = new RegExp(
-  `^(.+?)제?\\s*(\\d+)${DONG_NUMBER_TAIL}\\s*가(?:\\s*\\d+${DONG_NUMBER_TAIL})?\\s*동$`,
+  `^(.+?)(\\d+)${DONG_NUMBER_TAIL}\\s*가(?:\\s*\\d+${DONG_NUMBER_TAIL})?\\s*동$`,
 );
 
 /**
@@ -1685,7 +1706,7 @@ const GA_FORM_DONG = new RegExp(
  * 어간(`(.+?)`)까지 잡는 건 `원효로1동`처럼 `로`로 끝나는 이름을 갈라 내기 위해서다 —
  * 어간이 없는 `제1동`은 아예 매치되지 않아 그대로 나간다. 그 이름으로 조회하면 전국이 걸린다.
  */
-const NUMBERED_DONG_WITH_STEM = new RegExp(`^(.+?)제?\\s*(\\d+)${DONG_NUMBER_TAIL}\\s*동$`);
+const NUMBERED_DONG_WITH_STEM = new RegExp(`^(.+?)(\\d+)${DONG_NUMBER_TAIL}\\s*동$`);
 
 /** `로`로 끝나는 이름의 법정동은 `동` 없이 `N가`다 — 원효로1가, 종로1가, 한강로1가. */
 function legalDongForRoStem(stem: string, number: string): string {
@@ -1726,16 +1747,17 @@ function normalizeDongName(raw: string): NormalizedDong {
     const stem = ga[1];
     // 여러 `가`를 겸하는 행정동(`종로1ㆍ2ㆍ3ㆍ4가동`)은 첫 번호로 간다. 넷 다 훑을 방법이
     // 없고(한 번에 한 `addr`), 아무것도 안 보내는 것보다는 한 곳이라도 맞히는 쪽이 낫다.
-    return { name: stem.endsWith("로") ? legalDongForRoStem(stem, ga[2]) : `${stem}동${ga[2]}가` };
+    return { name: RO_STEMS_WITH_GA_DONG.has(stem) ? legalDongForRoStem(stem, ga[2]) : `${stem}동${ga[2]}가` };
   }
 
   const numbered = trimmed.match(NUMBERED_DONG_WITH_STEM);
-  // 어간에서 접두 `제`를 걷어 낸다. `제1동`은 어간이 통째로 `제`라 걷으면 아무것도 안 남고,
-  // 그때는 줄이지 않는다 — `제동`이나 `동`으로 조회하면 전국의 주소가 걸린다.
-  const numberedStem = numbered?.[1].replace(/제\s*$/, "").trim();
-  if (numbered && numberedStem) {
+  const numberedStem = numbered?.[1].trim();
+  // 어간이 `제` 한 글자면 줄이지 않는다(`제1동`) — `제동`으로 조회하면 전국이 걸린다.
+  if (numberedStem && numberedStem !== "제") {
     return {
-      name: numberedStem.endsWith("로") ? legalDongForRoStem(numberedStem, numbered[2]) : `${numberedStem}동`,
+      name: RO_STEMS_WITH_GA_DONG.has(numberedStem)
+        ? legalDongForRoStem(numberedStem, numbered![2])
+        : `${numberedStem}동`,
     };
   }
 
