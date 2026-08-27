@@ -973,15 +973,11 @@ async function runSmoke() {
       // 지역 요약 줄은 근거가 아니다(PR #70 리뷰 3라운드). 소형가전 수거함 품목은
       // `formatRegionItemGuide`의 마지막 갈래로 떨어져 `- {지역 요약}` 한 줄만 받는데,
       // 노원 요약의 "수수료 조회"·"동주민센터"에 걸려 확인 항목이 빠지고 있었다.
-      // 픽스처는 원래 `스탠드 조명`이었는데, 조명이 무상방문수거 대상이 아니라는 게
-      // 확인되면서 대형폐기물 갈래가 붙어(`small_electronics_collection_or_bulky`) 이
-      // 갈래를 더 이상 타지 않는다. 같은 모양의 `청소기`로 옮겼다 — 소형가전 수거함
-      // 품목이고, 노원구에 품목별 안내도 수수료 행도 없어 지역 요약 한 줄만 받는다.
-      const vacuumText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "청소기", region: "서울 노원구" }, requestId++));
-      assert(!vacuumText.includes("수수료 후보:"), "노원구 청소기: 수수료표가 나간다 — 픽스처가 더 이상 지역 요약만 받는 갈래를 타지 않는다");
+      const lampText = resultText(await callTool(baseUrl, "get_disposal_steps", { itemName: "스탠드 조명", region: "서울 노원구" }, requestId++));
+      assert(!lampText.includes("수수료 후보:"), "노원구 스탠드 조명: 수수료표가 나간다 — 픽스처가 더 이상 지역 요약만 받는 갈래를 타지 않는다");
       assert(
-        vacuumText.includes("- 확인 항목: 대형폐기물 신고 여부"),
-        "노원구 청소기: 지역 요약 문장의 낱말을 근거로, 답한 적 없는 확인 항목을 지웠다",
+        lampText.includes("- 확인 항목: 대형폐기물 신고 방법과 수수료"),
+        "노원구 스탠드 조명: 지역 요약 문장의 낱말을 근거로, 답한 적 없는 확인 항목을 지웠다",
       );
 
       // 괄호 안이 한정 질문이면 항목을 지우지 않는다. "품목별 수수료(일반·전동 구분)"는

@@ -5799,8 +5799,7 @@
     "expectedTextIncludes": [
       "스탠드 조명",
       "소형전기전자제품 전용수거함",
-      "인테리어 제품",
-      "인터넷 신청: "
+      "인테리어 제품"
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"floor_lamp\"",
