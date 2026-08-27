@@ -17,22 +17,51 @@
  */
 import { readFileSync } from "node:fs";
 
-/** 서버가 등록하는 툴. 여기 있는데 호출이 0인 툴은 description이 안 먹히고 있다는 신호다. */
-const KNOWN_TOOLS = [
+/** 항상 등록되는 다섯. 여기 있는데 호출이 0이면 description이 안 먹히고 있다는 신호다. */
+const ALWAYS_REGISTERED_TOOLS = [
   "classify_waste_item",
   "get_disposal_steps",
   "check_confusing_item",
   "make_cleanup_plan",
   "get_region_disposal_info",
-  "find_disposal_spots",
 ];
+/**
+ * 여섯 번째 툴은 `DATA_GO_KR_SERVICE_KEY`가 있을 때만 등록된다(PRD phase-12 D3).
+ * 키 없이 배포한 기간의 로그에서 이걸 "안 불린 툴"로 함께 세면, 이 리포트에서 가장
+ * 중요한 줄이 늘 늑대를 부르게 된다 — 문구를 갈라 둔다.
+ */
+const KEY_GATED_TOOL = "find_disposal_spots";
 
 /** 답을 못 준 것으로 세는 status. 툴마다 이름이 달라 한자리에 모은다. */
 const UNANSWERED = new Set(["not_found", "ambiguous", "spots_ask", "spots_fallback"]);
+/**
+ * 답을 못 준 것과 **터진 것**은 다르다. `error`를 위 집합에 섞으면 폴백으로 착지한 건과
+ * 한 칸에 뭉치고, 빼 두면 100% 터지는 툴이 `0/N (0.0%)`로 멀쩡해 보인다. 따로 센다.
+ */
+const FAILED = new Set(["error"]);
 
 function readInput(path) {
-  if (path) return readFileSync(path, "utf8");
+  if (path) {
+    try {
+      return readFileSync(path, "utf8");
+    } catch (error) {
+      console.error(`로그 파일을 읽지 못했다: ${path} (${error.code ?? error.message})`);
+      process.exit(1);
+    }
+  }
+  // 인자도 없고 파이프도 없으면 stdin에서 영원히 멈춘다. 무엇을 하라는 건지 알려주고 끝낸다.
+  if (process.stdin.isTTY) {
+    console.error("읽을 로그가 없다. 파일 경로를 주거나 로그를 파이프로 넘긴다.");
+    console.error("  pnpm report:calls logs/call-log.jsonl");
+    console.error("  kubectl logs deploy/recycling-helper-mcp | pnpm report:calls");
+    process.exit(1);
+  }
   return readFileSync(0, "utf8");
+}
+
+/** 표본이 십만 줄을 넘으면 `Math.max(...arr)`가 인자 한도에 걸려 리포트가 중간에 죽는다. */
+function maxOf(values) {
+  return values.reduce((max, value) => (value > max ? value : max), -Infinity);
 }
 
 function parseLines(text) {
@@ -90,8 +119,13 @@ function main() {
 
   const { entries, skipped } = parseLines(readInput(args[0]));
   if (entries.length === 0) {
-    console.log("호출 로그 줄을 하나도 찾지 못했다.");
-    if (skipped > 0) console.log(`(JSON으로 못 읽은 줄 ${skipped}개 — 로그 형식을 확인한다)`);
+    // 로그가 통째로 비었으면(조용한 구간) 정상이다. 줄은 있는데 하나도 못 읽었으면
+    // 형식이 바뀐 것이므로 끊는다 — `pnpm check`가 이 갈래로 스크립트의 실명을 잡는다.
+    if (skipped > 0) {
+      console.error(`호출 로그 줄을 하나도 못 읽었다 (건너뛴 줄 ${skipped}개). 로그 형식이 바뀌었는지 본다.`);
+      process.exit(1);
+    }
+    console.log("로그가 비어 있다.");
     return;
   }
 
@@ -108,9 +142,12 @@ function main() {
   }
   // **호출이 0인 툴이 이 리포트에서 가장 중요한 줄이다.** 데이터가 아무리 좋아도
   // 호스트가 그 툴을 안 고르면 사용자에게 닿지 않는다.
-  const unused = KNOWN_TOOLS.filter((tool) => !byTool.some(([name]) => name === tool));
+  const unused = ALWAYS_REGISTERED_TOOLS.filter((tool) => !byTool.some(([name]) => name === tool));
   if (unused.length > 0) {
     console.log(`- 한 번도 안 불린 툴: ${unused.join(", ")} — description이 안 먹히고 있는지 본다`);
+  }
+  if (!byTool.some(([name]) => name === KEY_GATED_TOOL)) {
+    console.log(`- ${KEY_GATED_TOOL} 호출이 없다 — 인증키 없이 배포했다면 아예 등록되지 않으므로 정상이다`);
   }
 
   section("답을 못 준 비율");
@@ -121,6 +158,31 @@ function main() {
       .map(([status, count]) => `${status} ${count}`)
       .join(", ");
     console.log(`- ${tool}: ${missed.length}/${rows.length} (${share(missed.length, rows.length)})${detail ? ` — ${detail}` : ""}`);
+  }
+
+  // 터진 호출은 위 비율과 갈라 센다. 0건이어도 줄을 남긴다 — 없는 줄과 0인 줄은 다르다.
+  const failed = entries.filter((entry) => FAILED.has(entry.status));
+  section("오류로 끝난 호출");
+  if (failed.length === 0) {
+    console.log("- 없음");
+  } else {
+    console.log(`- 전체 ${failed.length}건 (${share(failed.length, total)})`);
+    for (const [tool, count] of countBy(failed, (entry) => entry.tool)) {
+      console.log(`  - ${tool}: ${count}건`);
+    }
+    console.log("  (한 툴에 몰리면 그 핸들러를 먼저 본다. 서버 로그 원문의 예외 서명과 대조한다)");
+  }
+
+  // 여러 품목을 한 번에 받는 플랜은 status만으로는 절반만 답한 호출이 안 보인다.
+  // `partial`은 위 비율에서 "답을 준 것"으로 세지므로, 품목 단위 커버리지를 따로 낸다.
+  const plans = entries.filter((entry) => entry.tool === "make_cleanup_plan" && typeof entry.total === "number");
+  if (plans.length > 0) {
+    const items = plans.reduce((sum, entry) => sum + entry.total, 0);
+    const matched = plans.reduce((sum, entry) => sum + (typeof entry.matched === "number" ? entry.matched : 0), 0);
+    section("대청소 플랜의 품목 커버리지");
+    console.log(`- 품목 ${items}개 중 ${matched}개 확정 (${share(matched, items)})`);
+    const partial = plans.filter((entry) => entry.status === "partial").length;
+    console.log(`- 일부만 확정된 호출: ${partial}/${plans.length}`);
   }
 
   const fallbackTiers = countBy(entries, (entry) => entry.fallbackTier);
@@ -147,7 +209,7 @@ function main() {
     console.log("  (body가 쌓이면 키 오류나 일 한도 초과다 — network·http와 원인이 다르다)");
     const upstreamMs = entries.map((entry) => entry.upstreamMs).filter((ms) => typeof ms === "number");
     if (upstreamMs.length > 0) {
-      console.log(`- 업스트림 지연: p50 ${percentile(upstreamMs, 0.5)}ms · p95 ${percentile(upstreamMs, 0.95)}ms · 최대 ${Math.max(...upstreamMs)}ms`);
+      console.log(`- 업스트림 지연: p50 ${percentile(upstreamMs, 0.5)}ms · p95 ${percentile(upstreamMs, 0.95)}ms · 최대 ${maxOf(upstreamMs)}ms`);
     }
   }
 
@@ -155,7 +217,7 @@ function main() {
   for (const [tool] of byTool) {
     const durations = entries.filter((entry) => entry.tool === tool).map((entry) => entry.ms).filter((ms) => typeof ms === "number");
     if (durations.length === 0) continue;
-    console.log(`- ${tool}: p50 ${percentile(durations, 0.5)}ms · p95 ${percentile(durations, 0.95)}ms · 최대 ${Math.max(...durations)}ms`);
+    console.log(`- ${tool}: p50 ${percentile(durations, 0.5)}ms · p95 ${percentile(durations, 0.95)}ms · 최대 ${maxOf(durations)}ms`);
   }
 }
 
