@@ -352,7 +352,7 @@ const TOOL_DEFS: ToolDef[] = [
           name: "find_disposal_spots",
           title: "Find Disposal Spots",
           description:
-            "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; forms like 상계1동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
+            "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; 행정동 forms like 상계1동, 상계6·7동, 화곡본동, 금호1가동, 약수동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
           inputShape: {
             // `.trim()`이 스키마 단계에서 공백을 걷는다 — " "가 통과하면 정규화 뒤 빈 addr로
             // 업스트림 한도를 쓰고 "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
@@ -1631,13 +1631,60 @@ const SPOT_MAX_ASK_REGIONS = 4;
 
 const regionPolicyById = new Map(regionalPolicies.map((policy) => [policy.id, policy]));
 
+/** 숫자 사이에 들어가는 구분자. 지자체마다 `·`·`ㆍ`·`.`·공백을 제각각 쓴다. */
+const DONG_NUMBER_SEPARATOR = "[·ㆍ‧∙・.,\\-~\\s]";
+
 /**
- * 행정동 표기를 법정동으로 줄이는 규칙 하나(R2). `addr`은 법정동만 통해서
- * `상계1동`은 그대로 보내면 NODATA다. 그 밖의 변형(`종로1가` 등)은 손대지 않는다 —
- * 규칙을 늘릴수록 멀쩡한 이름을 망가뜨릴 자리가 늘고, 빗나가도 폴백이 받는다.
+ * 법정동 이름이 아예 다른 행정동. 규칙으로는 못 줄이는 것만 손으로 적는다.
+ *
+ * **`getSpot`에 쳐서 전국 0건인 이름만 넣는다.** 어딘가에 같은 이름의 법정동이 있으면
+ * 이 표가 멀쩡한 답을 다른 동네로 돌려 버린다 — `광희동`은 행정동이면서 법정동
+ * `광희동1가`의 앞부분이라 21건이 걸린다. 그래서 여기 없다.
+ */
+const ADMINISTRATIVE_DONG_ALIASES = new Map<string, string>([
+  // 서울 중구 — 셋 다 법정동은 신당동이다.
+  ["약수동", "신당동"],
+  ["청구동", "신당동"],
+  ["동화동", "신당동"],
+  ["을지로동", "을지로2가"],
+  // 서울 성동구
+  ["왕십리도선동", "하왕십리동"],
+]);
+
+/**
+ * 행정동 표기를 법정동으로 줄인다(R2). `addr`은 법정동만 통해서 `상계1동`을 그대로
+ * 보내면 NODATA다.
+ *
+ * 규칙은 넷이고, **전부 실측으로 고른 것**이다. 서울 행정동 이름 218개를 실제 `getSpot`에
+ * 쳐 보니 24개(11%)가 0건이었고, 아래 규칙이 그 24개를 전부 되살린다. 실패가 조용하다는
+ * 게 이 함수를 늘린 이유다 — 빗나가면 폴백이 받지만, 사용자는 자기 동에 수거함이 없는
+ * 건지 우리가 못 찾은 건지 알 수 없다.
+ *
+ * 1. `약수동`처럼 이름이 아예 다른 것은 표에서 바꾼다.
+ * 2. `금호1가동` → `금호동1가`. 법정동은 `동`이 숫자 앞에 온다.
+ * 3. `상계1동`·`상계6ㆍ7동` → `상계동`. 옛 규칙은 뒤 숫자만 떼어 `상계6ㆍ동`을 만들었다.
+ * 4. `화곡본동` → `화곡동`. 단 `본동`은 그 자체가 동작구 법정동이라 건드리지 않는다.
  */
 function normalizeDongName(raw: string): string {
-  return raw.trim().replace(/제?\s*\d+\s*동$/, "동");
+  const trimmed = raw.trim();
+
+  const alias = ADMINISTRATIVE_DONG_ALIASES.get(trimmed);
+  if (alias) return alias;
+
+  const ga = trimmed.match(new RegExp(`^(.+?)제?\\s*(\\d+)\\s*가(?:${DONG_NUMBER_SEPARATOR}*\\d+)*\\s*동$`));
+  if (ga?.[1]) return `${ga[1]}동${ga[2]}가`;
+
+  const numbered = trimmed.replace(
+    new RegExp(`제?\\s*\\d+(?:\\s*${DONG_NUMBER_SEPARATOR}\\s*\\d+)*\\s*동$`),
+    "동",
+  );
+  // 숫자를 떼고 나면 `동` 한 글자만 남는 입력(`제1동`)은 줄이지 않는다 — 그 이름으로
+  // 조회하면 전국의 주소가 걸린다.
+  if (numbered !== trimmed) return numbered === "동" ? trimmed : numbered;
+
+  if (trimmed.length > 2 && trimmed.endsWith("본동")) return `${trimmed.slice(0, -2)}동`;
+
+  return trimmed;
 }
 
 /** 수거함을 실제로 찾는 데 필요한 층·건물 설명이 `addrDtl`에 있다. 공백 하나로 잇는다. */

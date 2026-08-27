@@ -3032,6 +3032,37 @@ async function runSpotSmoke() {
     assert(upstream.requests.at(-1).addr === "상계동", `행정동을 법정동으로 줄이지 않았다: ${upstream.requests.at(-1).addr}`);
     assert(resultText(normalized).startsWith("## 서울 노원구 상계동"), "정규화된 동 이름으로 답해야 한다");
 
+    /**
+     * 나머지 행정동 표기. 서울 행정동 218개를 실제 업스트림에 쳐 보고 0건이던 24개를
+     * 갈래별로 한 줄씩 남긴다 — 정규화가 뒤로 물러나면 이 목록이 먼저 깨진다.
+     */
+    for (const [said, expected] of [
+      ["상계6ㆍ7동", "상계동"], // 숫자 결합형. 옛 규칙은 `상계6ㆍ동`을 만들었다.
+      ["중계2·3동", "중계동"],
+      ["면목3.8동", "면목동"],
+      ["화곡본동", "화곡동"], // 본동
+      ["금호1가동", "금호동1가"], // N가동 — 법정동은 `동`이 숫자 앞에 온다
+      ["성수1가2동", "성수동1가"],
+      ["약수동", "신당동"], // 이름이 아예 다른 행정동
+      ["왕십리도선동", "하왕십리동"],
+    ]) {
+      await call({ dong: said, region: "서울 노원구" });
+      assert(
+        upstream.requests.at(-1).addr === expected,
+        `행정동 정규화가 빗나갔다: ${said} → ${upstream.requests.at(-1).addr} (기대: ${expected})`,
+      );
+    }
+
+    // 건드리면 안 되는 것들. `본동`은 동작구 법정동이고, `광희동`은 법정동 `광희동1가`에
+    // 걸려 21건이 나온다. `제1동`은 숫자를 떼면 `동` 한 글자가 남아 전국이 걸린다.
+    for (const untouched of ["본동", "광희동", "제1동", "종로3가", "상계동"]) {
+      await call({ dong: untouched, region: "서울 노원구" });
+      assert(
+        upstream.requests.at(-1).addr === untouched,
+        `그대로 보내야 하는 이름을 고쳤다: ${untouched} → ${upstream.requests.at(-1).addr}`,
+      );
+    }
+
     // 품목 필터 — 확정되면 그 묶음만, 못 찾거나 모호하면 되묻지 않고 전 묶음으로 간다.
     const filtered = await call({ dong: "상계동", region: "서울 노원구", itemName: "폐의약품" });
     const filteredText = resultText(filtered);
