@@ -3054,6 +3054,7 @@ async function runSpotSmoke() {
       ["묵1동", "묵동"], // 한 글자 어간도 줄인다
       ["가락본동", "가락동"], // 송파 — 218개 표본 밖이었다
       ["잠실본동", "잠실동"],
+      ["종로 1가동", "종로1가"], // 어간을 안 다듬으면 `종로 동1가`가 나갔다
       ["약수동", "신당동"], // 이름이 아예 다른 행정동
       ["왕십리도선동", "하왕십리동"],
     ]) {
@@ -3070,6 +3071,14 @@ async function runSpotSmoke() {
       const renamed = resultText(await call({ dong: "약수동", region: "서울 중구" }));
       assert(renamed.includes("약수동"), `별칭으로 바뀐 원래 이름이 응답에 없다:\n${renamed}`);
       assert(renamed.includes("신당동"), `별칭이 가리키는 법정동이 응답에 없다:\n${renamed}`);
+    }
+
+    // 여러 `가`를 접었으면 그 사실을 밝혀야 한다 — 나머지 가를 조용히 버리면 이 PR이
+    // 없애려던 바로 그 모양이다(리뷰 4라운드).
+    {
+      const collapsed = resultText(await call({ dong: "종로1·2·3·4가동", region: "서울 종로구" }));
+      assert(collapsed.includes("종로1·2·3·4가동"), `접은 원래 이름이 응답에 없다:\n${collapsed}`);
+      assert(collapsed.includes("종로1가"), `접어서 실제로 조회한 이름이 응답에 없다:\n${collapsed}`);
     }
 
     // 건드리면 안 되는 것들. `본동`은 동작구 법정동이고, `광희동`은 법정동 `광희동1가`에
@@ -3095,6 +3104,10 @@ async function runSpotSmoke() {
       // 그래서 이 한 번만 직접 쳐서 시한을 건다(리뷰 2라운드).
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 3_000);
+      // 스키마 상한(40자) 바로 아래로 잡는다. 상한에 딱 붙이면 나중에 상한을 조이는 순간
+      // 이 입력이 스키마에서 걸려 툴에 닿지도 못한 채 단언만 통과한다.
+      const redosDong = `가1가${"1".repeat(30)}`;
+      let redosBody;
       try {
         const response = await fetch(`${baseUrl}/mcp`, {
           method: "POST",
@@ -3103,16 +3116,30 @@ async function runSpotSmoke() {
             jsonrpc: "2.0",
             id: requestId++,
             method: "tools/call",
-            params: { name: "find_disposal_spots", arguments: { dong: `가1가${"1".repeat(37)}`, region: "서울 노원구" } },
+            params: { name: "find_disposal_spots", arguments: { dong: redosDong, region: "서울 노원구" } },
           }),
           signal: controller.signal,
         });
-        await response.text();
+        redosBody = await response.text();
       } catch (error) {
-        assert(false, `행정동 정규화가 되짚기로 멈춘다 — 3초 안에 응답이 없다: ${error?.name ?? error}`);
+        // 중단(AbortError)만 되짚기 신호다. 그 밖의 fetch 실패를 같은 문장으로 보고하면
+        // 일시적 오류가 ReDoS 회귀로 읽힌다.
+        const timedOut = controller.signal.aborted || error?.name === "AbortError";
+        assert(
+          false,
+          timedOut
+            ? "행정동 정규화가 되짚기로 멈춘다 — 3초 안에 응답이 없다"
+            : `되짚기 가드 요청이 실패했다(되짚기와 무관): ${error?.name ?? error}`,
+        );
       } finally {
         clearTimeout(timer);
       }
+      // 툴까지 닿았는지 본다. 스키마가 걸러 냈으면 이 단언이 먼저 깨져 가드가 빈 채로
+      // 통과하는 일을 막는다.
+      assert(
+        redosBody.includes("근처 배출 장소") || redosBody.includes("찾지 못했습니다") || redosBody.includes("조회하지 못했습니다"),
+        `되짚기 가드 입력이 툴까지 닿지 않았다 — 스키마에서 걸린 듯하다:\n${redosBody.slice(0, 400)}`,
+      );
     }
 
     // 품목 필터 — 확정되면 그 묶음만, 못 찾거나 모호하면 되묻지 않고 전 묶음으로 간다.

@@ -1708,6 +1708,19 @@ const GA_FORM_DONG = new RegExp(
  */
 const NUMBERED_DONG_WITH_STEM = new RegExp(`^(.+?)(\\d+)${DONG_NUMBER_TAIL}\\s*동$`);
 
+/**
+ * 받침을 보고 `으로`/`로`를 고른다. 이름이 `한강로1가`처럼 열린 음절로 끝나면 `으로`가
+ * 붙어 `한강로1가으로`가 나갔다. 한글이 아닌 끝 글자는 보수적으로 `으로`를 붙인다.
+ */
+function withEuroJosa(word: string): string {
+  const last = word.at(-1) ?? "";
+  const code = last.charCodeAt(0);
+  if (Number.isNaN(code) || code < 0xac00 || code > 0xd7a3) return `${word}으로`;
+  const jongseong = (code - 0xac00) % 28;
+  // 받침이 없거나(0) `ㄹ`(8)이면 `로`다.
+  return jongseong === 0 || jongseong === 8 ? `${word}로` : `${word}으로`;
+}
+
 /** `로`로 끝나는 이름의 법정동은 `동` 없이 `N가`다 — 원효로1가, 종로1가, 한강로1가. */
 function legalDongForRoStem(stem: string, number: string): string {
   return `${stem}${number}가`;
@@ -1744,10 +1757,18 @@ function normalizeDongName(raw: string): NormalizedDong {
 
   const ga = trimmed.match(GA_FORM_DONG);
   if (ga?.[1]) {
-    const stem = ga[1];
-    // 여러 `가`를 겸하는 행정동(`종로1ㆍ2ㆍ3ㆍ4가동`)은 첫 번호로 간다. 넷 다 훑을 방법이
-    // 없고(한 번에 한 `addr`), 아무것도 안 보내는 것보다는 한 곳이라도 맞히는 쪽이 낫다.
-    return { name: RO_STEMS_WITH_GA_DONG.has(stem) ? legalDongForRoStem(stem, ga[2]) : `${stem}동${ga[2]}가` };
+    // 숫자 갈래와 달리 다듬지 않아 `종로 1가동`의 어간이 `"종로 "`가 되고, 집합에 걸리지
+    // 않아 `종로 동1가`(공백이 낀 0건)가 나갔다.
+    const stem = ga[1].trim();
+    const name = RO_STEMS_WITH_GA_DONG.has(stem) ? legalDongForRoStem(stem, ga[2]) : `${stem}동${ga[2]}가`;
+    /**
+     * 여러 `가`를 겸하는 행정동(`종로1ㆍ2ㆍ3ㆍ4가동`)은 첫 번호로 간다. 넷 다 훑을 방법이
+     * 없고(한 번에 한 `addr`), 아무것도 안 보내는 것보다는 한 곳이라도 맞히는 쪽이 낫다.
+     * 다만 **접었다는 사실은 밝힌다** — 나머지 가를 조용히 버리면 이 PR이 없애려던
+     * 바로 그 모양이 된다.
+     */
+    const collapsedOtherAreas = /\d[^\d]*\d/.test(trimmed.slice(0, trimmed.indexOf("가")));
+    return collapsedOtherAreas ? { name, renamedFrom: trimmed } : { name };
   }
 
   const numbered = trimmed.match(NUMBERED_DONG_WITH_STEM);
@@ -1993,7 +2014,7 @@ async function handleFindDisposalSpots({
       const unresolvedRegionNote =
         hintRegion && !regionMatch ? `말씀하신 지역 "${hintRegion}"만으로는 어느 시·군·구인지 정하지 못했습니다. ` : "";
       return textResult(
-        `${unresolvedRegionNote}${renamedFrom ? `"${renamedFrom}"은 행정동이라 법정동 이름인 ${normalizedDong}으로 찾았습니다. ` : ""}여러 지역에 "${normalizedDong}"이라는 같은 이름의 동이 있습니다(${regions.join(", ")}). 시·군·구를 함께 알려주세요 — 예: "서울 노원구 상계동".`,
+        `${unresolvedRegionNote}${renamedFrom ? `"${renamedFrom}"은 행정동이라 법정동 이름인 ${withEuroJosa(normalizedDong)} 찾았습니다. ` : ""}여러 지역에 "${normalizedDong}"이라는 같은 이름의 동이 있습니다(${regions.join(", ")}). 시·군·구를 함께 알려주세요 — 예: "서울 노원구 상계동".`,
         { found: false, dong: normalizedDong, ambiguousDong: true, regions },
         { ...baseLog, status: "spots_ask", upstream: lookup.upstream },
       );
