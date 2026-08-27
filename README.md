@@ -61,6 +61,8 @@
 
 카드를 내는 툴은 `get_disposal_steps`와 `classify_waste_item` 둘이고, 같은 카드를 냅니다. 카카오가 붙이는 `Kakao Tools · 재활용척척` 라벨이 위젯 응답에만 나오고 텍스트 답변은 ChatGPT가 다시 쓰기 때문에, 호스트가 어느 쪽을 골랐는지로 답변 품질이 갈리지 않게 맞춘 것입니다. 품목 3개를 견주는 `check_confusing_item`과 여러 품목을 묶는 `make_cleanup_plan`은 단일 품목 카드에 담기지 않아 텍스트로 답합니다.
 
+품목 카드의 텍스트는 **결론을 제목 바로 다음 줄에** 세웁니다. 카카오톡 말풍선에서 처음 두 줄이 가장 많이 읽히는 자리인데, 예전에는 거기에 `배출 그룹`·`확신도` 같은 분류 메타데이터가 서고 정작 답이 네 번째 줄로 밀려 있었습니다. `확신도`는 **높지 않을 때만** 냅니다(336개 중 255개가 `높음`이라 대부분의 답에서 아무것도 가르지 않고, 오히려 확신이 없다는 인상만 줍니다). `판단 범위`는 아래 `지역 확인 필요` 블록이 서는 응답에서는 뺍니다 — 같은 말을 두 번 하는 자리입니다.
+
 확정이 아닐 때는 텍스트로 답합니다.
 
 - `ambiguous` — 후보를 제시하고 재질·용도를 되묻습니다. 임의로 하나를 고르지 않습니다.
@@ -169,7 +171,7 @@ Agentic Player 10 공모전에서는 PlayMCP in KC가 제공하는 공모전용 
 
 - 품목 데이터: `src/data/waste-items.json` (336개)
 - 대표 질문 평가셋: `src/data/evaluation-cases.json` (336개)
-- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (626개)
+- MCP 답변 품질 케이스: `src/data/mcp-answer-cases.json` (628개)
 - 지역 정책 데이터: `src/data/region-policies.json` (57개 지역 — full 5, standard 35, metro 17)
 - 지역 평가셋: `src/data/region-evaluation-cases.json` (136개)
 - 대형폐기물 수수료: `src/data/bulky-waste-fees.json` (28개 지역 3,829행 — 서울 25개 구는 전부 있고, 경기 6개 시와 광역시 자치구 6곳이 남았다)

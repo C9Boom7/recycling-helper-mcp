@@ -2633,10 +2633,20 @@ export function formatItemGuide(item: WasteItem, region?: string): string {
     // 그룹`으로 맞춘 건 위젯 캡션·`classify_waste_item`·structuredContent의
     // `disposalGroup`이 이미 그 이름으로 같은 값을 부르고 있어서다 — 툴만 갈아탄
     // 사용자가 같은 값을 다른 이름으로 두 번 만나지 않게 한다.
+    // 결론을 라벨 없이 제목 바로 밑에 세운다. 예전에는 `배출 그룹` 다음 네 번째 줄이었는데,
+    // 카카오톡 말풍선에서 처음 두 줄이 가장 많이 읽히는 자리라 거기에 분류 메타데이터가
+    // 서고 정작 답이 아래로 밀려 있었다.
+    item.summary,
+    "",
     `- 배출 그룹: ${disposalGroupLabel(item.disposalType)}`,
-    `- 결론: ${item.summary}`,
-    `- 확신도: ${confidenceLabel(item.confidence)}`,
-    `- 판단 범위: ${itemRegionGuidance(item)}`,
+    // 확신도는 **높지 않을 때만** 낸다. 336개 중 255개가 `높음`이라 대부분의 답에서 이 줄은
+    // 아무것도 가르지 않는데, 사용자에게는 "얘가 확신이 없나" 하고 되묻게 만드는 값이다.
+    // 갈리는 답에만 남겨야 그 표시가 실제로 신호가 된다.
+    item.confidence === "high" ? undefined : `- 확신도: ${confidenceLabel(item.confidence)}`,
+    // 지역 확인 블록이 아래에 설 응답에서는 뺀다 — 같은 말을 두 번 하는 자리다.
+    // 그 블록이 안 서는 품목에서는 "전국 공통 기준으로 바로 안내 가능합니다"가 되어
+    // 되묻기를 줄이는 값이 있으므로 남긴다.
+    opensRegionSection ? undefined : `- 판단 범위: ${itemRegionGuidance(item)}`,
     item.conditions.length > 0 ? `- 판단 조건: ${item.conditions.map(conditionLabel).join(", ")}` : undefined,
     "",
     "### 배출 방법",

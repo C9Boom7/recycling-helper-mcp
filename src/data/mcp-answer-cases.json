@@ -947,12 +947,17 @@
       "깨끗한 부분과 오염된 부분",
       "깨끗한 종이 부분",
       "일반쓰레기",
-      "품목사전 - 피자박스"
+      "품목사전 - 피자박스",
+      "## 기름 묻은 피자박스\n\n기름이나 음식물이 묻은",
+      "- 판단 범위: 전국 공통 기준으로 바로 안내 가능합니다."
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"pizza_box_oily\"",
       "\"matchedBy\":\"기름 묻은 피자박스\"",
       "\"status\":\"verified\""
+    ],
+    "expectedTextExcludes": [
+      "- 확신도:"
     ]
   },
   {
@@ -11321,6 +11326,34 @@
     "expectedTextIncludes": [
       "서울 서초구 대형생활폐기물 수수료 후보",
       "- 장롱: 120cm 이상 15,000원"
+    ]
+  },
+  {
+    "id": "card_conclusion_leads_the_answer",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "매트리스"
+    },
+    "expectedTextIncludes": [
+      "## 매트리스\n\n매트리스는 대형폐기물 신고 후 배출합니다."
+    ],
+    "expectedTextExcludes": [
+      "- 결론:",
+      "- 확신도:",
+      "- 판단 범위:"
+    ]
+  },
+  {
+    "id": "card_shows_confidence_when_not_high",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "스프레이캔"
+    },
+    "expectedTextIncludes": [
+      "- 확신도: 보통"
+    ],
+    "expectedTextExcludes": [
+      "- 판단 범위:"
     ]
   }
 ]
