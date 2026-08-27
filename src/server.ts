@@ -352,7 +352,7 @@ const TOOL_DEFS: ToolDef[] = [
           name: "find_disposal_spots",
           title: "Find Disposal Spots",
           description:
-            "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; forms like 상계1동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
+            "Finds real collection-point addresses in a Korean neighborhood with RecyclingHelper(재활용척척): medicine, battery·fluorescent-lamp, clothing, small-electronics, PET-bottle and food-waste drop-off points, each with its place name and street address. Use when the question is WHERE to drop something off — e.g. '상계동 폐의약품 수거함 어디야', '역삼동에서 헌옷수거함 어디 있어', '폐건전지 버리는 곳 알려줘'. Needs a 법정동 name such as 상계동 or 역삼동; 행정동 forms like 상계1동, 상계6·7동, 화곡본동, 금호1가동, 약수동 are normalized, but a 구·시 name alone (강남구, 서울) finds nothing — ask the user which 동 they live in. Pass region when they name their city or district ('서울 노원구') so same-named 동 in other cities are filtered out, and itemName to narrow the answer to one kind of collection point. If they ask HOW to throw something away rather than where, use get_disposal_steps instead.",
           inputShape: {
             // `.trim()`이 스키마 단계에서 공백을 걷는다 — " "가 통과하면 정규화 뒤 빈 addr로
             // 업스트림 한도를 쓰고 "## 서울 노원구  근처"처럼 빈 이름이 찍힌다.
@@ -1631,13 +1631,158 @@ const SPOT_MAX_ASK_REGIONS = 4;
 
 const regionPolicyById = new Map(regionalPolicies.map((policy) => [policy.id, policy]));
 
+/** 숫자 사이에 들어가는 구분자. 지자체마다 `·`·`ㆍ`·`.`·공백을 제각각 쓴다. */
+const DONG_NUMBER_SEPARATOR = "[·ㆍ‧∙・.,\\-~\\s]";
+/** 구분자로 이어 붙는 뒷번호(`6ㆍ7동`의 `ㆍ7`). 구분자를 **반드시** 하나 먹어야 반복이 끝난다. */
+const DONG_NUMBER_TAIL = `(?:\\s*${DONG_NUMBER_SEPARATOR}\\s*\\d+)*`;
+
 /**
- * 행정동 표기를 법정동으로 줄이는 규칙 하나(R2). `addr`은 법정동만 통해서
- * `상계1동`은 그대로 보내면 NODATA다. 그 밖의 변형(`종로1가` 등)은 손대지 않는다 —
- * 규칙을 늘릴수록 멀쩡한 이름을 망가뜨릴 자리가 늘고, 빗나가도 폴백이 받는다.
+ * 법정동 이름이 아예 다른 행정동. 규칙으로는 못 줄이는 것만 손으로 적는다.
+ *
+ * **`getSpot`에 쳐서 전국 0건인 이름만 넣는다.** 어딘가에 같은 이름의 법정동이 있으면
+ * 이 표가 멀쩡한 답을 다른 동네로 돌려 버린다 — `광희동`은 행정동이면서 법정동
+ * `광희동1가`의 앞부분이라 21건이 걸린다. 그래서 여기 없다.
  */
-function normalizeDongName(raw: string): string {
-  return raw.trim().replace(/제?\s*\d+\s*동$/, "동");
+const ADMINISTRATIVE_DONG_ALIASES = new Map<string, string>([
+  // 서울 중구 — 셋 다 법정동은 신당동이다.
+  ["약수동", "신당동"],
+  ["청구동", "신당동"],
+  ["동화동", "신당동"],
+  ["을지로동", "을지로2가"],
+  // 서울 성동구
+  ["왕십리도선동", "하왕십리동"],
+  // 서울 용산구 — 번호가 없어 규칙이 못 짚는다. 법정동은 한강로1~3가다.
+  ["한강로동", "한강로1가"],
+  /**
+   * `○○본동`. 규칙(`본동` → `동`)으로 줄이려다 되돌렸다 — **`본동`으로 끝나는 법정동이
+   * 실제로 있다.** 산본동(군포), 소사본동·심곡본동(부천, 등록 지역)이 그렇고, 규칙을 걸면
+   * `산본동`(245건)이 `산동`(8,124건)으로 바뀌어 전혀 다른 동네 주소를 자신 있게 내보낸다.
+   * 조용한 실패보다 나쁘다. 그래서 실측으로 0건임을 확인한 이름만 적는다.
+   */
+  ["망우본동", "망우동"],
+  ["면목본동", "면목동"],
+  ["반포본동", "반포동"],
+  ["방배본동", "방배동"],
+  ["일원본동", "일원동"],
+  ["중계본동", "중계동"],
+  ["화곡본동", "화곡동"],
+  // 서울 송파구 — 218개 표본이 송파를 안 덮어 3라운드에서 드러났다.
+  ["가락본동", "가락동"],
+  ["잠실본동", "잠실동"],
+  /**
+   * 서수 `제`가 든 행정동. 규칙은 어간을 길게 잡아 `숭인제동`을 만드는데, 짧게 잡으면
+   * `홍제1동`이 `홍동`(충남 홍성군 홍동면 158건)으로 새서 **틀린 동네 주소를 자신 있게**
+   * 내보낸다. 0건으로 떨어져 폴백을 타는 쪽이 낫다고 보고 어간을 길게 잡은 뒤,
+   * 실제로 쓰는 이름만 여기 적는다.
+   */
+  ["숭인제1동", "숭인동"],
+  ["숭인제2동", "숭인동"],
+  ["창신제1동", "창신동"],
+  ["창신제2동", "창신동"],
+  ["창신제3동", "창신동"],
+]);
+
+/**
+ * 이름이 `로`로 끝나도 법정동이 `N가`인 것은 **이 넷뿐이다**. 어간이 `로`로 끝나는지만
+ * 보면 `구로3동`이 `구로3가`(0건)가 된다 — 법정동은 `구로동`(593건)이다.
+ * 후보를 넓히기 전에 반드시 `getSpot`으로 건수를 확인한다(`청파로1가`는 0건이라 없다).
+ */
+const RO_STEMS_WITH_GA_DONG = new Set(["종로", "을지로", "원효로", "한강로"]);
+
+/**
+ * `금호1가동`·`성수1가2동`·`금호2ㆍ3가동`처럼 `가`가 든 행정동.
+ *
+ * 반복 묶음마다 구분자나 숫자를 반드시 하나 먹게 짰다. 첫 판에서는 뒷번호를
+ * `(?:구분자*\d+)*`로 썼는데, 구분자가 없어도 되니 숫자 한 덩어리를 쪼개는 경우의 수가
+ * 폭발했다 — 40자 상한 안의 `가1가` + `1`×31 하나로 정규식이 2.8초를 먹었고 34자는 끝나지
+ * 않았다. `dong`은 사용자가 주는 값이라 그대로 두면 이벤트 루프가 멈춘다.
+ */
+const GA_FORM_DONG = new RegExp(
+  `^(.+?)(\\d+)${DONG_NUMBER_TAIL}\\s*가(?:\\s*\\d+${DONG_NUMBER_TAIL})?\\s*동$`,
+);
+
+/**
+ * `상계1동`·`상계6ㆍ7동`의 어간과 첫 번호. 위와 같은 이유로 뒷번호는 구분자를 요구한다.
+ * 어간(`(.+?)`)까지 잡는 건 `원효로1동`처럼 `로`로 끝나는 이름을 갈라 내기 위해서다 —
+ * 어간이 없는 `제1동`은 아예 매치되지 않아 그대로 나간다. 그 이름으로 조회하면 전국이 걸린다.
+ */
+const NUMBERED_DONG_WITH_STEM = new RegExp(`^(.+?)(\\d+)${DONG_NUMBER_TAIL}\\s*동$`);
+
+/**
+ * 받침을 보고 `으로`/`로`를 고른다. 이름이 `한강로1가`처럼 열린 음절로 끝나면 `으로`가
+ * 붙어 `한강로1가으로`가 나갔다. 한글이 아닌 끝 글자는 보수적으로 `으로`를 붙인다.
+ */
+function withEuroJosa(word: string): string {
+  const last = word.at(-1) ?? "";
+  const code = last.charCodeAt(0);
+  if (Number.isNaN(code) || code < 0xac00 || code > 0xd7a3) return `${word}으로`;
+  const jongseong = (code - 0xac00) % 28;
+  // 받침이 없거나(0) `ㄹ`(8)이면 `로`다.
+  return jongseong === 0 || jongseong === 8 ? `${word}로` : `${word}으로`;
+}
+
+/** `로`로 끝나는 이름의 법정동은 `동` 없이 `N가`다 — 원효로1가, 종로1가, 한강로1가. */
+function legalDongForRoStem(stem: string, number: string): string {
+  return `${stem}${number}가`;
+}
+
+/**
+ * 정규화 결과. `renamedFrom`은 **별칭 표가 이름을 통째로 바꿨을 때만** 채운다.
+ * `상계1동` → `상계동`처럼 줄이기만 한 것은 사용자가 자기가 댄 이름을 알아보지만,
+ * `약수동` → `신당동`은 대 본 적 없는 이름이라 응답에서 한 번 밝혀 줘야 한다.
+ */
+type NormalizedDong = { name: string; renamedFrom?: string };
+
+/**
+ * 행정동 표기를 법정동으로 줄인다(R2). `addr`은 법정동만 통해서 `상계1동`을 그대로
+ * 보내면 NODATA다.
+ *
+ * 규칙은 셋이고, **전부 실측으로 고른 것**이다. 서울 행정동 이름 218개를 실제 `getSpot`에
+ * 쳐 보니 24개(11%)가 0건이었고, 아래 규칙과 별칭 표가 그 24개를 전부 되살린다. 실패가
+ * 조용하다는 게 이 함수를 늘린 이유다 — 빗나가면 폴백이 받지만, 사용자는 자기 동에
+ * 수거함이 없는 건지 우리가 못 찾은 건지 알 수 없다.
+ *
+ * 1. `약수동`·`화곡본동`처럼 규칙으로 못 줄이는 것은 표에서 바꾼다.
+ * 2. `금호1가동` → `금호동1가`. 법정동은 `동`이 숫자 앞에 온다.
+ * 3. `상계1동`·`상계6ㆍ7동` → `상계동`. 옛 규칙은 뒤 숫자만 떼어 `상계6ㆍ동`을 만들었다.
+ *
+ * 2·3 모두 이름이 `로`로 끝나면 법정동에 `동`이 없다(`원효로1동` → `원효로1가`). 이 갈래를
+ * `가` 규칙에만 달았다가 `원효로1동`이 `원효로동`(0건)이 되는 것을 리뷰 2라운드에서 잡았다.
+ */
+function normalizeDongName(raw: string): NormalizedDong {
+  const trimmed = raw.trim();
+
+  const alias = ADMINISTRATIVE_DONG_ALIASES.get(trimmed);
+  if (alias) return { name: alias, renamedFrom: trimmed };
+
+  const ga = trimmed.match(GA_FORM_DONG);
+  if (ga?.[1]) {
+    // 숫자 갈래와 달리 다듬지 않아 `종로 1가동`의 어간이 `"종로 "`가 되고, 집합에 걸리지
+    // 않아 `종로 동1가`(공백이 낀 0건)가 나갔다.
+    const stem = ga[1].trim();
+    const name = RO_STEMS_WITH_GA_DONG.has(stem) ? legalDongForRoStem(stem, ga[2]) : `${stem}동${ga[2]}가`;
+    /**
+     * 여러 `가`를 겸하는 행정동(`종로1ㆍ2ㆍ3ㆍ4가동`)은 첫 번호로 간다. 넷 다 훑을 방법이
+     * 없고(한 번에 한 `addr`), 아무것도 안 보내는 것보다는 한 곳이라도 맞히는 쪽이 낫다.
+     * 다만 **접었다는 사실은 밝힌다** — 나머지 가를 조용히 버리면 이 PR이 없애려던
+     * 바로 그 모양이 된다.
+     */
+    const collapsedOtherAreas = /\d[^\d]*\d/.test(trimmed.slice(0, trimmed.indexOf("가")));
+    return collapsedOtherAreas ? { name, renamedFrom: trimmed } : { name };
+  }
+
+  const numbered = trimmed.match(NUMBERED_DONG_WITH_STEM);
+  const numberedStem = numbered?.[1].trim();
+  // 어간이 `제` 한 글자면 줄이지 않는다(`제1동`) — `제동`으로 조회하면 전국이 걸린다.
+  if (numberedStem && numberedStem !== "제") {
+    return {
+      name: RO_STEMS_WITH_GA_DONG.has(numberedStem)
+        ? legalDongForRoStem(numberedStem, numbered![2])
+        : `${numberedStem}동`,
+    };
+  }
+
+  return { name: trimmed };
 }
 
 /** 수거함을 실제로 찾는 데 필요한 층·건물 설명이 `addrDtl`에 있다. 공백 하나로 잇는다. */
@@ -1728,9 +1873,12 @@ function spotFallbackResult(params: {
   hiddenOnly?: boolean;
   /** 행은 받았는데 지역 필터가 전부 거른 경우 — 동과 지역이 안 맞는 신호다. */
   regionFilteredAll?: boolean;
+  /** 별칭 표가 이름을 바꿨을 때 사용자가 실제로 댄 이름. 폴백에서도 밝혀야 한다. */
+  renamedFrom?: string;
   log: ToolLogMeta;
 }): LoggedToolResult {
-  const { dong, reason, regionMatch, category, itemLabel, item, hiddenOnly, regionFilteredAll, log } = params;
+  const { dong, reason, regionMatch, category, itemLabel, item, hiddenOnly, regionFilteredAll, renamedFrom, log } =
+    params;
   // 텍스트와 structuredContent가 **같은 출처를 같은 순서로** 실어야 한다 — 같은 배열에서 나온다.
   // `sources[0]`을 그냥 집으면 자치구 대부분에서 대형폐기물 신청 페이지가 잡힌다. 품목이
   // 있으면 그 품목의 주제로, 없으면 수거함·분리배출을 말하는 출처로 고른다.
@@ -1765,6 +1913,9 @@ function spotFallbackResult(params: {
     (item ? `${item.name}은(는) 동네 전용 수거함으로 배출하는 품목이 아닙니다. ${item.summary}` : undefined);
 
   const lines = [
+    // 이름이 통째로 바뀌었으면 무엇을 무엇으로 바꿔 찾았는지부터 밝힌다 — 성공 응답과
+    // 같은 규칙이다. 이 줄이 없으면 `약수동`을 물은 사람이 `신당동` 이야기만 받는다.
+    renamedFrom ? `"${renamedFrom}"은 행정동이라 법정동 이름인 ${dong} 기준으로 찾았습니다.` : undefined,
     opening,
     `- ${REGION_SELECT_GUIDE_LINK.title}에서 지역을 골라 수거함 안내를 확인하세요: ${REGION_SELECT_GUIDE_LINK.url}`,
     ...regionSourceLines,
@@ -1797,7 +1948,7 @@ async function handleFindDisposalSpots({
   region?: string;
   itemName?: string;
 }): Promise<LoggedToolResult> {
-  const normalizedDong = normalizeDongName(dong);
+  const { name: normalizedDong, renamedFrom } = normalizeDongName(dong);
   // 공백만 온 지역은 안 온 것으로 본다 — 다른 툴과 같은 규칙이다.
   const hintRegion = region?.trim() || undefined;
   const regionMatch = findRegionalPolicy(hintRegion);
@@ -1825,6 +1976,7 @@ async function handleFindDisposalSpots({
   if (!lookup.ok) {
     return spotFallbackResult({
       dong: normalizedDong,
+      renamedFrom,
       reason: "upstream",
       regionMatch,
       category: itemCategory,
@@ -1862,7 +2014,7 @@ async function handleFindDisposalSpots({
       const unresolvedRegionNote =
         hintRegion && !regionMatch ? `말씀하신 지역 "${hintRegion}"만으로는 어느 시·군·구인지 정하지 못했습니다. ` : "";
       return textResult(
-        `${unresolvedRegionNote}여러 지역에 "${normalizedDong}"이라는 같은 이름의 동이 있습니다(${regions.join(", ")}). 시·군·구를 함께 알려주세요 — 예: "서울 노원구 상계동".`,
+        `${unresolvedRegionNote}${renamedFrom ? `"${renamedFrom}"은 행정동이라 법정동 이름인 ${withEuroJosa(normalizedDong)} 찾았습니다. ` : ""}여러 지역에 "${normalizedDong}"이라는 같은 이름의 동이 있습니다(${regions.join(", ")}). 시·군·구를 함께 알려주세요 — 예: "서울 노원구 상계동".`,
         { found: false, dong: normalizedDong, ambiguousDong: true, regions },
         { ...baseLog, status: "spots_ask", upstream: lookup.upstream },
       );
@@ -1912,6 +2064,7 @@ async function handleFindDisposalSpots({
   if (shown.length === 0) {
     return spotFallbackResult({
       dong: normalizedDong,
+      renamedFrom,
       reason: "empty",
       regionMatch,
       category: itemCategory,
@@ -1944,6 +2097,9 @@ async function handleFindDisposalSpots({
     omitted.length > 0
       ? `- 자리가 모자라 ${omitted.map(({ category, found }) => `${category.label} ${found}곳`).join(" · ")}은 싣지 못했습니다. 품목을 정해 물으면 그 묶음을 바로 보여 드립니다.`
       : undefined,
+    // 별칭 표가 이름을 바꿨으면 밝힌다. 안 밝히면 `약수동`을 물은 사람이 대 본 적 없는
+    // `신당동`으로 시작하는 답을 받는다.
+    renamedFrom ? `- "${renamedFrom}"은 행정동이라 법정동 이름인 ${normalizedDong} 기준으로 찾았습니다.` : undefined,
     "- 수거함 위치는 바뀔 수 있습니다. 방문 전 지자체 안내를 확인하세요.",
     `- 출처: ${SPOT_SOURCE_LABEL}`,
     // 빈 줄을 살려야 마지막 수거함 줄과 맺음말이 붙어 읽히지 않는다. `filter(Boolean)`을

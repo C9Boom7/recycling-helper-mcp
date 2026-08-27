@@ -3059,6 +3059,116 @@ async function runSpotSmoke() {
     assert(upstream.requests.at(-1).addr === "상계동", `행정동을 법정동으로 줄이지 않았다: ${upstream.requests.at(-1).addr}`);
     assert(resultText(normalized).startsWith("## 서울 노원구 상계동"), "정규화된 동 이름으로 답해야 한다");
 
+    /**
+     * 나머지 행정동 표기. 서울 행정동 218개를 실제 업스트림에 쳐 보고 0건이던 24개를
+     * 갈래별로 한 줄씩 남긴다 — 정규화가 뒤로 물러나면 이 목록이 먼저 깨진다.
+     */
+    for (const [said, expected] of [
+      ["상계6ㆍ7동", "상계동"], // 숫자 결합형. 옛 규칙은 `상계6ㆍ동`을 만들었다.
+      ["중계2·3동", "중계동"],
+      ["면목3.8동", "면목동"],
+      ["화곡본동", "화곡동"], // 본동
+      ["금호1가동", "금호동1가"], // N가동 — 법정동은 `동`이 숫자 앞에 온다
+      ["성수1가2동", "성수동1가"],
+      ["금호2·3가동", "금호동2가"], // 앞번호가 여럿이면 첫 번호로. 옛 규칙은 `금호2·동3가`를 만들었다
+      ["종로1·2·3·4가동", "종로1가"], // 이름이 `로`로 끝나면 법정동에 `동`이 없다
+      ["원효로1동", "원효로1가"], // 숫자 규칙에도 같은 `로` 갈래가 필요하다(리뷰 2라운드)
+      ["한강로동", "한강로1가"], // 번호가 없어 규칙이 못 짚는다 — 별칭 표
+      ["숭인제1동", "숭인동"], // 서수 `제`는 규칙이 아니라 표로 — 어간을 짧게 잡으면 홍제/거제가 샌다
+      ["구로3동", "구로동"], // 어간이 `로`로 끝나도 `구로동`이다. `로`+`N가`는 넷뿐
+      ["홍제1동", "홍제동"], // 어간을 짧게 잡으면 `홍동`(충남 홍성군 158건)으로 샌다
+      ["거제1동", "거제동"],
+      ["묵1동", "묵동"], // 한 글자 어간도 줄인다
+      ["가락본동", "가락동"], // 송파 — 218개 표본 밖이었다
+      ["잠실본동", "잠실동"],
+      ["종로 1가동", "종로1가"], // 어간을 안 다듬으면 `종로 동1가`가 나갔다
+      ["약수동", "신당동"], // 이름이 아예 다른 행정동
+      ["왕십리도선동", "하왕십리동"],
+    ]) {
+      await call({ dong: said, region: "서울 노원구" });
+      assert(
+        upstream.requests.at(-1).addr === expected,
+        `행정동 정규화가 빗나갔다: ${said} → ${upstream.requests.at(-1).addr} (기대: ${expected})`,
+      );
+    }
+
+    // 별칭 표가 이름을 바꿨으면 응답이 그 사실을 되비춰야 한다 — 안 그러면 `약수동`을
+    // 물은 사람이 대 본 적 없는 `신당동`으로 시작하는 답을 받는다(리뷰 2라운드).
+    {
+      const renamed = resultText(await call({ dong: "약수동", region: "서울 중구" }));
+      assert(renamed.includes("약수동"), `별칭으로 바뀐 원래 이름이 응답에 없다:\n${renamed}`);
+      assert(renamed.includes("신당동"), `별칭이 가리키는 법정동이 응답에 없다:\n${renamed}`);
+    }
+
+    // 여러 `가`를 접었으면 그 사실을 밝혀야 한다 — 나머지 가를 조용히 버리면 이 PR이
+    // 없애려던 바로 그 모양이다(리뷰 4라운드).
+    {
+      const collapsed = resultText(await call({ dong: "종로1·2·3·4가동", region: "서울 종로구" }));
+      assert(collapsed.includes("종로1·2·3·4가동"), `접은 원래 이름이 응답에 없다:\n${collapsed}`);
+      assert(collapsed.includes("종로1가"), `접어서 실제로 조회한 이름이 응답에 없다:\n${collapsed}`);
+    }
+
+    // 건드리면 안 되는 것들. `본동`은 동작구 법정동이고, `광희동`은 법정동 `광희동1가`에
+    // 걸려 21건이 나온다. `제1동`은 숫자를 떼면 `동` 한 글자가 남아 전국이 걸린다.
+    // `산본동`(군포)·`소사본동`·`심곡본동`(부천, 등록 지역)은 그 자체가 법정동이다.
+    // `본동` → `동` 규칙을 걸면 `산본동`(245건)이 `산동`(8,124건)으로 새서 규칙 대신 표를 쓴다.
+    for (const untouched of ["본동", "산본동", "소사본동", "심곡본동", "광희동", "제1동", "종로3가", "상계동"]) {
+      await call({ dong: untouched, region: "서울 노원구" });
+      assert(
+        upstream.requests.at(-1).addr === untouched,
+        `그대로 보내야 하는 이름을 고쳤다: ${untouched} → ${upstream.requests.at(-1).addr}`,
+      );
+    }
+
+    /**
+     * 정규식 되짚기 폭발 회귀. `dong`은 사용자가 주는 값이고 스키마 상한이 40자라,
+     * 반복 묶음이 구분자 없이도 돌면 이 한 줄로 이벤트 루프가 멈춘다(첫 판에서 34자가
+     * 끝나지 않았다). 정규화는 조회 전에 끝나므로 업스트림을 타지 않고 재는 게 맞다.
+     */
+    {
+      // `call`은 fetch에 시한을 안 걸어서, 되짚기가 되살아나면 이벤트 루프가 멈춘 채
+      // 응답이 영영 안 온다 — 단언이 실패하는 게 아니라 스위트가 CI 시한까지 매달린다.
+      // 그래서 이 한 번만 직접 쳐서 시한을 건다(리뷰 2라운드).
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3_000);
+      // 스키마 상한(40자) 바로 아래로 잡는다. 상한에 딱 붙이면 나중에 상한을 조이는 순간
+      // 이 입력이 스키마에서 걸려 툴에 닿지도 못한 채 단언만 통과한다.
+      const redosDong = `가1가${"1".repeat(30)}`;
+      let redosBody;
+      try {
+        const response = await fetch(`${baseUrl}/mcp`, {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: requestId++,
+            method: "tools/call",
+            params: { name: "find_disposal_spots", arguments: { dong: redosDong, region: "서울 노원구" } },
+          }),
+          signal: controller.signal,
+        });
+        redosBody = await response.text();
+      } catch (error) {
+        // 중단(AbortError)만 되짚기 신호다. 그 밖의 fetch 실패를 같은 문장으로 보고하면
+        // 일시적 오류가 ReDoS 회귀로 읽힌다.
+        const timedOut = controller.signal.aborted || error?.name === "AbortError";
+        assert(
+          false,
+          timedOut
+            ? "행정동 정규화가 되짚기로 멈춘다 — 3초 안에 응답이 없다"
+            : `되짚기 가드 요청이 실패했다(되짚기와 무관): ${error?.name ?? error}`,
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+      // 툴까지 닿았는지 본다. 스키마가 걸러 냈으면 이 단언이 먼저 깨져 가드가 빈 채로
+      // 통과하는 일을 막는다.
+      assert(
+        redosBody.includes("근처 배출 장소") || redosBody.includes("찾지 못했습니다") || redosBody.includes("조회하지 못했습니다"),
+        `되짚기 가드 입력이 툴까지 닿지 않았다 — 스키마에서 걸린 듯하다:\n${redosBody.slice(0, 400)}`,
+      );
+    }
+
     // 품목 필터 — 확정되면 그 묶음만, 못 찾거나 모호하면 되묻지 않고 전 묶음으로 간다.
     const filtered = await call({ dong: "상계동", region: "서울 노원구", itemName: "폐의약품" });
     const filteredText = resultText(filtered);
