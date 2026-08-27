@@ -1760,7 +1760,7 @@
   {
     "query": "안마의자 어떻게 버려?",
     "expectedItemId": "massage_chair",
-    "expectedDisposalType": "free_visit_collection_or_bulky",
+    "expectedDisposalType": "bulky_waste",
     "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
   },
   {
@@ -1808,7 +1808,7 @@
   {
     "query": "가스오븐레인지 어떻게 버려?",
     "expectedItemId": "gas_oven_range",
-    "expectedDisposalType": "small_electronics_collection_or_bulky",
+    "expectedDisposalType": "bulky_waste",
     "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
   },
   {
