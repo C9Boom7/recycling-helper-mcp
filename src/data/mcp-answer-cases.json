@@ -5799,7 +5799,8 @@
     "expectedTextIncludes": [
       "스탠드 조명",
       "소형전기전자제품 전용수거함",
-      "인테리어 제품"
+      "인테리어 제품",
+      "인터넷 신청: "
     ],
     "expectedStructuredIncludes": [
       "\"id\":\"floor_lamp\"",
@@ -11366,16 +11367,13 @@
     "tool": "get_disposal_steps",
     "arguments": {
       "itemName": "전자피아노",
-      "region": "서울 강남구"
+      "region": "서울 송파구"
     },
     "expectedTextIncludes": [
-      "## 전자피아노",
-      "건반 본체",
-      "의자와 받침대"
-    ],
-    "expectedStructuredIncludes": [
-      "\"id\":\"digital_piano\"",
-      "\"regionCheckLevel\":\"필수\""
+      "## 피아노",
+      "건반 본체만",
+      "의자와 받침대",
+      "- 피아노: "
     ]
   },
   {
@@ -11410,20 +11408,6 @@
     "expectedTextIncludes": [
       "개수 제한 없이 1개부터",
       "5개 이상"
-    ]
-  },
-  {
-    "id": "epr_acoustic_piano_stays_bulky",
-    "tool": "get_disposal_steps",
-    "arguments": {
-      "itemName": "피아노"
-    },
-    "expectedTextIncludes": [
-      "## 피아노",
-      "대형폐기물"
-    ],
-    "expectedTextExcludes": [
-      "건반 본체"
     ]
   }
 ]

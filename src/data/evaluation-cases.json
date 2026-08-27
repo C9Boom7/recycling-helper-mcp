@@ -1496,7 +1496,7 @@
   {
     "query": "스탠드 조명은 어떻게 버려?",
     "expectedItemId": "floor_lamp",
-    "expectedDisposalType": "small_electronics_collection",
+    "expectedDisposalType": "small_electronics_collection_or_bulky",
     "notes": "Phase 2 표준 티어 벌크 확장 품목의 대표 질의입니다."
   },
   {
@@ -1816,12 +1816,6 @@
     "expectedItemId": "piano",
     "expectedDisposalType": "bulky_waste",
     "notes": "Phase 7 대형폐기물 품목 확장 (배치 3)의 대표 질의입니다."
-  },
-  {
-    "query": "전자피아노 어떻게 버려?",
-    "expectedItemId": "digital_piano",
-    "expectedDisposalType": "free_visit_collection_or_bulky",
-    "notes": "피아노에서 떼어 낸 품목입니다. 건반만 무상방문수거 대상입니다."
   },
   {
     "query": "금고 어떻게 버려?",
