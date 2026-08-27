@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createServer as createHttpServer, request as httpRequest } from "node:http";
 import { createServer } from "node:net";
 import { measureResult } from "./measure-response-size.mjs";
+import { ALWAYS_REGISTERED_TOOLS, KEY_GATED_TOOL, parseLines } from "./report-call-log.mjs";
 
 const HOST = "127.0.0.1";
 const PLAYMCP_ENDPOINT_HOSTS = [
@@ -1903,7 +1904,33 @@ async function runSmoke() {
       });
     }
 
-    console.log(`MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases)`);
+    // 호출 로그 리포트가 **이 실행에서 실제로 나온 로그**를 읽는지 본다. 예시 픽스처로는
+    // `withCallLog`의 필드 이름이 바뀌는 것을 못 잡는다 — 픽스처는 늘 깨끗하게 파싱된다.
+    // 여기서는 방금 수백 번 호출한 서버의 stdout을 그대로 넘겨 대조한다.
+    const runtimeLog = parseLines(getOutput());
+    assert(
+      runtimeLog.entries.length > 0,
+      `호출 로그 리포트가 이번 실행의 로그를 한 줄도 못 읽었다 — withCallLog의 형식이 바뀌었는지 본다 (tool 없는 JSON ${runtimeLog.malformed}줄)`,
+    );
+    assert(
+      runtimeLog.malformed === 0,
+      `호출 로그에 tool이 없는 JSON 줄이 ${runtimeLog.malformed}개 있다 — 리포트가 그만큼 눈이 먼다`,
+    );
+    // 리포트가 손으로 들고 있는 툴 목록이 서버 등록 목록과 어긋나면, "한 번도 안 불린 툴"이
+    // 영원히 늑대를 부르거나 새 툴을 아예 안 본다. 이름이 바뀌는 순간 여기서 걸린다.
+    const reportTools = [...ALWAYS_REGISTERED_TOOLS].sort();
+    assert(
+      JSON.stringify(reportTools) === JSON.stringify([...EXPECTED_TOOL_NAMES].sort()),
+      `report-call-log.mjs의 툴 목록이 서버 등록 목록과 다르다:\n  리포트: ${reportTools.join(", ")}\n  서버:   ${[...EXPECTED_TOOL_NAMES].sort().join(", ")}`,
+    );
+    assert(
+      EXPECTED_TOOL_NAMES_WITH_SPOTS.includes(KEY_GATED_TOOL) && !EXPECTED_TOOL_NAMES.includes(KEY_GATED_TOOL),
+      `report-call-log.mjs의 KEY_GATED_TOOL(${KEY_GATED_TOOL})이 키로 갈리는 툴이 아니다`,
+    );
+
+    console.log(
+      `MCP smoke test passed at ${baseUrl} (${answerCases.length} answer cases, 호출 로그 ${runtimeLog.entries.length}줄 대조)`,
+    );
   } finally {
     stopServer();
   }
