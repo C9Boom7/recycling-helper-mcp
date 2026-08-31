@@ -11465,5 +11465,20 @@
       "전기만 쓰는 전기오븐",
       "소형가전 전용수거함"
     ]
+  },
+  {
+    "id": "bulky_fee_free_row_yongsan_microwave",
+    "tool": "get_disposal_steps",
+    "arguments": {
+      "itemName": "전자레인지",
+      "region": "서울 용산구"
+    },
+    "expectedTextIncludes": [
+      "- 서울 용산구 대형생활폐기물 수수료 후보:",
+      "  - 전자레인지: 모든규격 무상"
+    ],
+    "expectedTextExcludes": [
+      "0원"
+    ]
   }
 ]

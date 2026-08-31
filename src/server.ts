@@ -29,6 +29,7 @@ import {
   findWasteItems,
   formatClassifyResultText,
   formatItemGuide,
+  formatKrw,
   formatRegionBulkyContactLines,
   formatRegionItemGuide,
   formatRegionSourceLines,
@@ -443,7 +444,8 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   const fees = findBulkyWasteFees(regionMatch.region, item);
   if (fees.length === 0) return undefined;
 
-  const krw = (value: number) => `${value.toLocaleString("ko-KR")}원`;
+  // 0원(무상)을 "N원"으로 찍지 않는 판정은 formatKrw 한 곳에만 둔다(src/data.ts) —
+  // 수수료 행 목록(formatBulkyWasteFeeRows)도 이 함수를 쓴다.
   const amounts = fees.map((fee) => fee.feeKrw);
   const min = Math.min(...amounts);
   const max = Math.max(...amounts);
@@ -462,8 +464,8 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
   // `make_cleanup_plan`이 `수수료 1,000원 (-, 2026-08-22 확인)`으로 나간다 —
   // 마포 `빨래건조대`·`욕조` 등 10쌍이 그랬다(PRD phase-11 R3). 그때는 날짜만 남긴다.
   if (fees.length === 1) {
-    if (!hasFeeSpec(fees[0])) return checkedAt ? `수수료 ${krw(min)} (${checkedAt} 확인)` : `수수료 ${krw(min)}`;
-    return `수수료 ${krw(min)} ${paren(fees[0].spec)}`;
+    if (!hasFeeSpec(fees[0])) return checkedAt ? `수수료 ${formatKrw(min)} (${checkedAt} 확인)` : `수수료 ${formatKrw(min)}`;
+    return `수수료 ${formatKrw(min)} ${paren(fees[0].spec)}`;
   }
 
   // 상한에 걸린 품목은 `fees.length`가 우리가 들고 있는 행 수지 규격 수가 아니다.
@@ -484,7 +486,7 @@ function buildRegionFeeLine(item: WasteItem, regionMatch?: MatchedRegionPolicy):
       fees.every(hasFeeSpec)
       ? `규격 ${fees.length}종`
       : `수수료표 ${fees.length}행`;
-  return `수수료 ${krw(min)}~${krw(max)} ${paren(specDetail)}`;
+  return `수수료 ${formatKrw(min)}~${formatKrw(max)} ${paren(specDetail)}`;
 }
 
 function textResult(text: string, structuredContent?: ToolResult, log?: ToolLogMeta): LoggedToolResult {

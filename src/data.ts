@@ -2347,7 +2347,19 @@ export function findBulkyWasteFeeRowTotal(region: RegionalPolicyData, item: Wast
   return loaded > 0 && total > loaded ? total : undefined;
 }
 
-function formatKrw(value: number): string {
+/**
+ * 표준데이터 트랙에서 들어온 `feeKrw: 0` 행(용산 12·노원 11)은 실제로는 수수료가
+ * 없다는 뜻이 아니라 무상방문수거·소형가전 계열이라 애초에 요금이 안 붙는다는
+ * 뜻이다. "0원"으로 찍으면 유상인데 값만 0인 것처럼 읽혀 어색하고, 무상 배출
+ * 대상이라는 사실 자체가 가려진다. 행은 지우지 않고 표기만 "무상"으로 바꾼다
+ * (2026-08-31 저장소 주인 결정, docs/data-decision-backlog.md).
+ *
+ * `buildRegionFeeLine`([src/server.ts](./server.ts))도 같은 값을 별도로 조립하므로
+ * 거기서도 0원을 무상으로 바꿔야 한다 — 포매터가 둘이라 어느 한쪽만 고치면 카드와
+ * 텍스트 응답이 다른 말을 한다.
+ */
+export function formatKrw(value: number): string {
+  if (value === 0) return "무상";
   return `${value.toLocaleString("ko-KR")}원`;
 }
 
