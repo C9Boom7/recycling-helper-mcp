@@ -1791,14 +1791,51 @@ function formatSpotAddress(row: SpotRow): string {
 }
 
 /**
+ * 주소 첫 토큰을 광역 정식 이름으로 접는 표(`서울`·`서울시`→`서울특별시`). 환경부 데이터는
+ * 같은 구 안에서도 행마다 광역 표기가 달라서, 접지 않고 세면 노원구 하나가 세 라벨로 갈라져
+ * 실제로는 한 지역뿐인데도 되묻는다 — dong 단독 상계동 질의가 라이브에서 그렇게 깨졌다.
+ * 주소에 로마자 표기는 안 나오므로 한글 표기만 담는다. `sharedAliases`는 뺀다 — 두 광역이
+ * 나눠 쓰는 표기라 어느 정식 이름으로 접을지 이 표만으로는 못 정한다.
+ */
+const metroNameByAddressToken = new Map<string, string>(
+  regionalPolicies
+    .filter((policy) => !policy.metroId)
+    .flatMap((policy) =>
+      [policy.name, ...policy.aliases]
+        .filter((alias) => /[가-힣]/.test(alias))
+        .map((alias): [string, string] => [alias, policy.name]),
+    ),
+);
+
+/**
  * 주소에서 시·군·구까지를 떼어 낸다(`서울특별시 노원구 상계로 …` → `서울특별시 노원구`).
  * 지역을 안 받았을 때 "이 응답이 한 지역으로 수렴하는가"를 세는 열쇠이자, 수렴했을 때
  * 응답 머리에 밝히는 이름이다. 세종처럼 시·군·구가 없는 주소는 광역 이름만 남는다.
  */
 function addressRegionLabel(addrBase: string): string {
-  const [metro, second] = addrBase.trim().split(/\s+/);
-  if (!metro) return "";
+  const [first, second] = addrBase.trim().split(/\s+/);
+  if (!first) return "";
+  const metro = metroNameByAddressToken.get(first) ?? first;
   return second && /[시군구]$/.test(second) ? `${metro} ${second}` : metro;
+}
+
+/**
+ * 구가 빠진 광역 단독 라벨(`서울특별시 …`처럼 구를 생략한 행)을 정리한다. 같은 광역의
+ * 시·군·구 라벨이 하나뿐이면 그쪽 표기 누락분이 확실하니 흡수하고, 둘 이상이면 어느 구인지
+ * 알 수 없으니 라벨만 지워 되묻기 후보에서 뺀다 — 광역 이름이 제 구들과 나란히 "다른
+ * 지역"으로 서는 것 자체가 거짓이다. 어느 쪽이든 행은 버리지 않는다. 시·군·구 라벨이
+ * 아예 없는 광역(세종 등)은 그대로 둔다.
+ */
+function foldMetroOnlyLabels(counts: Map<string, number>): Map<string, number> {
+  const folded = new Map(counts);
+  for (const [label, count] of counts) {
+    if (/\s/.test(label)) continue;
+    const districtLabels = Array.from(counts.keys()).filter((other) => other.startsWith(`${label} `));
+    if (districtLabels.length === 0) continue;
+    folded.delete(label);
+    if (districtLabels.length === 1) folded.set(districtLabels[0], (folded.get(districtLabels[0]) ?? 0) + count);
+  }
+  return folded;
 }
 
 /**
@@ -1997,11 +2034,12 @@ async function handleFindDisposalSpots({
   } else {
     // 역추적 색인 없이 수렴만 본다(R4). 등록 지역 40곳짜리 색인으로 "이 동은 유일하다"를
     // 판정하면 전국 동명에서 오염된 쪽을 정답으로 확정해 버린다 — 그건 필터가 아니다.
-    const counts = new Map<string, number>();
+    const rawCounts = new Map<string, number>();
     for (const row of lookup.rows) {
       const label = addressRegionLabel(row.addrBase);
-      if (label) counts.set(label, (counts.get(label) ?? 0) + 1);
+      if (label) rawCounts.set(label, (rawCounts.get(label) ?? 0) + 1);
     }
+    const counts = foldMetroOnlyLabels(rawCounts);
 
     if (counts.size > 1) {
       const regions = Array.from(counts.entries())
