@@ -214,7 +214,7 @@ find_disposal_spots(dong: string, region?: string, itemName?: string)
 
 ## 완료 기준 (DoD)
 
-- [ ] 선행: 재등록 경로 확인 (8/26, 사람)
+- [x] 선행: 재등록 경로 확인 (8/26, 사람) — 임시 등록 `recycleHelperV2`가 본선 엔드포인트(`-kakaotools`)를 가리키고, 심사가 진행 중이다
 - [x] R1 클라이언트 — [src/moe-spot-client.ts](../../src/moe-spot-client.ts). 타임아웃 2,500ms·재시도 없음, 실패 넷(타임아웃·HTTP·게이트웨이 XML·비정상 resultCode)을 `timeout`/`http` 두 낱말로 접기, 키 두 형태(`%` 있으면 그대로), 단건 `items.item` 객체 정규화, `totalCount` 절단 플래그. 키는 URL에만 실리고 반환값·로그·응답 어디에도 없다
 - [x] R2 입력 계약 — `X숫자동` → `X동` 한 규칙(`제`도 함께 뗀다), `itemName`은 `match`면 그 묶음만·`ambiguous`/`not_found`면 필터 없이. **확정됐는데 걸리는 묶음이 없는 품목(`소파`)은 폴백으로 내려앉는다** — 필터를 슬쩍 푸는 대신
 - [x] R3 [src/data/spot-categories.json](../../src/data/spot-categories.json) 8묶음(순서 계약·`fallbackLine`·`defaultExposed`) + validate 스키마(키 순서 대조, `itemIds` 존재·중복 금지, 마지막 묶음만 patterns 빈 배열)
@@ -222,7 +222,10 @@ find_disposal_spots(dong: string, region?: string, itemName?: string)
 - [x] R5 3갈래 — 성공(묶음당 3곳·전체 12곳·표 순서로 채우기·절단 한 줄)·폴백(전국 경로 + 지역 확인처 + 품목 한 줄, 지역 없이도 완결)·되묻기. structuredContent 세 모양 전부 스모크 화이트리스트에 등록
 - [x] R6 `_log`에 `status`(`spots`/`spots_fallback`/`spots_ask`)·`upstream`·`upstreamMs`, env 둘, description(법정동 요구·트리거 예 셋·`get_disposal_steps` 대비 문구, 1,024자 안)
 - [x] R7 목 업스트림 6갈래 + 절단·정규화·품목 필터·키 인코딩 두 형태까지, 스모크 spawn env에 키 고정(기본 빈 값), 크기 경고 상한 신설(text 1,433B 실측). 기존 601건 무변경, `pnpm local:test` 통과
-- [ ] 머지 → 재배포 → **재등록** → Preview 실발화 2건 (8/29 전)
+- [x] 머지 (PR #77, 8/24)
+- [x] 재배포 확인 — 배포 서버가 최신 main 기준이고, 여섯 번째 툴 `find_disposal_spots`가 노출된다 (8/31 실측)
+- [ ] 재등록 — 임시 등록 `recycleHelperV2`가 본선 엔드포인트를 가리키는 것까지는 확인했지만 심사가 아직 진행 중이라 완료로 보지 않는다
+- [ ] Preview 실발화 2건 — 저장소에서 검증할 수 없는 항목이라 기록이 없다
 
 ## 진행 상태
 
