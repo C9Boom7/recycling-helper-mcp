@@ -68,7 +68,9 @@
 `find_disposal_spots`만 외부 API — 기후에너지환경부 분리배출 정보조회 서비스(`getSpot`) —
 를 실시간으로 부릅니다. 서버의 유일한 외부 런타임 의존이라 실패 설계를 함께 넣었습니다.
 타임아웃 2.5초에 재시도 없음, 실패·0건 어느 쪽이든 오류를 던지지 않고 전국 확인 경로와
-지역 공식 확인처로 내려앉습니다. 공공데이터포털 인증키(`DATA_GO_KR_SERVICE_KEY`)가
+지역 공식 확인처로 내려앉습니다. 같은 이름의 동이 여러 시·군·구에 있으면 임의로 고르지
+않고 어느 지역인지 되묻습니다 — `region`을 함께 주면 바로 좁혀집니다.
+공공데이터포털 인증키(`DATA_GO_KR_SERVICE_KEY`)가
 비어 있으면 이 툴은 `tools/list`에 아예 나오지 않으므로, 나머지 다섯 툴은 키 없이도
 온전히 동작합니다.
 
@@ -187,3 +189,4 @@ AMD64 환경(대부분의 클라우드 Kubernetes)에 올릴 이미지는 Apple 
 - 운영 런북 (장애 대응·로그 판독): [docs/qa-runbook.md](docs/qa-runbook.md)
 - 데이터 작업 가이드: [docs/data-quality.md](docs/data-quality.md)
 - 지역 정책 비교: [docs/region-policy-comparison.md](docs/region-policy-comparison.md)
+- 지역 정책 사례 (강남구): [docs/gangnam-region-policy.md](docs/gangnam-region-policy.md)
