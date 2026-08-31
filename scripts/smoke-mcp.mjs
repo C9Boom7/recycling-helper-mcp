@@ -2692,6 +2692,11 @@ const SPOT_FIXTURES = {
     { spotNm: "의류수거함", addrBase: "서울특별시 우세로 3", addrDtl: "" },
     { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 우세로 5", addrDtl: "" },
   ],
+  // 구 표기와 구 생략이 한 행씩 — 동률이면 근거가 반반이라 흡수하지 않는다.
+  동률동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 동률로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 동률로 2", addrDtl: "" },
+  ],
   // 지역 데이터가 겹친다고 적어 둔 표기 — "광주시"는 광주광역시 별칭이자 경기도 광주시다.
   // 이 토큰까지 광역으로 접으면 도를 생략한 경기도 주소가 광주광역시 라벨에 흡수된다.
   오포동: [
@@ -3060,6 +3065,11 @@ async function runSpotSmoke() {
         minorityDistrict.structuredContent.regions.includes("서울특별시"),
       `되묻기 후보가 다르다: ${JSON.stringify(minorityDistrict.structuredContent.regions)}`,
     );
+
+    // 한 행씩 동률이면 흡수 근거가 반반이다 — 접지 않고 되묻는다.
+    const tie = await call({ dong: "동률동" });
+    assertSpotStructured(tie, "동률 되묻기");
+    assert(tie.structuredContent.ambiguousDong === true, "구 표기가 동률이면 흡수하지 말고 되물어야 한다");
 
     // "광주시"는 광주광역시 별칭이자 경기도 광주시라 광역으로 접으면 안 된다.
     // 접으면 도를 생략한 경기도 주소가 광주광역시 라벨에 흡수돼 되묻기 없이 나간다.

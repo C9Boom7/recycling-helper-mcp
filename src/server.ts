@@ -1851,7 +1851,9 @@ function foldMetroOnlyLabels(counts: Map<string, number>): Map<string, number> {
     if (districtEntries.length === 0) continue;
     if (districtEntries.length === 1) {
       const [districtLabel, districtCount] = districtEntries[0];
-      if (count > districtCount) continue; // 구 생략 쪽이 다수면 같은 구라는 보장이 없다 — 되묻는다.
+      // 구 표기 쪽이 확실히 다수일 때만 흡수한다. 동률이면 근거가 반반이라 같은 구라는
+      // 보장이 없다 — 한 행씩일 때 접으면 오염 한 행의 구가 응답 머리에 설 수 있다.
+      if (count >= districtCount) continue;
       folded.delete(label);
       folded.set(districtLabel, (folded.get(districtLabel) ?? 0) + count);
       continue;
