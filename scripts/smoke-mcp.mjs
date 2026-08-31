@@ -2666,6 +2666,45 @@ const SPOT_FIXTURES = {
     { spotNm: "폐의약품 수거함", addrBase: "서울특별시 마포구 서교동 358", addrDtl: "마포구보건소" },
     { spotNm: "폐의약품 수거함", addrBase: "전라남도 여수시 서교동 12", addrDtl: "여수시보건소" },
   ],
+  // 실측 표기 갈래: 전부 노원구인데 광역 표기가 행마다 다르고 구를 생략한 행까지 있다.
+  // 이대로 세면 한 지역이 세 라벨로 갈라져, dong 단독 질의에 거짓 되묻기가 나간다.
+  표기동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 노원구 표기로 1", addrDtl: "노원구보건소" },
+    { spotNm: "의류수거함", addrBase: "서울 노원구 표기로 3", addrDtl: "" },
+    { spotNm: "폐건전지 수거함", addrBase: "서울특별시 표기로 5", addrDtl: "" },
+  ],
+  // 같은 광역에서 구가 둘로 갈리면 표기를 접어도 모호하다. 구를 생략한 행은 어느 구인지
+  // 알 수 없으므로 되묻기 후보에 광역 이름으로 끼면 안 된다.
+  갈림동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 노원구 갈림로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울 도봉구 갈림로 2", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 갈림로 3", addrDtl: "" },
+  ],
+  // 표기를 접어도 광역이 다르면 진짜 모호다 — 정규화가 이 둘을 합치면 오염 주소가 나간다.
+  두광역동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울 노원구 두광역로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "부산 해운대구 두광역로 2", addrDtl: "" },
+  ],
+  // 구 표기가 한 행뿐이고 구 생략 행이 다수인 경우 — 그 다수가 같은 구라는 보장이 없다.
+  // 우세 조건 없이 흡수하면 오염일지 모를 한 행의 구가 전체의 이름이 된다.
+  우세동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 우세로 1", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 우세로 3", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 우세로 5", addrDtl: "" },
+  ],
+  // 구 표기와 구 생략이 한 행씩 — 동률이면 근거가 반반이라 흡수하지 않는다.
+  동률동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 동률로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 동률로 2", addrDtl: "" },
+  ],
+  // 지역 데이터가 겹친다고 적어 둔 표기 — "광주시"는 광주광역시 별칭이자 경기도 광주시다.
+  // 접기 표는 이 토큰을 빼서 막았지만, 접두어 흡수까지 막지 않으면 "광주시" 단독 라벨이
+  // 우세한 "광주시 북구"(광주광역시의 실측 표기)에 걸려 같은 겹침이 되돌아온다.
+  오포동: [
+    { spotNm: "폐의약품 수거함", addrBase: "광주시 오포로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "광주시 북구 오포로 2", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "광주시 북구 오포로 3", addrDtl: "" },
+  ],
   단건동: [{ spotNm: "폐의약품 수거함", addrBase: "충청북도 청주시 흥덕구 단건로 1", addrDtl: "단건동주민센터" }],
   // 이름을 품은 이웃 구 — `부산 서구` 질의에 강서구 주소가 부분 문자열로 통과하면 안 된다.
   경계동: [
@@ -2989,6 +3028,67 @@ async function runSpotSmoke() {
     assert(
       ask.structuredContent.regions.includes("서울특별시 마포구") && ask.structuredContent.regions.includes("전라남도 여수시"),
       `되묻기 후보가 다르다: ${JSON.stringify(ask.structuredContent.regions)}`,
+    );
+
+    // 광역 표기가 행마다 달라도 같은 지역이면 되묻지 않는다 — 라이브에서 dong 단독 상계동이
+    // (서울특별시 노원구, 서울 노원구, 서울특별시) 세 갈래로 세어져 거짓 되묻기가 나갔다.
+    const mixedNotation = await call({ dong: "표기동" });
+    const mixedNotationText = resultText(mixedNotation);
+    assert(
+      mixedNotationText.startsWith("## 서울특별시 노원구 표기동"),
+      `표기만 다른 한 지역인데 수렴하지 못했다:\n${mixedNotationText.slice(0, 160)}`,
+    );
+    assertSpotStructured(mixedNotation, "혼합 표기 수렴");
+    assert(mixedNotation.structuredContent.region === "서울특별시 노원구", "수렴한 지역명은 정식 표기 하나여야 한다");
+    // 구를 생략한 행도 같은 지역이므로 버리면 안 된다 — 세 행이 전부 나가야 한다.
+    assert(
+      mixedNotation.structuredContent.categories.reduce((sum, category) => sum + category.spots.length, 0) === 3,
+      "표기가 다른 행이 수렴 과정에서 사라졌다",
+    );
+
+    // 같은 광역이라도 구가 둘로 갈리면 여전히 되묻는다. 구를 생략한 행은 어느 구인지 알 수
+    // 없으므로 후보 목록에 "서울특별시"로 끼면 안 된다.
+    const sameMetroSplit = await call({ dong: "갈림동" });
+    assertSpotStructured(sameMetroSplit, "같은 광역 두 구 되묻기");
+    assert(sameMetroSplit.structuredContent.ambiguousDong === true, "구가 둘로 갈리면 되물어야 한다");
+    assert(
+      JSON.stringify([...sameMetroSplit.structuredContent.regions].sort()) ===
+        JSON.stringify(["서울특별시 노원구", "서울특별시 도봉구"]),
+      `되묻기 후보가 다르다: ${JSON.stringify(sameMetroSplit.structuredContent.regions)}`,
+    );
+
+    // 구 표기가 한 행뿐인데 구 생략 행이 더 많으면 흡수하지 않는다 — 그 한 행이 오염일 수
+    // 있어서, 흡수하면 오염된 구 이름이 응답 머리에 선다.
+    const minorityDistrict = await call({ dong: "우세동" });
+    assertSpotStructured(minorityDistrict, "구 생략 다수 되묻기");
+    assert(minorityDistrict.structuredContent.ambiguousDong === true, "구 표기가 소수면 흡수하지 말고 되물어야 한다");
+    assert(
+      minorityDistrict.structuredContent.regions.includes("서울특별시 강남구") &&
+        minorityDistrict.structuredContent.regions.includes("서울특별시"),
+      `되묻기 후보가 다르다: ${JSON.stringify(minorityDistrict.structuredContent.regions)}`,
+    );
+
+    // 한 행씩 동률이면 흡수 근거가 반반이다 — 접지 않고 되묻는다.
+    const tie = await call({ dong: "동률동" });
+    assertSpotStructured(tie, "동률 되묻기");
+    assert(tie.structuredContent.ambiguousDong === true, "구 표기가 동률이면 흡수하지 말고 되물어야 한다");
+
+    // "광주시"는 광주광역시 별칭이자 경기도 광주시라 광역으로 못 접는다. 접기 표 제외만으로는
+    // 모자라다 — 접두어 흡수가 남아 있으면 "광주시" 단독 라벨이 우세한 "광주시 북구"에 접혀,
+    // 도를 생략한 경기도 주소가 광주광역시 북구 머리 아래로 되묻기 없이 나간다.
+    const gwangjuCollision = await call({ dong: "오포동" });
+    assertSpotStructured(gwangjuCollision, "광주시 겹침 되묻기");
+    assert(gwangjuCollision.structuredContent.ambiguousDong === true, "겹치는 광주시 표기는 접지도 흡수하지도 말고 되물어야 한다");
+
+    // 표기를 접어도 광역이 다르면 진짜 모호다 — 정규화가 서로 다른 지역을 합쳐 버리면
+    // 되묻기를 없애려다 오염 주소를 자신 있게 내보내는 더 나쁜 버그가 된다.
+    const crossMetro = await call({ dong: "두광역동" });
+    assertSpotStructured(crossMetro, "다른 광역 되묻기");
+    assert(crossMetro.structuredContent.ambiguousDong === true, "광역이 다르면 여전히 되물어야 한다");
+    assert(
+      crossMetro.structuredContent.regions.includes("서울특별시 노원구") &&
+        crossMetro.structuredContent.regions.includes("부산광역시 해운대구"),
+      `되묻기 후보는 정식 표기로 나가야 한다: ${JSON.stringify(crossMetro.structuredContent.regions)}`,
     );
 
     // 지역을 대긴 했는데 못 알아들은 경우(맨 `중구`) — 그 사실을 밝히고 되묻는다.
