@@ -1791,6 +1791,20 @@ function formatSpotAddress(row: SpotRow): string {
 }
 
 /**
+ * 시·군·구 이름으로도 쓰이는 토큰들. 광역 별칭과 겹치면 접기에서 빼야 한다 — `광주시`는
+ * 광주광역시 별칭이자 경기도 광주시라서, 광역으로 접는 순간 도를 생략한 경기도 주소가
+ * 광주광역시로 둔갑한다. 손으로 나열하지 않고 지역 데이터가 시·군·구로 적어 둔 이름
+ * 전부에서 뽑는다 — 겹침이 늘면 데이터만 고치면 된다.
+ */
+const districtClaimedTokens = new Set(
+  regionalPolicies.flatMap((policy) => [
+    ...(policy.metroId ? [policy.name.split(/\s+/).at(-1) ?? "", ...policy.aliases] : []),
+    ...(policy.districtAliases ?? []),
+    ...(policy.prefixOnlyDistrictAliases ?? []),
+  ]),
+);
+
+/**
  * 주소 첫 토큰을 광역 정식 이름으로 접는 표(`서울`·`서울시`→`서울특별시`). 환경부 데이터는
  * 같은 구 안에서도 행마다 광역 표기가 달라서, 접지 않고 세면 노원구 하나가 세 라벨로 갈라져
  * 실제로는 한 지역뿐인데도 되묻는다 — dong 단독 상계동 질의가 라이브에서 그렇게 깨졌다.
@@ -1802,7 +1816,7 @@ const metroNameByAddressToken = new Map<string, string>(
     .filter((policy) => !policy.metroId)
     .flatMap((policy) =>
       [policy.name, ...policy.aliases]
-        .filter((alias) => /[가-힣]/.test(alias))
+        .filter((alias) => /[가-힣]/.test(alias) && !districtClaimedTokens.has(alias))
         .map((alias): [string, string] => [alias, policy.name]),
     ),
 );
@@ -1820,20 +1834,29 @@ function addressRegionLabel(addrBase: string): string {
 }
 
 /**
- * 구가 빠진 광역 단독 라벨(`서울특별시 …`처럼 구를 생략한 행)을 정리한다. 같은 광역의
- * 시·군·구 라벨이 하나뿐이면 그쪽 표기 누락분이 확실하니 흡수하고, 둘 이상이면 어느 구인지
- * 알 수 없으니 라벨만 지워 되묻기 후보에서 뺀다 — 광역 이름이 제 구들과 나란히 "다른
- * 지역"으로 서는 것 자체가 거짓이다. 어느 쪽이든 행은 버리지 않는다. 시·군·구 라벨이
- * 아예 없는 광역(세종 등)은 그대로 둔다.
+ * 구가 빠진 광역 단독 라벨(`서울특별시 …`처럼 구를 생략한 행)을 정리한다.
+ *
+ * - 같은 광역의 시·군·구 라벨이 **하나뿐이고 그쪽 행이 우세하면** 표기 누락분으로 보고
+ *   흡수한다. 우세 조건이 없으면 구 생략 행 다수에 오염 한 행이 섞였을 때 그 한 행의
+ *   구가 전체의 이름이 된다 — 되묻기를 없애려다 오염을 확정하는 꼴이다.
+ * - 시·군·구 라벨이 둘 이상이면 어차피 되물으므로, 라벨만 지워 후보 목록에서 뺀다 —
+ *   광역 이름이 제 구들과 나란히 "다른 지역"으로 서는 것 자체가 거짓이다.
+ * - 어느 쪽이든 행은 버리지 않는다. 시·군·구 라벨이 없는 광역(세종 등)은 그대로 둔다.
  */
 function foldMetroOnlyLabels(counts: Map<string, number>): Map<string, number> {
   const folded = new Map(counts);
   for (const [label, count] of counts) {
     if (/\s/.test(label)) continue;
-    const districtLabels = Array.from(counts.keys()).filter((other) => other.startsWith(`${label} `));
-    if (districtLabels.length === 0) continue;
+    const districtEntries = Array.from(counts.entries()).filter(([other]) => other.startsWith(`${label} `));
+    if (districtEntries.length === 0) continue;
+    if (districtEntries.length === 1) {
+      const [districtLabel, districtCount] = districtEntries[0];
+      if (count > districtCount) continue; // 구 생략 쪽이 다수면 같은 구라는 보장이 없다 — 되묻는다.
+      folded.delete(label);
+      folded.set(districtLabel, (folded.get(districtLabel) ?? 0) + count);
+      continue;
+    }
     folded.delete(label);
-    if (districtLabels.length === 1) folded.set(districtLabels[0], (folded.get(districtLabels[0]) ?? 0) + count);
   }
   return folded;
 }

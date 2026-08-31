@@ -2685,6 +2685,19 @@ const SPOT_FIXTURES = {
     { spotNm: "폐의약품 수거함", addrBase: "서울 노원구 두광역로 1", addrDtl: "" },
     { spotNm: "폐의약품 수거함", addrBase: "부산 해운대구 두광역로 2", addrDtl: "" },
   ],
+  // 구 표기가 한 행뿐이고 구 생략 행이 다수인 경우 — 그 다수가 같은 구라는 보장이 없다.
+  // 우세 조건 없이 흡수하면 오염일지 모를 한 행의 구가 전체의 이름이 된다.
+  우세동: [
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 우세로 1", addrDtl: "" },
+    { spotNm: "의류수거함", addrBase: "서울특별시 우세로 3", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "서울특별시 강남구 우세로 5", addrDtl: "" },
+  ],
+  // 지역 데이터가 겹친다고 적어 둔 표기 — "광주시"는 광주광역시 별칭이자 경기도 광주시다.
+  // 이 토큰까지 광역으로 접으면 도를 생략한 경기도 주소가 광주광역시 라벨에 흡수된다.
+  오포동: [
+    { spotNm: "폐의약품 수거함", addrBase: "광주시 오포로 1", addrDtl: "" },
+    { spotNm: "폐의약품 수거함", addrBase: "광주광역시 북구 오포로 2", addrDtl: "" },
+  ],
   단건동: [{ spotNm: "폐의약품 수거함", addrBase: "충청북도 청주시 흥덕구 단건로 1", addrDtl: "단건동주민센터" }],
   // 이름을 품은 이웃 구 — `부산 서구` 질의에 강서구 주소가 부분 문자열로 통과하면 안 된다.
   경계동: [
@@ -3036,6 +3049,23 @@ async function runSpotSmoke() {
         JSON.stringify(["서울특별시 노원구", "서울특별시 도봉구"]),
       `되묻기 후보가 다르다: ${JSON.stringify(sameMetroSplit.structuredContent.regions)}`,
     );
+
+    // 구 표기가 한 행뿐인데 구 생략 행이 더 많으면 흡수하지 않는다 — 그 한 행이 오염일 수
+    // 있어서, 흡수하면 오염된 구 이름이 응답 머리에 선다.
+    const minorityDistrict = await call({ dong: "우세동" });
+    assertSpotStructured(minorityDistrict, "구 생략 다수 되묻기");
+    assert(minorityDistrict.structuredContent.ambiguousDong === true, "구 표기가 소수면 흡수하지 말고 되물어야 한다");
+    assert(
+      minorityDistrict.structuredContent.regions.includes("서울특별시 강남구") &&
+        minorityDistrict.structuredContent.regions.includes("서울특별시"),
+      `되묻기 후보가 다르다: ${JSON.stringify(minorityDistrict.structuredContent.regions)}`,
+    );
+
+    // "광주시"는 광주광역시 별칭이자 경기도 광주시라 광역으로 접으면 안 된다.
+    // 접으면 도를 생략한 경기도 주소가 광주광역시 라벨에 흡수돼 되묻기 없이 나간다.
+    const gwangjuCollision = await call({ dong: "오포동" });
+    assertSpotStructured(gwangjuCollision, "광주시 겹침 되묻기");
+    assert(gwangjuCollision.structuredContent.ambiguousDong === true, "겹치는 광주시 표기는 광역으로 접지 말고 되물어야 한다");
 
     // 표기를 접어도 광역이 다르면 진짜 모호다 — 정규화가 서로 다른 지역을 합쳐 버리면
     // 되묻기를 없애려다 오염 주소를 자신 있게 내보내는 더 나쁜 버그가 된다.
