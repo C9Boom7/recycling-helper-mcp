@@ -14,7 +14,7 @@
 
 - **"패트병 어떻게 버려?"** — 오타를 자모 유사도로 흡수해 페트병 배출 카드를 냅니다.
   단계별 안내에 공식 출처와 확인 일자가 붙습니다.
-- **"컵은 어디에 버려?"** — 종이컵·플라스틱컵·유리컵이 다 다르므로 임의로 하나를
+- **"컵은 어디에 버려?"** — 종이컵·플라스틱 컵·머그컵이 다 다르므로 임의로 하나를
   고르지 않고, 후보를 보여주며 재질을 되묻습니다.
 - **"강남에서 이사 가는데 침대랑 화분 버려야 해"** — 여러 품목을 배출 그룹별로 묶고,
   그 지역 대형폐기물 수수료까지 얹어 계획을 세워 줍니다.
@@ -32,7 +32,7 @@
 - Endpoint: `POST /mcp` (헬스체크는 `GET /health`)
 - Session: 무상태 — 요청마다 서버·도구를 새로 구성합니다
 - Auth: 사용하지 않습니다
-- MCP name `재활용척척` / identifier `recyclingHelper`
+- `serverInfo.name`: `recycling-helper` (버전 `0.1.0`)
 
 일반 MCP 클라이언트라면 이렇게 붙습니다.
 
@@ -60,7 +60,10 @@
 | `get_region_disposal_info` | `region` | 지역별 확인 항목·신고 링크·수수료·공식 출처 |
 | `find_disposal_spots` | `dong` (법정동) | 동네 수거함의 실제 주소 조회 |
 
-`check_confusing_item`을 뺀 다섯 툴은 `region`을 함께 주면 그 지역 기준을 얹어 답합니다.
+`get_region_disposal_info`는 `region`이 필수입니다 — 빠지면 `-32602`로 되돌려주며 어떻게
+채워야 하는지 알려 줍니다. `get_disposal_steps`·`classify_waste_item`·`make_cleanup_plan`·
+`find_disposal_spots` 넷은 선택 인자라, 넣으면 그 지역 기준을 얹어 답합니다.
+`check_confusing_item`은 `region`을 받지 않습니다.
 
 `find_disposal_spots`만 외부 API — 기후에너지환경부 분리배출 정보조회 서비스(`getSpot`) —
 를 실시간으로 부릅니다. 서버의 유일한 외부 런타임 의존이라 실패 설계를 함께 넣었습니다.
@@ -71,16 +74,23 @@
 
 ## 응답 형태 — 위젯과 텍스트
 
-품목 하나를 확정한 응답은 **위젯 카드**로 나갑니다. 제목·캡션·단계·주의·근거에
-지역 블록까지 얹은 Kakao Tools 카드 형식이고, 그대로 복사해 공유할 수 있는
-`copy_text`가 따라갑니다. 위젯을 해석하지 않는 일반 MCP 클라이언트를 위해
-`WIDGET_ENABLED=false`로 두면 같은 내용이 마크다운 텍스트로 나갑니다
-(운영 중 되돌리기 절차는 [docs/qa-runbook.md](docs/qa-runbook.md) 참고).
+**위젯 카드**를 내는 툴은 `get_disposal_steps`와 `classify_waste_item` 둘뿐이고,
+그것도 품목 하나를 확정했을 때만입니다. `check_confusing_item`과 `make_cleanup_plan`은
+언제나 텍스트로 답합니다. 카드는 제목·캡션·단계·주의·근거에 지역 블록까지 얹은
+Kakao Tools 전용 형식이고, 그대로 복사해 공유할 수 있는 `copy_text`가 따라갑니다.
 
-확정이 아닐 때는 항상 텍스트로 답합니다.
+두 툴도 확정이 아닐 때는 텍스트로 답합니다.
 
 - `ambiguous` — 후보를 제시하고 재질·용도를 되묻습니다. 임의로 확정하지 않습니다.
 - `not_found` — 재질 기준 일반 안내로 착지합니다.
+
+위젯은 Kakao Tools에서만 그려지므로, 일반 MCP 클라이언트용으로 띄우는 배포에서는
+`WIDGET_ENABLED=false`로 두고 텍스트 응답을 받습니다. 클라이언트마다 고를 수 있는 값이
+아니라 프로세스 전체를 덮는 서버 스위치라, 켜 둔 서버에서 끄면 카카오톡 위젯도 같이
+꺼집니다. 끈 상태에서 `get_disposal_steps`는 같은 내용을 마크다운으로 낼 뿐이지만
+`classify_waste_item`은 분류 요약으로 답 자체가 바뀝니다 — 차이는
+[docs/design-notes.md](docs/design-notes.md#widget_enabledfalse로-되돌렸을-때의-차이)에,
+운영 중 되돌리기 절차는 [docs/qa-runbook.md](docs/qa-runbook.md)에 있습니다.
 
 자유 형식 질의는 완전 일치부터 자모 분해 오타 허용까지 다섯 단계 점수로 매칭하고,
 "컵"·"통"처럼 여러 품목에 걸치는 포괄어는 확정하지 않습니다. 점수 체계와 복합명사
@@ -97,8 +107,10 @@
 
 - `full` — 배출 요일·수거함·대형폐기물 수수료 기준까지 (서울 강남·서초·송파·마포, 성남)
 - `standard` — 대형폐기물 신고 링크·직통번호·폐의약품/폐건전지 수거함 안내까지.
-  서울 25개 구 전부, 경기 7개 시, 광역시 자치구 8곳
+  서울 21개 구, 경기 6개 시, 광역시 자치구 8곳
 - `metro` — 17개 시·도 광역 폴백. 자치구 데이터가 없어도 매칭이 실패하지 않습니다
+
+`full`과 `standard`를 합치면 서울은 25개 구 전부, 경기는 7개 시가 들어 있습니다.
 
 `standard`는 다섯 항목이 전부 공식 출처로 확인된 지역만 넣습니다. 하나라도 못 채우면
 [docs/data-decision-backlog.md](docs/data-decision-backlog.md)에 사유와 함께 남깁니다.
@@ -148,11 +160,14 @@ AMD64 환경(대부분의 클라우드 Kubernetes)에 올릴 이미지는 Apple 
 | `PORT` / `HOST` | 리슨 포트·바인드 주소 | `3000` / `127.0.0.1` (Docker는 `0.0.0.0`) |
 | `DATA_GO_KR_SERVICE_KEY` | 공공데이터포털 인증키. 없으면 `find_disposal_spots` 미등록 | 없음 |
 | `WIDGET_ENABLED` | `false`일 때만 위젯 카드 대신 텍스트 응답 | 켜짐 |
-| `ALLOWED_HOSTS` | `/mcp` Host 검증 허용 목록 (콤마 구분, `*.` 와일드카드) | localhost 계열 + 배포 도메인 |
+| `ALLOWED_HOSTS` | `/mcp` Host 검증 허용 목록 (콤마 구분, `*.` 와일드카드) | `localhost`, `127.0.0.1`, `[::1]`, `*.playmcp-endpoint.kakaocloud.io` |
 | `ALLOWED_ORIGINS` | CORS 허용 오리진 | 서비스 채널 도메인 |
 | `SPOT_CACHE_TTL_MS` | 수거함 조회 캐시 TTL. `0`이면 끔 | `300000` (5분) |
 | `CALL_LOG_DETAILS` | `true`면 로그에 호출 인자·예외 원문 포함 — 로컬 디버깅 전용 | 꺼짐 |
 | `MOE_API_BASE_URL` | getSpot API 주소 오버라이드 — 테스트에서 목 서버 주입용 | 공공데이터포털 |
+
+기본 허용 목록에 없는 자기 도메인으로 셀프호스팅하면 `/mcp` 요청이 전부
+`403 Invalid Host`로 막히니, `ALLOWED_HOSTS`에 그 도메인을 넣어야 합니다.
 
 ## 데이터 출처
 
