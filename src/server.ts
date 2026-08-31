@@ -1833,20 +1833,29 @@ function addressRegionLabel(addrBase: string): string {
   return second && /[시군구]$/.test(second) ? `${metro} ${second}` : metro;
 }
 
+/** 광역 정식 이름들. 정규화를 거친 광역 단독 라벨은 이 안에 있어야 접기 대상이 된다. */
+const metroCanonicalNames = new Set(regionalPolicies.filter((policy) => !policy.metroId).map((policy) => policy.name));
+
 /**
  * 구가 빠진 광역 단독 라벨(`서울특별시 …`처럼 구를 생략한 행)을 정리한다.
  *
  * - 같은 광역의 시·군·구 라벨이 **하나뿐이고 그쪽 행이 우세하면** 표기 누락분으로 보고
  *   흡수한다. 우세 조건이 없으면 구 생략 행 다수에 오염 한 행이 섞였을 때 그 한 행의
- *   구가 전체의 이름이 된다 — 되묻기를 없애려다 오염을 확정하는 꼴이다.
+ *   구가 전체의 이름이 된다 — 되묻기를 없애려다 오염을 확정하는 꼴이다. 우세하지 않으면
+ *   라벨을 남겨 되묻는다. 여기서 지우면 라벨이 하나로 수렴해 소수 구가 확정처럼 나간다.
  * - 시·군·구 라벨이 둘 이상이면 어차피 되물으므로, 라벨만 지워 후보 목록에서 뺀다 —
- *   광역 이름이 제 구들과 나란히 "다른 지역"으로 서는 것 자체가 거짓이다.
+ *   되묻기가 유지되는 갈래에서는 광역 이름이 제 구들과 나란히 "다른 지역"으로 서는
+ *   거짓만 남기 때문이다. 위 갈래와 달리 지워도 수렴이 생기지 않는다.
  * - 어느 쪽이든 행은 버리지 않는다. 시·군·구 라벨이 없는 광역(세종 등)은 그대로 둔다.
+ *
+ * 접기 대상은 광역 **정식 이름** 라벨뿐이다. 공백 없는 라벨을 다 잡으면 `광주시`(경기도
+ * 광주시일 수 있는, 접기 표에서 뺀 토큰)가 `광주시 북구`(광주광역시의 실측 표기)에
+ * 접두어로 걸려, 막아 둔 겹침이 이 함수로 되돌아온다.
  */
 function foldMetroOnlyLabels(counts: Map<string, number>): Map<string, number> {
   const folded = new Map(counts);
   for (const [label, count] of counts) {
-    if (/\s/.test(label)) continue;
+    if (!metroCanonicalNames.has(label)) continue;
     const districtEntries = Array.from(counts.entries()).filter(([other]) => other.startsWith(`${label} `));
     if (districtEntries.length === 0) continue;
     if (districtEntries.length === 1) {
